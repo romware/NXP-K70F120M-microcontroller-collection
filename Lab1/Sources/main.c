@@ -29,11 +29,14 @@
 
 // CPU mpdule - contains low level hardware initialization routines
 #include "Cpu.h"
-#include "Events.h"
-#include "PE_Types.h"
-#include "PE_Error.h"
-#include "PE_Const.h"
-#include "IO_Map.h"
+
+//UART baud rate
+#define UART_BAUD_RATE 38400
+
+#define PACKET_SIZE 5
+
+
+TFIFO RxFIFO, TxFIFO;
 
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
 int main(void)
@@ -44,11 +47,15 @@ int main(void)
   /*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
   PE_low_level_init();
   /*** End of Processor Expert internal initialization.                    ***/
-
   /* Write your code here */
-  for (;;)
-  {
-  }
+
+    FIFO_Init(&RxFIFO);
+    FIFO_Init(&TxFIFO);
+    for (;;)
+    {
+        UART_Poll();
+
+    }
 
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/
   /*** RTOS startup code. Macro PEX_RTOS_START is defined by the RTOS component. DON'T MODIFY THIS CODE!!! ***/
@@ -73,3 +80,10 @@ int main(void)
 **
 ** ###################################################################
 */
+
+
+bool UART_Init(void)
+{
+  UART2_C1 |= UART_C1_PE_MASK;
+  UART2_C1 |= UART_C1_PT_MASK;
+}
