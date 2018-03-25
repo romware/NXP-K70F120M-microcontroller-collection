@@ -95,13 +95,15 @@ void UART_Poll(void)
 {
     if(UART2_S1_RDRF)
     {
-	FIFO_Put(&RxFIFO, UART2_D);
-	//clear flag
+		//FIFO_Put(&RxFIFO, UART2_D);
+		UART_OutChar(UART2_D);
+		//clear flag
     }
 
     if(UART2_S1_TDRE)
     {
-        FIFO_Get(&TxFIFO, &UART2_D);
+        //FIFO_Get(&TxFIFO, &UART2_D);
+        UART_InChar(&UART2_D);
         //Clear flag maybe?
     }
 }

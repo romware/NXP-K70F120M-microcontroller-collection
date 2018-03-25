@@ -34,6 +34,7 @@ bool FIFO_Put(TFIFO * const FIFO, const uint8_t data)
         FIFO->Buffer[FIFO->End] = data;
         FIFO->End++;
         FIFO->NbBytes++;
+        
         if(FIFO->End == FIFO_SIZE)
         {
             FIFO->End = 0;
@@ -52,12 +53,17 @@ bool FIFO_Put(TFIFO * const FIFO, const uint8_t data)
  */
 bool FIFO_Get(TFIFO * const FIFO, uint8_t * const dataPtr)
 {
-    if(FIFO->NbBytes != 0)
+    if(FIFO->NbBytes > 0)
     {
-        dataPtr = FIFO->Buffer[FIFO->Start];
-	FIFO->NbBytes --;
-	FIFO->Start ++;
-	return true;
+        *dataPtr = FIFO->Buffer[FIFO->Start];
+		FIFO->NbBytes--;
+		FIFO->Start++;
+		
+		if(FIFO->Start == FIFO_SIZE)
+		{
+			FIFO->Start = 0;
+		}
+		return true;
     }
     return false;
 }
