@@ -22,6 +22,12 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
     // set PTE17 to be the UART2_Rx pin
     PORTE_PCR17 = PORT_PCR_MUX(3);
 
+    // set UART2_C2 transmit enable to 1;
+    UART2_C2_TE |= UART2_C2_TE_MASK;
+
+    // set UART2_C2 receive enable to 1;
+    UART2_C2_RE |= UART2_C2_RE_MASK;
+
     // page 323
     // example
     // 00010011
@@ -38,16 +44,17 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
     // 00000011
     // MY_W1C_REGISTER = 0x00010000;
     // w1c = write 1 to clear
-
+     uint16_t BRFA = 0;
      uint16_t SBR = 0;
      uint8_t BDH =0;
      uint8_t BDL =0;
-     SBR = moduleClk/(16*baudRate);	//calculate the module clock divisor
-     BDL = (uint8_t)SBR & 0b11111111;	//mask the BDL
-     SBR >> 8;				//shift bits [12:8] to [0:4]
-     BDH = (uint8_t)SBR & 0b11111;	//mask the BDH
-     UART2_BDH = BDH;			//Load the BDH register
-     UART2_BDL = BDL;			//load the BDL register
+     BRFA = (moduleClk*2)%32;			//calculate BRFA from %32
+     SBR = moduleClk/(16*baudRate) - BRFA;	//calculate the module clock divisor
+     BDL = (uint8_t)SBR & 0b11111111;		//mask the BDL
+     SBR >> 8;					//shift bits [12:8] to [0:4]
+     BDH = (uint8_t)SBR & 0b11111;		//mask the BDH
+     UART2_BDH = BDH;				//Load the BDH register
+     UART2_BDL = BDL;				//load the BDL register
      return true;
 }
 
