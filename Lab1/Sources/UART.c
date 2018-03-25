@@ -51,7 +51,7 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
      BRFA = (moduleClk*2)%32;			//calculate BRFA from %32
      SBR = moduleClk/(16*baudRate) - BRFA;	//calculate the module clock divisor
      BDL = (uint8_t)SBR & 0b11111111;		//mask the BDL
-     SBR >> 8;					//shift bits [12:8] to [0:4]
+     SBR >> 8;					//shift bits [12:8] to [4:0]
      BDH = (uint8_t)SBR & 0b11111;		//mask the BDH
      UART2_BDH = BDH;				//Load the BDH register
      UART2_BDL = BDL;				//load the BDL register
