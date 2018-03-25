@@ -24,7 +24,7 @@ bool Packet_Init(const uint32_t baudRate, const uint32_t moduleClk)
  *
  *  @return bool - TRUE if a valid packet was received.
  */
-bool Packet_Get(void)
+bool Packet_Get(void)		//Should we pass PacketSize??
 {
     //Declare variables
     uint8_t packet[PACKET_SIZE];
@@ -48,7 +48,6 @@ bool Packet_Get(void)
     }
     return true;
 }
-
 
 
 /*! @brief Builds a packet and places it in the transmit FIFO buffer.
