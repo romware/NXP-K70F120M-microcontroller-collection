@@ -59,6 +59,7 @@ bool Packet_Put(const uint8_t command, const uint8_t parameter1, const uint8_t p
     //Declare variables
     uint8_t checkSum;
     uint8_t packet[PACKET_SIZE];
+    bool validation = true;
 
     //Populate the first 4 bytes of the packet
     packet[0] = command;
@@ -74,10 +75,13 @@ bool Packet_Put(const uint8_t command, const uint8_t parameter1, const uint8_t p
 
     //Send packet to TxFIFO
     for(uint8_t i = 0; i < PACKET_SIZE; i++)
-        {
-    	FIFO_Put(&TxFIFO,packet[i]);
-        }
-    return true;
+    {
+    	if(!UART_OutChar(packet[i]))
+    	{
+    		validation = false;
+    	}
+    }
+    return validation;
 }
 
 bool Packet_Error_Check(const uint8_t packet[], const uint8_t packetLength)
