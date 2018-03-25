@@ -88,7 +88,7 @@ bool Packet_Error_Check(const uint8_t packet[], const uint8_t packetLength)
 uint8_t Packet_Checksum(const uint8_t packet[], const uint8_t packetLength)
 {
     uint8_t xorValue = packet[0];
-    for(uint8_t i = 1; i < packetLength; i++)
+    for(uint8_t i = 1; i < packetLength - 1; i++)
     {
 		xorValue = xorValue ^ packet[i];
     }
