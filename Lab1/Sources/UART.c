@@ -81,7 +81,7 @@ bool UART_InChar(uint8_t * const dataPtr)
  */
 bool UART_OutChar(const uint8_t data)
 {
-    return FIFO_Put(TxFIFO, data);
+    return FIFO_Put(&TxFIFO, data);
 }
 
 
