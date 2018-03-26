@@ -29,6 +29,7 @@
 
 // CPU mpdule - contains low level hardware initialization routines
 #include "Cpu.h"
+#include "MK70F12.h"
 
 //UART baud rate
 #define UART_BAUD_RATE 38400

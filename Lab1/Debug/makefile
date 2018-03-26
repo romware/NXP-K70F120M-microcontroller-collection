@@ -52,7 +52,7 @@ all: Lab1.elf secondary-outputs
 Lab1.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross ARM C++ Linker'
-	arm-none-eabi-g++ -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O0 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g3 -T "C:/Users/PMcL/Documents/Subjects/48434 Embedded Software/4 Labs/Lab 1/Template/Lab1/Project_Settings/Linker_Files/ProcessorExpert.ld" -Xlinker --gc-sections -L"C:/Users/PMcL/Documents/Subjects/48434 Embedded Software/4 Labs/Lab 1/Template/Lab1/Project_Settings/Linker_Files" -Wl,-Map,"Lab1.map" -specs=nano.specs -specs=nosys.specs -o "Lab1.elf" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-none-eabi-g++ -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O0 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g3 -T "C:/Users/liam/Documents/KDS/es18aut13/Lab1/Project_Settings/Linker_Files/ProcessorExpert.ld" -Xlinker --gc-sections -L"C:/Users/liam/Documents/KDS/es18aut13/Lab1/Project_Settings/Linker_Files" -Wl,-Map,"Lab1.map" -specs=nano.specs -specs=nosys.specs -o "Lab1.elf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

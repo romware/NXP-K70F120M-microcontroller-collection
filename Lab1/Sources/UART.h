@@ -13,6 +13,7 @@
 
 // new types
 #include "types.h"
+#include "MK70F12.h"
 
 
 

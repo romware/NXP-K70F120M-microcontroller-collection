@@ -5,7 +5,7 @@
  *      Author: 12403756
  */
 
-
+#include "packet.h"
 /*! @brief Initializes the packets by calling the initialization routines of the supporting software modules.
  *
  *  @param baudRate The desired baud rate in bits/sec.

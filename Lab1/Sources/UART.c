@@ -4,6 +4,7 @@
  *  Created on: 22 Mar 2018
  *      Author: 12403756
  */
+#include "UART.h"
 
 /*! @brief Sets up the UART interface before first use.
  *
@@ -23,10 +24,10 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
     PORTE_PCR17 = PORT_PCR_MUX(3);
 
     // set UART2_C2 transmit enable to 1;
-    UART2_C2_TE |= UART2_C2_TE_MASK;
+    UART2_C2 |= UART_C2_TE_MASK;
 
     // set UART2_C2 receive enable to 1;
-    UART2_C2_RE |= UART2_C2_RE_MASK;
+    UART2_C2 |= UART_C2_RE_MASK;
 
     // page 323
     // example
