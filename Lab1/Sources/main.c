@@ -32,7 +32,6 @@
 
 //UART baud rate
 #define UART_BAUD_RATE 38400
-
 #define PACKET_SIZE 5
 
 
@@ -48,15 +47,15 @@ int main(void)
   PE_low_level_init();
   /*** End of Processor Expert internal initialization.                    ***/
   /* Write your code here */
-
-    FIFO_Init(&RxFIFO);
-    FIFO_Init(&TxFIFO);
-    for (;;)
-    {
-        UART_Poll();
-
-    }
-
+  Packet_Init(UART_BAUD_RATE, CPU_BUS_CLK_HZ);
+  FIFO_Init(&RxFIFO);
+  FIFO_Init(&TxFIFO);
+  
+  for (;;)
+  {
+    UART_Poll();
+  }
+  
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/
   /*** RTOS startup code. Macro PEX_RTOS_START is defined by the RTOS component. DON'T MODIFY THIS CODE!!! ***/
   #ifdef PEX_RTOS_START
@@ -80,10 +79,3 @@ int main(void)
 **
 ** ###################################################################
 */
-
-
-bool UART_Init(void)
-{
-  UART2_C1 |= UART_C1_PE_MASK;
-  UART2_C1 |= UART_C1_PT_MASK;
-}

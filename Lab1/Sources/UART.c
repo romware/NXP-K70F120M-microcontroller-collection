@@ -58,6 +58,15 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
      return true;
 }
 
+/*
+this was included in main.c but not sure why?
+
+bool UART_Init(void)
+{
+  UART2_C1 |= UART_C1_PE_MASK;
+  UART2_C1 |= UART_C1_PT_MASK;
+}
+*/
 
 
 /*! @brief Get a character from the receive FIFO if it is not empty.
@@ -93,19 +102,38 @@ bool UART_OutChar(const uint8_t data)
  */
 void UART_Poll(void)
 {
-    if(UART2_S1_RDRF)
+	/* 
+	The incoming serial data will set the Receive Data Register Full (RDRF) flag in
+	the UART Status Register 1 (UART_S1) register, indicating that the receiver
+	hardware has just received a byte of data. In the main loop, a poll of the RDRF
+	flag is performed. If it is set, then the program tries to accept the data and put it
+	in the RxFIFO. The RxFIFO buffers data between the input hardware and the
+	main program that processes the data.
+	*/
+    if(UART2_S1 & UART_S1_RDRF_MASK) //And the UART2 Status register with the recieve mask
     {
-		//FIFO_Put(&RxFIFO, UART2_D);
+    	/*
+		When the packet module wishes to output, it calls UART_OutChar, which
+		will put the data in the TxFIFO and arm the output device
+		*/
 		UART_OutChar(UART2_D);
-		//clear flag
     }
-
-    if(UART2_S1_TDRE)
+    
+    /*
+	The setting of the Transmit Data Register Empty (TDRE) flag by the UART
+	hardware signals that the output shift register is idle and ready to output more
+	data. In the main loop, a poll of the TDRE flag is performed. If it is set, then the
+	program tries to retrieve the data in the TxFIFO., and send it out the serial
+	port. If the TxFIFO becomes empty, then no data will be sent out the serial
+	port.
+    */
+    if(UART2_S1 & UART_S1_TDRE_MASK) //And the UART2 Status register with the transmit mask
     {
-        //FIFO_Get(&TxFIFO, &UART2_D);
+		/*
+		When the packet module wishes to receive input, it calls UART_InChar,
+		which will attempt to get data from the RxFIFO (it will fail if the FIFO buffer
+		is empty). How does data get in the RxFIFO?
+		*/
         UART_InChar(&UART2_D);
-        //Clear flag maybe?
     }
 }
-
-
