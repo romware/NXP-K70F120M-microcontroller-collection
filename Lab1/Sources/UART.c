@@ -59,7 +59,8 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
 }
 
 /*
-this was included in main.c but not sure why?
+this was included in main.c but not sure why?--This was just an example peter went through
+setting parity enable and parity type IIRC.
 
 bool UART_Init(void)
 {
@@ -110,7 +111,7 @@ void UART_Poll(void)
 	in the RxFIFO. The RxFIFO buffers data between the input hardware and the
 	main program that processes the data.
 	*/
-    if(UART2_S1 & UART_S1_RDRF_MASK) //And the UART2 Status register with the recieve mask (Binary AND Operator copies a bit to the result if it exists in both operands.)
+    if(UART2_S1 & UART_S1_RDRF_MASK) //And the UART2 Status register with the receive mask (Binary AND Operator copies a bit to the result if it exists in both operands.)
     {
 		/*
 		When the packet module wishes to output, it calls UART_OutChar, which
