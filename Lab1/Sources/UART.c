@@ -110,13 +110,13 @@ void UART_Poll(void)
 	in the RxFIFO. The RxFIFO buffers data between the input hardware and the
 	main program that processes the data.
 	*/
-    if(UART2_S1 & UART_S1_RDRF_MASK) //And the UART2 Status register with the recieve mask
+    if(UART2_S1 & UART_S1_RDRF_MASK) //And the UART2 Status register with the recieve mask (Binary AND Operator copies a bit to the result if it exists in both operands.)
     {
-    	/*
+		/*
 		When the packet module wishes to output, it calls UART_OutChar, which
 		will put the data in the TxFIFO and arm the output device
 		*/
-		UART_OutChar(UART2_D);
+		UART_OutChar(UART2_D); //4006_C007 UART Data Register (UART2_D)
     }
     
     /*
@@ -127,13 +127,13 @@ void UART_Poll(void)
 	port. If the TxFIFO becomes empty, then no data will be sent out the serial
 	port.
     */
-    if(UART2_S1 & UART_S1_TDRE_MASK) //And the UART2 Status register with the transmit mask
+    if(UART2_S1 & UART_S1_TDRE_MASK) //And the UART2 Status register with the transmit mask (Binary AND Operator copies a bit to the result if it exists in both operands.)
     {
 		/*
 		When the packet module wishes to receive input, it calls UART_InChar,
 		which will attempt to get data from the RxFIFO (it will fail if the FIFO buffer
 		is empty). How does data get in the RxFIFO?
 		*/
-        UART_InChar(&UART2_D);
+        UART_InChar(&UART2_D); //4006_C007 UART Data Register (UART2_D)
     }
 }
