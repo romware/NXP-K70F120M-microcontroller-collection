@@ -6,6 +6,7 @@
  */
 
 #include "packet.h"
+#include "UART.h"
 /*! @brief Initializes the packets by calling the initialization routines of the supporting software modules.
  *
  *  @param baudRate The desired baud rate in bits/sec.
@@ -31,7 +32,7 @@ bool Packet_Get(void)		//Should we pass PacketSize??
     // Load PACKET_SIZE bytes in packet[] from RxFIFO
     for(uint8_t i = 0; i < PACKET_SIZE; i++)
     {
-		UART_InChar(packet[i]);
+		UART_InChar(&packet[i]);
     }
 
     //Check packet checksum, load in new byte if incorrect
@@ -43,7 +44,7 @@ bool Packet_Get(void)		//Should we pass PacketSize??
 			packet[i] = packet[i + 1];
 		}
 		//Load in new last byte into packet[]
-		UART_InChar(packet[PACKET_SIZE - 1]);
+		UART_InChar(&packet[PACKET_SIZE - 1]);
     }
     return true;
 }
@@ -67,7 +68,7 @@ bool Packet_Put(const uint8_t command, const uint8_t parameter1, const uint8_t p
     packet[3] = parameter3;
     
     //Generate checksum
-	packet[PACKET_SIZE -1] = Packet_Checksum(packet, PACKET_SIZE);
+	packet[PACKET_SIZE -1] = Checksum(packet, PACKET_SIZE);
 	
     //Send packet to TxFIFO
     for(uint8_t i = 0; i < PACKET_SIZE; i++)
@@ -82,10 +83,10 @@ bool Packet_Put(const uint8_t command, const uint8_t parameter1, const uint8_t p
 
 bool Packet_Error_Check(const uint8_t packet[], const uint8_t packetLength)
 {
-    return (Packet_Checksum(packet, packetLength) == packet[packetLength - 1]);
+    return (Checksum(packet, packetLength) == packet[packetLength - 1]);
 }
 
-uint8_t Packet_Checksum(const uint8_t packet[], const uint8_t packetLength)
+uint8_t Checksum(const uint8_t packet[], const uint8_t packetLength)
 {
     uint8_t xorValue = packet[0];
     for(uint8_t i = 1; i < packetLength - 1; i++)
