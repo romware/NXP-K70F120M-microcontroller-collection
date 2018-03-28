@@ -36,7 +36,7 @@ bool Packet_Get(void)		//Should we pass PacketSize??
     }
 
     //Check packet checksum, load in new byte if incorrect
-    while(Packet_Error_Check(packet, PACKET_SIZE) == false)
+    while(Checksum(packet, PACKET_SIZE) != packet[PACKET_SIZE - 1])
     {
 		//Shift bytes along packet[]
 		for(uint8_t i = 0; i < PACKET_SIZE - 1; i++)
@@ -79,11 +79,6 @@ bool Packet_Put(const uint8_t command, const uint8_t parameter1, const uint8_t p
     	}
     }
     return validation;
-}
-
-bool Packet_Error_Check(const uint8_t packet[], const uint8_t packetLength)
-{
-    return (Checksum(packet, packetLength) == packet[packetLength - 1]);
 }
 
 uint8_t Checksum(const uint8_t packet[], const uint8_t packetLength)
