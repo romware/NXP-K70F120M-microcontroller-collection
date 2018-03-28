@@ -37,9 +37,96 @@
 //UART baud rate
 #define UART_BAUD_RATE 38400
 
+#define TOWER_STARTUP 0x04
+#define TOWER_VER 0x09
+#define TOWER_NUM 0x0B
 
+#define TOWER_VER_MAJ 1
+#define TOWER_VER_MIN 0
+
+#define TOWER_NUM_MSB 0x05
+#define TOWER_NUM_LSB 0xA0
+
+// MSB   5 - 0b00000101
+// LSB 160 - 0b10100000
+
+#define TOWER_NUM_GET 1
+#define TOWER_NUM_SET 2
+
+#define TOWER_ACK_MASK 0x80
+#define TOWER_NACK_MASK 0x7F
+
+//  ACK 128 - 0b10000000
+// NACK 127 - 0b01111111
 
 TFIFO RxFIFO, TxFIFO;
+
+
+bool Startup_Packets(void)
+{
+  return (
+    Packet_Put(TOWER_STARTUP,0x00,0x00,0x00) && 
+    Packet_Put(TOWER_VER,'v',TOWER_VER_MAJ,TOWER_VER_MIN) && 
+    Packet_Put(TOWER_NUM,TOWER_NUM_GET,TOWER_NUM_LSB,TOWER_NUM_MSB)
+  );
+}
+
+
+void Handle_Packets(void)
+{
+  bool acknowledgement = FALSE;
+  
+  switch (Packet_Command & TOWER_NACK_MASK)
+  {
+    case TOWER_STARTUP:
+      acknowledgement = Startup_Packets();
+      break;
+    
+    case TOWER_VER:
+      acknowledgement = Packet_Put(TOWER_VER,'v',TOWER_VER_MAJ,TOWER_VER_MIN);
+      break;
+    
+    case TOWER_NUM:
+      switch(Packet_Parameter1)
+      {
+        case TOWER_NUM_GET:
+          acknowledgement = Packet_Put(TOWER_NUM,TOWER_NUM_GET,TOWER_NUM_LSB,TOWER_NUM_MSB);
+          break;
+        
+        case TOWER_NUM_SET:
+          #undef TOWER_NUM_LSB
+          #undef TOWER_NUM_MSB
+          #define TOWER_NUM_LSB Packet_Parameter2
+          #define TOWER_NUM_MSB Packet_Parameter3
+          acknowledgement = Packet_Put(TOWER_NUM,TOWER_NUM_GET,TOWER_NUM_LSB,TOWER_NUM_MSB);
+          break;
+        
+        default:
+          acknowledgement = FALSE;
+          break;
+      }
+      break;
+    
+    default:
+      acknowledgement = FALSE;
+      break;
+  }
+   
+  if(Packet_Command & TOWER_ACK_MASK)
+  {
+    if(acknowledgement == FALSE)
+    {
+      Packet_Put(Packet_Control & TOWER_NACK_MASK,Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
+    }
+    else
+    {
+      Packet_Put(Packet_Control,Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
+    }
+  }
+}
+
+
+
 
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
 int main(void)
@@ -52,12 +139,19 @@ int main(void)
   /*** End of Processor Expert internal initialization.                    ***/
   /* Write your code here */
   Packet_Init(UART_BAUD_RATE, CPU_BUS_CLK_HZ);
+  
   FIFO_Init(&RxFIFO);
   FIFO_Init(&TxFIFO);
+  
+  Startup_Packets();
   
   for (;;)
   {
     UART_Poll();
+    if(Packet_Get())
+    {
+      Handle_Packets();
+    }
   }
   
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/
