@@ -16,39 +16,30 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
 {
   // enable UART2 by turning the clock on
   SIM_SCGC4 |= SIM_SCGC4_UART2_MASK;
+  SIM_SCGC5 |= SIM_SCGC5_PORTE_MASK;
+
   // set PTE16 to be the UART2_Tx pin
   PORTE_PCR16 = PORT_PCR_MUX(3);
   // set PTE17 to be the UART2_Rx pin
   PORTE_PCR17 = PORT_PCR_MUX(3);
   // set UART2_C2 transmit enable to 1;
-  UART2_C2 |= UART_C2_TE_MASK;
+  UART2_C2 &= ~UART_C2_TE_MASK;
   // set UART2_C2 receive enable to 1;
-  UART2_C2 |= UART_C2_RE_MASK;
-  // page 323
-  // example
-  // 00010011
-  // try and clear bit 4
-  // bug! - will clear bits 0 and 1
-  // 00010000
-  // MY_W1C_REGISTER &= ~0x00010000;
-  // 00000000
-  // MY_W1C_REGISTER |= 0x00010000;
-  // correct:
-  // 00000011
-  // MY_W1C_REGISTER = 0x00010000;
-  // w1c = write 1 to clear
+  UART2_C2 &= ~UART_C2_RE_MASK;
   uint16_t BRFA = 0;
-  uint16_t SBR = 0;
-  uint8_t BDH =0;
-  uint8_t BDL =0;
-  BRFA = (moduleClk*2)%32;			//calculate BRFA from %32
-  SBR = moduleClk/(16*baudRate) - BRFA;	//calculate the module clock divisor
-  BDL = (uint8_t)SBR & 0b11111111;		//mask the BDL
-  SBR >> 8;					//shift bits [12:8] to [4:0]
-  BDH = (uint8_t)SBR & 0b11111;		//mask the BDH
-  UART2_BDH = BDH;				//Load the BDH register
-  UART2_BDL = BDL;				//load the BDL register
-  
+  uint16union_t SBR;
+
+  BRFA = ((moduleClk/(16*baudRate))*32)%32;			//calculate BRFA from %32
+
+  SBR.l = ((moduleClk/(16*baudRate))*32)/32 - BRFA;	//calculate the module clock divisor
+  UART2_BDL = SBR.s.Lo;
+  UART2_BDH = SBR.s.Hi & UART_BDH_SBR_MASK;
+
+  // set UART2_C2 transmit enable to 1;
+    UART2_C2 |= UART_C2_TE_MASK;
+    // set UART2_C2 receive enable to 1;
+    UART2_C2 |= UART_C2_RE_MASK;
+
   FIFO_Init(&RxFIFO);
   FIFO_Init(&TxFIFO);
   
@@ -64,7 +55,7 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
  */
 bool UART_InChar(uint8_t * const dataPtr)
 {
-  return FIFO_Get(&RxFIFO, &dataPtr);
+  return FIFO_Get(&RxFIFO, dataPtr);
 }
 
 
@@ -101,7 +92,7 @@ void UART_Poll(void)
     When the packet module wishes to output, it calls UART_OutChar, which
     will put the data in the TxFIFO and arm the output device
     */
-    FIFO_Put(&TxFIFO, UART2_D); //UART_OutChar(UART2_D); //4006_C007 UART Data Register (UART2_D)
+    FIFO_Put(&RxFIFO, UART2_D); //UART_OutChar(UART2_D); //4006_C007 UART Data Register (UART2_D)
   }
     
   /*
@@ -119,6 +110,7 @@ void UART_Poll(void)
     which will attempt to get data from the RxFIFO (it will fail if the FIFO buffer
     is empty). How does data get in the RxFIFO?
     */
-    FIFO_Get(&RxFIFO, &UART2_D); //UART_InChar(&UART2_D); //4006_C007 UART Data Register (UART2_D)
+
+      FIFO_Get(&TxFIFO, (uint8_t*)&UART2_D); //UART_InChar(&UART2_D); //4006_C007 UART Data Register (UART2_D)
   }
 }

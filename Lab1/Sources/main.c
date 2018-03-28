@@ -54,10 +54,17 @@
 // NACK 127 - 0b01111111
 
 uint8_t TOWER_NUM_MSB = 0x05;
-uint8_t TOWER_NUM_LSB = 0xA0;
+uint8_t TOWER_NUM_LSB = 0xEF;
 
 // MSB   5 - 0b00000101
 // LSB 160 - 0b10100000
+
+// Packet structure
+uint8_t Packet_Command,		/*!< The packet's command */
+	Packet_Parameter1, 	/*!< The packet's 1st parameter */
+	Packet_Parameter2, 	/*!< The packet's 2nd parameter */
+	Packet_Parameter3,	/*!< The packet's 3rd parameter */
+	Packet_Checksum;	/*!< The packet's checksum */
 
 
 bool Startup_Packets(void)
@@ -92,8 +99,8 @@ void Handle_Packets(void)
           break;
         
         case TOWER_NUM_SET:
-          TOWER_NUM_LSB = Packet_Parameter2
-          TOWER_NUM_MSB = Packet_Parameter3
+          TOWER_NUM_LSB = Packet_Parameter2;
+          TOWER_NUM_MSB = Packet_Parameter3;
           acknowledgement = Packet_Put(TOWER_NUM,TOWER_NUM_GET,TOWER_NUM_LSB,TOWER_NUM_MSB);
           break;
         
@@ -112,11 +119,11 @@ void Handle_Packets(void)
   {
     if(acknowledgement == FALSE)
     {
-      Packet_Put(Packet_Control & TOWER_NACK_MASK,Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
+      Packet_Put(Packet_Command & TOWER_NACK_MASK,Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
     }
     else
     {
-      Packet_Put(Packet_Control,Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
+      Packet_Put(Packet_Command,Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
     }
   }
 }
