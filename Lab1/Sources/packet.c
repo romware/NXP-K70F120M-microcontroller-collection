@@ -15,38 +15,33 @@
  */
 bool Packet_Init(const uint32_t baudRate, const uint32_t moduleClk)
 {
-    return UART_Init(baudRate, moduleClk);
+  return UART_Init(baudRate, moduleClk);
 }
-
 
 
 /*! @brief Attempts to get a packet from the received data.
  *
  *  @return bool - TRUE if a valid packet was received.
  */
-bool Packet_Get(void)		//Should we pass PacketSize??
+bool Packet_Get(void)
 {
-    //Declare variables
-    uint8_t packet[PACKET_SIZE];
-
-    // Load PACKET_SIZE bytes in packet[] from RxFIFO
-    for(uint8_t i = 0; i < PACKET_SIZE; i++)
-    {
-		UART_InChar(&packet[i]);
-    }
-
-    //Check packet checksum, load in new byte if incorrect
-    while(Checksum(packet, PACKET_SIZE) != packet[PACKET_SIZE - 1])
-    {
-		//Shift bytes along packet[]
-		for(uint8_t i = 0; i < PACKET_SIZE - 1; i++)
-		{
-			packet[i] = packet[i + 1];
-		}
-		//Load in new last byte into packet[]
-		UART_InChar(&packet[PACKET_SIZE - 1]);
-    }
-    return true;
+  UART_InChar(&Packet_Command);
+  UART_InChar(&Packet_Parameter1);
+  UART_InChar(&Packet_Parameter2);
+  UART_InChar(&Packet_Parameter3);
+  UART_InChar(&Packet_Checksum);
+  
+  //Check packet checksum, load in new byte if incorrect
+  while(Checksum_Generate(Packet_Command,Packet_Parameter1,Packet_Parameter2,Packet_Parameter3) != Packet_Checksum)
+  {
+    Packet_Command = Packet_Parameter1;
+    Packet_Parameter1 = Packet_Parameter2;
+    Packet_Parameter2 = Packet_Parameter3;
+    Packet_Parameter3 = Packet_Checksum;
+    UART_InChar(&Packet_Checksum);
+  }
+  
+  return true;
 }
 
 
@@ -56,37 +51,17 @@ bool Packet_Get(void)		//Should we pass PacketSize??
  */
 bool Packet_Put(const uint8_t command, const uint8_t parameter1, const uint8_t parameter2, const uint8_t parameter3)
 {
-    //Declare variables
-    uint8_t checkSum;
-    uint8_t packet[PACKET_SIZE];
-    bool validation = true;
-	
-    //Populate the first 4 bytes of the packet
-    packet[0] = command;
-    packet[1] = parameter1;
-    packet[2] = parameter2;
-    packet[3] = parameter3;
-    
-    //Generate checksum
-	packet[PACKET_SIZE -1] = Checksum(packet, PACKET_SIZE);
-	
-    //Send packet to TxFIFO
-    for(uint8_t i = 0; i < PACKET_SIZE; i++)
-    {
-    	if(!UART_OutChar(packet[i]))
-    	{
-    		validation = false;
-    	}
-    }
-    return validation;
+  uint8_t checksum = Checksum_Generate(command, parameter1, parameter2, parameter3);
+  return (
+    UART_OutChar(command) && 
+    UART_OutChar(parameter1) && 
+    UART_OutChar(parameter2) && 
+    UART_OutChar(parameter3) && 
+    UART_OutChar(checksum)
+  );
 }
 
-uint8_t Checksum(const uint8_t packet[], const uint8_t packetLength)
+uint8_t Checksum_Generate(const uint8_t command, const uint8_t parameter1, const uint8_t parameter2, const uint8_t parameter3)
 {
-    uint8_t xorValue = packet[0];
-    for(uint8_t i = 1; i < packetLength - 1; i++)
-    {
-		xorValue = xorValue ^ packet[i];
-    }
-    return xorValue;
+  return command ^ parameter1 ^ parameter2 ^ parameter3;
 }

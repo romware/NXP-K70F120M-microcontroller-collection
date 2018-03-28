@@ -10,7 +10,6 @@
 
 #ifndef PACKET_H
 #define PACKET_H
-#define PACKET_SIZE 5
 
 // new types
 #include "types.h"
@@ -45,6 +44,10 @@ bool Packet_Get(void);
  */
 bool Packet_Put(const uint8_t command, const uint8_t parameter1, const uint8_t parameter2, const uint8_t parameter3);
 
-uint8_t Checksum(const uint8_t packet[], const uint8_t packetLength);
+/*! @brief Generates a checksum from the given packet values
+ *
+ *  @return uint8_t - XOR value of all parameters.
+ */
+uint8_t Checksum_Generate(const uint8_t command, const uint8_t parameter1, const uint8_t parameter2, const uint8_t parameter3)
 
 #endif

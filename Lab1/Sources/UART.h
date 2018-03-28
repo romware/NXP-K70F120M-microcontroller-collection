@@ -15,8 +15,8 @@
 #include "types.h"
 #include "FIFO.h"
 #include "MK70F12.h"
-extern TFIFO RxFIFO;
-extern TFIFO TxFIFO;
+TFIFO RxFIFO;
+TFIFO TxFIFO;
 
 
 

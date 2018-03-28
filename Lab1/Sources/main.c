@@ -44,12 +44,6 @@
 #define TOWER_VER_MAJ 1
 #define TOWER_VER_MIN 0
 
-#define TOWER_NUM_MSB 0x05
-#define TOWER_NUM_LSB 0xA0
-
-// MSB   5 - 0b00000101
-// LSB 160 - 0b10100000
-
 #define TOWER_NUM_GET 1
 #define TOWER_NUM_SET 2
 
@@ -59,7 +53,11 @@
 //  ACK 128 - 0b10000000
 // NACK 127 - 0b01111111
 
-TFIFO RxFIFO, TxFIFO;
+uint8_t TOWER_NUM_MSB = 0x05;
+uint8_t TOWER_NUM_LSB = 0xA0;
+
+// MSB   5 - 0b00000101
+// LSB 160 - 0b10100000
 
 
 bool Startup_Packets(void)
@@ -94,10 +92,8 @@ void Handle_Packets(void)
           break;
         
         case TOWER_NUM_SET:
-          #undef TOWER_NUM_LSB
-          #undef TOWER_NUM_MSB
-          #define TOWER_NUM_LSB Packet_Parameter2
-          #define TOWER_NUM_MSB Packet_Parameter3
+          TOWER_NUM_LSB = Packet_Parameter2
+          TOWER_NUM_MSB = Packet_Parameter3
           acknowledgement = Packet_Put(TOWER_NUM,TOWER_NUM_GET,TOWER_NUM_LSB,TOWER_NUM_MSB);
           break;
         
@@ -139,9 +135,6 @@ int main(void)
   /*** End of Processor Expert internal initialization.                    ***/
   /* Write your code here */
   Packet_Init(UART_BAUD_RATE, CPU_BUS_CLK_HZ);
-  
-  FIFO_Init(&RxFIFO);
-  FIFO_Init(&TxFIFO);
   
   Startup_Packets();
   

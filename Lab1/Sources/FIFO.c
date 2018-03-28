@@ -20,6 +20,7 @@ void FIFO_Init(TFIFO * const FIFO)
   FIFO->End = 0;
 }
 
+
 /*! @brief Put one character into the FIFO.
  *
  *  @param FIFO A pointer to a FIFO struct where data is to be stored.
@@ -29,20 +30,21 @@ void FIFO_Init(TFIFO * const FIFO)
  */
 bool FIFO_Put(TFIFO * const FIFO, const uint8_t data)
 {
-    if(FIFO->NbBytes < FIFO_SIZE)
+  if(FIFO->NbBytes < FIFO_SIZE)
+  {
+    FIFO->Buffer[FIFO->End] = data;
+    FIFO->End++;
+    FIFO->NbBytes++;
+    
+    if(FIFO->End == FIFO_SIZE)
     {
-        FIFO->Buffer[FIFO->End] = data;
-        FIFO->End++;
-        FIFO->NbBytes++;
-        
-        if(FIFO->End == FIFO_SIZE)
-        {
-            FIFO->End = 0;
-        }
-        return true;
+      FIFO->End = 0;
     }
-    return false;
+    return true;
+  }
+  return false;
 }
+
 
 /*! @brief Get one character from the FIFO.
  *
@@ -53,20 +55,17 @@ bool FIFO_Put(TFIFO * const FIFO, const uint8_t data)
  */
 bool FIFO_Get(TFIFO * const FIFO, uint8_t * const dataPtr)
 {
-    if(FIFO->NbBytes > 0)
+  if(FIFO->NbBytes > 0)
+  {
+    *dataPtr = FIFO->Buffer[FIFO->Start];
+    FIFO->NbBytes--;
+    FIFO->Start++;
+    
+    if(FIFO->Start == FIFO_SIZE)
     {
-        *dataPtr = FIFO->Buffer[FIFO->Start];
-		FIFO->NbBytes--;
-		FIFO->Start++;
-		
-		if(FIFO->Start == FIFO_SIZE)
-		{
-			FIFO->Start = 0;
-		}
-		return true;
+      FIFO->Start = 0;
     }
-    return false;
+    return true;
+  }
+  return false;
 }
-
-
-
