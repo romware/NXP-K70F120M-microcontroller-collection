@@ -24,6 +24,7 @@ extern uint8_t 	Packet_Command,		/*!< The packet's command */
 // Acknowledgement bit mask
 extern const uint8_t PACKET_ACK_MASK;
 
+
 /*! @brief Initializes the packets by calling the initialization routines of the supporting software modules.
  *
  *  @param baudRate The desired baud rate in bits/sec.

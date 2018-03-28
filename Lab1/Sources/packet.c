@@ -25,23 +25,26 @@ bool Packet_Init(const uint32_t baudRate, const uint32_t moduleClk)
  */
 bool Packet_Get(void)
 {
-  UART_InChar(&Packet_Command);
-  UART_InChar(&Packet_Parameter1);
-  UART_InChar(&Packet_Parameter2);
-  UART_InChar(&Packet_Parameter3);
-  UART_InChar(&Packet_Checksum);
-  
-  //Check packet checksum, load in new byte if incorrect
-  while(Checksum_Generate(Packet_Command,Packet_Parameter1,Packet_Parameter2,Packet_Parameter3) != Packet_Checksum)
+  if(RxFIFO.NbBytes >= 5)
   {
-    Packet_Command = Packet_Parameter1;
-    Packet_Parameter1 = Packet_Parameter2;
-    Packet_Parameter2 = Packet_Parameter3;
-    Packet_Parameter3 = Packet_Checksum;
+    UART_InChar(&Packet_Command);
+    UART_InChar(&Packet_Parameter1);
+    UART_InChar(&Packet_Parameter2);
+    UART_InChar(&Packet_Parameter3);
     UART_InChar(&Packet_Checksum);
+
+    //Check packet checksum, load in new byte if incorrect
+    while(Checksum_Generate(Packet_Command,Packet_Parameter1,Packet_Parameter2,Packet_Parameter3) != Packet_Checksum)
+    {
+      Packet_Command = Packet_Parameter1;
+      Packet_Parameter1 = Packet_Parameter2;
+      Packet_Parameter2 = Packet_Parameter3;
+      Packet_Parameter3 = Packet_Checksum;
+      UART_InChar(&Packet_Checksum);
+    }
+    return true;
   }
-  
-  return true;
+  return false;
 }
 
 

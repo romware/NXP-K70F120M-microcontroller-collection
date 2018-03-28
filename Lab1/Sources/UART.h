@@ -15,10 +15,8 @@
 #include "types.h"
 #include "FIFO.h"
 #include "MK70F12.h"
-TFIFO RxFIFO;
-TFIFO TxFIFO;
 
-
+extern TFIFO RxFIFO, TxFIFO;
 
 
 /*! @brief Sets up the UART interface before first use.

@@ -66,6 +66,8 @@ uint8_t Packet_Command,		/*!< The packet's command */
 	Packet_Parameter3,	/*!< The packet's 3rd parameter */
 	Packet_Checksum;	/*!< The packet's checksum */
 
+TFIFO RxFIFO;
+TFIFO TxFIFO;
 
 bool Startup_Packets(void)
 {
@@ -101,7 +103,8 @@ void Handle_Packets(void)
         case TOWER_NUM_SET:
           TOWER_NUM_LSB = Packet_Parameter2;
           TOWER_NUM_MSB = Packet_Parameter3;
-          acknowledgement = Packet_Put(TOWER_NUM,TOWER_NUM_GET,TOWER_NUM_LSB,TOWER_NUM_MSB);
+          //acknowledgement = Packet_Put(TOWER_NUM,TOWER_NUM_GET,TOWER_NUM_LSB,TOWER_NUM_MSB);
+          acknowledgement = TRUE;
           break;
         
         default:
