@@ -1,4 +1,4 @@
-/*! @file
+/*! @file packet.h
  *
  *  @brief Routines to implement packet encoding and decoding for the serial port.
  *
@@ -14,6 +14,7 @@
 
 // new types
 #include "types.h"
+#include "UART.h"
 
 // Listed command bits of a packet
 #define TOWER_STARTUP 0x04

@@ -1,4 +1,4 @@
-/*! @file
+/*! @file FIFO.h
  *
  *  @brief Routines to implement a FIFO buffer.
  *

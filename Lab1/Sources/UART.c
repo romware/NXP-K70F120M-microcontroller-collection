@@ -1,9 +1,12 @@
-/*
- * UART.c
+/*! @file UART.c
  *
- *  Created on: 22 Mar 2018
- *      Author: 12403756, 12551519
- *    Modified: 2018-04-02
+ *  @brief I/O routines for UART communications on the TWR-K70F120M.
+ *
+ *  This contains the functions for operating the UART (serial port).
+ *
+ *  @author PMcL, 12403756, 12551519
+ *  @date 2015-07-23
+ *  @modified 2018-04-02
  */
 
 #include "UART.h"

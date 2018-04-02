@@ -1,9 +1,12 @@
-/*
- * FIFO.c
+/*! @file FIFO.c
  *
- *  Created on: 21 Mar 2018
- *      Author: 12403756, 12551519
- *    Modified: 2018-04-02
+ *  @brief Routines to implement a FIFO buffer.
+ *
+ *  This contains the structure and "methods" for accessing a byte-wide FIFO.
+ *
+ *  @author PMcL, 12403756, 12551519
+ *  @date 2015-07-23
+ *  @modified 2018-04-02
  */
 
 // new types

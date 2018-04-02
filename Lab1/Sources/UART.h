@@ -1,4 +1,4 @@
-/*! @file
+/*! @file UART.h
  *
  *  @brief I/O routines for UART communications on the TWR-K70F120M.
  *
