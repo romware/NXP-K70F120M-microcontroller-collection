@@ -81,46 +81,46 @@ bool Startup_Packets(void)
 
 void Handle_Packets(void)
 {
-  bool acknowledgement = FALSE;
+  bool acknowledgment = FALSE;
   
   switch (Packet_Command & TOWER_NACK_MASK)
   {
     case TOWER_STARTUP:
-      acknowledgement = Startup_Packets();
+      acknowledgment = Startup_Packets();
       break;
     
     case TOWER_VER:
-      acknowledgement = Packet_Put(TOWER_VER,'v',TOWER_VER_MAJ,TOWER_VER_MIN);
+      acknowledgment = Packet_Put(TOWER_VER,'v',TOWER_VER_MAJ,TOWER_VER_MIN);
       break;
     
     case TOWER_NUM:
       switch(Packet_Parameter1)
       {
         case TOWER_NUM_GET:
-          acknowledgement = Packet_Put(TOWER_NUM,TOWER_NUM_GET,TOWER_NUM_LSB,TOWER_NUM_MSB);
+          acknowledgment = Packet_Put(TOWER_NUM,TOWER_NUM_GET,TOWER_NUM_LSB,TOWER_NUM_MSB);
           break;
         
         case TOWER_NUM_SET:
           TOWER_NUM_LSB = Packet_Parameter2;
           TOWER_NUM_MSB = Packet_Parameter3;
-          //acknowledgement = Packet_Put(TOWER_NUM,TOWER_NUM_GET,TOWER_NUM_LSB,TOWER_NUM_MSB);
-          acknowledgement = TRUE;
+          //acknowledgment = Packet_Put(TOWER_NUM,TOWER_NUM_GET,TOWER_NUM_LSB,TOWER_NUM_MSB);
+          acknowledgment = TRUE;
           break;
         
         default:
-          acknowledgement = FALSE;
+          acknowledgment = FALSE;
           break;
       }
       break;
     
     default:
-      acknowledgement = FALSE;
+      acknowledgment = FALSE;
       break;
   }
    
   if(Packet_Command & TOWER_ACK_MASK)
   {
-    if(acknowledgement == FALSE)
+    if(acknowledgment == FALSE)
     {
       Packet_Put(Packet_Command & TOWER_NACK_MASK,Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
     }
