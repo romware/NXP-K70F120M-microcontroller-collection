@@ -25,6 +25,7 @@ bool Packet_Init(const uint32_t baudRate, const uint32_t moduleClk)
  */
 bool Packet_Get(void)
 {
+  //check if there are enough bytes of data in the RxFIFO for a full packet
   if(RxFIFO.NbBytes >= 5)
   {
     UART_InChar(&Packet_Command);
@@ -33,14 +34,23 @@ bool Packet_Get(void)
     UART_InChar(&Packet_Parameter3);
     UART_InChar(&Packet_Checksum);
 
-    //Check packet checksum, load in new byte if incorrect
+    //Check packet checksum
     while(Checksum_Generate(Packet_Command,Packet_Parameter1,Packet_Parameter2,Packet_Parameter3) != Packet_Checksum)
     {
-      Packet_Command = Packet_Parameter1;
-      Packet_Parameter1 = Packet_Parameter2;
-      Packet_Parameter2 = Packet_Parameter3;
-      Packet_Parameter3 = Packet_Checksum;
-      UART_InChar(&Packet_Checksum);
+      //check if there is any data in the RxFIFO, if so move data across, discarding Packet_Command. Load new byte into Packet_Checksum
+      if(RxFIFO.NbBytes > 0)
+      {
+        Packet_Command = Packet_Parameter1;
+        Packet_Parameter1 = Packet_Parameter2;
+        Packet_Parameter2 = Packet_Parameter3;
+        Packet_Parameter3 = Packet_Checksum;
+        UART_InChar(&Packet_Checksum);
+      }
+      //if there is no data in the RxFIFO, call UART_Poll()
+      else
+      {
+	  UART_Poll();
+      }
     }
     return true;
   }
