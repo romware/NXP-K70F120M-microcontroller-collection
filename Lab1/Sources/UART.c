@@ -14,32 +14,65 @@
  */
 bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
 {
-  // enable UART2 by turning the clock on
+  //for System Clock Gating Control Register 4 see 12.2.12 of K70P256M150SF3RM.pdf
+  //
+  // enable UART2 clock
   SIM_SCGC4 |= SIM_SCGC4_UART2_MASK;
+
+
+  //for System Clock Gating Control Register 5 see 12.2.13 of K70P256M150SF3RM.pdf
+  //
+  //enable PORTE clock
   SIM_SCGC5 |= SIM_SCGC5_PORTE_MASK;
 
-  // set PTE16 to be the UART2_Tx pin
+
+  //for K70 Signal Multiplexing and Pin Assignments see 10.3.1 of K70P256M150SF3RM.pdf
+  //
+  // set PTE16 (BGA Map 'J3') to be the UART2_Tx pin by setting to ALT3
   PORTE_PCR16 = PORT_PCR_MUX(3);
-  // set PTE17 to be the UART2_Rx pin
+
+  // set PTE17 (BGA Map 'K2') to be the UART2_Rx pin by setting to ALT3
   PORTE_PCR17 = PORT_PCR_MUX(3);
-  // set UART2_C2 transmit enable to 1;
+
+
+  //for UART Control Register 2 see 56.3.4 of K70P256M150SF3RM.pdf
+  //
+  // confirm UART2_C2 transmit enable is set to 0 to allow setting of the  Baud Rate Divisor Register
   UART2_C2 &= ~UART_C2_TE_MASK;
-  // set UART2_C2 receive enable to 1;
+
+  // confirm UART2_C2 receive enable is set to 0 to allow setting of the  Baud Rate Divisor Register
   UART2_C2 &= ~UART_C2_RE_MASK;
+
+  //declare variable to store the Baud Rate Fine Adjust divisor.
+  //This number represents 1/32 remainder from the baud rate division. See Table 56-351 of K70P256M150SF3RM.pdf for values.
   uint16_t BRFA = 0;
+
+  //declare union to store the baud rate setting, which is a 13 bit divisor.
+  //BDL is stored in SBR.s.Lo and BDH is stored in SBR.s.Hi. Note: The working value in BDH does not change until BDL is written.
   uint16union_t SBR;
 
-  BRFA = ((moduleClk/(16*baudRate))*32)%32;			//calculate BRFA from %32
+  // for SBR and BRFA calculations see 56.4.4 of K70P256M150SF3RM.pdf
+  // Calculate the BRFA value (%32 remainder)
+  BRFA = ((moduleClk/(16*baudRate))*32)%32;
 
-  SBR.l = ((moduleClk/(16*baudRate))*32)/32 - BRFA;	//calculate the module clock divisor
-  UART2_BDL = SBR.s.Lo;
+  //Calculate the SBR
+  SBR.l = ((moduleClk/(16*baudRate))*32)/32 - BRFA;
+
+  //set the UART2 BDH and BDL.
+  //Note: The working value in BDH does not change until BDL is written. BDH is not 8 bits long so it should be masked
   UART2_BDH = SBR.s.Hi & UART_BDH_SBR_MASK;
+  UART2_BDL = SBR.s.Lo;
 
+
+  //for UART Control Register 2 see 56.3.4 of K70P256M150SF3RM.pdf
+  //
   // set UART2_C2 transmit enable to 1;
-    UART2_C2 |= UART_C2_TE_MASK;
-    // set UART2_C2 receive enable to 1;
-    UART2_C2 |= UART_C2_RE_MASK;
+  UART2_C2 |= UART_C2_TE_MASK;
+  // set UART2_C2 receive enable to 1;
+  UART2_C2 |= UART_C2_RE_MASK;
 
+
+  //initiate the RxFIFO and TxFIFO
   FIFO_Init(&RxFIFO);
   FIFO_Init(&TxFIFO);
   

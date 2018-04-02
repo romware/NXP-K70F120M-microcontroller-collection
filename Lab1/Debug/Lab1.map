@@ -693,14 +693,14 @@ OUTPUT(Lab1.elf elf32-littlearm)
  .debug_macro   0x0001833e       0x94 ./Generated_Code/Cpu.o
  .debug_macro   0x000183d2       0x9f ./Generated_Code/Vectors.o
 
-.debug_line     0x00000000     0x1200
+.debug_line     0x00000000     0x1201
  .debug_line    0x00000000      0x1c7 ./Sources/FIFO.o
- .debug_line    0x000001c7      0x226 ./Sources/UART.o
- .debug_line    0x000003ed      0x2ac ./Sources/main.o
- .debug_line    0x00000699      0x248 ./Sources/packet.o
- .debug_line    0x000008e1      0x3b8 ./Project_Settings/Startup_Code/startup.o
- .debug_line    0x00000c99      0x2ef ./Generated_Code/Cpu.o
- .debug_line    0x00000f88      0x278 ./Generated_Code/Vectors.o
+ .debug_line    0x000001c7      0x227 ./Sources/UART.o
+ .debug_line    0x000003ee      0x2ac ./Sources/main.o
+ .debug_line    0x0000069a      0x248 ./Sources/packet.o
+ .debug_line    0x000008e2      0x3b8 ./Project_Settings/Startup_Code/startup.o
+ .debug_line    0x00000c9a      0x2ef ./Generated_Code/Cpu.o
+ .debug_line    0x00000f89      0x278 ./Generated_Code/Vectors.o
 
 .debug_str      0x00000000    0x8d222
  .debug_str     0x00000000     0x2e73 ./Sources/FIFO.o
