@@ -30,12 +30,17 @@ void FIFO_Init(TFIFO * const FIFO)
  */
 bool FIFO_Put(TFIFO * const FIFO, const uint8_t data)
 {
+  //check if there is room left in the FIFO
   if(FIFO->NbBytes < FIFO_SIZE)
   {
+    //put data byte into the buffer array
     FIFO->Buffer[FIFO->End] = data;
+
+    //increment the 'End' and NbBytes counters
     FIFO->End++;
     FIFO->NbBytes++;
     
+    //check if 'End' is past the last element of the array, if so, move to element 0
     if(FIFO->End == FIFO_SIZE)
     {
       FIFO->End = 0;
@@ -55,12 +60,17 @@ bool FIFO_Put(TFIFO * const FIFO, const uint8_t data)
  */
 bool FIFO_Get(TFIFO * const FIFO, uint8_t * const dataPtr)
 {
+  //check that there is data in the FIFO
   if(FIFO->NbBytes > 0)
   {
+    //put the 'Start' data byte into *dataPtr
     *dataPtr = FIFO->Buffer[FIFO->Start];
+
+    //decrement NbBytes, increment 'Start'
     FIFO->NbBytes--;
     FIFO->Start++;
     
+    //check if 'Start' is past the last element of the array, if so, move to element 0
     if(FIFO->Start == FIFO_SIZE)
     {
       FIFO->Start = 0;
