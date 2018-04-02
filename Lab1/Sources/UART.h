@@ -4,8 +4,9 @@
  *
  *  This contains the functions for operating the UART (serial port).
  *
- *  @author PMcL
+ *  @author PMcL, 12403756, 12551519
  *  @date 2015-07-23
+ *  @modified 2018-04-02
  */
 
 #ifndef UART_H
@@ -16,8 +17,8 @@
 #include "FIFO.h"
 #include "MK70F12.h"
 
+// Receive and transmit FIFOs
 extern TFIFO RxFIFO, TxFIFO;
-
 
 /*! @brief Sets up the UART interface before first use.
  *

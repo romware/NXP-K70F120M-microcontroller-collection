@@ -4,13 +4,14 @@
 **     Processor   : MK70FN1M0VMJ12
 **     Version     : Driver 01.01
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-07-20, 13:27, # CodeGen: 0
+**     Date/Time   : 2018-04-02, 13:27, # CodeGen: 0
 **     Abstract    :
 **         Main module.
 **         This module contains user's application code.
 **     Settings    :
 **     Contents    :
 **         No public methods
+**     Authors     : 12403756, 12551519
 **
 ** ###################################################################*/
 /*!
@@ -34,30 +35,15 @@
 #include "FIFO.h"
 #include "packet.h"
 
-//UART baud rate
+// UART baud rate
 #define UART_BAUD_RATE 38400
 
-#define TOWER_STARTUP 0x04
-#define TOWER_VER 0x09
-#define TOWER_NUM 0x0B
+// Bit 7 of byte set to 1
+const uint8_t PACKET_ACK_MASK = 0x80;
 
-#define TOWER_VER_MAJ 1
-#define TOWER_VER_MIN 0
-
-#define TOWER_NUM_GET 1
-#define TOWER_NUM_SET 2
-
-#define TOWER_ACK_MASK 0x80
-#define TOWER_NACK_MASK 0x7F
-
-//  ACK 128 - 0b10000000
-// NACK 127 - 0b01111111
-
-uint8_t TOWER_NUM_MSB = 0x05;
-uint8_t TOWER_NUM_LSB = 0xEF;
-
-// MSB   5 - 0b00000101
-// LSB 160 - 0b10100000
+// Tower number most and least significant bits
+uint8_t Tower_Num_MSB = 0x05;
+uint8_t Tower_Num_LSB = 0xEF;
 
 // Packet structure
 uint8_t Packet_Command,		/*!< The packet's command */
@@ -66,72 +52,9 @@ uint8_t Packet_Command,		/*!< The packet's command */
 	Packet_Parameter3,	/*!< The packet's 3rd parameter */
 	Packet_Checksum;	/*!< The packet's checksum */
 
+// Receive and transmit FIFOs
 TFIFO RxFIFO;
 TFIFO TxFIFO;
-
-bool Startup_Packets(void)
-{
-  return (
-    Packet_Put(TOWER_STARTUP,0x00,0x00,0x00) && 
-    Packet_Put(TOWER_VER,'v',TOWER_VER_MAJ,TOWER_VER_MIN) && 
-    Packet_Put(TOWER_NUM,TOWER_NUM_GET,TOWER_NUM_LSB,TOWER_NUM_MSB)
-  );
-}
-
-
-void Handle_Packets(void)
-{
-  bool acknowledgment = FALSE;
-  
-  switch (Packet_Command & TOWER_NACK_MASK)
-  {
-    case TOWER_STARTUP:
-      if(Packet_Parameter1 == 0 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
-      {
-        acknowledgment = Startup_Packets();
-      }
-      break;
-    
-    case TOWER_VER:
-      if(Packet_Parameter1 == 'v' && Packet_Parameter2 == 'x' && Packet_Parameter3 == 13)
-      {
-        acknowledgment = Packet_Put(TOWER_VER,'v',TOWER_VER_MAJ,TOWER_VER_MIN);
-      }
-      break;
-    
-    case TOWER_NUM:
-      if(Packet_Parameter1 == TOWER_NUM_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
-      {
-        acknowledgment = Packet_Put(TOWER_NUM,TOWER_NUM_GET,TOWER_NUM_LSB,TOWER_NUM_MSB);
-      }
-      else if (Packet_Parameter1 == TOWER_NUM_SET)
-      {
-        TOWER_NUM_LSB = Packet_Parameter2;
-        TOWER_NUM_MSB = Packet_Parameter3;
-        acknowledgment = TRUE;
-      }
-      break;
-
-    default:
-      acknowledgment = FALSE;
-      break;
-  }
-   
-  if(Packet_Command & TOWER_ACK_MASK)
-  {
-    if(acknowledgment == FALSE)
-    {
-      Packet_Put(Packet_Command & TOWER_NACK_MASK,Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
-    }
-    else
-    {
-      Packet_Put(Packet_Command,Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
-    }
-  }
-}
-
-
-
 
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
 int main(void)
@@ -143,16 +66,21 @@ int main(void)
   PE_low_level_init();
   /*** End of Processor Expert internal initialization.                    ***/
   /* Write your code here */
+
+  // Initializes the packets by calling the initialization routines of the supporting software modules.
   Packet_Init(UART_BAUD_RATE, CPU_BUS_CLK_HZ);
-  
-  Startup_Packets();
+  // Send startup packets to PC
+  Packet_Startup();
   
   for (;;)
   {
+    // Poll UART2 for packets to transmit and receive
     UART_Poll();
+    // Check if packet has been received
     if(Packet_Get())
     {
-      Handle_Packets();
+      // Execute a command depending on what packet has been received
+      Packet_Handle();
     }
   }
   
