@@ -86,33 +86,32 @@ void Handle_Packets(void)
   switch (Packet_Command & TOWER_NACK_MASK)
   {
     case TOWER_STARTUP:
-      acknowledgment = Startup_Packets();
-      break;
-    
-    case TOWER_VER:
-      acknowledgment = Packet_Put(TOWER_VER,'v',TOWER_VER_MAJ,TOWER_VER_MIN);
-      break;
-    
-    case TOWER_NUM:
-      switch(Packet_Parameter1)
+      if(Packet_Parameter1 == 0 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
       {
-        case TOWER_NUM_GET:
-          acknowledgment = Packet_Put(TOWER_NUM,TOWER_NUM_GET,TOWER_NUM_LSB,TOWER_NUM_MSB);
-          break;
-        
-        case TOWER_NUM_SET:
-          TOWER_NUM_LSB = Packet_Parameter2;
-          TOWER_NUM_MSB = Packet_Parameter3;
-          //acknowledgment = Packet_Put(TOWER_NUM,TOWER_NUM_GET,TOWER_NUM_LSB,TOWER_NUM_MSB);
-          acknowledgment = TRUE;
-          break;
-        
-        default:
-          acknowledgment = FALSE;
-          break;
+        acknowledgment = Startup_Packets();
       }
       break;
     
+    case TOWER_VER:
+      if(Packet_Parameter1 == 'v' && Packet_Parameter2 == 'x' && Packet_Parameter3 == 13)
+      {
+        acknowledgment = Packet_Put(TOWER_VER,'v',TOWER_VER_MAJ,TOWER_VER_MIN);
+      }
+      break;
+    
+    case TOWER_NUM:
+      if(Packet_Parameter1 == TOWER_NUM_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+      {
+        acknowledgment = Packet_Put(TOWER_NUM,TOWER_NUM_GET,TOWER_NUM_LSB,TOWER_NUM_MSB);
+      }
+      else if (Packet_Parameter1 == TOWER_NUM_SET)
+      {
+        TOWER_NUM_LSB = Packet_Parameter2;
+        TOWER_NUM_MSB = Packet_Parameter3;
+        acknowledgment = TRUE;
+      }
+      break;
+
     default:
       acknowledgment = FALSE;
       break;
