@@ -151,12 +151,12 @@ void Packet_Handle(void)
     // Check the success status of the packet which was sent
     if(success == false)
     {
-      // Return the sent packet with the ACK command if successful
+      // Return the sent packet with the NACK command if unsuccessful
       Packet_Put(Packet_Command & ~PACKET_ACK_MASK,Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
     }
     else
     {
-      // Return the sent packet with the NACK command if unsuccessful
+      // Return the sent packet with the ACK command if successful
       Packet_Put(Packet_Command,Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
     }
   }
