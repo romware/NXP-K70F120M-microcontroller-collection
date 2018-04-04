@@ -33,6 +33,7 @@
 #include "PE_Error.h"
 #include "PE_Const.h"
 #include "IO_Map.h"
+#include "LEDs.h"
 
 
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
@@ -46,8 +47,13 @@ int main(void)
   /*** End of Processor Expert internal initialization.                    ***/
 
   /* Write your code here */
+  LEDs_Init();
+  PORTA_GPWE |= GPIO_PDD_PIN_10;
+  //GPIOA_PSOR |= GPIO_PDD_PIN_10;
+  //GPIOA_PCOR |= GPIO_PDD_PIN_11;
   for (;;)
   {
+
   }
 
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/

@@ -11,6 +11,11 @@
 #ifndef LEDS_H
 #define LEDS_H
 
+#define GPIO_PDD_PIN_10 0x400U                   /**< Pin 10 mask */
+#define GPIO_PDD_PIN_11 0x800U                   /**< Pin 11 mask */
+#define GPIO_PDD_PIN_28 0x10000000U              /**< Pin 28 mask */
+#define GPIO_PDD_PIN_29 0x20000000U              /**< Pin 29 mask */
+
 // new types
 #include "types.h"
 
