@@ -38,23 +38,104 @@
 // UART baud rate
 #define UART_BAUD_RATE 38400
 
-// Bit 7 of byte set to 1
-const uint8_t PACKET_ACK_MASK = 0x80;
+/*! @brief Sends the startup packets to the PC
+ *
+ *  @return bool - TRUE if all packets are sent
+ */
+bool HandleTowerStartup(void)
+{
+  // Sends the tower startup values, version and number to the PC
+  return (
+    Packet_Put(PACKET_TOWER_STARTUP,0x00,0x00,0x00) &&
+    Packet_Put(PACKET_TOWER_VER,'v',PACKET_TOWER_VER_MAJ,PACKET_TOWER_VER_MIN) &&
+    Packet_Put(PACKET_TOWER_NUM,PACKET_TOWER_NUM_GET,Packet_Tower_Num_LSB,Packet_Tower_Num_MSB)
+  );
+}
 
-// Tower number most and least significant bits
-uint8_t Tower_Num_MSB = 0x05;
-uint8_t Tower_Num_LSB = 0xEF;
+/*! @brief Sends the version packet to the PC
+ *
+ *  @return bool - TRUE if packet is sent
+ */
+bool HandleTowerVersion(void)
+{
+  // Send tower number packet
+  return Packet_Put(PACKET_TOWER_NUM,PACKET_TOWER_NUM_GET,Packet_Tower_Num_LSB,Packet_Tower_Num_MSB);
+}
 
-// Packet structure
-uint8_t Packet_Command,		/*!< The packet's command */
-	Packet_Parameter1, 	/*!< The packet's 1st parameter */
-	Packet_Parameter2, 	/*!< The packet's 2nd parameter */
-	Packet_Parameter3,	/*!< The packet's 3rd parameter */
-	Packet_Checksum;	/*!< The packet's checksum */
+/*! @brief Sends or sets the number packet to the PC
+ *
+ *  @return bool - TRUE if packet is sent or number is set
+ */
+bool HandleTowerNumber(void)
+{
+  // Check if parameters match tower number GET or SET parameters
+  if(Packet_Parameter1 == PACKET_TOWER_NUM_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Send tower number packet
+    return Packet_Put(PACKET_TOWER_NUM,PACKET_TOWER_NUM_GET,Packet_Tower_Num_LSB,Packet_Tower_Num_MSB);
+  }
+  else if (Packet_Parameter1 == PACKET_TOWER_NUM_SET)
+  {
+    // Change tower number
+    Packet_Tower_Num_LSB = Packet_Parameter2;
+    Packet_Tower_Num_MSB = Packet_Parameter3;
+    return true;
+  }
+  return false;
+}
 
-// Receive and transmit FIFOs
-TFIFO RxFIFO;
-TFIFO TxFIFO;
+/*! @brief Executes the command depending on what packet has been received
+ *
+ *  @return void
+ */
+void ReceivedPacket(void)
+{
+  // Initializes the success status of the received packet to false
+  bool success = false;
+  uint8_t commandIgnoreAck = Packet_Command & ~PACKET_ACK_MASK;
+  uint8_t commandAck = Packet_Command & PACKET_ACK_MASK;
+
+  // AND the packet command byte with the bitwise inverse ACK MASK to ignore if ACK is requested
+  if(commandIgnoreAck == PACKET_TOWER_STARTUP && Packet_Parameter1 == 0 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Send tower startup packets
+    success = HandleTowerStartup();
+  }
+  else if(commandIgnoreAck == PACKET_TOWER_VER && Packet_Parameter1 == 'v' && Packet_Parameter2 == 'x' && Packet_Parameter3 == 13)
+  {
+    // Send tower version packet
+    success = HandleTowerVersion();
+  }
+  else if(commandIgnoreAck == PACKET_TOWER_NUM)
+  {
+    // Check if parameters match tower number GET or SET parameters
+    success = HandleTowerNumber();
+  }
+
+  // AND the packet command byte with the ACK MASK to check if ACK is requested
+  if(commandAck)
+  {
+    // Check the success status of the packet which was sent
+    if(success == false)
+    {
+      // Return the sent packet with the NACK command if unsuccessful
+      Packet_Put(commandIgnoreAck,Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
+    }
+    else
+    {
+      // Return the sent packet with the ACK command if successful
+      Packet_Put(Packet_Command,Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
+    }
+  }
+
+  // Reset the packet variables to 0
+  Packet_Command = 0;
+  Packet_Parameter1 = 0;
+  Packet_Parameter2 = 0;
+  Packet_Parameter3 = 0;
+  Packet_Checksum = 0;
+}
+
 
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
 int main(void)
@@ -70,7 +151,7 @@ int main(void)
   // Initializes the packets by calling the initialization routines of the supporting software modules.
   Packet_Init(UART_BAUD_RATE, CPU_BUS_CLK_HZ);
   // Send startup packets to PC
-  Packet_Startup();
+  HandleTowerStartup();
   
   for (;;)
   {
@@ -80,7 +161,7 @@ int main(void)
     if(Packet_Get())
     {
       // Execute a command depending on what packet has been received
-      Packet_Handle();
+      ReceivedPacket();
     }
   }
   
@@ -107,3 +188,13 @@ int main(void)
 **
 ** ###################################################################
 */
+
+/*
+ *
+ * TODO
+ * fix naming conventions particularly for packet
+ * use constants
+ * move all variables into correct modules
+ * check br formula
+ * main functionality lives in main - move startup and handle
+ */

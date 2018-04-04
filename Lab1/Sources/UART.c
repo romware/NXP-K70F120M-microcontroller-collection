@@ -11,6 +11,9 @@
 
 #include "UART.h"
 
+// Receive and transmit FIFOs
+TFIFO RxFIFO, TxFIFO;
+
 /*! @brief Sets up the UART interface before first use.
  *
  *  @param baudRate The desired baud rate in bits/sec.
@@ -37,21 +40,22 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
   // For UART Control Register 2 see 56.3.4 of K70P256M150SF3RM.pdf
 
   // Declare variable to store the Baud Rate Fine Adjust divisor. This number represents 1/32 remainder from the baud rate division.
-  uint16_t BRFA = 0;
+  uint16_t locBRFA = 0;
   // See Table 56-351 of K70P256M150SF3RM.pdf for values.
 
   // Declare union to store the baud rate setting, which is a 13 bit divisor.
   // BDL is stored in SBR.s.Lo and BDH is stored in SBR.s.Hi. Note: The working value in BDH does not change until BDL is written.
-  uint16union_t SBR;
+  uint16union_t locSBR;
   // Calculate the BRFA value (%32 remainder)
-  BRFA = ((moduleClk/(16*baudRate))*32)%32;
+  locBRFA = ((moduleClk/(16*baudRate))*32)%32;
   // Calculate the SBR
-  SBR.l = ((moduleClk/(16*baudRate))*32)/32 - BRFA;
+  locSBR.l = (moduleClk/(16*baudRate));
   // For SBR and BRFA calculations see 56.4.4 of K70P256M150SF3RM.pdf
 
   // Set the UART2 BDH and BDL. Note: The working value in BDH does not change until BDL is written. BDH is not 8 bits long so it should be masked
-  UART2_BDH = SBR.s.Hi & UART_BDH_SBR_MASK;
-  UART2_BDL = SBR.s.Lo;
+  UART2_BDH = locSBR.s.Hi & UART_BDH_SBR_MASK;
+  UART2_BDL = locSBR.s.Lo;
+  UART2_C4 = locBRFA & UART_C4_BRFA_MASK;
 
   // Set UART2_C2 transmit enable to 1
   UART2_C2 |= UART_C2_TE_MASK;
