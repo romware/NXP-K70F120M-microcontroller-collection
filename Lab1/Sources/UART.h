@@ -14,11 +14,6 @@
 
 // new types
 #include "types.h"
-#include "FIFO.h"
-#include "MK70F12.h"
-
-// Receive and transmit FIFOs
-TFIFO RxFIFO, TxFIFO;
 
 /*! @brief Sets up the UART interface before first use.
  *

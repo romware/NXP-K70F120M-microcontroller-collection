@@ -10,6 +10,8 @@
  */
 
 #include "UART.h"
+#include "FIFO.h"
+#include "MK70F12.h"
 
 // Receive and transmit FIFOs
 TFIFO RxFIFO, TxFIFO;
