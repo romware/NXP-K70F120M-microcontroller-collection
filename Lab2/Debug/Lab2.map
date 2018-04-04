@@ -479,20 +479,20 @@ OUTPUT(Lab2.elf elf32-littlearm)
  .debug_macro   0x00031aea       0x94 ./Generated_Code/Cpu.o
  .debug_macro   0x00031b7e       0x85 ./Generated_Code/Vectors.o
 
-.debug_line     0x00000000      0xb6a
- .debug_line    0x00000000      0x28d ./Sources/main.o
- .debug_line    0x0000028d      0x428 ./Project_Settings/Startup_Code/startup.o
- .debug_line    0x000006b5      0x296 ./Generated_Code/Cpu.o
- .debug_line    0x0000094b      0x21f ./Generated_Code/Vectors.o
+.debug_line     0x00000000      0xb0c
+ .debug_line    0x00000000      0x22f ./Sources/main.o
+ .debug_line    0x0000022f      0x428 ./Project_Settings/Startup_Code/startup.o
+ .debug_line    0x00000657      0x296 ./Generated_Code/Cpu.o
+ .debug_line    0x000008ed      0x21f ./Generated_Code/Vectors.o
 
-.debug_str      0x00000000    0x8cea0
- .debug_str     0x00000000    0x8a497 ./Sources/main.o
-                              0x8a5e1 (size before relaxing)
- .debug_str     0x0008a497     0x269e ./Project_Settings/Startup_Code/startup.o
+.debug_str      0x00000000    0x8cecb
+ .debug_str     0x00000000    0x8a468 ./Sources/main.o
+                              0x8a5b2 (size before relaxing)
+ .debug_str     0x0008a468     0x26f8 ./Project_Settings/Startup_Code/startup.o
                               0x8541a (size before relaxing)
- .debug_str     0x0008cb35      0x34f ./Generated_Code/Cpu.o
+ .debug_str     0x0008cb60      0x34f ./Generated_Code/Cpu.o
                               0x8a9eb (size before relaxing)
- .debug_str     0x0008ce84       0x1c ./Generated_Code/Vectors.o
+ .debug_str     0x0008ceaf       0x1c ./Generated_Code/Vectors.o
                               0x8a633 (size before relaxing)
 
 .comment        0x00000000       0x70

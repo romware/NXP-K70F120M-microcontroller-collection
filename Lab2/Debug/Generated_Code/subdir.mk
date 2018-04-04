@@ -20,7 +20,7 @@ C_DEPS += \
 Generated_Code/%.o: ../Generated_Code/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: Cross ARM C Compiler'
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O0 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g3 -I"C:/Users/PMcL/Documents/Subjects/48434 Embedded Software/4 Labs/Lab 2/Template/Lab2/Static_Code/IO_Map" -I"C:/Users/PMcL/Documents/Subjects/48434 Embedded Software/4 Labs/Lab 2/Template/Lab2/Sources" -I"C:/Users/PMcL/Documents/Subjects/48434 Embedded Software/4 Labs/Lab 2/Template/Lab2/Generated_Code" -std=c99 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -c -o "$@" "$<"
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O0 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g3 -I"C:/Users/12403756/git/es18aut13/Lab2/Static_Code/IO_Map" -I"C:/Users/12403756/git/es18aut13/Lab2/Sources" -I"C:/Users/12403756/git/es18aut13/Lab2/Generated_Code" -std=c99 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -c -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
