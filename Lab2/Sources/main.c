@@ -48,12 +48,21 @@ int main(void)
 
   /* Write your code here */
   LEDs_Init();
-  PORTA_GPWE |= GPIO_PDD_PIN_10;
-  //GPIOA_PSOR |= GPIO_PDD_PIN_10;
+  LEDs_On(LED_BLUE);
+  LEDs_On(LED_YELLOW);
+  LEDs_Off(LED_GREEN);
+  LEDs_Off(LED_ORANGE);
   //GPIOA_PCOR |= GPIO_PDD_PIN_11;
   for (;;)
   {
-
+    for(uint32_t i = 0; i <500000; i++)
+      {
+	//delay
+      }
+    LEDs_Toggle(LED_BLUE);
+    LEDs_Toggle(LED_ORANGE);
+    LEDs_Toggle(LED_YELLOW);
+    LEDs_Toggle(LED_GREEN);
   }
 
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/
