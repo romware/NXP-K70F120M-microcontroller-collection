@@ -62,7 +62,6 @@ const uint8_t TOWER_NUM_SET = 2;
 // Tower number most and least significant bits
 uint16union_t Tower_Num_Union;
 
-
 /*! @brief Sends the startup packets to the PC
  *
  *  @return bool - TRUE if all packets are sent
@@ -181,6 +180,9 @@ int main(void)
 
   // Initializes the packets by calling the initialization routines of the supporting software modules.
   Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ);
+
+  volatile uint16union_t *NvTowerNb; /*!< The non-volatile Tower number. */
+
 
   // Send startup packets to PC
   HandleTowerStartup();

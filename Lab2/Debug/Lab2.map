@@ -17,6 +17,8 @@ Common symbol       size              file
 Tower_Num_Union     0x2               ./Sources/main.o
 Packet              0x5               ./Sources/packet.o
 TxFIFO              0x106             ./Sources/UART.o
+commonCommandObject
+                    0xc               ./Sources/Flash.o
 RxFIFO              0x106             ./Sources/UART.o
 SR_reg              0x1               ./Generated_Code/Cpu.o
 
@@ -72,6 +74,50 @@ Discarded input sections
  .debug_macro   0x00000000       0x16 ./Sources/FIFO.o
  .debug_macro   0x00000000       0x44 ./Sources/FIFO.o
  .debug_macro   0x00000000      0x209 ./Sources/FIFO.o
+ .group         0x00000000        0x8 ./Sources/Flash.o
+ .group         0x00000000        0x8 ./Sources/Flash.o
+ .group         0x00000000        0x8 ./Sources/Flash.o
+ .group         0x00000000        0x8 ./Sources/Flash.o
+ .group         0x00000000        0x8 ./Sources/Flash.o
+ .group         0x00000000        0x8 ./Sources/Flash.o
+ .group         0x00000000        0x8 ./Sources/Flash.o
+ .group         0x00000000        0x8 ./Sources/Flash.o
+ .text          0x00000000        0x0 ./Sources/Flash.o
+ .data          0x00000000        0x0 ./Sources/Flash.o
+ .bss           0x00000000        0x0 ./Sources/Flash.o
+ .text.Flash_Init
+                0x00000000       0x10 ./Sources/Flash.o
+ .text.Flash_AllocateVar
+                0x00000000       0x18 ./Sources/Flash.o
+ .text.Flash_Write32
+                0x00000000       0x18 ./Sources/Flash.o
+ .text.Flash_Write16
+                0x00000000       0x18 ./Sources/Flash.o
+ .text.Flash_Write8
+                0x00000000       0x18 ./Sources/Flash.o
+ .text.Flash_Erase
+                0x00000000       0x10 ./Sources/Flash.o
+ .debug_info    0x00000000      0x2ca ./Sources/Flash.o
+ .debug_abbrev  0x00000000       0xc8 ./Sources/Flash.o
+ .debug_aranges
+                0x00000000       0x48 ./Sources/Flash.o
+ .debug_ranges  0x00000000       0x38 ./Sources/Flash.o
+ .debug_macro   0x00000000       0x76 ./Sources/Flash.o
+ .debug_macro   0x00000000      0x850 ./Sources/Flash.o
+ .debug_macro   0x00000000       0x16 ./Sources/Flash.o
+ .debug_macro   0x00000000       0x16 ./Sources/Flash.o
+ .debug_macro   0x00000000       0x44 ./Sources/Flash.o
+ .debug_macro   0x00000000      0x209 ./Sources/Flash.o
+ .debug_macro   0x00000000    0x174af ./Sources/Flash.o
+ .debug_macro   0x00000000       0x22 ./Sources/Flash.o
+ .debug_macro   0x00000000       0x2e ./Sources/Flash.o
+ .debug_line    0x00000000      0x236 ./Sources/Flash.o
+ .debug_str     0x00000000    0x82f88 ./Sources/Flash.o
+ .comment       0x00000000       0x71 ./Sources/Flash.o
+ .ARM.attributes
+                0x00000000       0x39 ./Sources/Flash.o
+ .debug_frame   0x00000000       0xb0 ./Sources/Flash.o
+ COMMON         0x00000000        0xc ./Sources/Flash.o
  .group         0x00000000        0x8 ./Sources/LEDs.o
  .group         0x00000000        0x8 ./Sources/LEDs.o
  .group         0x00000000        0x8 ./Sources/LEDs.o
@@ -87,8 +133,10 @@ Discarded input sections
                 0x00000000       0x24 ./Sources/LEDs.o
  .debug_macro   0x00000000      0x850 ./Sources/LEDs.o
  .debug_macro   0x00000000       0x16 ./Sources/LEDs.o
+ .debug_macro   0x00000000       0x16 ./Sources/LEDs.o
  .debug_macro   0x00000000       0x44 ./Sources/LEDs.o
  .debug_macro   0x00000000      0x209 ./Sources/LEDs.o
+ .debug_macro   0x00000000    0x174af ./Sources/LEDs.o
  .debug_macro   0x00000000       0x22 ./Sources/LEDs.o
  .group         0x00000000        0x8 ./Sources/UART.o
  .group         0x00000000        0x8 ./Sources/UART.o
@@ -319,6 +367,7 @@ LOAD c:/freescale/kds_3.0.0/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv7e-
 LOAD c:/freescale/kds_3.0.0/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/../../../../arm-none-eabi/lib/armv7e-m/fpu/crt0.o
 LOAD ./Sources/Events.o
 LOAD ./Sources/FIFO.o
+LOAD ./Sources/Flash.o
 LOAD ./Sources/LEDs.o
 LOAD ./Sources/UART.o
 LOAD ./Sources/main.o
@@ -707,37 +756,35 @@ OUTPUT(Lab2.elf elf32-littlearm)
  .debug_ranges  0x000000c0       0x40 ./Project_Settings/Startup_Code/startup.o
  .debug_ranges  0x00000100       0x28 ./Generated_Code/Cpu.o
 
-.debug_macro    0x00000000    0x19ce8
+.debug_macro    0x00000000     0x2823
  .debug_macro   0x00000000       0x65 ./Sources/FIFO.o
  .debug_macro   0x00000065       0x22 ./Sources/FIFO.o
  .debug_macro   0x00000087       0x6d ./Sources/LEDs.o
- .debug_macro   0x000000f4       0x16 ./Sources/LEDs.o
- .debug_macro   0x0000010a    0x174af ./Sources/LEDs.o
- .debug_macro   0x000175b9       0x71 ./Sources/UART.o
- .debug_macro   0x0001762a       0x10 ./Sources/UART.o
- .debug_macro   0x0001763a       0xdc ./Sources/main.o
- .debug_macro   0x00017716     0x1800 ./Sources/main.o
- .debug_macro   0x00018f16       0x3a ./Sources/main.o
- .debug_macro   0x00018f50       0x68 ./Sources/packet.o
- .debug_macro   0x00018fb8      0x121 ./Project_Settings/Startup_Code/startup.o
- .debug_macro   0x000190d9       0x58 ./Project_Settings/Startup_Code/startup.o
- .debug_macro   0x00019131       0x35 ./Project_Settings/Startup_Code/startup.o
- .debug_macro   0x00019166       0xa3 ./Project_Settings/Startup_Code/startup.o
- .debug_macro   0x00019209      0x166 ./Project_Settings/Startup_Code/startup.o
- .debug_macro   0x0001936f       0x4a ./Project_Settings/Startup_Code/startup.o
- .debug_macro   0x000193b9       0x52 ./Project_Settings/Startup_Code/startup.o
- .debug_macro   0x0001940b       0x16 ./Project_Settings/Startup_Code/startup.o
- .debug_macro   0x00019421       0x43 ./Project_Settings/Startup_Code/startup.o
- .debug_macro   0x00019464      0x180 ./Project_Settings/Startup_Code/startup.o
- .debug_macro   0x000195e4      0x2a6 ./Project_Settings/Startup_Code/startup.o
- .debug_macro   0x0001988a       0x10 ./Project_Settings/Startup_Code/startup.o
- .debug_macro   0x0001989a       0x35 ./Project_Settings/Startup_Code/startup.o
- .debug_macro   0x000198cf       0x16 ./Project_Settings/Startup_Code/startup.o
- .debug_macro   0x000198e5       0x22 ./Project_Settings/Startup_Code/startup.o
- .debug_macro   0x00019907      0x20f ./Project_Settings/Startup_Code/startup.o
- .debug_macro   0x00019b16       0x9f ./Generated_Code/Cpu.o
- .debug_macro   0x00019bb5       0x94 ./Generated_Code/Cpu.o
- .debug_macro   0x00019c49       0x9f ./Generated_Code/Vectors.o
+ .debug_macro   0x000000f4       0x71 ./Sources/UART.o
+ .debug_macro   0x00000165       0x10 ./Sources/UART.o
+ .debug_macro   0x00000175       0xdc ./Sources/main.o
+ .debug_macro   0x00000251     0x1800 ./Sources/main.o
+ .debug_macro   0x00001a51       0x3a ./Sources/main.o
+ .debug_macro   0x00001a8b       0x68 ./Sources/packet.o
+ .debug_macro   0x00001af3      0x121 ./Project_Settings/Startup_Code/startup.o
+ .debug_macro   0x00001c14       0x58 ./Project_Settings/Startup_Code/startup.o
+ .debug_macro   0x00001c6c       0x35 ./Project_Settings/Startup_Code/startup.o
+ .debug_macro   0x00001ca1       0xa3 ./Project_Settings/Startup_Code/startup.o
+ .debug_macro   0x00001d44      0x166 ./Project_Settings/Startup_Code/startup.o
+ .debug_macro   0x00001eaa       0x4a ./Project_Settings/Startup_Code/startup.o
+ .debug_macro   0x00001ef4       0x52 ./Project_Settings/Startup_Code/startup.o
+ .debug_macro   0x00001f46       0x16 ./Project_Settings/Startup_Code/startup.o
+ .debug_macro   0x00001f5c       0x43 ./Project_Settings/Startup_Code/startup.o
+ .debug_macro   0x00001f9f      0x180 ./Project_Settings/Startup_Code/startup.o
+ .debug_macro   0x0000211f      0x2a6 ./Project_Settings/Startup_Code/startup.o
+ .debug_macro   0x000023c5       0x10 ./Project_Settings/Startup_Code/startup.o
+ .debug_macro   0x000023d5       0x35 ./Project_Settings/Startup_Code/startup.o
+ .debug_macro   0x0000240a       0x16 ./Project_Settings/Startup_Code/startup.o
+ .debug_macro   0x00002420       0x22 ./Project_Settings/Startup_Code/startup.o
+ .debug_macro   0x00002442      0x20f ./Project_Settings/Startup_Code/startup.o
+ .debug_macro   0x00002651       0x9f ./Generated_Code/Cpu.o
+ .debug_macro   0x000026f0       0x94 ./Generated_Code/Cpu.o
+ .debug_macro   0x00002784       0x9f ./Generated_Code/Vectors.o
 
 .debug_line     0x00000000     0x146a
  .debug_line    0x00000000      0x1c8 ./Sources/FIFO.o
