@@ -44,7 +44,7 @@
 
 
 // UART baud rate
-#define UART_BAUD_RATE 38400
+#define BAUD_RATE 38400
 
 // Listed command bits of a packet
 const uint8_t TOWER_STARTUP = 0x04;
@@ -60,8 +60,7 @@ const uint8_t TOWER_NUM_GET = 1;
 const uint8_t TOWER_NUM_SET = 2;
 
 // Tower number most and least significant bits
-uint8_t Tower_Num_MSB = 0x05;
-uint8_t Tower_Num_LSB = 0xEF;
+uint16union_t Tower_Num_Union;
 
 
 /*! @brief Sends the startup packets to the PC
@@ -74,7 +73,7 @@ bool HandleTowerStartup(void)
   return (
     Packet_Put(TOWER_STARTUP,0x00,0x00,0x00) &&
     Packet_Put(TOWER_VER,'v',TOWER_VER_MAJ,TOWER_VER_MIN) &&
-    Packet_Put(TOWER_NUM,TOWER_NUM_GET,Tower_Num_LSB,Tower_Num_MSB)
+    Packet_Put(TOWER_NUM,TOWER_NUM_GET,Tower_Num_Union.s.Lo,Tower_Num_Union.s.Hi)
   );
 }
 
@@ -85,7 +84,7 @@ bool HandleTowerStartup(void)
 bool HandleTowerVersion(void)
 {
   // Send tower number packet
-  return Packet_Put(TOWER_NUM,TOWER_NUM_GET,Tower_Num_LSB,Tower_Num_MSB);
+  return Packet_Put(TOWER_NUM,TOWER_NUM_GET,Tower_Num_Union.s.Lo,Tower_Num_Union.s.Hi);
 }
 
 /*! @brief Sends or sets the number packet to the PC
@@ -98,13 +97,13 @@ bool HandleTowerNumber(void)
   if(Packet_Parameter1 == TOWER_NUM_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Send tower number packet
-    return Packet_Put(TOWER_NUM,TOWER_NUM_GET,Tower_Num_LSB,Tower_Num_MSB);
+    return Packet_Put(TOWER_NUM,TOWER_NUM_GET,Tower_Num_Union.s.Lo,Tower_Num_Union.s.Hi);
   }
   else if (Packet_Parameter1 == TOWER_NUM_SET)
   {
     // Change tower number
-    Tower_Num_LSB = Packet_Parameter2;
-    Tower_Num_MSB = Packet_Parameter3;
+    Tower_Num_Union.s.Lo = Packet_Parameter2;
+    Tower_Num_Union.s.Hi = Packet_Parameter3;
     return true;
   }
   return false;
@@ -173,9 +172,16 @@ int main(void)
   /*** End of Processor Expert internal initialization.                    ***/
 
   /* Write your code here */
+
+  // Set Tower Number.
+  Tower_Num_Union.l = 1519;
+
+  // Initializes the LEDs by calling the initialization routines of the supporting software modules.
   LEDs_Init();
+
   // Initializes the packets by calling the initialization routines of the supporting software modules.
-  Packet_Init(UART_BAUD_RATE, CPU_BUS_CLK_HZ);
+  Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ);
+
   // Send startup packets to PC
   HandleTowerStartup();
 
@@ -188,6 +194,7 @@ int main(void)
     {
       // Execute a command depending on what packet has been received
       ReceivedPacket();
+      LEDs_Toggle(LED_YELLOW);
     }
   }
 
