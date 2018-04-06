@@ -11,6 +11,7 @@
 
 TFCCOB commonCommandObject;
 
+
 /*! @brief Enables the Flash module.
  *
  *  @return bool - TRUE if the Flash was setup successfully.
