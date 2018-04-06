@@ -14,6 +14,22 @@
 // new types
 #include "types.h"
 
+typedef struct
+{
+  uint8_t FCMD;
+  uint8_t flashAddress23to16;
+  uint8_t flashAddress15to08;
+  uint8_t flashAddress07to00;
+  uint8_t dataByte0;
+  uint8_t dataByte1;
+  uint8_t dataByte2;
+  uint8_t dataByte3;
+  uint8_t dataByte4;
+  uint8_t dataByte5;
+  uint8_t dataByte6;
+  uint8_t dataByte7;
+} TFCCOB;
+
 // FLASH data access
 #define _FB(flashAddress)  *(uint8_t  volatile *)(flashAddress)
 #define _FH(flashAddress)  *(uint16_t volatile *)(flashAddress)

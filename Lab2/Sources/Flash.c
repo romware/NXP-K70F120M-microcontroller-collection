@@ -7,6 +7,9 @@
 
 #include "MK70F12.h"
 #include "LEDs.h"
+#include "Flash.h"
+
+TFCCOB commonCommandObject;
 
 /*! @brief Enables the Flash module.
  *

@@ -6,6 +6,7 @@
 C_SRCS += \
 ../Sources/Events.c \
 ../Sources/FIFO.c \
+../Sources/Flash.c \
 ../Sources/LEDs.c \
 ../Sources/UART.c \
 ../Sources/main.c \
@@ -14,6 +15,7 @@ C_SRCS += \
 OBJS += \
 ./Sources/Events.o \
 ./Sources/FIFO.o \
+./Sources/Flash.o \
 ./Sources/LEDs.o \
 ./Sources/UART.o \
 ./Sources/main.o \
@@ -22,6 +24,7 @@ OBJS += \
 C_DEPS += \
 ./Sources/Events.d \
 ./Sources/FIFO.d \
+./Sources/Flash.d \
 ./Sources/LEDs.d \
 ./Sources/UART.d \
 ./Sources/main.d \
