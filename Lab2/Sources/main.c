@@ -11,6 +11,7 @@
 **     Settings    :
 **     Contents    :
 **         No public methods
+**     Authors     : 12403756, 12551519
 **
 ** ###################################################################*/
 /*!
@@ -28,13 +29,138 @@
 
 
 // CPU module - contains low level hardware initialization routines
+#include "types.h"
 #include "Cpu.h"
+#include "Events.h"
 #include "PE_Types.h"
 #include "PE_Error.h"
 #include "PE_Const.h"
 #include "IO_Map.h"
 #include "LEDs.h"
+#include "MK70F12.h"
+#include "UART.h"
+#include "FIFO.h"
+#include "packet.h"
 
+
+// UART baud rate
+#define UART_BAUD_RATE 38400
+
+// Listed command bits of a packet
+const uint8_t TOWER_STARTUP = 0x04;
+const uint8_t TOWER_VER = 0x09;
+const uint8_t TOWER_NUM = 0x0B;
+
+// Tower major version and minor version
+const uint8_t TOWER_VER_MAJ = 1;
+const uint8_t TOWER_VER_MIN = 0;
+
+// Tower number get and set bits of packet parameter 1
+const uint8_t TOWER_NUM_GET = 1;
+const uint8_t TOWER_NUM_SET = 2;
+
+// Tower number most and least significant bits
+uint8_t Tower_Num_MSB = 0x05;
+uint8_t Tower_Num_LSB = 0xEF;
+
+
+/*! @brief Sends the startup packets to the PC
+ *
+ *  @return bool - TRUE if all packets are sent
+ */
+bool HandleTowerStartup(void)
+{
+  // Sends the tower startup values, version and number to the PC
+  return (
+    Packet_Put(TOWER_STARTUP,0x00,0x00,0x00) &&
+    Packet_Put(TOWER_VER,'v',TOWER_VER_MAJ,TOWER_VER_MIN) &&
+    Packet_Put(TOWER_NUM,TOWER_NUM_GET,Tower_Num_LSB,Tower_Num_MSB)
+  );
+}
+
+/*! @brief Sends the version packet to the PC
+ *
+ *  @return bool - TRUE if packet is sent
+ */
+bool HandleTowerVersion(void)
+{
+  // Send tower number packet
+  return Packet_Put(TOWER_NUM,TOWER_NUM_GET,Tower_Num_LSB,Tower_Num_MSB);
+}
+
+/*! @brief Sends or sets the number packet to the PC
+ *
+ *  @return bool - TRUE if packet is sent or number is set
+ */
+bool HandleTowerNumber(void)
+{
+  // Check if parameters match tower number GET or SET parameters
+  if(Packet_Parameter1 == TOWER_NUM_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Send tower number packet
+    return Packet_Put(TOWER_NUM,TOWER_NUM_GET,Tower_Num_LSB,Tower_Num_MSB);
+  }
+  else if (Packet_Parameter1 == TOWER_NUM_SET)
+  {
+    // Change tower number
+    Tower_Num_LSB = Packet_Parameter2;
+    Tower_Num_MSB = Packet_Parameter3;
+    return true;
+  }
+  return false;
+}
+
+/*! @brief Executes the command depending on what packet has been received
+ *
+ *  @return void
+ */
+void ReceivedPacket(void)
+{
+  // Initializes the success status of the received packet to false
+  bool success = false;
+  uint8_t commandIgnoreAck = Packet_Command & ~PACKET_ACK_MASK;
+  uint8_t commandAck = Packet_Command & PACKET_ACK_MASK;
+
+  // AND the packet command byte with the bitwise inverse ACK MASK to ignore if ACK is requested
+  if(commandIgnoreAck == TOWER_STARTUP && Packet_Parameter1 == 0 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Send tower startup packets
+    success = HandleTowerStartup();
+  }
+  else if(commandIgnoreAck == TOWER_VER && Packet_Parameter1 == 'v' && Packet_Parameter2 == 'x' && Packet_Parameter3 == 13)
+  {
+    // Send tower version packet
+    success = HandleTowerVersion();
+  }
+  else if(commandIgnoreAck == TOWER_NUM)
+  {
+    // Check if parameters match tower number GET or SET parameters
+    success = HandleTowerNumber();
+  }
+
+  // AND the packet command byte with the ACK MASK to check if ACK is requested
+  if(commandAck)
+  {
+    // Check the success status of the packet which was sent
+    if(success == false)
+    {
+      // Return the sent packet with the NACK command if unsuccessful
+      Packet_Put(commandIgnoreAck,Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
+    }
+    else
+    {
+      // Return the sent packet with the ACK command if successful
+      Packet_Put(Packet_Command,Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
+    }
+  }
+
+  // Reset the packet variables to 0
+  Packet_Command = 0;
+  Packet_Parameter1 = 0;
+  Packet_Parameter2 = 0;
+  Packet_Parameter3 = 0;
+  Packet_Checksum = 0;
+}
 
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
 int main(void)
@@ -48,21 +174,21 @@ int main(void)
 
   /* Write your code here */
   LEDs_Init();
-  LEDs_On(LED_BLUE);
-  LEDs_On(LED_YELLOW);
-  LEDs_Off(LED_GREEN);
-  LEDs_Off(LED_ORANGE);
-  //GPIOA_PCOR |= GPIO_PDD_PIN_11;
+  // Initializes the packets by calling the initialization routines of the supporting software modules.
+  Packet_Init(UART_BAUD_RATE, CPU_BUS_CLK_HZ);
+  // Send startup packets to PC
+  HandleTowerStartup();
+
   for (;;)
   {
-    for(uint32_t i = 0; i <500000; i++)
-      {
-	//delay
-      }
-    LEDs_Toggle(LED_BLUE);
-    LEDs_Toggle(LED_ORANGE);
-    LEDs_Toggle(LED_YELLOW);
-    LEDs_Toggle(LED_GREEN);
+    // Poll UART2 for packets to transmit and receive
+    UART_Poll();
+    // Check if packet has been received
+    if(Packet_Get())
+    {
+      // Execute a command depending on what packet has been received
+      ReceivedPacket();
+    }
   }
 
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/

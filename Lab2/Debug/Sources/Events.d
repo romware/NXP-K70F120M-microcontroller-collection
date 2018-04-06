@@ -1,4 +1,4 @@
-Sources/main.d: ../Sources/main.c ../Sources/types.h \
+Sources/Events.o: ../Sources/Events.c \
  D:/Embedded\ Software/es18aut13/Lab2/Generated_Code/Cpu.h \
  D:/Embedded\ Software/es18aut13/Lab2/Generated_Code/PE_Types.h \
  D:/Embedded\ Software/es18aut13/Lab2/Generated_Code/PE_Error.h \
@@ -9,11 +9,7 @@ Sources/main.d: ../Sources/main.c ../Sources/types.h \
  D:/Embedded\ Software/es18aut13/Lab2/Generated_Code/PE_Types.h \
  D:/Embedded\ Software/es18aut13/Lab2/Generated_Code/PE_Error.h \
  D:/Embedded\ Software/es18aut13/Lab2/Generated_Code/PE_Const.h \
- D:/Embedded\ Software/es18aut13/Lab2/Generated_Code/IO_Map.h \
- ../Sources/LEDs.h ../Sources/UART.h ../Sources/FIFO.h \
- ../Sources/packet.h
-
-../Sources/types.h:
+ D:/Embedded\ Software/es18aut13/Lab2/Generated_Code/IO_Map.h
 
 D:/Embedded\ Software/es18aut13/Lab2/Generated_Code/Cpu.h:
 
@@ -36,11 +32,3 @@ D:/Embedded\ Software/es18aut13/Lab2/Generated_Code/PE_Error.h:
 D:/Embedded\ Software/es18aut13/Lab2/Generated_Code/PE_Const.h:
 
 D:/Embedded\ Software/es18aut13/Lab2/Generated_Code/IO_Map.h:
-
-../Sources/LEDs.h:
-
-../Sources/UART.h:
-
-../Sources/FIFO.h:
-
-../Sources/packet.h:

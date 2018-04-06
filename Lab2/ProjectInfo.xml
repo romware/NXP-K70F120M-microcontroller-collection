@@ -35,80 +35,45 @@
     <FLASHsize>1M</FLASHsize>
   </PROCESSOR>
   <PATHS>
-    <LinkerCommandFile>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Project_Settings\Linker_Files\ProcessorExpert.ld</LinkerCommandFile>
+    <LinkerCommandFile>D:\Embedded Software\es18aut13\Lab2\Project_Settings\Linker_Files\ProcessorExpert.ld</LinkerCommandFile>
     <IncludePaths>
-      <Path>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\</Path>
-      <Path>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\IO_Map\</Path>
-      <Path>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Sources\</Path>
-      <Path>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Generated_Code\</Path>
+      <Path>D:\Embedded Software\es18aut13\Lab2\Static_Code\PDD\</Path>
+      <Path>D:\Embedded Software\es18aut13\Lab2\Static_Code\IO_Map\</Path>
+      <Path>D:\Embedded Software\es18aut13\Lab2\Sources\</Path>
+      <Path>D:\Embedded Software\es18aut13\Lab2\Generated_Code\</Path>
     </IncludePaths>
     <SourceCodePaths>
-      <Path>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Generated_Code\</Path>
-      <Path>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Project_Settings\Startup_Code\</Path>
-      <Path>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Sources\</Path>
+      <Path>D:\Embedded Software\es18aut13\Lab2\Generated_Code\</Path>
+      <Path>D:\Embedded Software\es18aut13\Lab2\Project_Settings\Startup_Code\</Path>
+      <Path>D:\Embedded Software\es18aut13\Lab2\Sources\</Path>
     </SourceCodePaths>
   </PATHS>
   <FILES>
     <GeneratedCs>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Generated_Code\Cpu.c</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Generated_Code\PE_LDD.c</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Generated_Code\Vectors.c</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Project_Settings\Startup_Code\startup.c</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Sources\Events.c</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Sources\main.c</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Generated_Code\Cpu.c</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Generated_Code\PE_LDD.c</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Generated_Code\Vectors.c</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Project_Settings\Startup_Code\startup.c</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Sources\Events.c</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Sources\LEDs.c</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Sources\main.c</PathName>
     </GeneratedCs>
     <GeneratedHs>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Generated_Code\Cpu.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Generated_Code\IO_Map.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Generated_Code\PE_Const.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Generated_Code\PE_Error.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Generated_Code\PE_LDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Generated_Code\PE_Types.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Sources\Events.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Sources\FIFO.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Sources\Flash.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Sources\UART.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Sources\packet.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Sources\types.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\IO_Map\MK70F12.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\ADC_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\CAN_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\CMP_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\CMT_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\CRC_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\DAC_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\DMAMUX_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\DMA_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\ENET_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\EWM_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\FMC_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\FTFE_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\FTM_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\GPIO_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\I2C_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\LCDC_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\LPTMR_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\MCG_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\MCM_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\NFC_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\OSC_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\PDB_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\PDD_Types.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\PIT_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\PORT_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\RNGA_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\RTC_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\SAI_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\SDHC_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\SIM_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\SPI_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\SysTick_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\UART_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\USBDCD_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\USBHS_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\USB_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\VREF_PDD.h</PathName>
-      <PathName>C:\Users\PMcL\Documents\Subjects\48434 Embedded Software\4 Labs\Lab 2\Template\Lab2\Static_Code\PDD\WDOG_PDD.h</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Generated_Code\Cpu.h</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Generated_Code\IO_Map.h</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Generated_Code\PE_Const.h</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Generated_Code\PE_Error.h</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Generated_Code\PE_LDD.h</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Generated_Code\PE_Types.h</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Sources\Events.h</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Sources\FIFO.h</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Sources\Flash.h</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Sources\LEDs.h</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Sources\UART.h</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Sources\packet.h</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Sources\types.h</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Static_Code\IO_Map\MK70F12.h</PathName>
+      <PathName>D:\Embedded Software\es18aut13\Lab2\Static_Code\PDD\PDD_Types.h</PathName>
     </GeneratedHs>
   </FILES>
   <OPTIONS>

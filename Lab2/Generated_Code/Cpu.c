@@ -8,7 +8,7 @@
 **     Repository  : Kinetis
 **     Datasheet   : K70P256M150SF3RM, Rev. 2, Dec 2011
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-08-14, 10:44, # CodeGen: 7
+**     Date/Time   : 2018-04-06, 20:17, # CodeGen: 8
 **     Abstract    :
 **
 **     Settings    :
@@ -328,6 +328,7 @@
 #include "PE_Error.h"
 #include "PE_Const.h"
 #include "IO_Map.h"
+#include "Events.h"
 #include "Cpu.h"
 
 #ifdef __cplusplus
