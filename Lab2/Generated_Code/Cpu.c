@@ -8,7 +8,7 @@
 **     Repository  : Kinetis
 **     Datasheet   : K70P256M150SF3RM, Rev. 2, Dec 2011
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2018-04-06, 20:17, # CodeGen: 8
+**     Date/Time   : 2018-04-07, 21:04, # CodeGen: 9
 **     Abstract    :
 **
 **     Settings    :
@@ -23,7 +23,12 @@
 **              Fast internal reference clock [MHz]        : 4
 **              Initialize fast trim value                 : no
 **            RTC oscillator                               : Disabled
-**            System oscillator 0                          : Disabled
+**            System oscillator 0                          : Enabled
+**              Clock source                               : External reference clock
+**                Clock input pin                          : 
+**                  Pin name                               : EXTAL0/PTA18/FTM0_FLT2/FTM_CLKIN0
+**                  Pin signal                             : 
+**                Clock frequency [MHz]                    : 50
 **            System oscillator 1                          : Disabled
 **            Clock source settings                        : 1
 **              Clock source setting 0                     : 
@@ -35,28 +40,29 @@
 **                External reference clock                 : 
 **                  OSC0ERCLK clock                        : Enabled
 **                  OSC0ERCLK in stop                      : Disabled
-**                  OSC0ERCLK clock [MHz]                  : 0
+**                  OSC0ERCLK clock [MHz]                  : 50
 **                  OSC1ERCLK clock                        : Disabled
 **                  OSC1ERCLK in stop                      : Disabled
 **                  OSC1ERCLK clock [MHz]                  : 0
 **                  ERCLK32K clock source                  : System oscillator 0
-**                  ERCLK32K. clock [kHz]                  : 0
+**                  ERCLK32K. clock [kHz]                  : 50
 **                MCG settings                             : 
-**                  MCG mode                               : FEI
-**                  MCG output clock                       : FLL clock
-**                  MCG output [MHz]                       : 20.97152
+**                  MCG mode                               : BLPE
+**                  MCG output clock                       : External clock
+**                  MCG output [MHz]                       : 50
 **                  MCG external ref. clock source         : System oscillator 0
-**                  MCG external ref. clock [MHz]          : 0
+**                  MCG external ref. clock [MHz]          : 50
 **                  Clock monitor                          : 
 **                    System oscillator 0                  : Disabled
 **                    RTC oscillator                       : Disabled
 **                    System oscillator 1                  : Disabled
 **                  FLL settings                           : 
-**                    FLL module                           : Enabled
-**                    FLL output [MHz]                     : 20.97152
-**                    MCGFFCLK clock [kHz]                 : 16.384
-**                    Reference clock source               : Slow internal clock
-**                    FLL reference clock [kHz]            : 32.768
+**                    FLL module                           : Disabled
+**                    FLL output [MHz]                     : 0
+**                    MCGFFCLK clock [kHz]                 : 24.4140625
+**                    Reference clock source               : External clock
+**                      Reference clock divider            : Auto select
+**                    FLL reference clock [kHz]            : 48.828125
 **                    Multiplication factor                : Auto select
 **                  PLL 0 settings                         : 
 **                    PLL module                           : Disabled
@@ -259,23 +265,23 @@
 **              __RTC_OSC                                  : 0
 **              Very low power mode                        : Disabled
 **              Clock source setting                       : configuration 0
-**                MCG mode                                 : FEI
-**                MCG output [MHz]                         : 20.97152
+**                MCG mode                                 : BLPE
+**                MCG output [MHz]                         : 50
 **                MCGIRCLK clock [MHz]                     : 0.032768
-**                OSCERCLK clock [MHz]                     : 0
-**                ERCLK32K. clock [kHz]                    : 0
-**                MCGFFCLK [kHz]                           : 16.384
+**                OSCERCLK clock [MHz]                     : 50
+**                ERCLK32K. clock [kHz]                    : 50
+**                MCGFFCLK [kHz]                           : 24.4140625
 **              System clocks                              : 
 **                Core clock prescaler                     : Auto select
-**                Core clock                               : 20.97152
+**                Core clock                               : 50
 **                Bus clock prescaler                      : Auto select
-**                Bus clock                                : 20.97152
+**                Bus clock                                : 25
 **                External clock prescaler                 : Auto select
-**                External bus clock                       : 10.48576
+**                External bus clock                       : 10
 **                Flash clock prescaler                    : Auto select
-**                Flash clock                              : 10.48576
+**                Flash clock                              : 12.5
 **                PLL/FLL clock selection                  : FLL
-**                  Clock frequency [MHz]                  : 20.97152
+**                  Clock frequency [MHz]                  : 0
 **     Contents    :
 **         No public methods
 **
@@ -403,35 +409,34 @@ void __init_hardware(void)
     /* PMC_REGSC: ACKISO=1 */
     PMC_REGSC |= PMC_REGSC_ACKISO_MASK; /* Release IO pads after wakeup from VLLS mode. */
   }
-  /* SIM_CLKDIV1: OUTDIV1=0,OUTDIV2=0,OUTDIV3=1,OUTDIV4=1,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0 */
+  /* SIM_CLKDIV1: OUTDIV1=0,OUTDIV2=1,OUTDIV3=4,OUTDIV4=3,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0 */
   SIM_CLKDIV1 = SIM_CLKDIV1_OUTDIV1(0x00) |
-                SIM_CLKDIV1_OUTDIV2(0x00) |
-                SIM_CLKDIV1_OUTDIV3(0x01) |
-                SIM_CLKDIV1_OUTDIV4(0x01); /* Update system prescalers */
+                SIM_CLKDIV1_OUTDIV2(0x01) |
+                SIM_CLKDIV1_OUTDIV3(0x04) |
+                SIM_CLKDIV1_OUTDIV4(0x03); /* Update system prescalers */
   /* SIM_SOPT2: PLLFLLSEL=0 */
   SIM_SOPT2 &= (uint32_t)~(uint32_t)(SIM_SOPT2_PLLFLLSEL(0x03)); /* Select FLL as a clock source for various peripherals */
   /* SIM_SOPT1: OSC32KSEL=0 */
   SIM_SOPT1 &= (uint32_t)~(uint32_t)(SIM_SOPT1_OSC32KSEL_MASK); /* System oscillator drives 32 kHz clock for various peripherals */
   /* SIM_SCGC1: OSC1=1 */
   SIM_SCGC1 |= SIM_SCGC1_OSC1_MASK;
-  /* Switch to FEI Mode */
-  /* MCG_C1: CLKS=0,FRDIV=0,IREFS=1,IRCLKEN=1,IREFSTEN=0 */
-  MCG_C1 = MCG_C1_CLKS(0x00) |
-           MCG_C1_FRDIV(0x00) |
-           MCG_C1_IREFS_MASK |
-           MCG_C1_IRCLKEN_MASK;
-  /* MCG_C2: LOCRE0=0,??=0,RANGE0=0,HGO0=0,EREFS0=0,LP=0,IRCS=0 */
-  MCG_C2 = MCG_C2_RANGE0(0x00);
-  /* MCG_C4: DMX32=0,DRST_DRS=0 */
-  MCG_C4 &= (uint8_t)~(uint8_t)((MCG_C4_DMX32_MASK | MCG_C4_DRST_DRS(0x03)));
-  /* OSC0_CR: ERCLKEN=1,??=0,EREFSTEN=0,??=0,SC2P=0,SC4P=0,SC8P=0,SC16P=0 */
-  OSC0_CR = OSC_CR_ERCLKEN_MASK;
-  /* MCG_C10: LOCRE2=0,??=0,RANGE1=0,HGO1=0,EREFS1=0,??=0,??=0 */
-  MCG_C10 = MCG_C10_RANGE1(0x00);
-  /* OSC1_CR: ERCLKEN=0,??=0,EREFSTEN=0,??=0,SC2P=0,SC4P=0,SC8P=0,SC16P=0 */
-  OSC1_CR = 0x00U;
+  /* PORTA_PCR18: ISF=0,MUX=0 */
+  PORTA_PCR18 &= (uint32_t)~(uint32_t)((PORT_PCR_ISF_MASK | PORT_PCR_MUX(0x07)));
+  /* Switch to FBE Mode */
   /* MCG_C7: OSCSEL=0 */
   MCG_C7 &= (uint8_t)~(uint8_t)(MCG_C7_OSCSEL_MASK);
+  /* MCG_C10: LOCRE2=0,??=0,RANGE1=0,HGO1=0,EREFS1=0,??=0,??=0 */
+  MCG_C10 = MCG_C10_RANGE1(0x00);
+  /* MCG_C2: LOCRE0=0,??=0,RANGE0=2,HGO0=0,EREFS0=0,LP=0,IRCS=0 */
+  MCG_C2 = MCG_C2_RANGE0(0x02);
+  /* OSC0_CR: ERCLKEN=1,??=0,EREFSTEN=0,??=0,SC2P=0,SC4P=0,SC8P=0,SC16P=0 */
+  OSC0_CR = OSC_CR_ERCLKEN_MASK;
+  /* OSC1_CR: ERCLKEN=0,??=0,EREFSTEN=0,??=0,SC2P=0,SC4P=0,SC8P=0,SC16P=0 */
+  OSC1_CR = 0x00U;
+  /* MCG_C1: CLKS=2,FRDIV=5,IREFS=0,IRCLKEN=1,IREFSTEN=0 */
+  MCG_C1 = (MCG_C1_CLKS(0x02) | MCG_C1_FRDIV(0x05) | MCG_C1_IRCLKEN_MASK);
+  /* MCG_C4: DMX32=0,DRST_DRS=0 */
+  MCG_C4 &= (uint8_t)~(uint8_t)((MCG_C4_DMX32_MASK | MCG_C4_DRST_DRS(0x03)));
   /* MCG_C5: PLLREFSEL0=0,PLLCLKEN0=0,PLLSTEN0=0,??=0,??=0,PRDIV0=0 */
   MCG_C5 = MCG_C5_PRDIV0(0x00);
   /* MCG_C6: LOLIE0=0,PLLS=0,CME0=0,VDIV0=0 */
@@ -439,10 +444,15 @@ void __init_hardware(void)
   /* MCG_C11: PLLREFSEL1=0,PLLCLKEN1=0,PLLSTEN1=0,PLLCS=0,??=0,PRDIV1=0 */
   MCG_C11 = MCG_C11_PRDIV1(0x00);
   /* MCG_C12: LOLIE1=0,??=0,CME2=0,VDIV1=0 */
-  MCG_C12 = MCG_C12_VDIV1(0x00);       /* 3 */
-  while((MCG_S & MCG_S_IREFST_MASK) == 0x00U) { /* Check that the source of the FLL reference clock is the internal reference clock. */
+  MCG_C12 = MCG_C12_VDIV1(0x00);
+  while((MCG_S & MCG_S_IREFST_MASK) != 0x00U) { /* Check that the source of the FLL reference clock is the external reference clock. */
   }
-  while((MCG_S & 0x0CU) != 0x00U) {    /* Wait until output of the FLL is selected */
+  while((MCG_S & 0x0CU) != 0x08U) {    /* Wait until external reference clock is selected as MCG output */
+  }
+  /* Switch to BLPE Mode */
+  /* MCG_C2: LOCRE0=0,??=0,RANGE0=2,HGO0=0,EREFS0=0,LP=1,IRCS=0 */
+  MCG_C2 = (MCG_C2_RANGE0(0x02) | MCG_C2_LP_MASK);
+  while((MCG_S & 0x0CU) != 0x08U) {    /* Wait until external reference clock is selected as MCG output */
   }
   /*** End of PE initialization code after reset ***/
 

@@ -35,45 +35,49 @@
     <FLASHsize>1M</FLASHsize>
   </PROCESSOR>
   <PATHS>
-    <LinkerCommandFile>D:\Embedded Software\es18aut13\Lab2\Project_Settings\Linker_Files\ProcessorExpert.ld</LinkerCommandFile>
+    <LinkerCommandFile>D:\es18aut13\Lab2\Project_Settings\Linker_Files\ProcessorExpert.ld</LinkerCommandFile>
     <IncludePaths>
-      <Path>D:\Embedded Software\es18aut13\Lab2\Static_Code\PDD\</Path>
-      <Path>D:\Embedded Software\es18aut13\Lab2\Static_Code\IO_Map\</Path>
-      <Path>D:\Embedded Software\es18aut13\Lab2\Sources\</Path>
-      <Path>D:\Embedded Software\es18aut13\Lab2\Generated_Code\</Path>
+      <Path>D:\es18aut13\Lab2\Static_Code\PDD\</Path>
+      <Path>D:\es18aut13\Lab2\Static_Code\IO_Map\</Path>
+      <Path>D:\es18aut13\Lab2\Sources\</Path>
+      <Path>D:\es18aut13\Lab2\Generated_Code\</Path>
     </IncludePaths>
     <SourceCodePaths>
-      <Path>D:\Embedded Software\es18aut13\Lab2\Generated_Code\</Path>
-      <Path>D:\Embedded Software\es18aut13\Lab2\Project_Settings\Startup_Code\</Path>
-      <Path>D:\Embedded Software\es18aut13\Lab2\Sources\</Path>
+      <Path>D:\es18aut13\Lab2\Generated_Code\</Path>
+      <Path>D:\es18aut13\Lab2\Project_Settings\Startup_Code\</Path>
+      <Path>D:\es18aut13\Lab2\Sources\</Path>
     </SourceCodePaths>
   </PATHS>
   <FILES>
     <GeneratedCs>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Generated_Code\Cpu.c</PathName>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Generated_Code\PE_LDD.c</PathName>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Generated_Code\Vectors.c</PathName>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Project_Settings\Startup_Code\startup.c</PathName>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Sources\Events.c</PathName>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Sources\LEDs.c</PathName>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Sources\main.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Generated_Code\Cpu.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Generated_Code\PE_LDD.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Generated_Code\Vectors.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Project_Settings\Startup_Code\startup.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\Events.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\FIFO.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\Flash.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\LEDs.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\UART.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\main.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\packet.c</PathName>
     </GeneratedCs>
     <GeneratedHs>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Generated_Code\Cpu.h</PathName>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Generated_Code\IO_Map.h</PathName>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Generated_Code\PE_Const.h</PathName>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Generated_Code\PE_Error.h</PathName>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Generated_Code\PE_LDD.h</PathName>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Generated_Code\PE_Types.h</PathName>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Sources\Events.h</PathName>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Sources\FIFO.h</PathName>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Sources\Flash.h</PathName>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Sources\LEDs.h</PathName>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Sources\UART.h</PathName>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Sources\packet.h</PathName>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Sources\types.h</PathName>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Static_Code\IO_Map\MK70F12.h</PathName>
-      <PathName>D:\Embedded Software\es18aut13\Lab2\Static_Code\PDD\PDD_Types.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Generated_Code\Cpu.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Generated_Code\IO_Map.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Generated_Code\PE_Const.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Generated_Code\PE_Error.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Generated_Code\PE_LDD.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Generated_Code\PE_Types.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\Events.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\FIFO.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\Flash.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\LEDs.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\UART.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\packet.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\types.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Static_Code\IO_Map\MK70F12.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Static_Code\PDD\PDD_Types.h</PathName>
     </GeneratedHs>
   </FILES>
   <OPTIONS>

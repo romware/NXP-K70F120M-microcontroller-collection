@@ -3,7 +3,7 @@
   <Header>
     <Name>Lab2</Name>
     <SavedBy>PMcL</SavedBy>
-    <ModificationStamp>15</ModificationStamp>
+    <ModificationStamp>16</ModificationStamp>
     <Date>2015-07-20</Date>
     <IDE>Eclipse IDE</IDE>
     <PEversion>1.12.0.RT7_b1515-0427</PEversion>
@@ -19861,8 +19861,8 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>false</Value>
-        <Expanded>false</Expanded>
+        <Value>true</Value>
+        <Expanded>true</Expanded>
       </ItemState>
       <ItemState>
         <ItemSymbol>SystemOSCSrc</ItemSymbol>
@@ -20082,7 +20082,7 @@
       <ItemState>
         <ItemSymbol>ERCLKClkCLKMode0</ItemSymbol>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>0</Value>
+        <Value>50</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>SystemOSC1ERCLKENCLKMode0</ItemSymbol>
@@ -20116,7 +20116,7 @@
       <ItemState>
         <ItemSymbol>ERCLK32KClkCLKMode0</ItemSymbol>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>0</Value>
+        <Value>50</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>MCGGrp0</ItemSymbol>
@@ -20129,7 +20129,7 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Index>0</Index>
+        <Index>7</Index>
       </ItemState>
       <ItemState>
         <ItemSymbol>PLLCSCLKMode0</ItemSymbol>
@@ -20143,8 +20143,8 @@
       <ItemState>
         <ItemSymbol>MCGOUTSelectCLKMode0</ItemSymbol>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Index>0</Index>
-        <EnumSymbVal>FLLOUT</EnumSymbVal>
+        <Index>3</Index>
+        <EnumSymbVal>EXTCLK</EnumSymbVal>
       </ItemState>
       <ItemState>
         <ItemSymbol>MCGModeCLKMode0</ItemSymbol>
@@ -20168,7 +20168,7 @@
       <ItemState>
         <ItemSymbol>MCG_ERCLKClkCLKMode0</ItemSymbol>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>0</Value>
+        <Value>50</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>ClockMonitorGrp0</ItemSymbol>
@@ -20224,7 +20224,7 @@
       <ItemState>
         <ItemSymbol>FLLFixedClkCLKMode0</ItemSymbol>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>16.384</Value>
+        <Value>24.4140625</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>FLL_RefClkSrcCLKMode0</ItemSymbol>
@@ -20245,7 +20245,7 @@
       <ItemState>
         <ItemSymbol>FLLRefClkCLKMode0</ItemSymbol>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>32.768</Value>
+        <Value>48.828125</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>MCG_FLL_MFactor_CLKMode0</ItemSymbol>
@@ -37910,7 +37910,7 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>IRC_32kHz</Value>
+        <Value>MCG_FRDIV</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>MCG_FRDIVSpeedMode0</ItemSymbol>
@@ -37966,7 +37966,7 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>MCGFLLCLK</Value>
+        <Value>MCG_ERCLK</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>VLPRSpeedMode0</ItemSymbol>
@@ -38003,13 +38003,13 @@
       <ItemState>
         <ItemSymbol>MCGModeSelSpeedMode0</ItemSymbol>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Index>0</Index>
-        <EnumSymbVal>0</EnumSymbVal>
+        <Index>7</Index>
+        <EnumSymbVal>7</EnumSymbVal>
       </ItemState>
       <ItemState>
         <ItemSymbol>MCGOutputSpeedMode0</ItemSymbol>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>20.97152</Value>
+        <Value>50</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>IRCLKClkSpeedMode0</ItemSymbol>
@@ -38017,15 +38017,15 @@
       </ItemState>
       <ItemState>
         <ItemSymbol>ERCLKClkSpeedMode0</ItemSymbol>
-        <Value>0</Value>
+        <Value>50</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>ERCLK32KClkSpeedMode0</ItemSymbol>
-        <Value>0</Value>
+        <Value>50</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>FLLFixedClkSpeedMode0</ItemSymbol>
-        <Value>16.384</Value>
+        <Value>24.4140625</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>SystemClocksGrp0</ItemSymbol>
@@ -38052,14 +38052,14 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>20.97152</Value>
+        <Value>50</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>OUTDIV2PrescSpeedMode0</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>1</Value>
+        <Value>2</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>OUTDIV2Presc_SpeedMode0</ItemSymbol>
@@ -38073,14 +38073,14 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>20.97152</Value>
+        <Value>25</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>OUTDIV3PrescSpeedMode0</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>2</Value>
+        <Value>5</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>OUTDIV3Presc_SpeedMode0</ItemSymbol>
@@ -38094,14 +38094,14 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>10.48576</Value>
+        <Value>10</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>OUTDIV4PrescSpeedMode0</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>2</Value>
+        <Value>4</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>OUTDIV4Presc_SpeedMode0</ItemSymbol>
@@ -38115,7 +38115,7 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>10.48576</Value>
+        <Value>12.5</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>USB0_CLKINSpeedMode0</ItemSymbol>
@@ -38149,7 +38149,7 @@
       <ItemState>
         <ItemSymbol>PLLFLLClockSpeedMode0</ItemSymbol>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>20.97152</Value>
+        <Value>0</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>I2S0_CLKINCondGrp0</ItemSymbol>

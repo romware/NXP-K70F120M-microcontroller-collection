@@ -44,7 +44,7 @@
 
 
 // UART baud rate
-#define BAUD_RATE 38400
+#define BAUD_RATE 115200
 
 // Listed command bits of a packet
 const uint8_t TOWER_STARTUP = 0x04;

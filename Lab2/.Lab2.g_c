@@ -2,7 +2,7 @@
 <GenerationInfo_G_C>
   <Options>
     <ProjectName>Lab2</ProjectName>
-    <ProjectDirectory>D:\Embedded Software\es18aut13\Lab2\</ProjectDirectory>
+    <ProjectDirectory>D:\es18aut13\Lab2\</ProjectDirectory>
     <ProjectMainModuleName>main</ProjectMainModuleName>
     <DestEventsDirectory>Sources\</DestEventsDirectory>
     <DestDriversSubDirectory>..\Generated_Code\</DestDriversSubDirectory>
@@ -19,16 +19,16 @@
         <Line>PE_Const</Line>
         <Line>IO_Map</Line>
       </GenSharedModules>
-      <ShrdHeaderAge0>1283891644</ShrdHeaderAge0>
+      <ShrdHeaderAge0>1283958629</ShrdHeaderAge0>
       <ShrdCodeAge0>-1</ShrdCodeAge0>
       <ShrdAsemblAge0>-1</ShrdAsemblAge0>
-      <ShrdHeaderAge1>1283891663</ShrdHeaderAge1>
+      <ShrdHeaderAge1>1283958621</ShrdHeaderAge1>
       <ShrdCodeAge1>-1</ShrdCodeAge1>
       <ShrdAsemblAge1>-1</ShrdAsemblAge1>
-      <ShrdHeaderAge2>1283891658</ShrdHeaderAge2>
+      <ShrdHeaderAge2>1283958617</ShrdHeaderAge2>
       <ShrdCodeAge2>-1</ShrdCodeAge2>
       <ShrdAsemblAge2>-1</ShrdAsemblAge2>
-      <ShrdHeaderAge3>1283891662</ShrdHeaderAge3>
+      <ShrdHeaderAge3>1283958621</ShrdHeaderAge3>
       <ShrdCodeAge3>-1</ShrdCodeAge3>
       <ShrdAsemblAge3>-1</ShrdAsemblAge3>
       <GenExtraFiles lines_count="9">
@@ -44,10 +44,10 @@
       </GenExtraFiles>
       <GenExtraFileSrcDir7>lib\Kinetis\startup\</GenExtraFileSrcDir7>
       <GenExtraFileSrcDir3>Repositories\lib\doxygen\</GenExtraFileSrcDir3>
-      <XtraAge4>1283891768</XtraAge4>
-      <XtraAge5>1283891768</XtraAge5>
-      <XtraAge7>1283891637</XtraAge7>
-      <XtraAge8>1283891769</XtraAge8>
+      <XtraAge4>1283958631</XtraAge4>
+      <XtraAge5>1283958631</XtraAge5>
+      <XtraAge7>1283958621</XtraAge7>
+      <XtraAge8>1283958616</XtraAge8>
       <GenExtraFileType8>4</GenExtraFileType8>
       <GenExtraFileType7>5</GenExtraFileType7>
       <GenExtraFileType6>4</GenExtraFileType6>
@@ -426,7 +426,7 @@
     </GenFiles>
     <SignalListFile>Documentation\Lab2_SIGNALS.txt</SignalListFile>
     <DestinationCompiler>GNUC</DestinationCompiler>
-    <ProjectModificationStamp>15</ProjectModificationStamp>
+    <ProjectModificationStamp>16</ProjectModificationStamp>
   </Options>
   <CpuID_2>
     <Generated>false</Generated>
@@ -516,8 +516,8 @@
     <GenComponentVersion>01.028</GenComponentVersion>
     <GenDriverVersion>01.04</GenDriverVersion>
     <GenEventModule>Events</GenEventModule>
-    <HeaderAge>1283891664</HeaderAge>
-    <CodeAge>1283891769</CodeAge>
+    <HeaderAge>1283958935</HeaderAge>
+    <CodeAge>1283958935</CodeAge>
     <AsemblAge>-1</AsemblAge>
     <GenNumMethods>11</GenNumMethods>
     <SetClockConfiguration>false</SetClockConfiguration>
