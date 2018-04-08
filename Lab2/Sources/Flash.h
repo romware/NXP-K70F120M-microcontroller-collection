@@ -11,8 +11,24 @@
 #ifndef FLASH_H
 #define FLASH_H
 
+// FCMD commands
+static const uint8_t PROGRAM_PHRASE = 0x07;
+static const uint8_t ERASE_FLASH_SECTOR = 0x09;
+
 // new types
 #include "types.h"
+
+typedef union
+{
+  int32_t l;
+  struct
+  {
+    int8_t Lo;
+    int8_t MidLo;
+    int8_t MidHi;
+    int8_t Hi;
+  } s;
+} int32quarterUnion_t;
 
 typedef struct
 {
@@ -95,5 +111,7 @@ bool Flash_Write8(volatile uint8_t* const address, const uint8_t data);
  *  @note Assumes Flash has been initialized.
  */
 bool Flash_Erase(void);
+
+bool WritePhrase(const uint32_t address, const uint64union_t phrase);
 
 #endif

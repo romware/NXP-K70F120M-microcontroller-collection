@@ -9,7 +9,11 @@
 #include "LEDs.h"
 #include "Flash.h"
 
-TFCCOB commonCommandObject;
+
+static bool LaunchCommand(TFCCOB* commonCommandObject);
+/*static*/ bool WritePhrase(const uint32_t address, const uint64union_t phrase);
+static bool EraseSector(const uint32_t address);
+static bool ModifyPhrase(const uint32_t address, const uint64union_t phrase);
 
 
 /*! @brief Enables the Flash module.
@@ -18,7 +22,22 @@ TFCCOB commonCommandObject;
  */
 bool Flash_Init(void)
 {
+  // Check that CCIF is 1 (command completed) and there are no flash access errors or flash protection violation flags set.
+  if ((FTFE_FSTAT & FTFE_FSTAT_CCIF_MASK) && !(FTFE_FSTAT & FTFE_FSTAT_ACCERR_MASK) && !(FTFE_FSTAT & FTFE_FSTAT_FPVIOL_MASK))
+  {
+    return true;
+  }
+  // If so, erase the flash sector and return false
+  else
+  {
+    // Write 1 to clear ACCERR and FPVIOL
+    FTFE_FSTAT |= FTFE_FSTAT_ACCERR_MASK;
+    FTFE_FSTAT |= FTFE_FSTAT_FPVIOL_MASK;
 
+    // Clear flash
+    Flash_Erase();
+    return false;
+  }
 }
 
 /*! @brief Allocates space for a non-volatile variable in the Flash memory.
@@ -82,5 +101,62 @@ bool Flash_Write8(volatile uint8_t* const address, const uint8_t data)
  */
 bool Flash_Erase(void)
 {
-
+  return EraseSector(FLASH_DATA_START);
 }
+
+
+static bool EraseSector(const uint32_t address)
+{
+  TFCCOB commonCommandObject;
+  commonCommandObject.FCMD = FTFE_FCCOB0_CCOBn(ERASE_FLASH_SECTOR);
+  commonCommandObject.flashAddress23to16 = ( (address >> 16) );
+  commonCommandObject.flashAddress15to08 = ( (address >> 8) );
+  commonCommandObject.flashAddress07to00 = ( address );
+
+  return LaunchCommand(&commonCommandObject);
+}
+
+static bool LaunchCommand(TFCCOB* commonCommandObject)
+{
+  // Write 1 to clear ACCERR and FPVIOL flags
+  FTFE_FSTAT |= FTFE_FSTAT_ACCERR_MASK | FTFE_FSTAT_FPVIOL_MASK;
+
+  // Move commonCommandObject to FCCOB
+  FTFE_FCCOB0 = commonCommandObject->FCMD;
+  FTFE_FCCOB1 = commonCommandObject->flashAddress23to16;
+  FTFE_FCCOB2 = commonCommandObject->flashAddress15to08;
+  FTFE_FCCOB3 = commonCommandObject->flashAddress07to00;
+  FTFE_FCCOB4 = commonCommandObject->dataByte0;
+  FTFE_FCCOB5 = commonCommandObject->dataByte1;
+  FTFE_FCCOB6 = commonCommandObject->dataByte2;
+  FTFE_FCCOB7 = commonCommandObject->dataByte3;
+  FTFE_FCCOB8 = commonCommandObject->dataByte4;
+  FTFE_FCCOB9 = commonCommandObject->dataByte5;
+  FTFE_FCCOBA = commonCommandObject->dataByte6;
+  FTFE_FCCOBB = commonCommandObject->dataByte7;
+
+  // Wait for write to finish
+  while(!(FTFE_FSTAT & FTFE_FSTAT_CCIF_MASK)){}
+  return true;
+}
+
+/*static*/ bool WritePhrase(const uint32_t address, const uint64union_t phrase)
+{
+  TFCCOB cornCob;
+  cornCob.FCMD = ( FTFE_FCCOB0_CCOBn(PROGRAM_PHRASE) );
+  cornCob.flashAddress23to16 = ( (address >> 16) );
+  cornCob.flashAddress15to08 = ( (address >>  8) );
+  cornCob.flashAddress07to00 = ( (address >>  0) );
+
+  cornCob.dataByte0 = ( (phrase.l >> 56) );
+  cornCob.dataByte1 = ( (phrase.l >> 48) );
+  cornCob.dataByte2 = ( (phrase.l >> 40) );
+  cornCob.dataByte3 = ( (phrase.l >> 32) );
+  cornCob.dataByte4 = ( (phrase.l >> 24) );
+  cornCob.dataByte5 = ( (phrase.l >> 16) );
+  cornCob.dataByte6 = ( (phrase.l >>  8) );
+  cornCob.dataByte7 = ( (phrase.l >>  0) );
+
+  return LaunchCommand(&cornCob);
+}
+

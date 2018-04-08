@@ -41,6 +41,7 @@
 #include "UART.h"
 #include "FIFO.h"
 #include "packet.h"
+#include "Flash.h"
 
 
 // UART baud rate
@@ -61,6 +62,35 @@ const uint8_t TOWER_NUM_SET = 2;
 
 // Tower number most and least significant bits
 uint16union_t Tower_Num_Union;
+
+
+void leftToRight()
+{
+  for(uint32_t i = 0; i <320000; i++){}
+  LEDs_Toggle(LED_BLUE);
+  for(uint32_t i = 0; i <160000; i++){}
+  LEDs_Toggle(LED_GREEN);
+  for(uint32_t i = 0; i <200000; i++){}
+  LEDs_Toggle(LED_YELLOW);
+  for(uint32_t i = 0; i <240000; i++){}
+  LEDs_Toggle(LED_ORANGE);
+  for(uint32_t i = 0; i <280000; i++){}
+}
+
+void rightToLeft()
+{
+  for(uint32_t i = 0; i <280000; i++){}
+  LEDs_Toggle(LED_ORANGE);
+  for(uint32_t i = 0; i <240000; i++){}
+  LEDs_Toggle(LED_YELLOW);
+  for(uint32_t i = 0; i <200000; i++){}
+  LEDs_Toggle(LED_GREEN);
+  for(uint32_t i = 0; i <160000; i++){}
+  LEDs_Toggle(LED_BLUE);
+  for(uint32_t i = 0; i <320000; i++){}
+}
+
+
 
 /*! @brief Sends the startup packets to the PC
  *
@@ -191,12 +221,30 @@ int main(void)
   {
     // Poll UART2 for packets to transmit and receive
     UART_Poll();
+    Flash_Erase();
+
+    uint64union_t corn;
+    corn.l = 0x00000000FFCC00BB;
+    Flash_Init();
+    WritePhrase(FLASH_DATA_START, corn);
+
+    uint64union_t* cobReturnPtr = (uint64union_t*)FLASH_DATA_START;
+
+    uint64union_t returnOfTheCob;
+    returnOfTheCob = *cobReturnPtr;
+
+
+
+
     // Check if packet has been received
     if(Packet_Get())
     {
       // Execute a command depending on what packet has been received
       ReceivedPacket();
-      LEDs_Toggle(LED_YELLOW);
+      leftToRight();
+      leftToRight();
+      //rightToLeft();
+      //rightToLeft();
     }
   }
 
