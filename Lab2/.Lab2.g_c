@@ -426,7 +426,7 @@
     </GenFiles>
     <SignalListFile>Documentation\Lab2_SIGNALS.txt</SignalListFile>
     <DestinationCompiler>GNUC</DestinationCompiler>
-    <ProjectModificationStamp>16</ProjectModificationStamp>
+    <ProjectModificationStamp>17</ProjectModificationStamp>
   </Options>
   <CpuID_2>
     <Generated>false</Generated>

@@ -44,17 +44,17 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
   // Declare union to store the baud rate setting, which is a 13 bit divisor.
   // BDL is stored in SBR.s.Lo and BDH is stored in SBR.s.Hi. Note: The working value in BDH does not change until BDL is written.
   uint16union_t locSBR;
-  locSBR.l= moduleClk/(16*baudRate);
+  locSBR.l = moduleClk/(16*baudRate);
 
   // Declare variable to store the Baud Rate Fine Adjust divisor. This number represents 1/32 remainder from the baud rate division.
   // Calculate the BRFA value (%32 remainder). Only use BDL to avoid overflowing the uint32_t.
-  uint32_t  locBRFA = (locSBR.s.Lo*32)%32;
+  uint8_t locBRFA = (2*moduleClk/baudRate)%32;
   // For SBR and BRFA calculations see 56.4.4 of K70P256M150SF3RM.pdf
 
   // Set the UART2 BDH and BDL. Note: The working value in BDH does not change until BDL is written. BDH is not 8 bits long so it should be masked
   UART2_BDH = UART_BDH_SBR(locSBR.s.Hi);
   UART2_BDL = UART_BDL_SBR(locSBR.s.Lo);
-  UART2_C4 = UART_C4_BRFA(16);
+  UART2_C4 = UART_C4_BRFA(locBRFA);
 
   // Set UART2_C2 transmit enable to 1
   UART2_C2 |= UART_C2_TE_MASK;
