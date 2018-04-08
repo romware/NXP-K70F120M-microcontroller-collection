@@ -145,6 +145,9 @@ static bool LaunchCommand(TFCCOB* commonCommandObject)
   FTFE_FCCOBA = FTFE_FCCOBA_CCOBn(commonCommandObject->dataByte6);
   FTFE_FCCOBB = FTFE_FCCOBB_CCOBn(commonCommandObject->dataByte7);
 
+  //Write 1 to clear CCIF
+  FTFE_FSTAT = FTFE_FSTAT_CCIF_MASK;
+
   // Wait for write to finish
   while(!(FTFE_FSTAT & FTFE_FSTAT_CCIF_MASK)){}
   return true;
