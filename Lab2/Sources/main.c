@@ -221,7 +221,7 @@ int main(void)
   {
     // Poll UART2 for packets to transmit and receive
     UART_Poll();
-    Flash_Erase();
+
 
     uint64union_t corn;
     corn.l = 0x00000000FFCC00BB;
