@@ -285,8 +285,8 @@ Discarded input sections
  .debug_macro   0x00000000       0x64 ./Generated_Code/PE_LDD.o
  .debug_macro   0x00000000    0x174c1 ./Generated_Code/PE_LDD.o
  .debug_macro   0x00000000       0x94 ./Generated_Code/PE_LDD.o
- .debug_line    0x00000000      0x24b ./Generated_Code/PE_LDD.o
- .debug_str     0x00000000    0x8a790 ./Generated_Code/PE_LDD.o
+ .debug_line    0x00000000      0x228 ./Generated_Code/PE_LDD.o
+ .debug_str     0x00000000    0x8a76d ./Generated_Code/PE_LDD.o
  .comment       0x00000000       0x71 ./Generated_Code/PE_LDD.o
  .ARM.attributes
                 0x00000000       0x39 ./Generated_Code/PE_LDD.o
@@ -432,44 +432,43 @@ LOAD c:/freescale/kds_v3/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv7e-m/f
  .text.EraseSector
                 0x00000630       0x58 ./Sources/Flash.o
  .text.LaunchCommand
-                0x00000688       0xa0 ./Sources/Flash.o
+                0x00000688       0xa4 ./Sources/Flash.o
  .text.WritePhrase
-                0x00000728       0xe0 ./Sources/Flash.o
-                0x00000728                WritePhrase
+                0x0000072c       0xe0 ./Sources/Flash.o
+                0x0000072c                WritePhrase
  .text.LEDs_Init
-                0x00000808       0xd4 ./Sources/LEDs.o
-                0x00000808                LEDs_Init
+                0x0000080c       0xd4 ./Sources/LEDs.o
+                0x0000080c                LEDs_Init
  .text.LEDs_Toggle
-                0x000008dc       0x24 ./Sources/LEDs.o
-                0x000008dc                LEDs_Toggle
+                0x000008e0       0x24 ./Sources/LEDs.o
+                0x000008e0                LEDs_Toggle
  .text.UART_Init
-                0x00000900       0xf4 ./Sources/UART.o
-                0x00000900                UART_Init
+                0x00000904       0xf4 ./Sources/UART.o
+                0x00000904                UART_Init
  .text.UART_InChar
-                0x000009f4       0x20 ./Sources/UART.o
-                0x000009f4                UART_InChar
+                0x000009f8       0x20 ./Sources/UART.o
+                0x000009f8                UART_InChar
  .text.UART_OutChar
-                0x00000a14       0x24 ./Sources/UART.o
-                0x00000a14                UART_OutChar
+                0x00000a18       0x24 ./Sources/UART.o
+                0x00000a18                UART_OutChar
  .text.UART_Poll
-                0x00000a38       0x48 ./Sources/UART.o
-                0x00000a38                UART_Poll
+                0x00000a3c       0x48 ./Sources/UART.o
+                0x00000a3c                UART_Poll
  .text.leftToRight
-                0x00000a80       0xa4 ./Sources/main.o
-                0x00000a80                leftToRight
+                0x00000a84       0xa4 ./Sources/main.o
+                0x00000a84                leftToRight
  .text.HandleTowerStartup
-                0x00000b24       0x58 ./Sources/main.o
-                0x00000b24                HandleTowerStartup
+                0x00000b28       0x58 ./Sources/main.o
+                0x00000b28                HandleTowerStartup
  .text.HandleTowerVersion
-                0x00000b7c       0x20 ./Sources/main.o
-                0x00000b7c                HandleTowerVersion
+                0x00000b80       0x20 ./Sources/main.o
+                0x00000b80                HandleTowerVersion
  .text.HandleTowerNumber
-                0x00000b9c       0x60 ./Sources/main.o
-                0x00000b9c                HandleTowerNumber
+                0x00000ba0       0x60 ./Sources/main.o
+                0x00000ba0                HandleTowerNumber
  .text.ReceivedPacket
-                0x00000bfc       0xf8 ./Sources/main.o
-                0x00000bfc                ReceivedPacket
- *fill*         0x00000cf4        0x4 
+                0x00000c00       0xf8 ./Sources/main.o
+                0x00000c00                ReceivedPacket
  .text.main     0x00000cf8       0x80 ./Sources/main.o
                 0x00000cf8                main
  .text.Packet_Init
@@ -804,36 +803,36 @@ OUTPUT(Lab2.elf elf32-littlearm)
  .debug_macro   0x00019c62       0x9a ./Generated_Code/Cpu.o
  .debug_macro   0x00019cfc       0x9f ./Generated_Code/Vectors.o
 
-.debug_line     0x00000000     0x190d
+.debug_line     0x00000000     0x17af
  .debug_line    0x00000000      0x1bc ./Sources/FIFO.o
- .debug_line    0x000001bc      0x2bf ./Sources/Flash.o
- .debug_line    0x0000047b      0x232 ./Sources/LEDs.o
- .debug_line    0x000006ad      0x243 ./Sources/UART.o
- .debug_line    0x000008f0      0x401 ./Sources/main.o
- .debug_line    0x00000cf1      0x1da ./Sources/packet.o
- .debug_line    0x00000ecb      0x3f9 ./Project_Settings/Startup_Code/startup.o
- .debug_line    0x000012c4      0x365 ./Generated_Code/Cpu.o
- .debug_line    0x00001629      0x2e4 ./Generated_Code/Vectors.o
+ .debug_line    0x000001bc      0x29c ./Sources/Flash.o
+ .debug_line    0x00000458      0x232 ./Sources/LEDs.o
+ .debug_line    0x0000068a      0x220 ./Sources/UART.o
+ .debug_line    0x000008aa      0x3bb ./Sources/main.o
+ .debug_line    0x00000c65      0x1da ./Sources/packet.o
+ .debug_line    0x00000e3f      0x3f9 ./Project_Settings/Startup_Code/startup.o
+ .debug_line    0x00001238      0x2fc ./Generated_Code/Cpu.o
+ .debug_line    0x00001534      0x27b ./Generated_Code/Vectors.o
 
-.debug_str      0x00000000    0x8d84a
- .debug_str     0x00000000     0x2e9b ./Sources/FIFO.o
-                               0x3005 (size before relaxing)
- .debug_str     0x00002e9b    0x80130 ./Sources/Flash.o
-                              0x830db (size before relaxing)
- .debug_str     0x00082fcb      0x1ae ./Sources/LEDs.o
+.debug_str      0x00000000    0x8d871
+ .debug_str     0x00000000     0x2e78 ./Sources/FIFO.o
+                               0x2fe2 (size before relaxing)
+ .debug_str     0x00002e78    0x80130 ./Sources/Flash.o
+                              0x830b8 (size before relaxing)
+ .debug_str     0x00082fa8      0x1f8 ./Sources/LEDs.o
                               0x82f06 (size before relaxing)
- .debug_str     0x00083179      0x134 ./Sources/UART.o
-                              0x82fe4 (size before relaxing)
- .debug_str     0x000832ad     0x7c8d ./Sources/main.o
-                              0x8abfb (size before relaxing)
- .debug_str     0x0008af3a       0x3f ./Sources/packet.o
-                               0x3288 (size before relaxing)
- .debug_str     0x0008af79     0x2663 ./Project_Settings/Startup_Code/startup.o
+ .debug_str     0x000831a0      0x134 ./Sources/UART.o
+                              0x82fc1 (size before relaxing)
+ .debug_str     0x000832d4     0x7c8d ./Sources/main.o
+                              0x8abd8 (size before relaxing)
+ .debug_str     0x0008af61       0x3f ./Sources/packet.o
+                               0x3265 (size before relaxing)
+ .debug_str     0x0008afa0     0x2663 ./Project_Settings/Startup_Code/startup.o
                               0x8540a (size before relaxing)
- .debug_str     0x0008d5dc      0x252 ./Generated_Code/Cpu.o
-                              0x8aa08 (size before relaxing)
- .debug_str     0x0008d82e       0x1c ./Generated_Code/Vectors.o
-                              0x8a650 (size before relaxing)
+ .debug_str     0x0008d603      0x252 ./Generated_Code/Cpu.o
+                              0x8a9e5 (size before relaxing)
+ .debug_str     0x0008d855       0x1c ./Generated_Code/Vectors.o
+                              0x8a62d (size before relaxing)
 
 .comment        0x00000000       0x70
  .comment       0x00000000       0x70 ./Sources/FIFO.o

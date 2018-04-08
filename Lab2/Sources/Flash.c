@@ -149,7 +149,7 @@ static bool LaunchCommand(TFCCOB* commonCommandObject)
   FTFE_FSTAT = FTFE_FSTAT_CCIF_MASK;
 
   // Wait for write to finish
-  while(!(FTFE_FSTAT & FTFE_FSTAT_CCIF_MASK)){}
+  while((~FTFE_FSTAT & FTFE_FSTAT_CCIF_MASK)){}
   return true;
 }
 
