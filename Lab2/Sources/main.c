@@ -63,11 +63,13 @@ const uint8_t PARAM_SET = 2;
 const uint8_t TOWER_VER_MAJ = 1;
 const uint8_t TOWER_VER_MIN = 0;
 
-// Tower number most and least significant bits
-uint16union_t Tower_Num_Union;
 
-// Tower mode most and least significant bits
-uint16union_t Tower_Mode_Union;
+
+// Tower number union pointer to flash
+volatile uint16union_t* NvTowerNb;
+
+// Tower mode union pointer to flash
+volatile uint16union_t* NvTowerMd;
 
 
 /*! @brief Sends the startup packets to the PC
@@ -80,8 +82,8 @@ bool HandleTowerStartup(void)
   return (
     Packet_Put(COMMAND_STARTUP,0x00,0x00,0x00) &&
     Packet_Put(COMMAND_VER,'v',TOWER_VER_MAJ,TOWER_VER_MIN) &&
-    Packet_Put(COMMAND_NUM,PARAM_GET,Tower_Num_Union.s.Lo,Tower_Num_Union.s.Hi) &&
-    Packet_Put(COMMAND_MODE,PARAM_GET,Tower_Mode_Union.s.Lo,Tower_Mode_Union.s.Hi)
+    Packet_Put(COMMAND_NUM,PARAM_GET,NvTowerNb->s.Lo,NvTowerNb->s.Hi) &&
+    Packet_Put(COMMAND_MODE,PARAM_GET,NvTowerMd->s.Lo,NvTowerMd->s.Hi)
   );
 }
 
@@ -92,7 +94,7 @@ bool HandleTowerStartup(void)
 bool HandleTowerVersion(void)
 {
   // Send tower number packet
-  return Packet_Put(COMMAND_NUM,PARAM_GET,Tower_Num_Union.s.Lo,Tower_Num_Union.s.Hi);
+  return Packet_Put(COMMAND_NUM,PARAM_GET,NvTowerNb->s.Lo,NvTowerNb->s.Hi);
 }
 
 /*! @brief Sends or sets the number packet to the PC
@@ -105,13 +107,12 @@ bool HandleTowerNumber(void)
   if(Packet_Parameter1 == PARAM_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Send tower number packet
-    return Packet_Put(COMMAND_NUM,PARAM_GET,Tower_Num_Union.s.Lo,Tower_Num_Union.s.Hi);
+    return Packet_Put(COMMAND_NUM,PARAM_GET,NvTowerNb->s.Lo,NvTowerNb->s.Hi);
   }
   else if (Packet_Parameter1 == PARAM_SET)
   {
     // Change tower number
-    Tower_Num_Union.s.Lo = Packet_Parameter2;
-    Tower_Num_Union.s.Hi = Packet_Parameter3;
+    Flash_Write16((uint16_t*)NvTowerNb,(uint16_t)Packet_Parameter23);
     return true;
   }
   return false;
@@ -129,15 +130,15 @@ bool HandleTowerProgramByte(void)
     // Erase Flash
     return Flash_Erase();
   }
-  else if (Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07)
-  {
+  //else if (Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07)
+  //{
     // Flash data
-    volatile uint8_t *NvData = FLASH_DATA_START + Packet_Parameter1;
-    if(Flash_AllocateVar( &NvData, sizeof(*NvData) ))
-    {
-      return Flash_Write8( (uint8_t *)NvData, Packet_Parameter3 );
-    }
-  }
+    //volatile uint8_t *NvData = FLASH_DATA_START + Packet_Parameter1;
+    //if(Flash_AllocateVar( &NvData, sizeof(*NvData) ))
+    //{
+      //return Flash_Write8( (uint8_t *)NvData, Packet_Parameter3 );
+    //}
+  //}
   return false;
 }
 
@@ -166,13 +167,12 @@ bool HandleTowerMode(void)
   if(Packet_Parameter1 == PARAM_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Send tower mode packet
-    return Packet_Put(COMMAND_MODE,PARAM_GET,Tower_Mode_Union.s.Lo,Tower_Mode_Union.s.Hi);
+    return Packet_Put(COMMAND_MODE,PARAM_GET,NvTowerMd->s.Lo,NvTowerMd->s.Hi);
   }
   else if (Packet_Parameter1 == PARAM_SET)
   {
     // Change tower mode
-    Tower_Mode_Union.s.Lo = Packet_Parameter2;
-    Tower_Mode_Union.s.Hi = Packet_Parameter3;
+    Flash_Write16((uint16_t*)NvTowerMd,(uint16_t)Packet_Parameter23);
     return true;
   }
   return false;
@@ -257,19 +257,26 @@ int main(void)
 
   /* Write your code here */
 
-  // Set Tower Number.
-  Tower_Num_Union.l = 1519;
-
-  // Set Tower Mode.
-  Tower_Mode_Union.l = 1;
-
   // Initializes the LEDs, UART and FLASH by calling the initialization routines of the supporting software modules.
   if(Flash_Init() && LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ))
   {
+    NvTowerNb = (uint16union_t* volatile)FLASH_DATA_START;
+    NvTowerMd = (uint16union_t* volatile)FLASH_DATA_START + 0x02;
+
+    if(NvTowerNb->l == 0xFFFF)
+    {
+      // Set Tower Number
+      Flash_Write16((uint16_t*)NvTowerNb,(uint16_t)1519);
+    }
+
+    if(NvTowerMd->l == 0xFFFF)
+    {
+      // Set Tower Mode
+      //Flash_Write16((uint16_t*)NvTowerMd,(uint16_t)1);
+    }
+
     LEDs_On(LED_ORANGE);
   }
-
-  volatile uint16union_t *NvTowerNb; /*!< The non-volatile Tower number. */
 
   // Send startup packets to PC
   HandleTowerStartup();
