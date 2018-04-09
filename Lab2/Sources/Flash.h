@@ -112,6 +112,4 @@ bool Flash_Write8(volatile uint8_t* const address, const uint8_t data);
  */
 bool Flash_Erase(void);
 
-bool WritePhrase(const uint32_t address, const uint64union_t phrase);
-
 #endif

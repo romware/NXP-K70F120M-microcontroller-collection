@@ -44,52 +44,30 @@
 #include "Flash.h"
 
 
-// UART baud rate
+// Baud rate
 #define BAUD_RATE 115200
 
 // Listed command bits of a packet
-const uint8_t TOWER_STARTUP = 0x04;
-const uint8_t TOWER_VER = 0x09;
-const uint8_t TOWER_NUM = 0x0B;
+const uint8_t COMMAND_STARTUP = 0x04;
+const uint8_t COMMAND_VER = 0x09;
+const uint8_t COMMAND_NUM = 0x0B;
+const uint8_t COMMAND_PROGRAMBYTE = 0x07;
+const uint8_t COMMAND_READBYTE = 0x08;
+const uint8_t COMMAND_MODE = 0x0D;
+
+// Tower number get and set bits of packet parameter 1
+const uint8_t PARAM_GET = 1;
+const uint8_t PARAM_SET = 2;
 
 // Tower major version and minor version
 const uint8_t TOWER_VER_MAJ = 1;
 const uint8_t TOWER_VER_MIN = 0;
 
-// Tower number get and set bits of packet parameter 1
-const uint8_t TOWER_NUM_GET = 1;
-const uint8_t TOWER_NUM_SET = 2;
-
 // Tower number most and least significant bits
 uint16union_t Tower_Num_Union;
 
-
-void leftToRight()
-{
-  for(uint32_t i = 0; i <320000; i++){}
-  LEDs_Toggle(LED_BLUE);
-  for(uint32_t i = 0; i <160000; i++){}
-  LEDs_Toggle(LED_GREEN);
-  for(uint32_t i = 0; i <200000; i++){}
-  LEDs_Toggle(LED_YELLOW);
-  for(uint32_t i = 0; i <240000; i++){}
-  LEDs_Toggle(LED_ORANGE);
-  for(uint32_t i = 0; i <280000; i++){}
-}
-
-void rightToLeft()
-{
-  for(uint32_t i = 0; i <280000; i++){}
-  LEDs_Toggle(LED_ORANGE);
-  for(uint32_t i = 0; i <240000; i++){}
-  LEDs_Toggle(LED_YELLOW);
-  for(uint32_t i = 0; i <200000; i++){}
-  LEDs_Toggle(LED_GREEN);
-  for(uint32_t i = 0; i <160000; i++){}
-  LEDs_Toggle(LED_BLUE);
-  for(uint32_t i = 0; i <320000; i++){}
-}
-
+// Tower mode most and least significant bits
+uint16union_t Tower_Mode_Union;
 
 
 /*! @brief Sends the startup packets to the PC
@@ -100,9 +78,10 @@ bool HandleTowerStartup(void)
 {
   // Sends the tower startup values, version and number to the PC
   return (
-    Packet_Put(TOWER_STARTUP,0x00,0x00,0x00) &&
-    Packet_Put(TOWER_VER,'v',TOWER_VER_MAJ,TOWER_VER_MIN) &&
-    Packet_Put(TOWER_NUM,TOWER_NUM_GET,Tower_Num_Union.s.Lo,Tower_Num_Union.s.Hi)
+    Packet_Put(COMMAND_STARTUP,0x00,0x00,0x00) &&
+    Packet_Put(COMMAND_VER,'v',TOWER_VER_MAJ,TOWER_VER_MIN) &&
+    Packet_Put(COMMAND_NUM,PARAM_GET,Tower_Num_Union.s.Lo,Tower_Num_Union.s.Hi) &&
+    Packet_Put(COMMAND_MODE,PARAM_GET,Tower_Mode_Union.s.Lo,Tower_Mode_Union.s.Hi)
   );
 }
 
@@ -113,7 +92,7 @@ bool HandleTowerStartup(void)
 bool HandleTowerVersion(void)
 {
   // Send tower number packet
-  return Packet_Put(TOWER_NUM,TOWER_NUM_GET,Tower_Num_Union.s.Lo,Tower_Num_Union.s.Hi);
+  return Packet_Put(COMMAND_NUM,PARAM_GET,Tower_Num_Union.s.Lo,Tower_Num_Union.s.Hi);
 }
 
 /*! @brief Sends or sets the number packet to the PC
@@ -123,16 +102,77 @@ bool HandleTowerVersion(void)
 bool HandleTowerNumber(void)
 {
   // Check if parameters match tower number GET or SET parameters
-  if(Packet_Parameter1 == TOWER_NUM_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  if(Packet_Parameter1 == PARAM_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Send tower number packet
-    return Packet_Put(TOWER_NUM,TOWER_NUM_GET,Tower_Num_Union.s.Lo,Tower_Num_Union.s.Hi);
+    return Packet_Put(COMMAND_NUM,PARAM_GET,Tower_Num_Union.s.Lo,Tower_Num_Union.s.Hi);
   }
-  else if (Packet_Parameter1 == TOWER_NUM_SET)
+  else if (Packet_Parameter1 == PARAM_SET)
   {
     // Change tower number
     Tower_Num_Union.s.Lo = Packet_Parameter2;
     Tower_Num_Union.s.Hi = Packet_Parameter3;
+    return true;
+  }
+  return false;
+}
+
+/*! @brief Sends the tower program byte packet to the PC
+ *
+ *  @return bool - TRUE if packet is sent
+ */
+bool HandleTowerProgramByte(void)
+{
+  // Check if offset is erase or set
+  if(Packet_Parameter1 == 0x08)
+  {
+    // Erase Flash
+    return Flash_Erase();
+  }
+  else if (Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07)
+  {
+    // Flash data
+    volatile uint8_t *NvData = FLASH_DATA_START + Packet_Parameter1;
+    if(Flash_AllocateVar( &NvData, sizeof(*NvData) ))
+    {
+      return Flash_Write8( (uint8_t *)NvData, Packet_Parameter3 );
+    }
+  }
+  return false;
+}
+
+/*! @brief Sends the tower read byte packet to the PC
+ *
+ *  @return bool - TRUE if packet is sent
+ */
+bool HandleTowerReadByte(void)
+{
+  // Check if offset is within range
+  if (Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07)
+  {
+    // Send read byte packet
+    return Packet_Put(COMMAND_READBYTE,Packet_Parameter1,0,FLASH_DATA_START + Packet_Parameter1);
+  }
+  return false;
+}
+
+/*! @brief Sends or sets the mode packet to the PC
+ *
+ *  @return bool - TRUE if packet is sent or number is set
+ */
+bool HandleTowerMode(void)
+{
+  // Check if parameters match tower mode GET or SET parameters
+  if(Packet_Parameter1 == PARAM_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Send tower mode packet
+    return Packet_Put(COMMAND_MODE,PARAM_GET,Tower_Mode_Union.s.Lo,Tower_Mode_Union.s.Hi);
+  }
+  else if (Packet_Parameter1 == PARAM_SET)
+  {
+    // Change tower mode
+    Tower_Mode_Union.s.Lo = Packet_Parameter2;
+    Tower_Mode_Union.s.Hi = Packet_Parameter3;
     return true;
   }
   return false;
@@ -150,20 +190,35 @@ void ReceivedPacket(void)
   uint8_t commandAck = Packet_Command & PACKET_ACK_MASK;
 
   // AND the packet command byte with the bitwise inverse ACK MASK to ignore if ACK is requested
-  if(commandIgnoreAck == TOWER_STARTUP && Packet_Parameter1 == 0 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  if(commandIgnoreAck == COMMAND_STARTUP && Packet_Parameter1 == 0 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Send tower startup packets
     success = HandleTowerStartup();
   }
-  else if(commandIgnoreAck == TOWER_VER && Packet_Parameter1 == 'v' && Packet_Parameter2 == 'x' && Packet_Parameter3 == 13)
+  else if(commandIgnoreAck == COMMAND_VER && Packet_Parameter1 == 'v' && Packet_Parameter2 == 'x' && Packet_Parameter3 == 13)
   {
     // Send tower version packet
     success = HandleTowerVersion();
   }
-  else if(commandIgnoreAck == TOWER_NUM)
+  else if(commandIgnoreAck == COMMAND_NUM)
   {
     // Check if parameters match tower number GET or SET parameters
     success = HandleTowerNumber();
+  }
+  else if(commandIgnoreAck == COMMAND_MODE)
+    {
+      // Check if parameters match tower mode GET or SET parameters
+      success = HandleTowerMode();
+    }
+  else if(commandIgnoreAck == COMMAND_PROGRAMBYTE && Packet_Parameter2 == 0)
+  {
+    // Send tower program byte packet
+    success = HandleTowerProgramByte();
+  }
+  else if(commandIgnoreAck == COMMAND_READBYTE && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Send tower read byte packet
+    success = HandleTowerReadByte();
   }
 
   // AND the packet command byte with the ACK MASK to check if ACK is requested
@@ -205,14 +260,16 @@ int main(void)
   // Set Tower Number.
   Tower_Num_Union.l = 1519;
 
-  // Initializes the LEDs by calling the initialization routines of the supporting software modules.
-  LEDs_Init();
+  // Set Tower Mode.
+  Tower_Mode_Union.l = 1;
 
-  // Initializes the packets by calling the initialization routines of the supporting software modules.
-  Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ);
+  // Initializes the LEDs, UART and FLASH by calling the initialization routines of the supporting software modules.
+  if(Flash_Init() && LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ))
+  {
+    LEDs_On(LED_ORANGE);
+  }
 
   volatile uint16union_t *NvTowerNb; /*!< The non-volatile Tower number. */
-
 
   // Send startup packets to PC
   HandleTowerStartup();
@@ -222,29 +279,11 @@ int main(void)
     // Poll UART2 for packets to transmit and receive
     UART_Poll();
 
-
-    uint64union_t corn;
-    corn.l = 0x00000000FFCC00BB;
-    Flash_Init();
-    WritePhrase(FLASH_DATA_START, corn);
-
-    uint64union_t* cobReturnPtr = (uint64union_t*)FLASH_DATA_START;
-
-    uint64union_t returnOfTheCob;
-    returnOfTheCob = *cobReturnPtr;
-
-
-
-
     // Check if packet has been received
     if(Packet_Get())
     {
       // Execute a command depending on what packet has been received
       ReceivedPacket();
-      leftToRight();
-      leftToRight();
-      //rightToLeft();
-      //rightToLeft();
     }
   }
 

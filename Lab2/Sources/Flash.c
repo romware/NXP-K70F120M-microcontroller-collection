@@ -11,7 +11,7 @@
 
 
 static bool LaunchCommand(TFCCOB* commonCommandObject);
-/*static*/ bool WritePhrase(const uint32_t address, const uint64union_t phrase);
+static bool WritePhrase(const uint32_t address, const uint64union_t phrase);
 static bool EraseSector(const uint32_t address);
 static bool ModifyPhrase(const uint32_t address, const uint64union_t phrase);
 
@@ -86,13 +86,13 @@ bool Flash_Write32(volatile uint32_t* const address, const uint32_t data)
 {
   uint64union_t phrase; // The phrase
 
-  if (((unit32_t)address / 4) % 2 == 0) // Evenly divisible by 4
+  if (((uint32_t)address / 4) % 2 == 0) // Evenly divisible by 4
   {
     phrase.s.Lo = data; // The word takes the low end of the phrase
     
     phrase.s.Hi = *(uint32_t volatile *)(address + 4); // The value of the next 4 bytes takes the high end of the phrase
     
-    return WritePhrase( (uint32_t)address, phrase.l ); // Send the phrase address and the phrase value
+    return WritePhrase( (uint32_t)address, phrase ); // Send the phrase address and the phrase value
   }
   else // Move to evenly divisible by 4
   {
@@ -100,7 +100,7 @@ bool Flash_Write32(volatile uint32_t* const address, const uint32_t data)
     
     phrase.s.Hi = data; // The word takes the high end of the phrase
     
-    return WritePhrase( (uint32_t)(address - 4), phrase.l ); // Send the phrase address and the phrase value
+    return WritePhrase( (uint32_t)(address - 4), phrase ); // Send the phrase address and the phrase value
   }
 }
 
@@ -165,18 +165,10 @@ bool Flash_Erase(void)
 static bool EraseSector(const uint32_t address)
 {
   TFCCOB commonCommandObject;
-  commonCommandObject.FCMD = FTFE_FCCOB0_CCOBn(0x09);
+  commonCommandObject.FCMD = ERASE_FLASH_SECTOR;
   commonCommandObject.flashAddress23to16 = ( (address >> 16) );
   commonCommandObject.flashAddress15to08 = ( (address >> 8) );
   commonCommandObject.flashAddress07to00 = ( address );
-  commonCommandObject.dataByte0 = 0xff;
-  commonCommandObject.dataByte1 = 0xff;
-  commonCommandObject.dataByte2 = 0xff;
-  commonCommandObject.dataByte3 = 0xff;
-  commonCommandObject.dataByte4 = 0xff;
-  commonCommandObject.dataByte5 = 0xff;
-  commonCommandObject.dataByte6 = 0xff;
-  commonCommandObject.dataByte7 = 0xff;
 
   return LaunchCommand(&commonCommandObject);
 }
@@ -184,21 +176,23 @@ static bool EraseSector(const uint32_t address)
 static bool LaunchCommand(TFCCOB* commonCommandObject)
 {
   // Write 1 to clear ACCERR and FPVIOL flags
-  FTFE_FSTAT |= FTFE_FSTAT_ACCERR_MASK | FTFE_FSTAT_FPVIOL_MASK;
+  FTFE_FSTAT = FTFE_FSTAT_ACCERR_MASK | FTFE_FSTAT_FPVIOL_MASK;
 
   // Move commonCommandObject to FCCOB
   FTFE_FCCOB0 = FTFE_FCCOB0_CCOBn(commonCommandObject->FCMD);
   FTFE_FCCOB1 = FTFE_FCCOB1_CCOBn(commonCommandObject->flashAddress23to16);
   FTFE_FCCOB2 = FTFE_FCCOB2_CCOBn(commonCommandObject->flashAddress15to08);
   FTFE_FCCOB3 = FTFE_FCCOB3_CCOBn(commonCommandObject->flashAddress07to00);
-  FTFE_FCCOB4 = FTFE_FCCOB4_CCOBn(commonCommandObject->dataByte0);
-  FTFE_FCCOB5 = FTFE_FCCOB5_CCOBn(commonCommandObject->dataByte1);
-  FTFE_FCCOB6 = FTFE_FCCOB6_CCOBn(commonCommandObject->dataByte2);
-  FTFE_FCCOB7 = FTFE_FCCOB7_CCOBn(commonCommandObject->dataByte3);
-  FTFE_FCCOB8 = FTFE_FCCOB8_CCOBn(commonCommandObject->dataByte4);
-  FTFE_FCCOB9 = FTFE_FCCOB9_CCOBn(commonCommandObject->dataByte5);
-  FTFE_FCCOBA = FTFE_FCCOBA_CCOBn(commonCommandObject->dataByte6);
-  FTFE_FCCOBB = FTFE_FCCOBB_CCOBn(commonCommandObject->dataByte7);
+
+  FTFE_FCCOB8 = FTFE_FCCOB8_CCOBn(commonCommandObject->dataByte0);
+  FTFE_FCCOB9 = FTFE_FCCOB9_CCOBn(commonCommandObject->dataByte1);
+  FTFE_FCCOBA = FTFE_FCCOBA_CCOBn(commonCommandObject->dataByte2);
+  FTFE_FCCOBB = FTFE_FCCOBB_CCOBn(commonCommandObject->dataByte3);
+
+  FTFE_FCCOB4 = FTFE_FCCOB4_CCOBn(commonCommandObject->dataByte4);
+  FTFE_FCCOB5 = FTFE_FCCOB5_CCOBn(commonCommandObject->dataByte5);
+  FTFE_FCCOB6 = FTFE_FCCOB6_CCOBn(commonCommandObject->dataByte6);
+  FTFE_FCCOB7 = FTFE_FCCOB7_CCOBn(commonCommandObject->dataByte7);
 
   //Write 1 to clear CCIF
   FTFE_FSTAT = FTFE_FSTAT_CCIF_MASK;
@@ -208,12 +202,12 @@ static bool LaunchCommand(TFCCOB* commonCommandObject)
   return true;
 }
 
-/*static*/ bool WritePhrase(const uint32_t address, const uint64union_t phrase)
+static bool WritePhrase(const uint32_t address, const uint64union_t phrase)
 {
   Flash_Erase();
-  
+
   TFCCOB commonCommandObject;
-  commonCommandObject.FCMD = ( FTFE_FCCOB0_CCOBn(0x07) );
+  commonCommandObject.FCMD = PROGRAM_PHRASE;
   commonCommandObject.flashAddress23to16 = ( (address >> 16) );
   commonCommandObject.flashAddress15to08 = ( (address >>  8) );
   commonCommandObject.flashAddress07to00 = ( (address >>  0) );
@@ -222,6 +216,7 @@ static bool LaunchCommand(TFCCOB* commonCommandObject)
   commonCommandObject.dataByte1 = ( (phrase.l >> 48) );
   commonCommandObject.dataByte2 = ( (phrase.l >> 40) );
   commonCommandObject.dataByte3 = ( (phrase.l >> 32) );
+
   commonCommandObject.dataByte4 = ( (phrase.l >> 24) );
   commonCommandObject.dataByte5 = ( (phrase.l >> 16) );
   commonCommandObject.dataByte6 = ( (phrase.l >>  8) );
