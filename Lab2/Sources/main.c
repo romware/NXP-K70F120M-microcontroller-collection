@@ -63,8 +63,6 @@ const uint8_t PARAM_SET = 2;
 const uint8_t TOWER_VER_MAJ = 1;
 const uint8_t TOWER_VER_MIN = 0;
 
-
-
 // Tower number union pointer to flash
 volatile uint16union_t* NvTowerNb;
 
@@ -130,15 +128,12 @@ bool HandleTowerProgramByte(void)
     // Erase Flash
     return Flash_Erase();
   }
-  //else if (Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07)
-  //{
+  else if (Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07)
+  {
     // Flash data
-    //volatile uint8_t *NvData = FLASH_DATA_START + Packet_Parameter1;
-    //if(Flash_AllocateVar( &NvData, sizeof(*NvData) ))
-    //{
-      //return Flash_Write8( (uint8_t *)NvData, Packet_Parameter3 );
-    //}
-  //}
+    volatile uint8_t* NvData = FLASH_DATA_START + Packet_Parameter1;
+    return Flash_Write8( (uint8_t*)NvData, Packet_Parameter3 );
+  }
   return false;
 }
 
@@ -260,20 +255,26 @@ int main(void)
   // Initializes the LEDs, UART and FLASH by calling the initialization routines of the supporting software modules.
   if(Flash_Init() && LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ))
   {
-    NvTowerNb = (uint16union_t* volatile)FLASH_DATA_START;
-    NvTowerMd = (uint16union_t* volatile)FLASH_DATA_START + 0x02;
+    Flash_AllocateVar((volatile void**)&NvTowerNb, sizeof(*NvTowerNb));
+    Flash_AllocateVar((volatile void**)&NvTowerMd, sizeof(*NvTowerMd));
 
-    if(NvTowerNb->l == 0xFFFF)
+    if(_FH(NvTowerNb) == 0xFFFF)
     {
       // Set Tower Number
       Flash_Write16((uint16_t*)NvTowerNb,(uint16_t)1519);
     }
 
-    if(NvTowerMd->l == 0xFFFF)
+    volatile uint64_t NvTemp;
+    NvTemp = _FP(FLASH_DATA_START);
+
+    if(_FH(NvTowerMd) == 0xFFFF)
     {
       // Set Tower Mode
-      //Flash_Write16((uint16_t*)NvTowerMd,(uint16_t)1);
+      Flash_Write16((uint16_t*)NvTowerMd,(uint16_t)1);
     }
+
+
+    NvTemp = _FP(FLASH_DATA_START);
 
     LEDs_On(LED_ORANGE);
   }

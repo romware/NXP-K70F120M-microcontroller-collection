@@ -9,12 +9,13 @@
 #include "LEDs.h"
 #include "Flash.h"
 
-
 static bool LaunchCommand(TFCCOB* commonCommandObject);
 static bool WritePhrase(const uint32_t address, const uint64union_t phrase);
 static bool EraseSector(const uint32_t address);
 static bool ModifyPhrase(const uint32_t address, const uint64union_t phrase);
 
+// Flash allocation bytes
+uint8_t OccupationIndicator = 0b00000000;
 
 /*! @brief Enables the Flash module.
  *
@@ -57,24 +58,22 @@ bool Flash_Init(void)
  */
 bool Flash_AllocateVar(volatile void** variable, const uint8_t size)
 {
-  switch (size)
+  if(size == 1 || size == 2 || size == 4)
   {
-    case 1:
-      // Address of byte (any)
-      break;
-      
-    case 2:
-      // Address of half word (even)
-      break;
-      
-    case 4:
-      // Address of word (evenly divisible by 4) 
-      break;
-      
-    default:
-      return false;
+    uint8_t allocation = size * 2 - 1;
+
+    for(uint8_t i = 0; i < 8/size; i++)
+    {
+      if(!(OccupationIndicator & allocation))
+      {
+        *variable = (uint16_t* volatile)FLASH_DATA_START + i;
+        OccupationIndicator |= allocation;
+        return true;
+      }
+      allocation = allocation << size;
+    }
   }
-  return true;
+  return false;
 }
 
 /*! @brief Writes a 32-bit number to Flash.
@@ -87,22 +86,21 @@ bool Flash_AllocateVar(volatile void** variable, const uint8_t size)
 bool Flash_Write32(volatile uint32_t* const address, const uint32_t data)
 {
   uint64union_t phrase; // The phrase
+  uint32_t address32 = (uint32_t)address;
 
-  if (((uint32_t)address / 4) % 2 == 0) // Evenly divisible by 4
+  if (address32 % 8 == 0) // Writing to first word
   {
     phrase.s.Lo = data; // The word takes the low end of the phrase
+    phrase.s.Hi = _FW(address32 + 4); // The value of the next 4 bytes takes the high end of the phrase
     
-    phrase.s.Hi = *(uint32_t volatile *)(address + 4); // The value of the next 4 bytes takes the high end of the phrase
-    
-    return WritePhrase( (uint32_t)address, phrase ); // Send the phrase address and the phrase value
+    return WritePhrase( (address32), phrase ); // Send the phrase address and the phrase value
   }
-  else // Move to evenly divisible by 4
+  else // Writing to second word
   {
-    phrase.s.Lo = *(uint32_t volatile *)(address - 4); // The value of the previous 4 bytes takes the low end of the phrase
-    
+    phrase.s.Lo = _FW(address32 - 4); // The value of the previous 4 bytes takes the low end of the phrase
     phrase.s.Hi = data; // The word takes the high end of the phrase
     
-    return WritePhrase( (uint32_t)(address - 4), phrase ); // Send the phrase address and the phrase value
+    return WritePhrase( (address32 - 4), phrase ); // Send the phrase address and the phrase value
   }
 }
 
@@ -116,22 +114,21 @@ bool Flash_Write32(volatile uint32_t* const address, const uint32_t data)
 bool Flash_Write16(volatile uint16_t* const address, const uint16_t data)
 {
   uint32union_t word; // The word
+  uint32_t address32 = (uint32_t)address;
 
-  if((uint32_t)address % 2 == 0) // On even address
+  if(address32 % 4 == 0) // Writing to first half word
   {
     word.s.Lo = data; // The half word takes the low end of the word
+    word.s.Hi = _FH(address32 + 2); // The value of the next 2 bytes takes the high end of the word
     
-    word.s.Hi = *(uint16_t volatile *)(address + 2); // The value of the next 2 bytes takes the high end of the word
-    
-    return Flash_Write32( &(*(uint32_t volatile *)address), word.l ); // Send the word address and the word value
+    return Flash_Write32( (uint32_t volatile *)(address), word.l ); // Send the word address and the word value
   }
-  else // move to even address
+  else // Writing to second half word
   {
-    word.s.Lo = *(uint16_t volatile *)(address - 2); // The value of the previous 2 bytes takes the low end of the word
-    
+    word.s.Lo = _FH(address32 - 2); // The value of the previous 2 bytes takes the low end of the word
     word.s.Hi = data; // The half word takes the high end of the word
     
-    return Flash_Write32( &(*(uint32_t volatile *)(address - 2)), word.l ); // Send the word address moved up 2 and the word value
+    return Flash_Write32( (uint32_t volatile *)(address - 2), word.l ); // Send the word address moved up 2 and the word value
   }
 }
 
@@ -145,12 +142,22 @@ bool Flash_Write16(volatile uint16_t* const address, const uint16_t data)
 bool Flash_Write8(volatile uint8_t* const address, const uint8_t data)
 {
   uint16union_t halfWord; // The half word
+  uint32_t address32 = (uint32_t)address;
   
-  halfWord.s.Lo = data; // The byte takes the low end of the half word
-  
-  halfWord.s.Hi = *(uint8_t volatile *)(address + 1); // The value of the next byte takes the high end of the half word
-  
-  return Flash_Write16( &(*(uint16_t volatile *)address), halfWord.l ); // Send the half word address and the half word value
+  if(address32 % 2 == 0) // Writing to first byte
+  {
+    halfWord.s.Lo = data; // The byte takes the low end of the half word
+    halfWord.s.Hi = _FB(address32 + 1); // The value of the next byte takes the high end of the half word
+
+    return Flash_Write16( (uint16_t volatile *)(address), halfWord.l ); // Send the half word address and the half word value
+  }
+  else // Writing to second byte
+  {
+    halfWord.s.Lo = _FB(address32 - 1); // The value of the previous byte takes the low end of the half word
+    halfWord.s.Hi = data; // The byte takes the high end of the half word
+
+    return Flash_Write16( (uint16_t volatile *)(address - 1), halfWord.l ); // Send the half word address moved up 1 and the half word value
+  }
 }
 
 /*! @brief Erases the entire Flash sector.
