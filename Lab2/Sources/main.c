@@ -128,12 +128,12 @@ bool HandleTowerProgramByte(void)
     // Erase Flash
     return Flash_Erase();
   }
-  else if (Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07)
-  {
+  //else if (Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07)
+  //{
     // Flash data
-    volatile uint8_t* NvData = FLASH_DATA_START + Packet_Parameter1;
-    return Flash_Write8( (uint8_t*)NvData, Packet_Parameter3 );
-  }
+  //  volatile uint8_t* NvData = FLASH_DATA_START + Packet_Parameter1;
+  //  return Flash_Write8( (uint8_t*)NvData, Packet_Parameter3 );
+  //}
   return false;
 }
 

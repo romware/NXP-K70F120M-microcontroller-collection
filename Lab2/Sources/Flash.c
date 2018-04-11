@@ -121,14 +121,14 @@ bool Flash_Write16(volatile uint16_t* const address, const uint16_t data)
     word.s.Lo = data; // The half word takes the low end of the word
     word.s.Hi = _FH(address32 + 2); // The value of the next 2 bytes takes the high end of the word
     
-    return Flash_Write32( (uint32_t volatile *)(address), word.l ); // Send the word address and the word value
+    return Flash_Write32( (uint32_t volatile *)(address32), word.l ); // Send the word address and the word value
   }
   else // Writing to second half word
   {
     word.s.Lo = _FH(address32 - 2); // The value of the previous 2 bytes takes the low end of the word
     word.s.Hi = data; // The half word takes the high end of the word
     
-    return Flash_Write32( (uint32_t volatile *)(address - 2), word.l ); // Send the word address moved up 2 and the word value
+    return Flash_Write32( (uint32_t volatile *)(address32 - 2), word.l ); // Send the word address moved up 2 and the word value
   }
 }
 
@@ -149,14 +149,14 @@ bool Flash_Write8(volatile uint8_t* const address, const uint8_t data)
     halfWord.s.Lo = data; // The byte takes the low end of the half word
     halfWord.s.Hi = _FB(address32 + 1); // The value of the next byte takes the high end of the half word
 
-    return Flash_Write16( (uint16_t volatile *)(address), halfWord.l ); // Send the half word address and the half word value
+    return Flash_Write16( (uint16_t volatile *)(address32), halfWord.l ); // Send the half word address and the half word value
   }
   else // Writing to second byte
   {
     halfWord.s.Lo = _FB(address32 - 1); // The value of the previous byte takes the low end of the half word
     halfWord.s.Hi = data; // The byte takes the high end of the half word
 
-    return Flash_Write16( (uint16_t volatile *)(address - 1), halfWord.l ); // Send the half word address moved up 1 and the half word value
+    return Flash_Write16( (uint16_t volatile *)(address32 - 1), halfWord.l ); // Send the half word address moved up 1 and the half word value
   }
 }
 
