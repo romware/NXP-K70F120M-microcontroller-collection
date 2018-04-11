@@ -22,6 +22,8 @@ static bool ModifyPhrase(const uint32_t address, const uint64union_t phrase);
  */
 bool Flash_Init(void)
 {
+  SIM_SCGC7 |= SIM_SCGC7_MPU_MASK;
+  
   // Check that CCIF is 1 (command completed) and there are no flash access errors or flash protection violation flags set.
   if ((FTFE_FSTAT & FTFE_FSTAT_CCIF_MASK) && !(FTFE_FSTAT & FTFE_FSTAT_ACCERR_MASK) && !(FTFE_FSTAT & FTFE_FSTAT_FPVIOL_MASK))
   {
