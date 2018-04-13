@@ -21,7 +21,7 @@
  */
 static bool LaunchCommand(TFCCOB* commonCommandObject);
 
-/*! @brief Encodes an address and phrase into the TFCCOB struct
+/*! @brief Encodes an address and phrase into the TFCCOB structure
  *
  *  @param address The address of the data.
  *  @param phrase The 64-bit phrase to write.
@@ -38,33 +38,14 @@ static bool WritePhrase(const uint32_t address, const uint64union_t phrase);
  */
 static bool EraseSector(const uint32_t address);
 
-// Flash allocation bytes
-uint8_t OccupationIndicator = 0b00000000;
-
 /*! @brief Enables the Flash module.
  *
  *  @return bool - TRUE if the Flash was setup successfully.
  */
 bool Flash_Init(void)
 {
-  // Enable MPU clock: For System Clock Gating Control Register 7 see 12.2.15 of K70P256M150SF3RM.pdf
-  SIM_SCGC7 |= SIM_SCGC7_MPU_MASK;
-  
-  // Check that CCIF is 1 (command completed) and there are no flash access errors or flash protection violation flags set.
-  if ((FTFE_FSTAT & FTFE_FSTAT_CCIF_MASK) && !(FTFE_FSTAT & FTFE_FSTAT_ACCERR_MASK) && !(FTFE_FSTAT & FTFE_FSTAT_FPVIOL_MASK))
-  {
-    return true;
-  }
-  else
-  {
-    // Write 1 to clear ACCERR and FPVIOL
-    FTFE_FSTAT |= FTFE_FSTAT_ACCERR_MASK;
-    FTFE_FSTAT |= FTFE_FSTAT_FPVIOL_MASK;
-
-    // Clear flash
-    Flash_Erase();
-    return false;
-  }
+  // Initialize the Flash
+  return true;
 }
 
 /*! @brief Allocates space for a non-volatile variable in the Flash memory.
@@ -82,23 +63,26 @@ bool Flash_Init(void)
  */
 bool Flash_AllocateVar(volatile void** variable, const uint8_t size)
 {
+  // Flash allocation bytes
+  static uint8_t occupiedBytes = 0b00000000;
+
   // Check if size of data to be allocated an address is a byte, half word or word
   if(size == 1 || size == 2 || size == 4)
   {
-    // Initialise the allocation to be the first address which can store the data
+    // Initialize the allocation to be the first address which can store the data
     uint8_t allocation = size * 2 - 1;
     
     // Loop through each of the 8 bytes in Flash until an address is available
     for(uint8_t i = 0; i < 8/size; i++)
     {
       // Mask the allocation with the currently occupied bit mask to see if it is available
-      if(!(OccupationIndicator & allocation))
+      if(!(occupiedBytes & allocation))
       {
       	// Set the variable value to be the Flash address
         *variable = (uint16_t* volatile)FLASH_DATA_START + i;
         
         // Set the occupation bit mask to have the newly allocated address as occupied
-        OccupationIndicator |= allocation;
+        occupiedBytes |= allocation;
         return true;
       }
       
@@ -288,7 +272,7 @@ static bool WritePhrase(const uint32_t address, const uint64union_t phrase)
   // Erase Flash before writing
   Flash_Erase();
   
-  // Initialise a local TFCCOB struct
+  // Initialize a local TFCCOB structure
   TFCCOB commonCommandObject;
   
   // Set the FTFE command to program a phrase
@@ -322,7 +306,7 @@ static bool WritePhrase(const uint32_t address, const uint64union_t phrase)
  */
 static bool EraseSector(const uint32_t address)
 {
-  // Initialise a local TFCCOB struct
+  // Initialize a local TFCCOB structure
   TFCCOB commonCommandObject;
   
   // Set the FTFE command to erase the flash sector

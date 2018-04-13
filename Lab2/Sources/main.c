@@ -115,7 +115,7 @@ bool HandleTowerNumber(void)
   return false;
 }
 
-/*! @brief Erases or programs a byte to Flash based on packet recieved
+/*! @brief Erases or programs a byte to Flash based on packet received
  *
  *  @return bool - TRUE if Flash was modified
  */
@@ -273,7 +273,7 @@ int main(void)
       Flash_Write16((uint16_t*)NvTowerMd,(uint16_t)1);
     }
     
-    // Turn on the orange LED to indicate the tower has initialised successfully
+    // Turn on the orange LED to indicate the tower has initialized successfully
     LEDs_On(LED_ORANGE);
   }
 
