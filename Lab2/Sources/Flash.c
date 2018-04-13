@@ -109,13 +109,13 @@ bool Flash_Write32(volatile uint32_t* const address, const uint32_t data)
   uint32_t address32 = (uint32_t)address;
 
   // Check if address is evenly divisible by 4 to find which bytes to write it to
-  if (address32 % 8 == 0) 
+  if (address32 % (2*sizeof(data)) == 0)
   {
     // The word takes the low end of the phrase
     phrase.s.Lo = data;
     
     // The value of the next 4 bytes takes the high end of the phrase
-    phrase.s.Hi = _FW(address32 + 4);
+    phrase.s.Hi = _FW(address32 + sizeof(data));
     
     // Write the phrase to the second half of the 8 byte Flash memory
     return WritePhrase( (address32), phrase ); 
@@ -123,13 +123,13 @@ bool Flash_Write32(volatile uint32_t* const address, const uint32_t data)
   else
   {
     // The value of the previous 4 bytes takes the low end of the phrase
-    phrase.s.Lo = _FW(address32 - 4); 
+    phrase.s.Lo = _FW(address32 - sizeof(data));
     
     // The word takes the high end of the phrase
     phrase.s.Hi = data; 
     
     // Write the phrase to the first half of the 8 byte Flash memory
-    return WritePhrase( (address32 - 4), phrase );
+    return WritePhrase( (address32 - sizeof(data)), phrase );
   }
 }
 
@@ -149,13 +149,13 @@ bool Flash_Write16(volatile uint16_t* const address, const uint16_t data)
   uint32_t address32 = (uint32_t)address;
 
   // Check if address is divisible by 4 to find which bytes to write it to
-  if(address32 % 4 == 0)
+  if(address32 % (2*sizeof(data)) == 0)
   {
     // The half word takes the low end of the word
     word.s.Lo = data; 
     
     // The value of the next 2 bytes takes the high end of the word
-    word.s.Hi = _FH(address32 + 2); 
+    word.s.Hi = _FH(address32 + sizeof(data));
     
     // Write the word to the second quarter or fourth quarter of the 8 byte Flash memory
     return Flash_Write32( (uint32_t volatile *)(address32), word.l ); 
@@ -163,13 +163,13 @@ bool Flash_Write16(volatile uint16_t* const address, const uint16_t data)
   else
   {
     // The value of the previous 2 bytes takes the low end of the word
-    word.s.Lo = _FH(address32 - 2); 
+    word.s.Lo = _FH(address32 - sizeof(data));
     
     // The half word takes the high end of the word
     word.s.Hi = data;
     
     // Write the word to the first quarter or thirst quarter of the 8 byte Flash memory
-    return Flash_Write32( (uint32_t volatile *)(address32 - 2), word.l );
+    return Flash_Write32( (uint32_t volatile *)(address32 - sizeof(data)), word.l );
   }
 }
 
@@ -189,13 +189,13 @@ bool Flash_Write8(volatile uint8_t* const address, const uint8_t data)
   uint32_t address32 = (uint32_t)address;
   
   // Check if address is divisible by 2 to find which bytes to write it to
-  if(address32 % 2 == 0)
+  if(address32 % (2*sizeof(data)) == 0)
   {
     // The byte takes the low end of the half word
     halfWord.s.Lo = data; 
     
     // The value of the next byte takes the high end of the half word
-    halfWord.s.Hi = _FB(address32 + 1); 
+    halfWord.s.Hi = _FB(address32 + sizeof(data));
     
     // Write the half word to the second, fourth, sixth or eighth section of the 8 byte Flash memory
     return Flash_Write16( (uint16_t volatile *)(address32), halfWord.l );
@@ -203,13 +203,13 @@ bool Flash_Write8(volatile uint8_t* const address, const uint8_t data)
   else
   {
     // The value of the previous byte takes the low end of the half word
-    halfWord.s.Lo = _FB(address32 - 1); 
+    halfWord.s.Lo = _FB(address32 - sizeof(data));
     
     // The byte takes the high end of the half word
     halfWord.s.Hi = data; 
     
     // Write the half word to the first, third, fifth or seventh section of the 8 byte Flash memory
-    return Flash_Write16( (uint16_t volatile *)(address32 - 1), halfWord.l );
+    return Flash_Write16( (uint16_t volatile *)(address32 - sizeof(data)), halfWord.l );
   }
 }
 

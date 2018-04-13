@@ -649,7 +649,7 @@ LOAD c:/freescale/kds_3.0.0/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv7e-
  *(.bss)
  .bss           0x1fff0060       0x1c c:/freescale/kds_3.0.0/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv7e-m/fpu/crtbegin.o
  *(.bss*)
- .bss.occupationIndicator.5646
+ .bss.occupiedBytes.5646
                 0x1fff007c        0x1 ./Sources/Flash.o
  *(COMMON)
  *fill*         0x1fff007d        0x3 
@@ -831,24 +831,24 @@ OUTPUT(Lab2.elf elf32-littlearm)
  .debug_line    0x0000120f      0x314 ./Generated_Code/Cpu.o
  .debug_line    0x00001523      0x293 ./Generated_Code/Vectors.o
 
-.debug_str      0x00000000    0x8d89d
+.debug_str      0x00000000    0x8d897
  .debug_str     0x00000000     0x2e7c ./Sources/FIFO.o
                                0x2fe6 (size before relaxing)
- .debug_str     0x00002e7c    0x8017b ./Sources/Flash.o
-                              0x83107 (size before relaxing)
- .debug_str     0x00082ff7      0x1ae ./Sources/LEDs.o
+ .debug_str     0x00002e7c    0x80175 ./Sources/Flash.o
+                              0x83101 (size before relaxing)
+ .debug_str     0x00082ff1      0x1ae ./Sources/LEDs.o
                               0x82ee7 (size before relaxing)
- .debug_str     0x000831a5      0x126 ./Sources/UART.o
+ .debug_str     0x0008319f      0x126 ./Sources/UART.o
                               0x82fc5 (size before relaxing)
- .debug_str     0x000832cb     0x7cc2 ./Sources/main.o
+ .debug_str     0x000832c5     0x7cc2 ./Sources/main.o
                               0x8abef (size before relaxing)
- .debug_str     0x0008af8d       0x3f ./Sources/packet.o
+ .debug_str     0x0008af87       0x3f ./Sources/packet.o
                                0x3269 (size before relaxing)
- .debug_str     0x0008afcc     0x2663 ./Project_Settings/Startup_Code/startup.o
+ .debug_str     0x0008afc6     0x2663 ./Project_Settings/Startup_Code/startup.o
                               0x853eb (size before relaxing)
- .debug_str     0x0008d62f      0x252 ./Generated_Code/Cpu.o
+ .debug_str     0x0008d629      0x252 ./Generated_Code/Cpu.o
                               0x8a9e9 (size before relaxing)
- .debug_str     0x0008d881       0x1c ./Generated_Code/Vectors.o
+ .debug_str     0x0008d87b       0x1c ./Generated_Code/Vectors.o
                               0x8a631 (size before relaxing)
 
 .comment        0x00000000       0x70
