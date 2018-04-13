@@ -1,11 +1,12 @@
-/*! @file
+/*! @file Flash.h
  *
  *  @brief Routines for erasing and writing to the Flash.
  *
  *  This contains the functions needed for accessing the internal Flash.
  *
- *  @author PMcL
- *  @date 2015-08-07
+ *  @author 12403756, 12551519
+ *  @date 2018-04-13
+ *  @modified 2018-04-13
  */
 
 #ifndef FLASH_H
@@ -18,18 +19,7 @@ static const uint8_t ERASE_FLASH_SECTOR = 0x09;
 // new types
 #include "types.h"
 
-typedef union
-{
-  int32_t l;
-  struct
-  {
-    int8_t Lo;
-    int8_t MidLo;
-    int8_t MidHi;
-    int8_t Hi;
-  } s;
-} int32quarterUnion_t;
-
+// TFCCOB struct of containing the Flash command, address and 8 data bytes
 typedef struct
 {
   uint8_t FCMD;

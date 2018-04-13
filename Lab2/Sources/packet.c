@@ -4,9 +4,9 @@
  *
  *  This contains the functions for implementing the "Tower to PC Protocol" 5-byte packets.
  *
- *  @author PMcL, 12403756, 12551519
- *  @date 2015-07-23
- *  @modified 2018-04-02
+ *  @author 12403756, 12551519
+ *  @date 2018-04-13
+ *  @modified 2018-04-13
  */
 
 #include "types.h"

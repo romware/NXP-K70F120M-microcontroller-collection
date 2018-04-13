@@ -4,7 +4,7 @@
 **     Processor   : MK70FN1M0VMJ12
 **     Version     : Driver 01.01
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-07-20, 13:27, # CodeGen: 0
+**     Date/Time   : 2018-04-12, 13:27, # CodeGen: 0
 **     Abstract    :
 **         Main module.
 **         This module contains user's application code.
@@ -55,7 +55,7 @@ const uint8_t COMMAND_PROGRAMBYTE = 0x07;
 const uint8_t COMMAND_READBYTE = 0x08;
 const uint8_t COMMAND_MODE = 0x0D;
 
-// Tower number get and set bits of packet parameter 1
+// Get and set bits of packet parameter 1
 const uint8_t PARAM_GET = 1;
 const uint8_t PARAM_SET = 2;
 
@@ -76,7 +76,7 @@ volatile uint16union_t* NvTowerMd;
  */
 bool HandleTowerStartup(void)
 {
-  // Sends the tower startup values, version and number to the PC
+  // Sends the tower startup values, version, number and mode to the PC
   return (
     Packet_Put(COMMAND_STARTUP,0x00,0x00,0x00) &&
     Packet_Put(COMMAND_VER,'v',TOWER_VER_MAJ,TOWER_VER_MIN) &&
@@ -85,17 +85,17 @@ bool HandleTowerStartup(void)
   );
 }
 
-/*! @brief Sends the version packet to the PC
+/*! @brief Sends the tower version packet to the PC
  *
  *  @return bool - TRUE if packet is sent
  */
 bool HandleTowerVersion(void)
 {
-  // Send tower number packet
+  // Sends the tower number packet
   return Packet_Put(COMMAND_NUM,PARAM_GET,NvTowerNb->s.Lo,NvTowerNb->s.Hi);
 }
 
-/*! @brief Sends or sets the number packet to the PC
+/*! @brief Sets the tower number or sends the packet to the PC
  *
  *  @return bool - TRUE if packet is sent or number is set
  */
@@ -104,21 +104,20 @@ bool HandleTowerNumber(void)
   // Check if parameters match tower number GET or SET parameters
   if(Packet_Parameter1 == PARAM_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
-    // Send tower number packet
+    // Sends the tower number packet
     return Packet_Put(COMMAND_NUM,PARAM_GET,NvTowerNb->s.Lo,NvTowerNb->s.Hi);
   }
   else if (Packet_Parameter1 == PARAM_SET)
   {
-    // Change tower number
-    Flash_Write16((uint16_t*)NvTowerNb,(uint16_t)Packet_Parameter23);
-    return true;
+    // Sets the tower number
+    return Flash_Write16((uint16_t*)NvTowerNb,(uint16_t)Packet_Parameter23);
   }
   return false;
 }
 
-/*! @brief Sends the tower program byte packet to the PC
+/*! @brief Erases or programs a byte to Flash based on packet recieved
  *
- *  @return bool - TRUE if packet is sent
+ *  @return bool - TRUE if Flash was modified
  */
 bool HandleTowerProgramByte(void)
 {
@@ -128,16 +127,16 @@ bool HandleTowerProgramByte(void)
     // Erase Flash
     return Flash_Erase();
   }
-  //else if (Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07)
-  //{
-    // Flash data
-  //  volatile uint8_t* NvData = FLASH_DATA_START + Packet_Parameter1;
-  //  return Flash_Write8( (uint8_t*)NvData, Packet_Parameter3 );
-  //}
+  else if (Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07)
+  {
+    // Program byte to Flash
+    volatile uint8_t* nvData = FLASH_DATA_START + Packet_Parameter1;
+    return Flash_Write8( (uint8_t*)nvData, Packet_Parameter3 );
+  }
   return false;
 }
 
-/*! @brief Sends the tower read byte packet to the PC
+/*! @brief Sends the byte read from Flash packet to the PC
  *
  *  @return bool - TRUE if packet is sent
  */
@@ -152,7 +151,7 @@ bool HandleTowerReadByte(void)
   return false;
 }
 
-/*! @brief Sends or sets the mode packet to the PC
+/*! @brief Sets the tower mode or sends the packet to the PC
  *
  *  @return bool - TRUE if packet is sent or number is set
  */
@@ -161,14 +160,13 @@ bool HandleTowerMode(void)
   // Check if parameters match tower mode GET or SET parameters
   if(Packet_Parameter1 == PARAM_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
-    // Send tower mode packet
+    // Sends the tower mode packet
     return Packet_Put(COMMAND_MODE,PARAM_GET,NvTowerMd->s.Lo,NvTowerMd->s.Hi);
   }
   else if (Packet_Parameter1 == PARAM_SET)
   {
-    // Change tower mode
-    Flash_Write16((uint16_t*)NvTowerMd,(uint16_t)Packet_Parameter23);
-    return true;
+    // Sets the tower mode
+    return Flash_Write16((uint16_t*)NvTowerMd,(uint16_t)Packet_Parameter23);
   }
   return false;
 }
@@ -201,10 +199,10 @@ void ReceivedPacket(void)
     success = HandleTowerNumber();
   }
   else if(commandIgnoreAck == COMMAND_MODE)
-    {
-      // Check if parameters match tower mode GET or SET parameters
-      success = HandleTowerMode();
-    }
+  {
+    // Check if parameters match tower mode GET or SET parameters
+    success = HandleTowerMode();
+  }
   else if(commandIgnoreAck == COMMAND_PROGRAMBYTE && Packet_Parameter2 == 0)
   {
     // Send tower program byte packet
@@ -255,27 +253,27 @@ int main(void)
   // Initializes the LEDs, UART and FLASH by calling the initialization routines of the supporting software modules.
   if(Flash_Init() && LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ))
   {
+  	// Allocates an adress in Flash memory to the tower number
     Flash_AllocateVar((volatile void**)&NvTowerNb, sizeof(*NvTowerNb));
+    
+  	// Allocates an adress in Flash memory to the tower mode
     Flash_AllocateVar((volatile void**)&NvTowerMd, sizeof(*NvTowerMd));
-
+    
+    // Checks if tower number is unset
     if(_FH(NvTowerNb) == 0xFFFF)
     {
-      // Set Tower Number
+      // Sets the tower number to the default number
       Flash_Write16((uint16_t*)NvTowerNb,(uint16_t)1519);
     }
-
-    volatile uint64_t NvTemp;
-    NvTemp = _FP(FLASH_DATA_START);
-
+    
+    // Checks if tower mode is unset
     if(_FH(NvTowerMd) == 0xFFFF)
     {
-      // Set Tower Mode
+      // Sets the tower mode to the default mode
       Flash_Write16((uint16_t*)NvTowerMd,(uint16_t)1);
     }
-
-
-    NvTemp = _FP(FLASH_DATA_START);
-
+    
+    // Turn on the orange LED to indicate the tower has initialised successfully
     LEDs_On(LED_ORANGE);
   }
 

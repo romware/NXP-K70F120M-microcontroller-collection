@@ -1,11 +1,12 @@
-/*! @file
+/*! @file FIFO.h
  *
  *  @brief Routines to implement a FIFO buffer.
  *
  *  This contains the structure and "methods" for accessing a byte-wide FIFO.
  *
- *  @author PMcL
- *  @date 2015-07-23
+ *  @author 12403756, 12551519
+ *  @date 2018-04-13
+ *  @modified 2018-04-13
  */
 
 #ifndef FIFO_H
