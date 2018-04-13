@@ -130,8 +130,8 @@ bool HandleTowerProgramByte(void)
   else if (Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07)
   {
     // Program byte to Flash
-    volatile uint8_t* nvData = FLASH_DATA_START + Packet_Parameter1;
-    return Flash_Write8( (uint8_t*)nvData, Packet_Parameter3 );
+    volatile uint8_t* nvAddess = (uint8_t*)(FLASH_DATA_START + Packet_Parameter1);
+    return Flash_Write8( (uint8_t*)nvAddess, Packet_Parameter3 );
   }
   return false;
 }
@@ -146,7 +146,7 @@ bool HandleTowerReadByte(void)
   if (Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07)
   {
     // Send read byte packet
-    return Packet_Put(COMMAND_READBYTE,Packet_Parameter1,0,FLASH_DATA_START + Packet_Parameter1);
+    return Packet_Put(COMMAND_READBYTE,Packet_Parameter1,0,_FB(FLASH_DATA_START + (uint32_t)Packet_Parameter1));
   }
   return false;
 }
@@ -253,20 +253,20 @@ int main(void)
   // Initializes the LEDs, UART and FLASH by calling the initialization routines of the supporting software modules.
   if(Flash_Init() && LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ))
   {
-  	// Allocates an adress in Flash memory to the tower number
+    // Allocates an address in Flash memory to the tower number
     Flash_AllocateVar((volatile void**)&NvTowerNb, sizeof(*NvTowerNb));
     
-  	// Allocates an adress in Flash memory to the tower mode
+    // Allocates an address in Flash memory to the tower mode
     Flash_AllocateVar((volatile void**)&NvTowerMd, sizeof(*NvTowerMd));
     
-    // Checks if tower number is unset
+    // Checks if tower number is clear
     if(_FH(NvTowerNb) == 0xFFFF)
     {
       // Sets the tower number to the default number
       Flash_Write16((uint16_t*)NvTowerNb,(uint16_t)1519);
     }
     
-    // Checks if tower mode is unset
+    // Checks if tower mode is clear
     if(_FH(NvTowerMd) == 0xFFFF)
     {
       // Sets the tower mode to the default mode
