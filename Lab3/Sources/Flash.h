@@ -1,18 +1,40 @@
-/*! @file
+/*! @file Flash.h
  *
  *  @brief Routines for erasing and writing to the Flash.
  *
  *  This contains the functions needed for accessing the internal Flash.
  *
- *  @author PMcL
- *  @date 2015-08-07
+ *  @author 12403756, 12551519
+ *  @date 2018-04-13
+ *  @modified 2018-04-13
  */
 
 #ifndef FLASH_H
 #define FLASH_H
 
+// FCMD commands
+static const uint8_t PROGRAM_PHRASE = 0x07;
+static const uint8_t ERASE_FLASH_SECTOR = 0x09;
+
 // new types
 #include "types.h"
+
+// TFCCOB struct of containing the Flash command, address and 8 data bytes
+typedef struct
+{
+  uint8_t FCMD;
+  uint8_t flashAddress23to16;
+  uint8_t flashAddress15to08;
+  uint8_t flashAddress07to00;
+  uint8_t dataByte0;
+  uint8_t dataByte1;
+  uint8_t dataByte2;
+  uint8_t dataByte3;
+  uint8_t dataByte4;
+  uint8_t dataByte5;
+  uint8_t dataByte6;
+  uint8_t dataByte7;
+} TFCCOB;
 
 // FLASH data access
 #define _FB(flashAddress)  *(uint8_t  volatile *)(flashAddress)
