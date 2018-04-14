@@ -42,6 +42,8 @@
 #include "FIFO.h"
 #include "packet.h"
 #include "Flash.h"
+#include "PE_Types.h"
+
 
 
 // Baud rate
@@ -248,6 +250,9 @@ int main(void)
   PE_low_level_init();
   /*** End of Processor Expert internal initialization.                    ***/
 
+  // Globally disable interrupts
+   __DI();
+
   /* Write your code here */
 
   // Initializes the LEDs, UART and FLASH by calling the initialization routines of the supporting software modules.
@@ -277,13 +282,17 @@ int main(void)
     LEDs_On(LED_ORANGE);
   }
 
+
   // Send startup packets to PC
   HandleTowerStartup();
+
+  // Globally enable interrupts
+  __EI();
 
   for (;;)
   {
     // Poll UART2 for packets to transmit and receive
-    UART_Poll();
+    //UART_Poll();
 
     // Check if packet has been received
     if(Packet_Get())

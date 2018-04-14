@@ -60,7 +60,19 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
   UART2_C2 |= UART_C2_TE_MASK;
   // Set UART2_C2 receive enable to 1
   UART2_C2 |= UART_C2_RE_MASK;
+  // Set UART2_C2 transmit interrupt enable to 1
+  UART2_C2 |= UART_C2_TIE_MASK;
+  // Set UART2_C2 receive interrupt enable to 1
+  UART2_C2 |= UART_C2_RIE_MASK;
   // For UART Control Register 2 see 56.3.4 of K70P256M150SF3RM.pdf
+
+  // Clear any pending interrupts from UART2 (bit 17 of register 1)
+  NVICICPR1 = (1 << 17);
+  // Enable interrupt source for UART2 in NVIC (bit 17 of register 1)
+  NVICISER1 = (1 << 17);
+  // Set the interrupt priority to 1 (NVICIPR from bit 12 to bit 15)
+  //NVICIPR12 = (1 << 15);
+  // For NVIC configuration see 3.2.2 of K70P256M150SF3RM.pdf
 
   // Initiate the RxFIFO and TxFIFO
   FIFO_Init(&RxFIFO);
@@ -130,3 +142,37 @@ void UART_Poll(void)
     FIFO_Get(&TxFIFO, (uint8_t*)&UART2_D);
   }
 }
+
+/*! @brief Interrupt service routine for the UART.
+ *
+ *  @note Assumes the transmit and receive FIFOs have been initialized.
+ */
+void __attribute__ ((interrupt)) UART_ISR(void)
+  {
+    // Check if UART2 receive interrupt is enabled
+    if(UART2_C2 & UART_C2_RIE_MASK)
+      {
+	// AND the UART2 Status register with the receive mask
+	if(UART2_S1 & UART_S1_RDRF_MASK)
+	  {
+	    // Put the value in UART2 Data Register (UART2_D) in the RxFIFO
+	    FIFO_Put(&RxFIFO, UART2_D);
+	  }
+      }
+
+    // Check if the UART2 transmit interrupt is enabled
+    if(UART2_C2 & UART_C2_TIE_MASK)
+      {
+	  // AND the UART2 Status register with the transmit mask
+	  if(UART2_S1 & UART_S1_TDRE_MASK)
+	  {
+	    // Put the value in TxFIFO into the UART2 Data Register (UART2_D)
+	    FIFO_Get(&TxFIFO, (uint8_t*)&UART2_D);
+	  }
+      }
+  }
+
+
+
+
+
