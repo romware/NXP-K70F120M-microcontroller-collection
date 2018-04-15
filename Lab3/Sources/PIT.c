@@ -26,13 +26,13 @@ bool PIT_Init(const uint32_t moduleClk, void (*userFunction)(void*), void* userA
   EnterCritical();
 
   // Enable PIT module in PIT_MCR
-  PIT_MCR &= ~PIT_MCR_MDIS_MASK;
+  //PIT_MCR &= ~PIT_MCR_MDIS_MASK;
 
   // Ensure the PIT0 in disabled
-  PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
+  //PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
 
   // Enable interrupts flags for PIT0
-  PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;
+  //PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;
 
   // Return global interrupts to how they were
   ExitCritical();
