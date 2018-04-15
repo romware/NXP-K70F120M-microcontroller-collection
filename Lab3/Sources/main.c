@@ -245,7 +245,7 @@ void ReceivedPacket(void)
  *
  *  @return void
  */
-void GreenFlash(void)
+void PIT_Callback(void* arg)
 {
   // Toggle green LED
   LEDs_Toggle(LED_GREEN);
@@ -257,12 +257,13 @@ int main(void)
 {
   /* Write your local variable definition here */
 
+  // Globally disable interrupts
+  __DI();
+
   /*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
   PE_low_level_init();
   /*** End of Processor Expert internal initialization.                    ***/
 
-  // Globally disable interrupts
-   __DI();
 
   /* Write your code here */
 
@@ -292,6 +293,10 @@ int main(void)
     // Turn on the orange LED to indicate the tower has initialized successfully
     LEDs_On(LED_ORANGE);
   }
+
+  PIT_Init(CPU_BUS_CLK_HZ, PIT_Callback, NULL);
+
+  PIT_Set(500000000, true);
 
 
   // Send startup packets to PC

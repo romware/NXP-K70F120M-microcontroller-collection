@@ -6,6 +6,11 @@
  */
 #include "PIT.h"
 
+// Private gloabl variable for PIT
+static uint32_t ModuleClk;
+static void (*UserFunction)(void*);
+static void* UserArguments;
+
 /*! @brief Sets up the PIT before first use.
  *
  *  Enables the PIT and freezes the timer when debugging.
@@ -26,9 +31,6 @@ bool PIT_Init(const uint32_t moduleClk, void (*userFunction)(void*), void* userA
   // Ensure the PIT0 in disabled
   PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
 
-  // Load the LDVAL so it can later be multiplied by the desired number of nanoseconds by loading with the moduleClk in nanoHz not Hz
-  PIT_LDVAL0 = (moduleClk / 1000000000);
-
   // Enable interrupts flags for PIT0
   PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;
 
@@ -47,6 +49,23 @@ bool PIT_Init(const uint32_t moduleClk, void (*userFunction)(void*), void* userA
  */
 void PIT_Set(const uint32_t period, const bool restart)
 {
+  if(restart)
+  {
+    // Disable PIT0
+    PIT_Enable(false);
+
+    // Load the new LDVAL
+    PIT_LDVAL0 = (((ModuleClk * period)/ 1000000000)-1);
+
+    // Enable PIT0
+    PIT_Enable(true);
+  }
+
+  else
+  {
+    // Load the new LDVAL
+    PIT_LDVAL0 = (((ModuleClk * period)/ 1000000000)-1);
+  }
 
 }
 
@@ -56,7 +75,16 @@ void PIT_Set(const uint32_t period, const bool restart)
  */
 void PIT_Enable(const bool enable)
 {
-
+  // Enable PIT0
+  if(enable)
+  {
+    PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
+  }
+  // Disable PIT0
+  else
+  {
+      PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
+  }
 }
 
 /*! @brief Interrupt service routine for the PIT.
@@ -71,7 +99,8 @@ void __attribute__ ((interrupt)) PIT_ISR(void)
   PIT_TFLG0 &= ~PIT_TFLG_TIF_MASK;
 
   // Call user callback function to toggle green led
-  //GreenFlash();
+  if (UserFunction)
+   (*UserFunction)(UserArguments);
 }
 
 
