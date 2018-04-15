@@ -60,8 +60,8 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
   UART2_C2 |= UART_C2_TE_MASK;
   // Set UART2_C2 receive enable to 1
   UART2_C2 |= UART_C2_RE_MASK;
-  // Set UART2_C2 transmit interrupt enable to 1
-  UART2_C2 |= UART_C2_TIE_MASK;
+  // Set UART2_C2 transmit interrupt enable to 0
+  UART2_C2 &= ~UART_C2_TIE_MASK;
   // Set UART2_C2 receive interrupt enable to 1
   UART2_C2 |= UART_C2_RIE_MASK;
   // For UART Control Register 2 see 56.3.4 of K70P256M150SF3RM.pdf
@@ -102,7 +102,12 @@ bool UART_InChar(uint8_t * const dataPtr)
 bool UART_OutChar(const uint8_t data)
 {
   // Put one character into the TxFIFO.
-  return FIFO_Put(&TxFIFO, data);
+  if(FIFO_Put(&TxFIFO, data))
+  {
+    // Set UART2_C2 transmit interrupt enable to 1
+    UART2_C2 |= UART_C2_TIE_MASK;
+    return true;
+  }
 }
 
 /*! @brief Poll the UART status register to try and receive and/or transmit one character.
@@ -125,6 +130,7 @@ void UART_Poll(void)
   {
     // Put the value in UART2 Data Register (UART2_D) in the RxFIFO
     FIFO_Put(&RxFIFO, UART2_D);
+    uint8_t test = UART2_C2;
   }
 
   /*!  "The setting of the Transmit Data Register Empty (TDRE) flag by the UART
@@ -167,7 +173,11 @@ void __attribute__ ((interrupt)) UART_ISR(void)
 	  if(UART2_S1 & UART_S1_TDRE_MASK)
 	  {
 	    // Put the value in TxFIFO into the UART2 Data Register (UART2_D)
-	    FIFO_Get(&TxFIFO, (uint8_t*)&UART2_D);
+	    if(!(FIFO_Get(&TxFIFO, (uint8_t*)&UART2_D)))
+	    {
+	      // If the FIFO is empty set the TIE to 0
+		UART2_C2 &= ~UART_C2_TIE_MASK;
+	    }
 	  }
       }
   }

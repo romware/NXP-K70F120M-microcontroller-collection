@@ -41,7 +41,11 @@ bool FIFO_Put(TFIFO * const FIFO, const uint8_t data)
 
     // Increment the End and NbBytes counters
     FIFO->End++;
+    // First disable global interrupts
+    //__DI();
     FIFO->NbBytes++;
+    // Enable global interrupts
+    //__EI();
 
     // Check if End is past the last element of the array
     if(FIFO->End == FIFO_SIZE)
@@ -70,7 +74,11 @@ bool FIFO_Get(TFIFO * const FIFO, uint8_t * const dataPtr)
     *dataPtr = FIFO->Buffer[FIFO->Start];
 
     // Decrement NbBytes, increment Start
+    // First disable global interrupts
+    //__DI();
     FIFO->NbBytes--;
+    // Enable global interrupts
+    //__EI();
     FIFO->Start++;
 
     // Check if Start is past the last element of the array
