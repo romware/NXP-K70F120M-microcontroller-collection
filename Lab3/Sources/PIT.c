@@ -1,20 +1,10 @@
-/*! @file
+/*
+ * PIT.c
  *
- *  @brief Routines for controlling Periodic Interrupt Timer (PIT) on the TWR-K70F120M.
- *
- *  This contains the functions for operating the periodic interrupt timer (PIT).
- *
- *  @author PMcL
- *  @date 2015-08-22
+ *  Created on: 15 Apr 2018
+ *      Author: 12403756
  */
-
-#ifndef PIT_H
-#define PIT_H
-
-// new types
-#include "types.h"
-#include "MK70F12.h"
-#include "Cpu.h"
+#include "PIT.h"
 
 /*! @brief Sets up the PIT before first use.
  *
@@ -25,7 +15,28 @@
  *  @return bool - TRUE if the PIT was successfully initialized.
  *  @note Assumes that moduleClk has a period which can be expressed as an integral number of nanoseconds.
  */
-bool PIT_Init(const uint32_t moduleClk, void (*userFunction)(void*), void* userArguments);
+bool PIT_Init(const uint32_t moduleClk, void (*userFunction)(void*), void* userArguments)
+{
+  // Ensure global interrupts are disabled
+  EnterCritical();
+
+  // Enable PIT module in PIT_MCR
+  PIT_MCR &= ~PIT_MCR_MDIS_MASK;
+
+  // Ensure the PIT0 in disabled
+  PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
+
+  // Load the LDVAL so it can later be multiplied by the desired number of nanoseconds by loading with the moduleClk in nanoHz not Hz
+  PIT_LDVAL0 = (moduleClk / 1000000000);
+
+  // Enable interrupts flags for PIT0
+  PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;
+
+  // Return global interrupts to how they were
+  ExitCritical();
+
+  return true;
+}
 
 /*! @brief Sets the value of the desired period of the PIT.
  *
@@ -34,13 +45,19 @@ bool PIT_Init(const uint32_t moduleClk, void (*userFunction)(void*), void* userA
  *                 FALSE if the PIT will use the new value after a trigger event.
  *  @note The function will enable the timer and interrupts for the PIT.
  */
-void PIT_Set(const uint32_t period, const bool restart);
+void PIT_Set(const uint32_t period, const bool restart)
+{
+
+}
 
 /*! @brief Enables or disables the PIT.
  *
  *  @param enable - TRUE if the PIT is to be enabled, FALSE if the PIT is to be disabled.
  */
-void PIT_Enable(const bool enable);
+void PIT_Enable(const bool enable)
+{
+
+}
 
 /*! @brief Interrupt service routine for the PIT.
  *
@@ -48,6 +65,13 @@ void PIT_Enable(const bool enable);
  *  The user callback function will be called.
  *  @note Assumes the PIT has been initialized.
  */
-void __attribute__ ((interrupt)) PIT_ISR(void);
+void __attribute__ ((interrupt)) PIT_ISR(void)
+{
+  //Clear the timer interrupt flag
+  PIT_TFLG0 &= ~PIT_TFLG_TIF_MASK;
 
-#endif
+  // Call user callback function to toggle green led
+  //GreenFlash();
+}
+
+

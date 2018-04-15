@@ -43,6 +43,7 @@
 #include "packet.h"
 #include "Flash.h"
 #include "PE_Types.h"
+#include "PIT.h"
 
 
 
@@ -238,6 +239,16 @@ void ReceivedPacket(void)
   Packet_Parameter2 = 0;
   Packet_Parameter3 = 0;
   Packet_Checksum = 0;
+}
+
+/*! @brief Toggles the green LED every time it is called
+ *
+ *  @return void
+ */
+void GreenFlash(void)
+{
+  // Toggle green LED
+  LEDs_Toggle(LED_GREEN);
 }
 
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */

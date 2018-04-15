@@ -7,6 +7,7 @@ Generated_Code/Vectors.o: ../Generated_Code/Vectors.c \
  C:/Users/12403756/git/es18aut13/Lab3/Sources/types.h \
  C:/Users/12403756/git/es18aut13/Lab3/Generated_Code/PE_Types.h \
  C:/Users/12403756/git/es18aut13/Lab3/Sources/PIT.h \
+ C:/Users/12403756/git/es18aut13/Lab3/Generated_Code/Cpu.h \
  C:/Users/12403756/git/es18aut13/Lab3/Sources/RTC.h \
  C:/Users/12403756/git/es18aut13/Lab3/Sources/FTM.h
 
@@ -29,6 +30,8 @@ C:/Users/12403756/git/es18aut13/Lab3/Sources/types.h:
 C:/Users/12403756/git/es18aut13/Lab3/Generated_Code/PE_Types.h:
 
 C:/Users/12403756/git/es18aut13/Lab3/Sources/PIT.h:
+
+C:/Users/12403756/git/es18aut13/Lab3/Generated_Code/Cpu.h:
 
 C:/Users/12403756/git/es18aut13/Lab3/Sources/RTC.h:
 
