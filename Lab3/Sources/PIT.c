@@ -6,7 +6,7 @@
  */
 #include "PIT.h"
 
-// Private gloabl variable for PIT
+// Private global variable for PIT
 static uint32_t ModuleClk;
 static void (*UserFunction)(void*);
 static void* UserArguments;
@@ -22,17 +22,31 @@ static void* UserArguments;
  */
 bool PIT_Init(const uint32_t moduleClk, void (*userFunction)(void*), void* userArguments)
 {
+  // Store parameters
+  ModuleClk = moduleClk;
+  UserFunction = userFunction;
+  UserArguments = userArguments;
+
   // Ensure global interrupts are disabled
   EnterCritical();
 
   // Enable PIT module in PIT_MCR
-  //PIT_MCR &= ~PIT_MCR_MDIS_MASK;
+  PIT_MCR = ~PIT_MCR_MDIS_MASK;
+
+  // Clear any pending interrupts on PIT0
+  NVICICPR2 = (1 << 5);
+  // Enable interrupts from PIT0 module
+  NVICISER2 = (1 << 5);
+
 
   // Ensure the PIT0 in disabled
   //PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
+  //PIT_TCTRL0 &= ~0x01;
 
   // Enable interrupts flags for PIT0
-  //PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;
+  PIT_TCTRL1 = PIT_TCTRL_TIE_MASK;
+
+  //PIT_TCTRL0 = 0x02;
 
   // Return global interrupts to how they were
   ExitCritical();
@@ -55,7 +69,7 @@ void PIT_Set(const uint32_t period, const bool restart)
     PIT_Enable(false);
 
     // Load the new LDVAL
-    PIT_LDVAL0 = (((ModuleClk * period)/ 1000000000)-1);
+    PIT_LDVAL1 = (((ModuleClk * period)/ 1000000000)-1);
 
     // Enable PIT0
     PIT_Enable(true);
@@ -64,7 +78,7 @@ void PIT_Set(const uint32_t period, const bool restart)
   else
   {
     // Load the new LDVAL
-    PIT_LDVAL0 = (((ModuleClk * period)/ 1000000000)-1);
+    PIT_LDVAL1 = (((ModuleClk * period)/ 1000000000)-1);
   }
 
 }
@@ -78,12 +92,12 @@ void PIT_Enable(const bool enable)
   // Enable PIT0
   if(enable)
   {
-    PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
+    PIT_TCTRL1 = PIT_TCTRL_TEN_MASK | PIT_TCTRL_TIE_MASK;
   }
   // Disable PIT0
   else
   {
-      PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
+      PIT_TCTRL1 = ~PIT_TCTRL_TEN_MASK | PIT_TCTRL_TIE_MASK;
   }
 }
 
@@ -95,8 +109,8 @@ void PIT_Enable(const bool enable)
  */
 void __attribute__ ((interrupt)) PIT_ISR(void)
 {
-  //Clear the timer interrupt flag
-  PIT_TFLG0 &= ~PIT_TFLG_TIF_MASK;
+  //Clear the timer interrupt flag (W1C)
+  PIT_TFLG1 = PIT_TFLG_TIF_MASK;
 
   // Call user callback function to toggle green led
   if (UserFunction)

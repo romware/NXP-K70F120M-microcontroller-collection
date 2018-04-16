@@ -130,7 +130,6 @@ void UART_Poll(void)
   {
     // Put the value in UART2 Data Register (UART2_D) in the RxFIFO
     FIFO_Put(&RxFIFO, UART2_D);
-    uint8_t test = UART2_C2;
   }
 
   /*!  "The setting of the Transmit Data Register Empty (TDRE) flag by the UART
