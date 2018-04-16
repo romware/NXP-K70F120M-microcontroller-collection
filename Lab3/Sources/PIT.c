@@ -22,16 +22,19 @@ static void* UserArguments;
  */
 bool PIT_Init(const uint32_t moduleClk, void (*userFunction)(void*), void* userArguments)
 {
+  SIM_SCGC6 |= SIM_SCGC6_PIT_MASK;
+
   // Store parameters
   ModuleClk = moduleClk;
   UserFunction = userFunction;
   UserArguments = userArguments;
 
   // Ensure global interrupts are disabled
-  EnterCritical();
+  //EnterCritical();
 
   // Enable PIT module in PIT_MCR
-  PIT_MCR = ~PIT_MCR_MDIS_MASK;
+  PIT_MCR &= ~PIT_MCR_MDIS_MASK;
+  //uint32_t testMCR = PIT_MCR;
 
   // Clear any pending interrupts on PIT0
   NVICICPR2 = (1 << 5);
@@ -39,17 +42,24 @@ bool PIT_Init(const uint32_t moduleClk, void (*userFunction)(void*), void* userA
   NVICISER2 = (1 << 5);
 
 
+  // Enable interrupts flags for PIT0
+  PIT_TCTRL1 |= PIT_TCTRL_TIE_MASK;
+  //PIT_TCTRL1 &= ~PIT_MCR_FRZ_MASK;
+  //PIT_TCTRL1 &= ~PIT_MCR_MDIS_MASK;
+
+
   // Ensure the PIT0 in disabled
   //PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
   //PIT_TCTRL0 &= ~0x01;
 
   // Enable interrupts flags for PIT0
-  PIT_TCTRL1 = PIT_TCTRL_TIE_MASK;
+  //PIT_TCTRL1 |= PIT_TCTRL_TIE_MASK;
+  //uint32_t testTCTRL = PIT_TCTRL1;
 
   //PIT_TCTRL0 = 0x02;
 
   // Return global interrupts to how they were
-  ExitCritical();
+  //ExitCritical();
 
   return true;
 }
@@ -63,13 +73,15 @@ bool PIT_Init(const uint32_t moduleClk, void (*userFunction)(void*), void* userA
  */
 void PIT_Set(const uint32_t period, const bool restart)
 {
+  uint32_t lval = (ModuleClk / 1000000) * (period / 1000) -1;
+
   if(restart)
   {
     // Disable PIT0
     PIT_Enable(false);
 
     // Load the new LDVAL
-    PIT_LDVAL1 = (((ModuleClk * period)/ 1000000000)-1);
+    PIT_LDVAL1 = (uint32_t)lval;
 
     // Enable PIT0
     PIT_Enable(true);
@@ -78,7 +90,7 @@ void PIT_Set(const uint32_t period, const bool restart)
   else
   {
     // Load the new LDVAL
-    PIT_LDVAL1 = (((ModuleClk * period)/ 1000000000)-1);
+    PIT_LDVAL1 = (uint32_t)lval;
   }
 
 }
@@ -92,12 +104,12 @@ void PIT_Enable(const bool enable)
   // Enable PIT0
   if(enable)
   {
-    PIT_TCTRL1 = PIT_TCTRL_TEN_MASK | PIT_TCTRL_TIE_MASK;
+    PIT_TCTRL1 |= PIT_TCTRL_TEN_MASK;
   }
   // Disable PIT0
   else
   {
-      PIT_TCTRL1 = ~PIT_TCTRL_TEN_MASK | PIT_TCTRL_TIE_MASK;
+      PIT_TCTRL1 &= ~PIT_TCTRL_TEN_MASK;
   }
 }
 

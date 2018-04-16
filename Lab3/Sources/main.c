@@ -296,7 +296,7 @@ int main(void)
 
   PIT_Init(CPU_BUS_CLK_HZ, PIT_Callback, NULL);
 
-  PIT_Set((uint32_t)500000000, (bool)TRUE);
+  PIT_Set((uint32_t)500000000, (bool)true);
 
 
   // Send startup packets to PC
