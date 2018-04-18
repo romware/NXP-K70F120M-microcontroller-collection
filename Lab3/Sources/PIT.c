@@ -33,6 +33,10 @@ bool PIT_Init(const uint32_t moduleClk, void (*userFunction)(void*), void* userA
   // Ensure global interrupts are disabled
   EnterCritical();
 
+  // Address     | Vector | IRQ1 | NVIC non-IPR register | NVIC IPR register | Source module | Source description
+  // 0x0000_0150 | 84     | 68   | 2                     | 17                | PIT           | Channel 0
+  // IRQ1 modulo 32 = 4
+
   // Enable PIT module in PIT_MCR
   PIT_MCR &= ~PIT_MCR_MDIS_MASK;
 

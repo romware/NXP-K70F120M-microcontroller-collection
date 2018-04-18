@@ -66,6 +66,10 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
   UART2_C2 |= UART_C2_RIE_MASK;
   // For UART Control Register 2 see 56.3.4 of K70P256M150SF3RM.pdf
 
+  // Address     | Vector | IRQ1 | NVIC non-IPR register | NVIC IPR register | Source module | Source description
+  // 0x0000_0104 | 65     | 49   | 1                     | 12                | UART2         | Single interrupt vector for UART status sources
+  // IRQ1 modulo 32 = 17
+
   // Clear any pending interrupts from UART2 (bit 17 of register 1 (IRQ49))
   NVICICPR1 = (1 << 17);
   // Enable interrupt source for UART2 in NVIC (bit 17 of register 1 (IRQ49))
