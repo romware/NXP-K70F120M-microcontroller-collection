@@ -160,8 +160,8 @@
     (tIsrFunc)&Cpu_Interrupt,          /* 0x51  0x00000144   -   ivINT_CMT                      unused by PE */
     (tIsrFunc)&Cpu_Interrupt,          /* 0x52  0x00000148   -   ivINT_RTC                      unused by PE */
     (tIsrFunc)&Cpu_Interrupt,          /* 0x53  0x0000014C   -   ivINT_RTC_Seconds              unused by PE */
-    (tIsrFunc)&Cpu_Interrupt,          /* 0x54  0x00000150   -   ivINT_PIT0                     unused by PE */
-    (tIsrFunc)&PIT_ISR,                /* 0x55  0x00000154   -   ivINT_PIT1                     unused by PE */
+    (tIsrFunc)&PIT_ISR,                /* 0x54  0x00000150   -   ivINT_PIT0                     unused by PE */
+    (tIsrFunc)&Cpu_Interrupt,          /* 0x55  0x00000154   -   ivINT_PIT1                     unused by PE */
     (tIsrFunc)&Cpu_Interrupt,          /* 0x56  0x00000158   -   ivINT_PIT2                     unused by PE */
     (tIsrFunc)&Cpu_Interrupt,          /* 0x57  0x0000015C   -   ivINT_PIT3                     unused by PE */
     (tIsrFunc)&Cpu_Interrupt,          /* 0x58  0x00000160   -   ivINT_PDB0                     unused by PE */

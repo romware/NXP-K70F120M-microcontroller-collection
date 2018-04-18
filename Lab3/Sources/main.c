@@ -50,6 +50,9 @@
 // Baud rate
 #define BAUD_RATE 115200
 
+// Period of periodic interrupt timer 0
+const uint32_t PERIOD_LED_GREEN = 500000000;
+
 // Listed command bits of a packet
 const uint8_t COMMAND_STARTUP = 0x04;
 const uint8_t COMMAND_VER = 0x09;
@@ -241,14 +244,29 @@ void ReceivedPacket(void)
   Packet_Checksum = 0;
 }
 
+
 /*! @brief Toggles the green LED every time it is called
  *
  *  @return void
  */
-void PIT_Callback(void* arg)
+void PITCallback(void* arg)
 {
   // Toggle green LED
   LEDs_Toggle(LED_GREEN);
+}
+
+/*! @brief // Initializes the main tower components by calling the initialization routines of the supporting software modules.
+ *
+ *  @return void
+ */
+bool TowerInit(void)
+{
+  return (
+    Flash_Init() &&
+    LEDs_Init() &&
+    Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) &&
+    PIT_Init(CPU_BUS_CLK_HZ, PITCallback, NULL)
+  );
 }
 
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
@@ -262,13 +280,13 @@ int main(void)
   PE_low_level_init();
   /*** End of Processor Expert internal initialization.                    ***/
 
+  /* Write your code here */
+
   // Globally disable interrupts
    __DI();
 
-  /* Write your code here */
-
-  // Initializes the LEDs, UART and FLASH by calling the initialization routines of the supporting software modules.
-  if(Flash_Init() && LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ))
+  // Initializes the main tower components
+  if(TowerInit())
   {
     // Allocates an address in Flash memory to the tower number
     Flash_AllocateVar((volatile void**)&NvTowerNb, sizeof(*NvTowerNb));
@@ -290,26 +308,21 @@ int main(void)
       Flash_Write16((uint16_t*)NvTowerMd,(uint16_t)1);
     }
 
+    // Set the periodic interrupt timer 0 to 500ms
+    PIT_Set(PERIOD_LED_GREEN, true);
+
     // Turn on the orange LED to indicate the tower has initialized successfully
     LEDs_On(LED_ORANGE);
   }
 
-  PIT_Init(CPU_BUS_CLK_HZ, PIT_Callback, NULL);
-
-  PIT_Set((uint32_t)500000000, (bool)true);
-
+  // Globally enable interrupts
+  __EI();
 
   // Send startup packets to PC
   HandleTowerStartup();
 
-  // Globally enable interrupts
-  __EI();
-
   for (;;)
   {
-    // Poll UART2 for packets to transmit and receive
-    //UART_Poll();
-
     // Check if packet has been received
     if(Packet_Get())
     {

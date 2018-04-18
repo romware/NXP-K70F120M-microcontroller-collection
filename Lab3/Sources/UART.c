@@ -110,76 +110,30 @@ bool UART_OutChar(const uint8_t data)
   }
 }
 
-/*! @brief Poll the UART status register to try and receive and/or transmit one character.
- *
- *  @return void
- *  @note Assumes that UART_Init has been called.
- */
-void UART_Poll(void)
-{
-  /*!  "The incoming serial data will set the Receive Data Register Full (RDRF) flag
-   *   in the UART Status Register 1 (UART_S1) register, indicating that the receiver
-   *   hardware has just received a byte of data. In the main loop, a poll of the RDRF
-   *   flag is performed. If it is set, then the program tries to accept the data and
-   *   put it in the RxFIFO. The RxFIFO buffers data between the input hardware and
-   *   the main program that processes the data." - Assignment Specification
-   */
-
-  // AND the UART2 Status register with the receive mask
-  if(UART2_S1 & UART_S1_RDRF_MASK)
-  {
-    // Put the value in UART2 Data Register (UART2_D) in the RxFIFO
-    FIFO_Put(&RxFIFO, UART2_D);
-  }
-
-  /*!  "The setting of the Transmit Data Register Empty (TDRE) flag by the UART
-   *   hardware signals that the output shift register is idle and ready to output
-   *   more data. In the main loop, a poll of the TDRE flag is performed. If it is
-   *   set, then the program tries to retrieve the data in the TxFIFO, and send it
-   *   out the serial port. If the TxFIFO becomes empty, then no data will be sent
-   *   out the serial port." - Assignment Specification
-   */
-
-  // AND the UART2 Status register with the transmit mask
-  if(UART2_S1 & UART_S1_TDRE_MASK)
-  {
-    // Put the value in TxFIFO into the UART2 Data Register (UART2_D)
-    FIFO_Get(&TxFIFO, (uint8_t*)&UART2_D);
-  }
-}
-
 /*! @brief Interrupt service routine for the UART.
  *
  *  @note Assumes the transmit and receive FIFOs have been initialized.
  */
 void __attribute__ ((interrupt)) UART_ISR(void)
+{
+  // Check if UART2 receive interrupt is enabled and the UART2 receive data register full flag is set
+  if((UART2_C2 & UART_C2_RIE_MASK) && (UART2_S1 & UART_S1_RDRF_MASK))
   {
-    // Check if UART2 receive interrupt is enabled
-    if(UART2_C2 & UART_C2_RIE_MASK)
-      {
-	// AND the UART2 Status register with the receive mask
-	if(UART2_S1 & UART_S1_RDRF_MASK)
-	  {
-	    // Put the value in UART2 Data Register (UART2_D) in the RxFIFO
-	    FIFO_Put(&RxFIFO, UART2_D);
-	  }
-      }
-
-    // Check if the UART2 transmit interrupt is enabled
-    if(UART2_C2 & UART_C2_TIE_MASK)
-      {
-	  // AND the UART2 Status register with the transmit mask
-	  if(UART2_S1 & UART_S1_TDRE_MASK)
-	  {
-	    // Put the value in TxFIFO into the UART2 Data Register (UART2_D)
-	    if(!(FIFO_Get(&TxFIFO, (uint8_t*)&UART2_D)))
-	    {
-	      // If the FIFO is empty set the TIE to 0
-		UART2_C2 &= ~UART_C2_TIE_MASK;
-	    }
-	  }
-      }
+    // Put the value in UART2 Data Register (UART2_D) in the RxFIFO
+    FIFO_Put(&RxFIFO, UART2_D);
   }
+
+  // Check if the UART2 transmit interrupt is enabled and the UART2 transmit data register empty flag is set
+  if((UART2_C2 & UART_C2_TIE_MASK) && (UART2_S1 & UART_S1_TDRE_MASK))
+  {
+    // Put the value in TxFIFO into the UART2 Data Register (UART2_D)
+    if(!(FIFO_Get(&TxFIFO, (uint8_t*)&UART2_D)))
+    {
+      // If the FIFO is empty clear the transmit interrupt enable
+      UART2_C2 &= ~UART_C2_TIE_MASK;
+    }
+  }
+}
 
 
 

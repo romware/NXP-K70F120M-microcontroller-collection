@@ -22,44 +22,32 @@ static void* UserArguments;
  */
 bool PIT_Init(const uint32_t moduleClk, void (*userFunction)(void*), void* userArguments)
 {
+  // Enable the Periodic Interrupt Timer in System Clock Gating Control Register 6
   SIM_SCGC6 |= SIM_SCGC6_PIT_MASK;
 
-  // Store parameters
+  // Store parameters for interrupt routine and PIT enable
   ModuleClk = moduleClk;
   UserFunction = userFunction;
   UserArguments = userArguments;
 
   // Ensure global interrupts are disabled
-  //EnterCritical();
+  EnterCritical();
 
   // Enable PIT module in PIT_MCR
   PIT_MCR &= ~PIT_MCR_MDIS_MASK;
-  //uint32_t testMCR = PIT_MCR;
 
   // Clear any pending interrupts on PIT0
-  NVICICPR2 = (1 << 5);
+  NVICICPR2 = (1 << 4);
+
   // Enable interrupts from PIT0 module
-  NVICISER2 = (1 << 5);
-
-
-  // Enable interrupts flags for PIT0
-  PIT_TCTRL1 |= PIT_TCTRL_TIE_MASK;
-  //PIT_TCTRL1 &= ~PIT_MCR_FRZ_MASK;
-  //PIT_TCTRL1 &= ~PIT_MCR_MDIS_MASK;
-
-
-  // Ensure the PIT0 in disabled
-  //PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
-  //PIT_TCTRL0 &= ~0x01;
+  NVICISER2 = (1 << 4);
 
   // Enable interrupts flags for PIT0
-  //PIT_TCTRL1 |= PIT_TCTRL_TIE_MASK;
-  //uint32_t testTCTRL = PIT_TCTRL1;
-
-  //PIT_TCTRL0 = 0x02;
+  PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;
+  //PIT_MCR &= ~PIT_MCR_FRZ_MASK;
 
   // Return global interrupts to how they were
-  //ExitCritical();
+  ExitCritical();
 
   return true;
 }
@@ -73,26 +61,26 @@ bool PIT_Init(const uint32_t moduleClk, void (*userFunction)(void*), void* userA
  */
 void PIT_Set(const uint32_t period, const bool restart)
 {
-  uint32_t lval = (ModuleClk / 1000000) * (period / 1000) -1;
+  // Timer Load Value Register
+  uint32_t locLDVAL = (ModuleClk / 1000000) * (period / 1000) -1;
 
+  // Check if restarting PIT
   if(restart)
   {
     // Disable PIT0
     PIT_Enable(false);
 
     // Load the new LDVAL
-    PIT_LDVAL1 = (uint32_t)lval;
+    PIT_LDVAL0 = locLDVAL;
 
     // Enable PIT0
     PIT_Enable(true);
   }
-
   else
   {
     // Load the new LDVAL
-    PIT_LDVAL1 = (uint32_t)lval;
+    PIT_LDVAL0 = locLDVAL;
   }
-
 }
 
 /*! @brief Enables or disables the PIT.
@@ -101,15 +89,15 @@ void PIT_Set(const uint32_t period, const bool restart)
  */
 void PIT_Enable(const bool enable)
 {
-  // Enable PIT0
   if(enable)
   {
-    PIT_TCTRL1 |= PIT_TCTRL_TEN_MASK;
+    // Enable PIT0
+    PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
   }
-  // Disable PIT0
   else
   {
-      PIT_TCTRL1 &= ~PIT_TCTRL_TEN_MASK;
+    // Disable PIT0
+    PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
   }
 }
 
@@ -121,10 +109,10 @@ void PIT_Enable(const bool enable)
  */
 void __attribute__ ((interrupt)) PIT_ISR(void)
 {
-  //Clear the timer interrupt flag (W1C)
-  PIT_TFLG1 = PIT_TFLG_TIF_MASK;
+  // Clear the timer interrupt flag (W1C)
+  PIT_TFLG0 = PIT_TFLG_TIF_MASK;
 
-  // Call user callback function to toggle green led
+  // Call user callback function to toggle the green LED
   if (UserFunction)
    (*UserFunction)(UserArguments);
 }
