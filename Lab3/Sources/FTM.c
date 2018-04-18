@@ -6,17 +6,11 @@
  */
 #include "FTM.h"
 #include "MK70F12.h"
-#include "PE_Types.h"
+#include "Cpu.h"
 
-
-TTimerFunction TimerFunction;
-
-TTimerOutputAction TimerOutputAction;
-
-TTimerInputDetection TimerInputDetection;
-
-TFTMChannel FTMChannel;
-
+// Private global variable for PIT
+static void (*UserFunction)(void*);
+static void* UserArguments;
 
 /*! @brief Sets up the FTM before first use.
  *
@@ -36,13 +30,23 @@ bool FTM_Init()
   // IRQ1 modulo 32 = 30
 
   // Clear any pending interrupts on FTM0
-  NVICICPR1 = (1 << 30);
+  NVICICPR1 |= (1 << 30);
 
   // Enable interrupts from FTM0 module
-  NVICISER1 = (1 << 30);
+  NVICISER1 |= (1 << 30);
+
+  // Set timer overflow interrupt enable to 1
+  FTM0_SC |= FTM_SC_TOIE_MASK;
+
+  // Set clock source to fixed frequency clock (0b10)
+  FTM0_SC |= FTM_SC_CLKS(0b10);
+
+
 
   // Return global interrupts to how they were
   ExitCritical();
+
+  return true;
 }
 
 /*! @brief Sets up a timer channel.
@@ -61,7 +65,14 @@ bool FTM_Init()
  */
 bool FTM_Set(const TFTMChannel* const aFTMChannel)
 {
+  // Store parameters for interrupt routine
+  UserFunction = aFTMChannel->userFunction;
+  UserArguments = aFTMChannel->userArguments;
 
+  // Set the channel interrupt enable
+  FTM0_CnSC(aFTMChannel->channelNb) |= FTM_CnSC_CHIE_MASK;
+
+  return true;
 }
 
 
@@ -85,7 +96,9 @@ bool FTM_StartTimer(const TFTMChannel* const aFTMChannel)
 void __attribute__ ((interrupt)) FTM0_ISR(void)
 {
   // Clear interrupt flag
-  FTM0_CnSC(3) &= ~FTM_CnSC_CHF_MASK;
+  FTM0_CnSC(0) &= ~FTM_CnSC_CHF_MASK;
 
-
+  // Call user callback function to toggle the blue LED
+  if (UserFunction)
+   (*UserFunction)(UserArguments);
 }

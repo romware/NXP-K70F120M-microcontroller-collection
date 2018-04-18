@@ -41,10 +41,10 @@ bool PIT_Init(const uint32_t moduleClk, void (*userFunction)(void*), void* userA
   PIT_MCR &= ~PIT_MCR_MDIS_MASK;
 
   // Clear any pending interrupts on PIT0
-  NVICICPR2 = (1 << 4);
+  NVICICPR2 |= (1 << 4);
 
   // Enable interrupts from PIT0 module
-  NVICISER2 = (1 << 4);
+  NVICISER2 |= (1 << 4);
 
   // Enable interrupts flags for PIT0
   PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;

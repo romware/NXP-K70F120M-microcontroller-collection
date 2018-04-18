@@ -6,6 +6,7 @@
 C_SRCS += \
 ../Sources/Events.c \
 ../Sources/FIFO.c \
+../Sources/FTM.c \
 ../Sources/Flash.c \
 ../Sources/LEDs.c \
 ../Sources/PIT.c \
@@ -16,6 +17,7 @@ C_SRCS += \
 OBJS += \
 ./Sources/Events.o \
 ./Sources/FIFO.o \
+./Sources/FTM.o \
 ./Sources/Flash.o \
 ./Sources/LEDs.o \
 ./Sources/PIT.o \
@@ -26,6 +28,7 @@ OBJS += \
 C_DEPS += \
 ./Sources/Events.d \
 ./Sources/FIFO.d \
+./Sources/FTM.d \
 ./Sources/Flash.d \
 ./Sources/LEDs.d \
 ./Sources/PIT.d \

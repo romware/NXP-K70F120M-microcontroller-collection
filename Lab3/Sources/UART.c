@@ -71,9 +71,9 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
   // IRQ1 modulo 32 = 17
 
   // Clear any pending interrupts from UART2 (bit 17 of register 1 (IRQ49))
-  NVICICPR1 = (1 << 17);
+  NVICICPR1 |= (1 << 17);
   // Enable interrupt source for UART2 in NVIC (bit 17 of register 1 (IRQ49))
-  NVICISER1 = (1 << 17);
+  NVICISER1 |= (1 << 17);
   // Set the interrupt priority to 1 (NVICIPR from bit 12 to bit 15)
   //NVICIPR12 = (1 << 15);
   // For NVIC configuration see 3.2.2 of K70P256M150SF3RM.pdf

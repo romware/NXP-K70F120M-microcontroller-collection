@@ -44,6 +44,7 @@
 #include "Flash.h"
 #include "PE_Types.h"
 #include "PIT.h"
+#include "FTM.h"
 
 
 
@@ -255,6 +256,16 @@ void PITCallback(void* arg)
   LEDs_Toggle(LED_GREEN);
 }
 
+/*! @brief Toggles the blue LED every time it is called
+ *
+ *  @return void
+ */
+void FTMCallback(void* arg)
+{
+  // Toggle green LED
+  LEDs_Off(LED_BLUE);
+}
+
 /*! @brief // Initializes the main tower components by calling the initialization routines of the supporting software modules.
  *
  *  @return void
@@ -311,6 +322,18 @@ int main(void)
 
     // Set the periodic interrupt timer 0 to 500ms
     PIT_Set(PERIOD_LED_GREEN, true);
+
+    TFTMChannel temp;
+
+    temp.channelNb = 0;
+    temp.delayCount = 65535;
+    temp.ioType.inputDetection = TIMER_INPUT_ANY;
+    temp.ioType.outputAction = TIMER_OUTPUT_TOGGLE;
+    temp.timerFunction = TIMER_FUNCTION_OUTPUT_COMPARE;
+    temp.userFunction = FTMCallback;
+    temp.userArguments = NULL;
+
+     FTM_Set(&temp);
 
     // Turn on the orange LED to indicate the tower has initialized successfully
     LEDs_On(LED_ORANGE);
