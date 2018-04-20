@@ -45,7 +45,8 @@ bool FTM_Init()
 
   // Ensure global interrupts are disabled
   EnterCritical();
-  //FTM0_MODE |= FTM_MODE_WPDIS_MASK;
+  FTM0_MODE |= FTM_MODE_WPDIS_MASK;
+  FTM0_MODE |= FTM_MODE_FTMEN_MASK;
 
   // Address     | Vector | IRQ1 | NVIC non-IPR register | NVIC IPR register | Source module | Source description
   // 0x0000_0138 | 78     | 62   | 1                     | 15                | FTM0          | Single interrupt vector for all sources
@@ -64,11 +65,13 @@ bool FTM_Init()
   // Set counter initial value to 0
   FTM0_CNTIN = 0x0000;
 
-  // Set overflow value to 0xFFFF
-  FTM0_MOD = 0xFFFF;
 
   // Write anything to CNT to start it
   FTM0_CNT = 0xFFFF;
+
+  // Set overflow value to 0xFFFF
+  FTM0_MOD = 0xFFFF;
+
 
   // Set clock source to fixed frequency clock (0b10)
   FTM0_SC |= FTM_SC_CLKS(0b10);
@@ -134,7 +137,11 @@ bool FTM_Set(const TFTMChannel* const aFTMChannel)
 bool FTM_StartTimer(const TFTMChannel* const aFTMChannel)
 {
   // Set the channel value
-  FTM0_CnV(aFTMChannel->channelNb) = FTM0_CNT + aFTMChannel->delayCount;
+  FTM0_CnV(aFTMChannel->channelNb) = (FTM_CNT_COUNT_MASK & FTM0_CNT) + aFTMChannel->delayCount;
+  //uint16_t tempCNT = FTM0_CNT;
+  //uint16_t tempVAL = FTM0_C0V;
+
+
 
   // Clear the channel flag
   FTM0_CnSC(aFTMChannel->channelNb) &= ~FTM_CnSC_CHF_MASK;
@@ -154,6 +161,7 @@ void __attribute__ ((interrupt)) FTM0_ISR(void)
 {
   // Clear interrupt flag
   FTM0_CnSC(0) &= ~FTM_CnSC_CHF_MASK;
+  FTM0_CnSC(0) &= ~FTM_CnSC_CHIE_MASK;
 
   // Call user callback function to toggle the blue LED
   if (UserFunctionCh0)
