@@ -7,7 +7,7 @@ var struct_e_n_e_t___mem_map =
     [ "ATPER", "struct_e_n_e_t___mem_map.html#a37be83627f6f5f7fb967292d2f53e294", null ],
     [ "ATSTMP", "struct_e_n_e_t___mem_map.html#afc576420775d6124f0ed3ced438ba89e", null ],
     [ "ATVR", "struct_e_n_e_t___mem_map.html#a28e2d519809c574a0b4c3161bfe16545", null ],
-    [ "CHANNEL", "struct_e_n_e_t___mem_map.html#ae46e0d3a8439e8723b354814523c7f57", null ],
+    [ "CHANNEL", "struct_e_n_e_t___mem_map.html#af6bf0743ed66dd23087be7bd0d156ef0", null ],
     [ "ECR", "struct_e_n_e_t___mem_map.html#acecfb77364c642e2f4c404101154b84e", null ],
     [ "EIMR", "struct_e_n_e_t___mem_map.html#afc82bb113d2a15c34b9704d14d52bde7", null ],
     [ "EIR", "struct_e_n_e_t___mem_map.html#a29d8a8af55bce6f1482fc85b39ead867", null ],

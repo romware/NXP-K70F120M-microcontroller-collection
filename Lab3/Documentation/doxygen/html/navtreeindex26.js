@@ -1,7 +1,5 @@
 var NAVTREEINDEX26 =
 {
-"group___f_t_f_e___register___accessor___macros.html#ga58dcdfdd261f3685d6b89afe1b19aeea":[4,0,2,0,0,6112],
-"group___f_t_f_e___register___accessor___macros.html#ga5c14b90518da27748aa06a69c1010a83":[4,0,2,0,0,6079],
 "group___f_t_f_e___register___accessor___macros.html#ga623e1a70bb4d7f5f5022d1258fcedae9":[4,0,2,0,0,6144],
 "group___f_t_f_e___register___accessor___macros.html#ga75cc272b9c1177fb2c8aeded0dcd9df0":[4,0,2,0,0,6039],
 "group___f_t_f_e___register___accessor___macros.html#ga7b11e2825fb3cb775926bbbb46d17aca":[4,0,2,0,0,6054],
@@ -129,8 +127,8 @@ var NAVTREEINDEX26 =
 "group___f_t_m___peripheral.html#ga38115fba8eadfc94b2fc411f45906002":[4,0,2,0,0,6212],
 "group___f_t_m___peripheral.html#ga897564efeaf1be1f991305d294eda3d6":[2,8,23,5],
 "group___f_t_m___peripheral.html#ga897564efeaf1be1f991305d294eda3d6":[4,0,2,0,0,6242],
-"group___f_t_m___peripheral.html#gaafa7875c9deb2b3afe4aa22ce6a99d39":[2,8,23,8],
 "group___f_t_m___peripheral.html#gaafa7875c9deb2b3afe4aa22ce6a99d39":[4,0,2,0,0,13289],
+"group___f_t_m___peripheral.html#gaafa7875c9deb2b3afe4aa22ce6a99d39":[2,8,23,8],
 "group___f_t_m___peripheral.html#gae712c29b7abcf338d8f8f6418683fa66":[2,8,23,3],
 "group___f_t_m___peripheral.html#gae712c29b7abcf338d8f8f6418683fa66":[4,0,2,0,0,6170],
 "group___f_t_m___register___accessor___macros.html":[2,8,23,0],
@@ -249,5 +247,7 @@ var NAVTREEINDEX26 =
 "group___f_t_m___register___accessor___macros.html#gaa8cb4b7bcccc202d9256a35e2557c359":[4,0,2,0,0,6207],
 "group___f_t_m___register___accessor___macros.html#gaac1710c65463d98f9003b4a10991b26b":[4,0,2,0,0,6213],
 "group___f_t_m___register___accessor___macros.html#gaacf8fed24da463653900319184874197":[4,0,2,0,0,6338],
-"group___f_t_m___register___accessor___macros.html#gaade79f672ad080d530a40665a662cd0f":[4,0,2,0,0,6250]
+"group___f_t_m___register___accessor___macros.html#gaade79f672ad080d530a40665a662cd0f":[4,0,2,0,0,6250],
+"group___f_t_m___register___accessor___macros.html#gaaf20cb3762dca102677e4896baca2578":[4,0,2,0,0,6251],
+"group___f_t_m___register___accessor___macros.html#gaaf7fca8f1a3586ef43e159d6090ca2d5":[4,0,2,0,0,6205]
 };

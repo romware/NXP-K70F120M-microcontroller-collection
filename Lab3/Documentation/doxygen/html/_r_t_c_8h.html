@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.10"/>
-<title>Lab3: C:/Users/PMcL/Documents/Subjects/48434 Embedded Software/4 Labs/Lab 3/Template/Lab 3/sources/RTC.h File Reference</title>
+<title>Lab3: C:/Users/12403756/git/es18aut13/Lab3/sources/RTC.h File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -66,8 +66,7 @@ $(document).ready(function(){initNavTree('_r_t_c_8h.html','');});
 <div id="doc-content">
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a> &#124;
-<a href="#var-members">Variables</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">RTC.h File Reference</div>  </div>
 </div><!--header-->
@@ -81,9 +80,9 @@ $(document).ready(function(){initNavTree('_r_t_c_8h.html','');});
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a0faa546897ba438dfbd6efbfe6036a67"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_r_t_c_8h.html#a0faa546897ba438dfbd6efbfe6036a67">RTC_Init</a> (void(*userFunction)(void *), void *userArguments)</td></tr>
-<tr class="memdesc:a0faa546897ba438dfbd6efbfe6036a67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the RTC before first use.  <a href="#a0faa546897ba438dfbd6efbfe6036a67">More...</a><br /></td></tr>
-<tr class="separator:a0faa546897ba438dfbd6efbfe6036a67"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1eff20f412d72f94182b7fca0b3b0925"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_r_t_c_8h.html#a1eff20f412d72f94182b7fca0b3b0925">RTC_Init</a> (void(*userFunction)(void *), void *userArguments)</td></tr>
+<tr class="memdesc:a1eff20f412d72f94182b7fca0b3b0925"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the RTC before first use.  <a href="#a1eff20f412d72f94182b7fca0b3b0925">More...</a><br /></td></tr>
+<tr class="separator:a1eff20f412d72f94182b7fca0b3b0925"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acbe916e4fad6bfc2ffcde604fa6afb52"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_r_t_c_8h.html#acbe916e4fad6bfc2ffcde604fa6afb52">RTC_Set</a> (const uint8_t hours, const uint8_t minutes, const uint8_t seconds)</td></tr>
 <tr class="memdesc:acbe916e4fad6bfc2ffcde604fa6afb52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the value of the real time clock.  <a href="#acbe916e4fad6bfc2ffcde604fa6afb52">More...</a><br /></td></tr>
 <tr class="separator:acbe916e4fad6bfc2ffcde604fa6afb52"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -93,11 +92,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a5c3135ad0e3b6ba681fc49fa3623f0d6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_r_t_c_8h.html#a5c3135ad0e3b6ba681fc49fa3623f0d6">__attribute__</a> ((interrupt)) RTC_ISR(void)</td></tr>
 <tr class="memdesc:a5c3135ad0e3b6ba681fc49fa3623f0d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupt service routine for the RTC.  <a href="#a5c3135ad0e3b6ba681fc49fa3623f0d6">More...</a><br /></td></tr>
 <tr class="separator:a5c3135ad0e3b6ba681fc49fa3623f0d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:a4af4b33d296804234d5a9ab3649a81eb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a> volatile&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_r_t_c_8h.html#a4af4b33d296804234d5a9ab3649a81eb">RTC_Updated</a></td></tr>
-<tr class="separator:a4af4b33d296804234d5a9ab3649a81eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Routines for controlling the Real Time Clock (RTC) on the TWR-K70F120M. </p>
@@ -120,7 +114,17 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Interrupt service routine for the RTC. </p>
-<p>The RTC has incremented one second. The global variable RTC_Updated will be set to bTRUE. </p><dl class="section note"><dt>Note</dt><dd>Assumes the RTC has been initialized. </dd></dl>
+<p>The RTC has incremented one second. The user callback function will be called. </p><dl class="section note"><dt>Note</dt><dd>Assumes the RTC has been initialized.</dd></dl>
+<p>Interrupt service routine for the RTC.</p>
+<p>Interrupt service routine for the PIT.</p>
+<p>If a timer channel was set up as output compare, then the user callback function will be called. </p><dl class="section note"><dt>Note</dt><dd>Assumes the FTM has been initialized.</dd></dl>
+<p>Interrupt service routine for the RTC.</p>
+<p>Interrupt service routine for the FTM.</p>
+<p>The periodic interrupt timer has timed out. The user callback function will be called. </p><dl class="section note"><dt>Note</dt><dd>Assumes the PIT has been initialized.</dd></dl>
+<p>Interrupt service routine for the RTC.</p>
+<p>Interrupt service routine for the PIT.</p>
+<p>Interrupt service routine for the FTM.</p>
+<dl class="section note"><dt>Note</dt><dd>Assumes the transmit and receive FIFOs have been initialized. </dd></dl>
 
 </div>
 </div>
@@ -167,12 +171,12 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a0faa546897ba438dfbd6efbfe6036a67"></a>
+<a class="anchor" id="a1eff20f412d72f94182b7fca0b3b0925"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a> RTC_Init </td>
+          <td class="memname">bool RTC_Init </td>
           <td>(</td>
           <td class="paramtype">void(*)(void *)&#160;</td>
           <td class="paramname"><em>userFunction</em>, </td>
@@ -199,7 +203,7 @@ Variables</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>BOOL - TRUE if the RTC was successfully initialized. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>bool - TRUE if the RTC was successfully initialized. </dd></dl>
 
 </div>
 </div>
@@ -246,27 +250,13 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<h2 class="groupheader">Variable Documentation</h2>
-<a class="anchor" id="a4af4b33d296804234d5a9ab3649a81eb"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a> volatile RTC_Updated</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Flag to indicate the real time clock was updated. </p>
-
-</div>
-</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_08d237fc27d4ecd563f71c5d52f2fecc.html">sources</a></li><li class="navelem"><a class="el" href="_r_t_c_8h.html">RTC.h</a></li>
-    <li class="footer">Generated on Mon Sep 7 2015 16:10:14 for Lab3 by
+    <li class="footer">Generated on Fri Apr 20 2018 18:17:29 for Lab3 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

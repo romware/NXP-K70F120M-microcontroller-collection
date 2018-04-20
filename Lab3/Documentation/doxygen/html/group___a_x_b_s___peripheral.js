@@ -20,7 +20,7 @@ var group___a_x_b_s___peripheral =
       [ "RESERVED_4", "struct_a_x_b_s___mem_map.html#aa163ab2918180ca89176ceb13b329716", null ],
       [ "RESERVED_5", "struct_a_x_b_s___mem_map.html#a8ce530a61c570b9634253dedb2bfdd00", null ],
       [ "RESERVED_6", "struct_a_x_b_s___mem_map.html#a60f93ced8ce2164878e763cdb47bda04", null ],
-      [ "SLAVE", "struct_a_x_b_s___mem_map.html#a1670fa9c00157637d693f14aebbf0fb5", null ]
+      [ "SLAVE", "struct_a_x_b_s___mem_map.html#ad3bfac2489b5048127f3b4b50f1ee9a2", null ]
     ] ],
     [ "AXBS_BASE_PTR", "group___a_x_b_s___peripheral.html#gacbbf56489b86d1ddb3e0ac291922a56d", null ],
     [ "AXBS_BASE_PTRS", "group___a_x_b_s___peripheral.html#ga522ab97d5ed3e73f1cb3591c40ecc50e", null ],

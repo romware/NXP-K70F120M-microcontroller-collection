@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.10"/>
-<title>Lab3: C:/Users/PMcL/Documents/Subjects/48434 Embedded Software/4 Labs/Lab 3/Template/Lab 3/sources/main.c File Reference</title>
+<title>Lab3: C:/Users/12403756/git/es18aut13/Lab3/sources/main.c File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -66,7 +66,9 @@ $(document).ready(function(){initNavTree('main_8c.html','');});
 <div id="doc-content">
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#define-members">Macros</a> &#124;
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">main.c File Reference</div>  </div>
 </div><!--header-->
@@ -74,28 +76,116 @@ $(document).ready(function(){initNavTree('main_8c.html','');});
 
 <p>Main module. This module contains user's application code.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;<a class="el" href="_cpu_8h_source.html">Cpu.h</a>&quot;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="types_8h_source.html">types.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_cpu_8h_source.html">Cpu.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_events_8h_source.html">Events.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="_p_e___types_8h_source.html">PE_Types.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="_p_e___error_8h_source.html">PE_Error.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="_p_e___const_8h_source.html">PE_Const.h</a>&quot;</code><br />
 <code>#include &quot;IO_Map.h&quot;</code><br />
+<code>#include &quot;<a class="el" href="_l_e_ds_8h_source.html">LEDs.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_m_k70_f12_8h_source.html">MK70F12.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_u_a_r_t_8h_source.html">UART.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_f_i_f_o_8h_source.html">FIFO.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="packet_8h_source.html">packet.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_flash_8h_source.html">Flash.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_p_i_t_8h_source.html">PIT.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_f_t_m_8h_source.html">FTM.h</a>&quot;</code><br />
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:gad4455691936f92fdd6c37566fc58ba1f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gad4455691936f92fdd6c37566fc58ba1f"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>BAUD_RATE</b>&#160;&#160;&#160;115200</td></tr>
+<tr class="separator:gad4455691936f92fdd6c37566fc58ba1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ga8703dc5d6d6c78462c6d19eefcd594c7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#ga8703dc5d6d6c78462c6d19eefcd594c7">HandleTowerStartup</a> (void)</td></tr>
+<tr class="memdesc:ga8703dc5d6d6c78462c6d19eefcd594c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends the startup packets to the PC.  <a href="group__main__module.html#ga8703dc5d6d6c78462c6d19eefcd594c7">More...</a><br /></td></tr>
+<tr class="separator:ga8703dc5d6d6c78462c6d19eefcd594c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac9c8611e6ca6e8101dc2c7f34e445d0a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#gac9c8611e6ca6e8101dc2c7f34e445d0a">HandleTowerVersion</a> (void)</td></tr>
+<tr class="memdesc:gac9c8611e6ca6e8101dc2c7f34e445d0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends the tower version packet to the PC.  <a href="group__main__module.html#gac9c8611e6ca6e8101dc2c7f34e445d0a">More...</a><br /></td></tr>
+<tr class="separator:gac9c8611e6ca6e8101dc2c7f34e445d0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga48b1be0eab5f4af73fbac1aa4cecbf62"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#ga48b1be0eab5f4af73fbac1aa4cecbf62">HandleTowerNumber</a> (void)</td></tr>
+<tr class="memdesc:ga48b1be0eab5f4af73fbac1aa4cecbf62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the tower number or sends the packet to the PC.  <a href="group__main__module.html#ga48b1be0eab5f4af73fbac1aa4cecbf62">More...</a><br /></td></tr>
+<tr class="separator:ga48b1be0eab5f4af73fbac1aa4cecbf62"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga642f5c203b68dd5c5d902b32c7042f8c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#ga642f5c203b68dd5c5d902b32c7042f8c">HandleTowerProgramByte</a> (void)</td></tr>
+<tr class="memdesc:ga642f5c203b68dd5c5d902b32c7042f8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erases or programs a byte to Flash based on packet received.  <a href="group__main__module.html#ga642f5c203b68dd5c5d902b32c7042f8c">More...</a><br /></td></tr>
+<tr class="separator:ga642f5c203b68dd5c5d902b32c7042f8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga34b9ab4cffb0154fedb4a8e56d6e5e36"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#ga34b9ab4cffb0154fedb4a8e56d6e5e36">HandleTowerReadByte</a> (void)</td></tr>
+<tr class="memdesc:ga34b9ab4cffb0154fedb4a8e56d6e5e36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends the byte read from Flash packet to the PC.  <a href="group__main__module.html#ga34b9ab4cffb0154fedb4a8e56d6e5e36">More...</a><br /></td></tr>
+<tr class="separator:ga34b9ab4cffb0154fedb4a8e56d6e5e36"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1731ffe6036a63b162d2efcac8f934c3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#ga1731ffe6036a63b162d2efcac8f934c3">HandleTowerMode</a> (void)</td></tr>
+<tr class="memdesc:ga1731ffe6036a63b162d2efcac8f934c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the tower mode or sends the packet to the PC.  <a href="group__main__module.html#ga1731ffe6036a63b162d2efcac8f934c3">More...</a><br /></td></tr>
+<tr class="separator:ga1731ffe6036a63b162d2efcac8f934c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf57dd4c5e7e444cfe5571d411f9548c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#gaf57dd4c5e7e444cfe5571d411f9548c9">ReceivedPacket</a> (void)</td></tr>
+<tr class="memdesc:gaf57dd4c5e7e444cfe5571d411f9548c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes the command depending on what packet has been received.  <a href="group__main__module.html#gaf57dd4c5e7e444cfe5571d411f9548c9">More...</a><br /></td></tr>
+<tr class="separator:gaf57dd4c5e7e444cfe5571d411f9548c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga83e32d3437f8fdbf06974d23242a9462"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#ga83e32d3437f8fdbf06974d23242a9462">PITCallback</a> (void *arg)</td></tr>
+<tr class="memdesc:ga83e32d3437f8fdbf06974d23242a9462"><td class="mdescLeft">&#160;</td><td class="mdescRight">Toggles the green LED every time it is called.  <a href="group__main__module.html#ga83e32d3437f8fdbf06974d23242a9462">More...</a><br /></td></tr>
+<tr class="separator:ga83e32d3437f8fdbf06974d23242a9462"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae21c1c1f38c8de226d06fa5b986c57df"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#gae21c1c1f38c8de226d06fa5b986c57df">FTMCallback</a> (void *arg)</td></tr>
+<tr class="memdesc:gae21c1c1f38c8de226d06fa5b986c57df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Toggles the blue LED every time it is called.  <a href="group__main__module.html#gae21c1c1f38c8de226d06fa5b986c57df">More...</a><br /></td></tr>
+<tr class="separator:gae21c1c1f38c8de226d06fa5b986c57df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaeda7b585d318b7b1476285b82b6fed11"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#gaeda7b585d318b7b1476285b82b6fed11">TowerInit</a> (void)</td></tr>
+<tr class="memdesc:gaeda7b585d318b7b1476285b82b6fed11"><td class="mdescLeft">&#160;</td><td class="mdescRight">// Initializes the main tower components by calling the initialization routines of the supporting software modules.  <a href="group__main__module.html#gaeda7b585d318b7b1476285b82b6fed11">More...</a><br /></td></tr>
+<tr class="separator:gaeda7b585d318b7b1476285b82b6fed11"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga840291bc02cba5474a4cb46a9b9566fe"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>main</b> (void)</td></tr>
 <tr class="separator:ga840291bc02cba5474a4cb46a9b9566fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:gac4bbb9e39995159e05373a09d6e28127"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gac4bbb9e39995159e05373a09d6e28127"></a>
+const uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>PERIOD_LED_GREEN</b> = 500000000</td></tr>
+<tr class="separator:gac4bbb9e39995159e05373a09d6e28127"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae92e2c71adaaae707782058cec983f91"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gae92e2c71adaaae707782058cec983f91"></a>
+const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>COMMAND_STARTUP</b> = 0x04</td></tr>
+<tr class="separator:gae92e2c71adaaae707782058cec983f91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf9fddcc7682949db939222cec848b92c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gaf9fddcc7682949db939222cec848b92c"></a>
+const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>COMMAND_VER</b> = 0x09</td></tr>
+<tr class="separator:gaf9fddcc7682949db939222cec848b92c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab87bb2bd23dd78fbe94f98c0d4d51bfc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gab87bb2bd23dd78fbe94f98c0d4d51bfc"></a>
+const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>COMMAND_NUM</b> = 0x0B</td></tr>
+<tr class="separator:gab87bb2bd23dd78fbe94f98c0d4d51bfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae8762c85b8519b08700226b967c9581c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gae8762c85b8519b08700226b967c9581c"></a>
+const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>COMMAND_PROGRAMBYTE</b> = 0x07</td></tr>
+<tr class="separator:gae8762c85b8519b08700226b967c9581c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7bd303e78d4119c2d34e00967c1b1230"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga7bd303e78d4119c2d34e00967c1b1230"></a>
+const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>COMMAND_READBYTE</b> = 0x08</td></tr>
+<tr class="separator:ga7bd303e78d4119c2d34e00967c1b1230"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae2909d574bfc1ab702eed1fb28a62505"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gae2909d574bfc1ab702eed1fb28a62505"></a>
+const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>COMMAND_MODE</b> = 0x0D</td></tr>
+<tr class="separator:gae2909d574bfc1ab702eed1fb28a62505"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga590be3fd131777c613188298af1d7ebe"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga590be3fd131777c613188298af1d7ebe"></a>
+const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>PARAM_GET</b> = 1</td></tr>
+<tr class="separator:ga590be3fd131777c613188298af1d7ebe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadd09d8fcbae69002598b43a17fe09566"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gadd09d8fcbae69002598b43a17fe09566"></a>
+const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>PARAM_SET</b> = 2</td></tr>
+<tr class="separator:gadd09d8fcbae69002598b43a17fe09566"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf7a418e92b8fc61e43bd6a4b55e308f2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gaf7a418e92b8fc61e43bd6a4b55e308f2"></a>
+const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>TOWER_VER_MAJ</b> = 1</td></tr>
+<tr class="separator:gaf7a418e92b8fc61e43bd6a4b55e308f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4cb61e8ce9aecb8cc246efa06637d082"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga4cb61e8ce9aecb8cc246efa06637d082"></a>
+const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>TOWER_VER_MIN</b> = 0</td></tr>
+<tr class="separator:ga4cb61e8ce9aecb8cc246efa06637d082"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga65fc76be2b0895efd0e3ba05ce041c8b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga65fc76be2b0895efd0e3ba05ce041c8b"></a>
+volatile <a class="el" href="unionuint16union__t.html">uint16union_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>NvTowerNb</b></td></tr>
+<tr class="separator:ga65fc76be2b0895efd0e3ba05ce041c8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga34f4a2041161f5c8cda7808c766d53d0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga34f4a2041161f5c8cda7808c766d53d0"></a>
+volatile <a class="el" href="unionuint16union__t.html">uint16union_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>NvTowerMd</b></td></tr>
+<tr class="separator:ga34f4a2041161f5c8cda7808c766d53d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Main module. This module contains user's application code. </p>
-<dl class="section version"><dt>Version</dt><dd>03.0 </dd></dl>
+<dl class="section version"><dt>Version</dt><dd>2.0 </dd></dl>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_08d237fc27d4ecd563f71c5d52f2fecc.html">sources</a></li><li class="navelem"><a class="el" href="main_8c.html">main.c</a></li>
-    <li class="footer">Generated on Mon Sep 7 2015 16:10:14 for Lab3 by
+    <li class="footer">Generated on Fri Apr 20 2018 18:17:29 for Lab3 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

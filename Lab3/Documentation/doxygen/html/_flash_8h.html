@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.10"/>
-<title>Lab3: C:/Users/PMcL/Documents/Subjects/48434 Embedded Software/4 Labs/Lab 3/Template/Lab 3/sources/Flash.h File Reference</title>
+<title>Lab3: C:/Users/12403756/git/es18aut13/Lab3/sources/Flash.h File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -66,6 +66,7 @@ $(document).ready(function(){initNavTree('_flash_8h.html','');});
 <div id="doc-content">
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
@@ -79,23 +80,22 @@ $(document).ready(function(){initNavTree('_flash_8h.html','');});
 </div>
 <p><a href="_flash_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Data Structures</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_t_f_c_c_o_b.html">TFCCOB</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:ac450fb89f016956f685a1e541644b2a8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac450fb89f016956f685a1e541644b2a8"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>_FB</b>(flashAddress)&#160;&#160;&#160;*(uint8_t  volatile *)(flashAddress)</td></tr>
 <tr class="separator:ac450fb89f016956f685a1e541644b2a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a056968f778f3aa09257b198f4e1381c2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a056968f778f3aa09257b198f4e1381c2"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>_FI</b>(flashAddress)&#160;&#160;&#160;*(int16_t  volatile *)(flashAddress)</td></tr>
-<tr class="separator:a056968f778f3aa09257b198f4e1381c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28550847e9609b9b396a4230f36884e9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a28550847e9609b9b396a4230f36884e9"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>_FH</b>(flashAddress)&#160;&#160;&#160;*(uint16_t volatile *)(flashAddress)</td></tr>
+<tr class="separator:a28550847e9609b9b396a4230f36884e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4fb772b3db9c8eecdbf9df472351a28"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad4fb772b3db9c8eecdbf9df472351a28"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>_FW</b>(flashAddress)&#160;&#160;&#160;*(uint16_t volatile *)(flashAddress)</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>_FW</b>(flashAddress)&#160;&#160;&#160;*(uint32_t volatile *)(flashAddress)</td></tr>
 <tr class="separator:ad4fb772b3db9c8eecdbf9df472351a28"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa5d9f147026998118681e31e0a0946a6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa5d9f147026998118681e31e0a0946a6"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>_FL</b>(flashAddress)&#160;&#160;&#160;*(int32_t  volatile *)(flashAddress)</td></tr>
-<tr class="separator:aa5d9f147026998118681e31e0a0946a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c7f5a450349b685f8da7f480457d36a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0c7f5a450349b685f8da7f480457d36a"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>_FS</b>(flashAddress)&#160;&#160;&#160;*(uint32_t volatile *)(flashAddress)</td></tr>
-<tr class="separator:a0c7f5a450349b685f8da7f480457d36a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c1198da68f5da4f6ffd5abc1d1c052a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4c1198da68f5da4f6ffd5abc1d1c052a"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>_FP</b>(flashAddress)&#160;&#160;&#160;*(uint64_t volatile *)(flashAddress)</td></tr>
 <tr class="separator:a4c1198da68f5da4f6ffd5abc1d1c052a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -108,37 +108,37 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ae6f8902953e089e0d8a6a1593e465910"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_flash_8h.html#ae6f8902953e089e0d8a6a1593e465910">Flash_Init</a> (void)</td></tr>
-<tr class="memdesc:ae6f8902953e089e0d8a6a1593e465910"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enables the Flash module.  <a href="#ae6f8902953e089e0d8a6a1593e465910">More...</a><br /></td></tr>
-<tr class="separator:ae6f8902953e089e0d8a6a1593e465910"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a206e98bf61f22c4989b73f1ce06f0627"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_flash_8h.html#a206e98bf61f22c4989b73f1ce06f0627">Flash_AllocateVar</a> (volatile void **variable, const uint8_t size)</td></tr>
-<tr class="memdesc:a206e98bf61f22c4989b73f1ce06f0627"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocates space for a non-volatile variable in the Flash memory.  <a href="#a206e98bf61f22c4989b73f1ce06f0627">More...</a><br /></td></tr>
-<tr class="separator:a206e98bf61f22c4989b73f1ce06f0627"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a76c844dad8546bce7ceb837b0ebe692a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_flash_8h.html#a76c844dad8546bce7ceb837b0ebe692a">Flash_Write32</a> (volatile uint32_t *const address, const uint32_t data)</td></tr>
-<tr class="memdesc:a76c844dad8546bce7ceb837b0ebe692a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes a 32-bit number to Flash.  <a href="#a76c844dad8546bce7ceb837b0ebe692a">More...</a><br /></td></tr>
-<tr class="separator:a76c844dad8546bce7ceb837b0ebe692a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b1945cab517f6d476c9e365dcba02c7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_flash_8h.html#a3b1945cab517f6d476c9e365dcba02c7">Flash_Write16</a> (volatile uint16_t *const address, const uint16_t data)</td></tr>
-<tr class="memdesc:a3b1945cab517f6d476c9e365dcba02c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes a 16-bit number to Flash.  <a href="#a3b1945cab517f6d476c9e365dcba02c7">More...</a><br /></td></tr>
-<tr class="separator:a3b1945cab517f6d476c9e365dcba02c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5591ecf92f70de6e9d04c79c793495d3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_flash_8h.html#a5591ecf92f70de6e9d04c79c793495d3">Flash_Write8</a> (volatile uint8_t *const address, const uint8_t data)</td></tr>
-<tr class="memdesc:a5591ecf92f70de6e9d04c79c793495d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes an 8-bit number to Flash.  <a href="#a5591ecf92f70de6e9d04c79c793495d3">More...</a><br /></td></tr>
-<tr class="separator:a5591ecf92f70de6e9d04c79c793495d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e818ce3e68dff71d2975bb887c5b7bc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_flash_8h.html#a6e818ce3e68dff71d2975bb887c5b7bc">Flash_Erase</a> (void)</td></tr>
-<tr class="memdesc:a6e818ce3e68dff71d2975bb887c5b7bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erases the entire Flash sector.  <a href="#a6e818ce3e68dff71d2975bb887c5b7bc">More...</a><br /></td></tr>
-<tr class="separator:a6e818ce3e68dff71d2975bb887c5b7bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5782279b5e558cafc2f135c0a1177d3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_flash_8h.html#aa5782279b5e558cafc2f135c0a1177d3">Flash_Init</a> (void)</td></tr>
+<tr class="memdesc:aa5782279b5e558cafc2f135c0a1177d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enables the Flash module.  <a href="#aa5782279b5e558cafc2f135c0a1177d3">More...</a><br /></td></tr>
+<tr class="separator:aa5782279b5e558cafc2f135c0a1177d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50871aff0f5af1e092aea3ed2545cf72"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_flash_8h.html#a50871aff0f5af1e092aea3ed2545cf72">Flash_AllocateVar</a> (volatile void **variable, const uint8_t size)</td></tr>
+<tr class="memdesc:a50871aff0f5af1e092aea3ed2545cf72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocates space for a non-volatile variable in the Flash memory.  <a href="#a50871aff0f5af1e092aea3ed2545cf72">More...</a><br /></td></tr>
+<tr class="separator:a50871aff0f5af1e092aea3ed2545cf72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5da7dcc0c6ef765546c79bbe25b48479"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_flash_8h.html#a5da7dcc0c6ef765546c79bbe25b48479">Flash_Write32</a> (volatile uint32_t *const address, const uint32_t data)</td></tr>
+<tr class="memdesc:a5da7dcc0c6ef765546c79bbe25b48479"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes a 32-bit number to Flash.  <a href="#a5da7dcc0c6ef765546c79bbe25b48479">More...</a><br /></td></tr>
+<tr class="separator:a5da7dcc0c6ef765546c79bbe25b48479"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1458f5e4ac15e1848ae0bde32fe5b5f3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_flash_8h.html#a1458f5e4ac15e1848ae0bde32fe5b5f3">Flash_Write16</a> (volatile uint16_t *const address, const uint16_t data)</td></tr>
+<tr class="memdesc:a1458f5e4ac15e1848ae0bde32fe5b5f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes a 16-bit number to Flash.  <a href="#a1458f5e4ac15e1848ae0bde32fe5b5f3">More...</a><br /></td></tr>
+<tr class="separator:a1458f5e4ac15e1848ae0bde32fe5b5f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e6f34b272d8ed7b0f897b43e65f2cc0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_flash_8h.html#a1e6f34b272d8ed7b0f897b43e65f2cc0">Flash_Write8</a> (volatile uint8_t *const address, const uint8_t data)</td></tr>
+<tr class="memdesc:a1e6f34b272d8ed7b0f897b43e65f2cc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes an 8-bit number to Flash.  <a href="#a1e6f34b272d8ed7b0f897b43e65f2cc0">More...</a><br /></td></tr>
+<tr class="separator:a1e6f34b272d8ed7b0f897b43e65f2cc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06868787ccef73e69bd236d3b93b68f3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_flash_8h.html#a06868787ccef73e69bd236d3b93b68f3">Flash_Erase</a> (void)</td></tr>
+<tr class="memdesc:a06868787ccef73e69bd236d3b93b68f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erases the entire Flash sector.  <a href="#a06868787ccef73e69bd236d3b93b68f3">More...</a><br /></td></tr>
+<tr class="separator:a06868787ccef73e69bd236d3b93b68f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Routines for erasing and writing to the Flash. </p>
 <p>This contains the functions needed for accessing the internal Flash.</p>
-<dl class="section author"><dt>Author</dt><dd>PMcL </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>2015-08-07 </dd></dl>
+<dl class="section author"><dt>Author</dt><dd>12403756, 12551519 </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>2018-04-13  2018-04-13 </dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="a206e98bf61f22c4989b73f1ce06f0627"></a>
+<a class="anchor" id="a50871aff0f5af1e092aea3ed2545cf72"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a> Flash_AllocateVar </td>
+          <td class="memname">bool Flash_AllocateVar </td>
           <td>(</td>
           <td class="paramtype">volatile void **&#160;</td>
           <td class="paramname"><em>variable</em>, </td>
@@ -160,22 +160,22 @@ Functions</h2></td></tr>
 <p>Allocates space for a non-volatile variable in the Flash memory. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">variable</td><td>is the address of a pointer to a variable that is to be allocated space in Flash memory. The pointer will be allocated to a relevant address: If the variable is a byte, then any address. If the variable is a word, then an even address. If the variable is a longword, then an address divisible by 4. This allows the resulting variable to be used with the relevant Flash_Write function which assumes a certain memory address. e.g. a 16-bit variable will be on an even address </td></tr>
+    <tr><td class="paramname">variable</td><td>is the address of a pointer to a variable that is to be allocated space in Flash memory. The pointer will be allocated to a relevant address: If the variable is a byte, then any address. If the variable is a half-word, then an even address. If the variable is a word, then an address divisible by 4. This allows the resulting variable to be used with the relevant Flash_Write function which assumes a certain memory address. e.g. a 16-bit variable will be on an even address </td></tr>
     <tr><td class="paramname">size</td><td>The size, in bytes, of the variable that is to be allocated space in the Flash memory. Valid values are 1, 2 and 4. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>BOOL - TRUE if the variable was allocated space in the Flash memory. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>bool - TRUE if the variable was allocated space in the Flash memory. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Assumes Flash has been initialized. </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a6e818ce3e68dff71d2975bb887c5b7bc"></a>
+<a class="anchor" id="a06868787ccef73e69bd236d3b93b68f3"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a> Flash_Erase </td>
+          <td class="memname">bool Flash_Erase </td>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -185,17 +185,17 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Erases the entire Flash sector. </p>
-<dl class="section return"><dt>Returns</dt><dd>BOOL - TRUE if the Flash "data" sector was erased successfully. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>bool - TRUE if the Flash "data" sector was erased successfully. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Assumes Flash has been initialized. </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="ae6f8902953e089e0d8a6a1593e465910"></a>
+<a class="anchor" id="aa5782279b5e558cafc2f135c0a1177d3"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a> Flash_Init </td>
+          <td class="memname">bool Flash_Init </td>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -205,16 +205,16 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Enables the Flash module. </p>
-<dl class="section return"><dt>Returns</dt><dd>BOOL - TRUE if the Flash was setup successfully. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>bool - TRUE if the Flash was setup successfully. </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a3b1945cab517f6d476c9e365dcba02c7"></a>
+<a class="anchor" id="a1458f5e4ac15e1848ae0bde32fe5b5f3"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a> Flash_Write16 </td>
+          <td class="memname">bool Flash_Write16 </td>
           <td>(</td>
           <td class="paramtype">volatile uint16_t *const&#160;</td>
           <td class="paramname"><em>address</em>, </td>
@@ -241,17 +241,17 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>BOOL - TRUE if Flash was written successfully, FALSE if address is not aligned to a 2-byte boundary or if there is a programming error. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 2-byte boundary or if there is a programming error. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Assumes Flash has been initialized. </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a76c844dad8546bce7ceb837b0ebe692a"></a>
+<a class="anchor" id="a5da7dcc0c6ef765546c79bbe25b48479"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a> Flash_Write32 </td>
+          <td class="memname">bool Flash_Write32 </td>
           <td>(</td>
           <td class="paramtype">volatile uint32_t *const&#160;</td>
           <td class="paramname"><em>address</em>, </td>
@@ -278,17 +278,17 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>BOOL - TRUE if Flash was written successfully, FALSE if address is not aligned to a 4-byte boundary or if there is a programming error. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 4-byte boundary or if there is a programming error. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Assumes Flash has been initialized. </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a5591ecf92f70de6e9d04c79c793495d3"></a>
+<a class="anchor" id="a1e6f34b272d8ed7b0f897b43e65f2cc0"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a> Flash_Write8 </td>
+          <td class="memname">bool Flash_Write8 </td>
           <td>(</td>
           <td class="paramtype">volatile uint8_t *const&#160;</td>
           <td class="paramname"><em>address</em>, </td>
@@ -315,7 +315,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>BOOL - TRUE if Flash was written successfully, FALSE if there is a programming error. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>bool - TRUE if Flash was written successfully, FALSE if there is a programming error. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Assumes Flash has been initialized. </dd></dl>
 
 </div>
@@ -326,7 +326,7 @@ Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_08d237fc27d4ecd563f71c5d52f2fecc.html">sources</a></li><li class="navelem"><a class="el" href="_flash_8h.html">Flash.h</a></li>
-    <li class="footer">Generated on Mon Sep 7 2015 16:10:14 for Lab3 by
+    <li class="footer">Generated on Fri Apr 20 2018 18:17:29 for Lab3 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

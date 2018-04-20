@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.10"/>
-<title>Lab3: C:/Users/PMcL/Documents/Subjects/48434 Embedded Software/4 Labs/Lab 3/Template/Lab 3/sources/Flash.h Source File</title>
+<title>Lab3: C:/Users/12403756/git/es18aut13/Lab3/sources/Flash.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -70,53 +70,72 @@ $(document).ready(function(){initNavTree('_flash_8h_source.html','');});
 </div><!--header-->
 <div class="contents">
 <a href="_flash_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#ifndef FLASH_H</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#define FLASH_H</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment">// new types</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="types_8h.html">types.h</a>&quot;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">// FLASH data access</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#define _FB(flashAddress)  *(uint8_t  volatile *)(flashAddress)</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#define _FI(flashAddress)  *(int16_t  volatile *)(flashAddress)</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#define _FW(flashAddress)  *(uint16_t volatile *)(flashAddress)</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#define _FL(flashAddress)  *(int32_t  volatile *)(flashAddress)</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#define _FS(flashAddress)  *(uint32_t volatile *)(flashAddress)</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#define _FP(flashAddress)  *(uint64_t volatile *)(flashAddress)</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="comment">// Address of the start of the Flash block we are using for data storage</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#define FLASH_DATA_START 0x00080000LU</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="comment">// Address of the end of the Flash block we are using for data storage</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#define FLASH_DATA_END   0x00080007LU</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<a class="code" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a> <a class="code" href="_flash_8h.html#ae6f8902953e089e0d8a6a1593e465910">Flash_Init</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<a class="code" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a> <a class="code" href="_flash_8h.html#a206e98bf61f22c4989b73f1ce06f0627">Flash_AllocateVar</a>(<span class="keyword">volatile</span> <span class="keywordtype">void</span>** variable, <span class="keyword">const</span> uint8_t size);</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<a class="code" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a> <a class="code" href="_flash_8h.html#a76c844dad8546bce7ceb837b0ebe692a">Flash_Write32</a>(<span class="keyword">volatile</span> uint32_t* <span class="keyword">const</span> address, <span class="keyword">const</span> uint32_t data);</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<a class="code" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a> <a class="code" href="_flash_8h.html#a3b1945cab517f6d476c9e365dcba02c7">Flash_Write16</a>(<span class="keyword">volatile</span> uint16_t* <span class="keyword">const</span> address, <span class="keyword">const</span> uint16_t data);</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<a class="code" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a> <a class="code" href="_flash_8h.html#a5591ecf92f70de6e9d04c79c793495d3">Flash_Write8</a>(<span class="keyword">volatile</span> uint8_t* <span class="keyword">const</span> address, <span class="keyword">const</span> uint8_t data);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<a class="code" href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a> <a class="code" href="_flash_8h.html#a6e818ce3e68dff71d2975bb887c5b7bc">Flash_Erase</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="_flash_8h_html_a5591ecf92f70de6e9d04c79c793495d3"><div class="ttname"><a href="_flash_8h.html#a5591ecf92f70de6e9d04c79c793495d3">Flash_Write8</a></div><div class="ttdeci">BOOL Flash_Write8(volatile uint8_t *const address, const uint8_t data)</div><div class="ttdoc">Writes an 8-bit number to Flash. </div></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#ifndef FLASH_H</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#define FLASH_H</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment">// FCMD commands</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> uint8_t PROGRAM_PHRASE = 0x07;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> uint8_t ERASE_FLASH_SECTOR = 0x09;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="comment">// new types</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="types_8h.html">types.h</a>&quot;</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="comment">// TFCCOB struct of containing the Flash command, address and 8 data bytes</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="struct_t_f_c_c_o_b.html">   23</a></span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;{</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  uint8_t FCMD;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  uint8_t flashAddress23to16;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  uint8_t flashAddress15to08;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  uint8_t flashAddress07to00;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  uint8_t dataByte0;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  uint8_t dataByte1;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  uint8_t dataByte2;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  uint8_t dataByte3;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  uint8_t dataByte4;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  uint8_t dataByte5;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  uint8_t dataByte6;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  uint8_t dataByte7;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;} <a class="code" href="struct_t_f_c_c_o_b.html">TFCCOB</a>;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">// FLASH data access</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">#define _FB(flashAddress)  *(uint8_t  volatile *)(flashAddress)</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#define _FH(flashAddress)  *(uint16_t volatile *)(flashAddress)</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">#define _FW(flashAddress)  *(uint32_t volatile *)(flashAddress)</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">#define _FP(flashAddress)  *(uint64_t volatile *)(flashAddress)</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment">// Address of the start of the Flash block we are using for data storage</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#define FLASH_DATA_START 0x00080000LU</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment">// Address of the end of the Flash block we are using for data storage</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#define FLASH_DATA_END   0x00080007LU</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="_flash_8h.html#aa5782279b5e558cafc2f135c0a1177d3">Flash_Init</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="_flash_8h.html#a50871aff0f5af1e092aea3ed2545cf72">Flash_AllocateVar</a>(<span class="keyword">volatile</span> <span class="keywordtype">void</span>** variable, <span class="keyword">const</span> uint8_t size);</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="_flash_8h.html#a5da7dcc0c6ef765546c79bbe25b48479">Flash_Write32</a>(<span class="keyword">volatile</span> uint32_t* <span class="keyword">const</span> address, <span class="keyword">const</span> uint32_t data);</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="_flash_8h.html#a1458f5e4ac15e1848ae0bde32fe5b5f3">Flash_Write16</a>(<span class="keyword">volatile</span> uint16_t* <span class="keyword">const</span> address, <span class="keyword">const</span> uint16_t data);</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="_flash_8h.html#a1e6f34b272d8ed7b0f897b43e65f2cc0">Flash_Write8</a>(<span class="keyword">volatile</span> uint8_t* <span class="keyword">const</span> address, <span class="keyword">const</span> uint8_t data);</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="_flash_8h.html#a06868787ccef73e69bd236d3b93b68f3">Flash_Erase</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="types_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div><div class="ttdoc">Declares new types. </div></div>
-<div class="ttc" id="_flash_8h_html_ae6f8902953e089e0d8a6a1593e465910"><div class="ttname"><a href="_flash_8h.html#ae6f8902953e089e0d8a6a1593e465910">Flash_Init</a></div><div class="ttdeci">BOOL Flash_Init(void)</div><div class="ttdoc">Enables the Flash module. </div></div>
-<div class="ttc" id="_flash_8h_html_a6e818ce3e68dff71d2975bb887c5b7bc"><div class="ttname"><a href="_flash_8h.html#a6e818ce3e68dff71d2975bb887c5b7bc">Flash_Erase</a></div><div class="ttdeci">BOOL Flash_Erase(void)</div><div class="ttdoc">Erases the entire Flash sector. </div></div>
-<div class="ttc" id="_flash_8h_html_a76c844dad8546bce7ceb837b0ebe692a"><div class="ttname"><a href="_flash_8h.html#a76c844dad8546bce7ceb837b0ebe692a">Flash_Write32</a></div><div class="ttdeci">BOOL Flash_Write32(volatile uint32_t *const address, const uint32_t data)</div><div class="ttdoc">Writes a 32-bit number to Flash. </div></div>
-<div class="ttc" id="types_8h_html_a3e5b8192e7d9ffaf3542f1210aec18dd"><div class="ttname"><a href="types_8h.html#a3e5b8192e7d9ffaf3542f1210aec18dd">BOOL</a></div><div class="ttdeci">BOOL</div><div class="ttdef"><b>Definition:</b> types.h:71</div></div>
-<div class="ttc" id="_flash_8h_html_a3b1945cab517f6d476c9e365dcba02c7"><div class="ttname"><a href="_flash_8h.html#a3b1945cab517f6d476c9e365dcba02c7">Flash_Write16</a></div><div class="ttdeci">BOOL Flash_Write16(volatile uint16_t *const address, const uint16_t data)</div><div class="ttdoc">Writes a 16-bit number to Flash. </div></div>
-<div class="ttc" id="_flash_8h_html_a206e98bf61f22c4989b73f1ce06f0627"><div class="ttname"><a href="_flash_8h.html#a206e98bf61f22c4989b73f1ce06f0627">Flash_AllocateVar</a></div><div class="ttdeci">BOOL Flash_AllocateVar(volatile void **variable, const uint8_t size)</div><div class="ttdoc">Allocates space for a non-volatile variable in the Flash memory. </div></div>
+<div class="ttc" id="_flash_8h_html_a06868787ccef73e69bd236d3b93b68f3"><div class="ttname"><a href="_flash_8h.html#a06868787ccef73e69bd236d3b93b68f3">Flash_Erase</a></div><div class="ttdeci">bool Flash_Erase(void)</div><div class="ttdoc">Erases the entire Flash sector. </div><div class="ttdef"><b>Definition:</b> Flash.c:221</div></div>
+<div class="ttc" id="_flash_8h_html_a50871aff0f5af1e092aea3ed2545cf72"><div class="ttname"><a href="_flash_8h.html#a50871aff0f5af1e092aea3ed2545cf72">Flash_AllocateVar</a></div><div class="ttdeci">bool Flash_AllocateVar(volatile void **variable, const uint8_t size)</div><div class="ttdoc">Allocates space for a non-volatile variable in the Flash memory. </div><div class="ttdef"><b>Definition:</b> Flash.c:64</div></div>
+<div class="ttc" id="_flash_8h_html_a1e6f34b272d8ed7b0f897b43e65f2cc0"><div class="ttname"><a href="_flash_8h.html#a1e6f34b272d8ed7b0f897b43e65f2cc0">Flash_Write8</a></div><div class="ttdeci">bool Flash_Write8(volatile uint8_t *const address, const uint8_t data)</div><div class="ttdoc">Writes an 8-bit number to Flash. </div><div class="ttdef"><b>Definition:</b> Flash.c:183</div></div>
+<div class="ttc" id="_flash_8h_html_a5da7dcc0c6ef765546c79bbe25b48479"><div class="ttname"><a href="_flash_8h.html#a5da7dcc0c6ef765546c79bbe25b48479">Flash_Write32</a></div><div class="ttdeci">bool Flash_Write32(volatile uint32_t *const address, const uint32_t data)</div><div class="ttdoc">Writes a 32-bit number to Flash. </div><div class="ttdef"><b>Definition:</b> Flash.c:103</div></div>
+<div class="ttc" id="struct_t_f_c_c_o_b_html"><div class="ttname"><a href="struct_t_f_c_c_o_b.html">TFCCOB</a></div><div class="ttdef"><b>Definition:</b> Flash.h:23</div></div>
+<div class="ttc" id="_flash_8h_html_aa5782279b5e558cafc2f135c0a1177d3"><div class="ttname"><a href="_flash_8h.html#aa5782279b5e558cafc2f135c0a1177d3">Flash_Init</a></div><div class="ttdeci">bool Flash_Init(void)</div><div class="ttdoc">Enables the Flash module. </div><div class="ttdef"><b>Definition:</b> Flash.c:45</div></div>
+<div class="ttc" id="_flash_8h_html_a1458f5e4ac15e1848ae0bde32fe5b5f3"><div class="ttname"><a href="_flash_8h.html#a1458f5e4ac15e1848ae0bde32fe5b5f3">Flash_Write16</a></div><div class="ttdeci">bool Flash_Write16(volatile uint16_t *const address, const uint16_t data)</div><div class="ttdoc">Writes a 16-bit number to Flash. </div><div class="ttdef"><b>Definition:</b> Flash.c:143</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_08d237fc27d4ecd563f71c5d52f2fecc.html">sources</a></li><li class="navelem"><a class="el" href="_flash_8h.html">Flash.h</a></li>
-    <li class="footer">Generated on Mon Sep 7 2015 16:10:13 for Lab3 by
+    <li class="footer">Generated on Fri Apr 20 2018 18:17:28 for Lab3 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

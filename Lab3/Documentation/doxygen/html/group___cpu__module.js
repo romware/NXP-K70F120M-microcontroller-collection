@@ -15,6 +15,5 @@ var group___cpu__module =
     [ "tVectorTable", "structt_vector_table.html", [
       [ "__fun", "structt_vector_table.html#a6001c7c57c392674cadaf831203e4606", null ],
       [ "__ptr", "structt_vector_table.html#a324d365e9c8c6c033f4edbc906f94844", null ]
-    ] ],
-    [ "PE_CpuClockConfigurations", "group___cpu__module.html#gab69281f0e90d16198a5595ed7f471441", null ]
+    ] ]
 ];

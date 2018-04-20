@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.10"/>
-<title>Lab3: C:/Users/PMcL/Documents/Subjects/48434 Embedded Software/4 Labs/Lab 3/Template/Lab 3/Generated_Code/PE_Types.h Source File</title>
+<title>Lab3: C:/Users/12403756/git/es18aut13/Lab3/Generated_Code/PE_Types.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -276,7 +276,7 @@ $(document).ready(function(){initNavTree('_p_e___types_8h_source.html','');});
 <div class="line"><a name="l00225"></a><span class="lineno"><a class="line" href="group___p_e___types__module.html#gaa984d091b259d06f63c567fbabc300d9">  225</a></span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">void</span> <a class="code" href="group___p_e___types__module.html#gaa984d091b259d06f63c567fbabc300d9">LDD_TCallbackParam</a>;       </div>
 <div class="line"><a name="l00226"></a><span class="lineno"><a class="line" href="group___p_e___types__module.html#ga3143a5034c40904068d84ec482789ea3">  226</a></span>&#160;<span class="keyword">typedef</span> void (* <a class="code" href="group___p_e___types__module.html#ga3143a5034c40904068d84ec482789ea3">LDD_TCallback</a>)(<a class="code" href="group___p_e___types__module.html#gaa984d091b259d06f63c567fbabc300d9">LDD_TCallbackParam</a> *CallbackParam); </div>
 <div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;<span class="comment">/* Fills a memory area block by a specified value. Function defined in PE_LDD.c */</span></div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code" href="group___p_e___types__module.html#ga6cb22864b71fd00f200c9fb3375f4e29">PE_FillMemory</a>(<span class="keyword">register</span> <span class="keywordtype">void</span>* SourceAddressPtr, <span class="keyword">register</span> uint8_t c, <span class="keyword">register</span> uint32_t len);</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">void</span> PE_FillMemory(<span class="keyword">register</span> <span class="keywordtype">void</span>* SourceAddressPtr, <span class="keyword">register</span> uint8_t c, <span class="keyword">register</span> uint32_t len);</div>
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;</div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;</div>
 <div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;<span class="comment">/*</span></div>
@@ -3009,7 +3009,6 @@ $(document).ready(function(){initNavTree('_p_e___types_8h_source.html','');});
 <div class="ttc" id="group___p_e___types__module_html_gad268d607015891269cb015faa8bc0dac"><div class="ttname"><a href="group___p_e___types__module.html#gad268d607015891269cb015faa8bc0dac">LDD_DMA_TChannelNumber</a></div><div class="ttdeci">uint8_t LDD_DMA_TChannelNumber</div><div class="ttdef"><b>Definition:</b> PE_Types.h:1906</div></div>
 <div class="ttc" id="group___p_e___types__module_html_ga8330eca54134cfe204ce0309a1953349"><div class="ttname"><a href="group___p_e___types__module.html#ga8330eca54134cfe204ce0309a1953349">ERR_USB_HOST_PORT_POWERED_OFF</a></div><div class="ttdeci">#define ERR_USB_HOST_PORT_POWERED_OFF</div><div class="ttdef"><b>Definition:</b> PE_Types.h:1128</div></div>
 <div class="ttc" id="struct_l_d_d___c_r_c___t_user_c_r_c_standard_html_a82a24fa9104800759f278afc36a4e00e"><div class="ttname"><a href="struct_l_d_d___c_r_c___t_user_c_r_c_standard.html#a82a24fa9104800759f278afc36a4e00e">LDD_CRC_TUserCRCStandard::Width32bit</a></div><div class="ttdeci">bool Width32bit</div><div class="ttdef"><b>Definition:</b> PE_Types.h:2230</div></div>
-<div class="ttc" id="group___p_e___types__module_html_ga6cb22864b71fd00f200c9fb3375f4e29"><div class="ttname"><a href="group___p_e___types__module.html#ga6cb22864b71fd00f200c9fb3375f4e29">PE_FillMemory</a></div><div class="ttdeci">void PE_FillMemory(register void *SourceAddressPtr, register uint8_t c, register uint32_t len)</div><div class="ttdoc">Fills a memory area block by a specified value. </div><div class="ttdef"><b>Definition:</b> PE_LDD.c:104</div></div>
 <div class="ttc" id="group___p_e___types__module_html_gga9dc2d6e80cf609a571ea020e1d0c4934aa95ad02a832aeaf92d6c00fa728c9266"><div class="ttname"><a href="group___p_e___types__module.html#gga9dc2d6e80cf609a571ea020e1d0c4934aa95ad02a832aeaf92d6c00fa728c9266">LDD_CRC_BITS</a></div><div class="ttdef"><b>Definition:</b> PE_Types.h:2212</div></div>
 <div class="ttc" id="group___p_e___types__module_html_ga979750cbc14369238ebdbce9c1f1fbaf"><div class="ttname"><a href="group___p_e___types__module.html#ga979750cbc14369238ebdbce9c1f1fbaf">ERR_USB_HOST_PORT_SUSPENDED</a></div><div class="ttdeci">#define ERR_USB_HOST_PORT_SUSPENDED</div><div class="ttdef"><b>Definition:</b> PE_Types.h:1134</div></div>
 <div class="ttc" id="group___p_e___types__module_html_ggaaacde464f656aa18a43a0f4b73122cf6acc8aa8118b555955b664bb4f43864c81"><div class="ttname"><a href="group___p_e___types__module.html#ggaaacde464f656aa18a43a0f4b73122cf6acc8aa8118b555955b664bb4f43864c81">LDD_CRC_DNP</a></div><div class="ttdef"><b>Definition:</b> PE_Types.h:2223</div></div>
@@ -3173,7 +3172,7 @@ $(document).ready(function(){initNavTree('_p_e___types_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_5ee4f4c790f0b84ba8f281983ad9ea7d.html">Generated_Code</a></li><li class="navelem"><a class="el" href="_p_e___types_8h.html">PE_Types.h</a></li>
-    <li class="footer">Generated on Mon Sep 7 2015 16:10:13 for Lab3 by
+    <li class="footer">Generated on Fri Apr 20 2018 18:17:28 for Lab3 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

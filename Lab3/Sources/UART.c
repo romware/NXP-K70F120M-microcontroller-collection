@@ -14,7 +14,7 @@
 #include "MK70F12.h"
 
 // Receive and transmit FIFOs
-TFIFO RxFIFO, TxFIFO;
+TFIFO RxFIFO, TxFIFO; /*!< comment here */
 
 /*! @brief Sets up the UART interface before first use.
  *

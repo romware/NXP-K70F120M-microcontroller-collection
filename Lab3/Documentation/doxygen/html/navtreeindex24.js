@@ -1,15 +1,12 @@
 var NAVTREEINDEX24 =
 {
-"group___e_t_f___register___accessor___macros.html#gaf42e2c82c7c3f8b0b92c0220651a307b":[4,0,2,0,0,5557],
-"group___e_t_f___register___accessor___macros.html#gaf4432d41c2c9ae9498d247bbf6c738d2":[4,0,2,0,0,5548],
-"group___e_t_f___register___accessor___macros.html#gaf70f578ef4ae9dc6d0d1e27c3b57d0f2":[4,0,2,0,0,5549],
 "group___e_t_f___register___accessor___macros.html#gafb0168c9dc119257f3f16054b469d53d":[4,0,2,0,0,5552],
 "group___e_t_f___register___masks.html":[2,8,16,1],
 "group___e_t_m___peripheral.html":[2,8,17],
 "group___e_t_m___peripheral.html#ga5f573e73b1defe379e4a2e666d2e47c7":[2,8,17,3],
 "group___e_t_m___peripheral.html#ga5f573e73b1defe379e4a2e666d2e47c7":[4,0,2,0,0,5597],
-"group___e_t_m___peripheral.html#ga88a18470aafe4a4922485f18a93c172d":[4,0,2,0,0,13283],
 "group___e_t_m___peripheral.html#ga88a18470aafe4a4922485f18a93c172d":[2,8,17,5],
+"group___e_t_m___peripheral.html#ga88a18470aafe4a4922485f18a93c172d":[4,0,2,0,0,13283],
 "group___e_t_m___peripheral.html#gaff322b8dea24909f2b9156b5ddcda707":[2,8,17,4],
 "group___e_t_m___peripheral.html#gaff322b8dea24909f2b9156b5ddcda707":[4,0,2,0,0,5598],
 "group___e_t_m___register___accessor___macros.html":[2,8,17,0],
@@ -95,8 +92,8 @@ var NAVTREEINDEX24 =
 "group___e_t_m___register___accessor___macros.html#gafcfc7ea4ce6ec9fed12bf13d190aadd9":[4,0,2,0,0,5647],
 "group___e_t_m___register___masks.html":[2,8,17,1],
 "group___e_w_m___peripheral.html":[2,8,18],
-"group___e_w_m___peripheral.html#ga1de35bc04fc7fa4929507210147339a6":[2,8,18,5],
 "group___e_w_m___peripheral.html#ga1de35bc04fc7fa4929507210147339a6":[4,0,2,0,0,13284],
+"group___e_w_m___peripheral.html#ga1de35bc04fc7fa4929507210147339a6":[2,8,18,5],
 "group___e_w_m___peripheral.html#ga8b79ee9e363583bee6122ee3da7952b2":[2,8,18,4],
 "group___e_w_m___peripheral.html#ga8b79ee9e363583bee6122ee3da7952b2":[4,0,2,0,0,5679],
 "group___e_w_m___peripheral.html#gae3454b5b37183b746362498d1fafc40c":[2,8,18,3],
@@ -128,6 +125,7 @@ var NAVTREEINDEX24 =
 "group___e_w_m___register___masks.html#gaed4764277fd6da7338abe074b6ca509e":[4,0,2,0,0,5687],
 "group___e_w_m___register___masks.html#gaf5f891da276df3d0ec104c6aa126540e":[4,0,2,0,0,5702],
 "group___e_w_m___register___masks.html#gafac96f184ce423d5872e0ca6e258d004":[4,0,2,0,0,5694],
+"group___events__module.html":[2,0],
 "group___f_b___peripheral.html":[2,8,19],
 "group___f_b___peripheral.html#ga0aa36a3189de1e68b58234782768941a":[2,8,19,4],
 "group___f_b___peripheral.html#ga0aa36a3189de1e68b58234782768941a":[4,0,2,0,0,5706],
@@ -221,8 +219,8 @@ var NAVTREEINDEX24 =
 "group___f_b___register___masks.html#gaf3d9d750b7dddf0d1df65c98d7ecc7e1":[4,0,2,0,0,5726],
 "group___f_b___register___masks.html#gaf6ddd3e9e267951e4af3886b8bf0c54e":[4,0,2,0,0,5756],
 "group___f_m_c___peripheral.html":[2,8,20],
-"group___f_m_c___peripheral.html#ga0552c12b8b29667270d15450ed977a6e":[2,8,20,5],
 "group___f_m_c___peripheral.html#ga0552c12b8b29667270d15450ed977a6e":[4,0,2,0,0,13286],
+"group___f_m_c___peripheral.html#ga0552c12b8b29667270d15450ed977a6e":[2,8,20,5],
 "group___f_m_c___peripheral.html#ga0a740437b573e32e6b932bf729485fd9":[2,8,20,3],
 "group___f_m_c___peripheral.html#ga0a740437b573e32e6b932bf729485fd9":[4,0,2,0,0,5790],
 "group___f_m_c___peripheral.html#ga7ad26eb02eedda3bb7e2863700c32017":[2,8,20,4],
@@ -249,5 +247,7 @@ var NAVTREEINDEX24 =
 "group___f_m_c___register___accessor___macros.html#ga40ad0668a152cfd1b14f0f4cc6264012":[4,0,2,0,0,5980],
 "group___f_m_c___register___accessor___macros.html#ga4bbf51097b816db5cf8a83657ca7606f":[4,0,2,0,0,5826],
 "group___f_m_c___register___accessor___macros.html#ga4c54d49f847685ee4fe2e81a82f7af72":[4,0,2,0,0,5824],
-"group___f_m_c___register___accessor___macros.html#ga4cde25337db64075580001f9d5387f40":[4,0,2,0,0,5860]
+"group___f_m_c___register___accessor___macros.html#ga4cde25337db64075580001f9d5387f40":[4,0,2,0,0,5860],
+"group___f_m_c___register___accessor___macros.html#ga4ded34886430cb8d8c26c04a6a4a9110":[4,0,2,0,0,5873],
+"group___f_m_c___register___accessor___macros.html#ga4e03f60fd7f774927f55089ee49acd8e":[4,0,2,0,0,5846]
 };

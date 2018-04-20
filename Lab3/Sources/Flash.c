@@ -8,7 +8,11 @@
  *  @date 2018-04-13
  *  @modified 2018-04-13
  */
-
+/*!
+**  @addtogroup flash_module flash module documentation
+**  @{
+*/
+/* MODULE flash */
 #include "MK70F12.h"
 #include "LEDs.h"
 #include "Flash.h"
@@ -255,7 +259,7 @@ static bool LaunchCommand(TFCCOB* commonCommandObject)
   FTFE_FSTAT = FTFE_FSTAT_CCIF_MASK;
 
   // Wait for write to finish
-  while((~FTFE_FSTAT & FTFE_FSTAT_CCIF_MASK)){}
+  while(!(FTFE_FSTAT & FTFE_FSTAT_CCIF_MASK)){}
   
   return true;
 }
@@ -270,6 +274,7 @@ static bool LaunchCommand(TFCCOB* commonCommandObject)
 static bool WritePhrase(const uint32_t address, const uint64union_t phrase)
 {
   // Erase Flash before writing
+  //TODO: Check that flash erase passed
   Flash_Erase();
   
   // Initialize a local TFCCOB structure
@@ -320,3 +325,7 @@ static bool EraseSector(const uint32_t address)
   // Run the command to erase the flash sector
   return LaunchCommand(&commonCommandObject);
 }
+/* END flash */
+/*!
+** @}
+*/

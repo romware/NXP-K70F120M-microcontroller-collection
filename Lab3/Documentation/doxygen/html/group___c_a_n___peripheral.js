@@ -15,7 +15,7 @@ var group___c_a_n___peripheral =
       [ "IFLAG2", "struct_c_a_n___mem_map.html#aa06064731318366c51bc3ee552491070", null ],
       [ "IMASK1", "struct_c_a_n___mem_map.html#ad847310f75c51368595da91e905ad1bf", null ],
       [ "IMASK2", "struct_c_a_n___mem_map.html#a7f5ec3c75c69675f968a5d42c86d73f6", null ],
-      [ "MB", "struct_c_a_n___mem_map.html#a97cfc77a06e6f8a796e0d1c10b4e5d2d", null ],
+      [ "MB", "struct_c_a_n___mem_map.html#a9f80b015127baf32d28f67bf33bbc12b", null ],
       [ "MCR", "struct_c_a_n___mem_map.html#aa78ee3ab61a8a0a9bceade6152bccec3", null ],
       [ "RESERVED_0", "struct_c_a_n___mem_map.html#a3a44c5c05358d3fde727247cafbf0576", null ],
       [ "RESERVED_1", "struct_c_a_n___mem_map.html#ae58a16f3c7d42f622807e4c673105991", null ],

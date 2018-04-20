@@ -8,9 +8,30 @@
 #include "MK70F12.h"
 #include "Cpu.h"
 
-// Private global variable for PIT
-static void (*UserFunction)(void*);
-static void* UserArguments;
+// Private global variables for FTM0 Channels
+static void (*UserFunctionCh0)(void*);
+static void* UserArgumentsCh0;
+
+static void (*UserFunctionCh1)(void*);
+static void* UserArgumentsCh1;
+
+static void (*UserFunctionCh2)(void*);
+static void* UserArgumentsCh2;
+
+static void (*UserFunctionCh3)(void*);
+static void* UserArgumentsCh3;
+
+static void (*UserFunctionCh4)(void*);
+static void* UserArgumentsCh4;
+
+static void (*UserFunctionCh5)(void*);
+static void* UserArgumentsCh5;
+
+static void (*UserFunctionCh6)(void*);
+static void* UserArgumentsCh6;
+
+static void (*UserFunctionCh7)(void*);
+static void* UserArgumentsCh7;
 
 /*! @brief Sets up the FTM before first use.
  *
@@ -24,6 +45,7 @@ bool FTM_Init()
 
   // Ensure global interrupts are disabled
   EnterCritical();
+  //FTM0_MODE |= FTM_MODE_WPDIS_MASK;
 
   // Address     | Vector | IRQ1 | NVIC non-IPR register | NVIC IPR register | Source module | Source description
   // 0x0000_0138 | 78     | 62   | 1                     | 15                | FTM0          | Single interrupt vector for all sources
@@ -36,13 +58,22 @@ bool FTM_Init()
   NVICISER1 |= (1 << 30);
 
   // Set timer overflow interrupt enable to 1
-  FTM0_SC |= FTM_SC_TOIE_MASK;
+  //FTM0_SC |= FTM_SC_TOIE_MASK;
+
+
+  // Set counter initial value to 0
+  FTM0_CNTIN = 0x0000;
+
+  // Set overflow value to 0xFFFF
+  FTM0_MOD = 0xFFFF;
+
+  // Write anything to CNT to start it
+  FTM0_CNT = 0xFFFF;
 
   // Set clock source to fixed frequency clock (0b10)
   FTM0_SC |= FTM_SC_CLKS(0b10);
 
-
-
+  //FTM0_MODE &= ~FTM_MODE_WPDIS_MASK;
   // Return global interrupts to how they were
   ExitCritical();
 
@@ -66,11 +97,29 @@ bool FTM_Init()
 bool FTM_Set(const TFTMChannel* const aFTMChannel)
 {
   // Store parameters for interrupt routine
-  UserFunction = aFTMChannel->userFunction;
-  UserArguments = aFTMChannel->userArguments;
+  UserFunctionCh0 = aFTMChannel->userFunction;
+  UserArgumentsCh0 = aFTMChannel->userArguments;
 
   // Set the channel interrupt enable
-  FTM0_CnSC(aFTMChannel->channelNb) |= FTM_CnSC_CHIE_MASK;
+  //FTM0_CnSC(aFTMChannel->channelNb) |= FTM_CnSC_CHIE_MASK;
+
+  // Set the Mode Select A to the LSB of the timer function
+  FTM0_CnSC(aFTMChannel->channelNb) |= FTM_CnSC_MSA_MASK & (aFTMChannel->timerFunction << FTM_CnSC_MSA_SHIFT);
+
+  // Set the Mode Select B to the MSB of the timer function
+  FTM0_CnSC(aFTMChannel->channelNb) |= FTM_CnSC_MSB_MASK & (aFTMChannel->timerFunction << FTM_CnSC_MSB_SHIFT);
+
+  // Check if timer function is an input capture or output compare
+  if(aFTMChannel->timerFunction == TIMER_FUNCTION_INPUT_CAPTURE)
+  {
+    // Create 2 bit mask for ELS LSB and MSB to AND with the input detection bits
+    FTM0_CnSC(aFTMChannel->channelNb) |= (FTM_CnSC_ELSA_MASK | FTM_CnSC_ELSB_MASK) & (aFTMChannel->ioType.inputDetection << FTM_CnSC_ELSA_SHIFT);
+  }
+  else if (aFTMChannel->timerFunction == TIMER_FUNCTION_OUTPUT_COMPARE)
+  {
+    // Create 2 bit mask for ELS LSB and MSB to AND with the output action bits
+    FTM0_CnSC(aFTMChannel->channelNb) |= (FTM_CnSC_ELSA_MASK | FTM_CnSC_ELSB_MASK) & (aFTMChannel->ioType.outputAction << FTM_CnSC_ELSB_SHIFT);
+  }
 
   return true;
 }
@@ -84,7 +133,15 @@ bool FTM_Set(const TFTMChannel* const aFTMChannel)
  */
 bool FTM_StartTimer(const TFTMChannel* const aFTMChannel)
 {
+  // Set the channel value
+  FTM0_CnV(aFTMChannel->channelNb) = FTM0_CNT + aFTMChannel->delayCount;
 
+  // Clear the channel flag
+  FTM0_CnSC(aFTMChannel->channelNb) &= ~FTM_CnSC_CHF_MASK;
+
+  FTM0_CnSC(aFTMChannel->channelNb) |= FTM_CnSC_CHIE_MASK;
+
+  return true;
 }
 
 
@@ -99,6 +156,6 @@ void __attribute__ ((interrupt)) FTM0_ISR(void)
   FTM0_CnSC(0) &= ~FTM_CnSC_CHF_MASK;
 
   // Call user callback function to toggle the blue LED
-  if (UserFunction)
-   (*UserFunction)(UserArguments);
+  if (UserFunctionCh0)
+   (*UserFunctionCh0)(UserArgumentsCh0);
 }

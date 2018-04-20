@@ -256,13 +256,13 @@ void PITCallback(void* arg)
   LEDs_Toggle(LED_GREEN);
 }
 
-/*! @brief Toggles the blue LED every time it is called
+/*! @brief Turns off the blue LED every time it is called
  *
  *  @return void
  */
 void FTMCallback(void* arg)
 {
-  // Toggle green LED
+  // Turn off blue LED
   LEDs_Off(LED_BLUE);
 }
 
@@ -276,7 +276,8 @@ bool TowerInit(void)
     Flash_Init() &&
     LEDs_Init() &&
     Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) &&
-    PIT_Init(CPU_BUS_CLK_HZ, PITCallback, NULL)
+    PIT_Init(CPU_BUS_CLK_HZ, PITCallback, NULL) &&
+    FTM_Init()
   );
 }
 
@@ -295,12 +296,13 @@ int main(void)
 
 
   // Globally disable interrupts
-   __DI();
+  __DI();
 
   // Initializes the main tower components
   if(TowerInit())
   {
     // Allocates an address in Flash memory to the tower number
+      //TODO: Check bools here.
     Flash_AllocateVar((volatile void**)&NvTowerNb, sizeof(*NvTowerNb));
 
     // Allocates an address in Flash memory to the tower mode
@@ -310,6 +312,7 @@ int main(void)
     if(_FH(NvTowerNb) == 0xFFFF)
     {
       // Sets the tower number to the default number
+	//TODO: Check bools here
       Flash_Write16((uint16_t*)NvTowerNb,(uint16_t)1519);
     }
 
@@ -323,21 +326,20 @@ int main(void)
     // Set the periodic interrupt timer 0 to 500ms
     PIT_Set(PERIOD_LED_GREEN, true);
 
-    TFTMChannel temp;
-
-    temp.channelNb = 0;
-    temp.delayCount = 65535;
-    temp.ioType.inputDetection = TIMER_INPUT_ANY;
-    temp.ioType.outputAction = TIMER_OUTPUT_TOGGLE;
-    temp.timerFunction = TIMER_FUNCTION_OUTPUT_COMPARE;
-    temp.userFunction = FTMCallback;
-    temp.userArguments = NULL;
-
-     FTM_Set(&temp);
-
     // Turn on the orange LED to indicate the tower has initialized successfully
     LEDs_On(LED_ORANGE);
   }
+
+  TFTMChannel temp;
+
+      temp.channelNb = 0;
+      temp.delayCount = 24000;
+      temp.ioType.inputDetection = TIMER_INPUT_ANY;
+      temp.ioType.outputAction = TIMER_OUTPUT_DISCONNECT;
+      temp.timerFunction = TIMER_FUNCTION_OUTPUT_COMPARE;
+      temp.userFunction = FTMCallback;
+      temp.userArguments = NULL;
+      FTM_Set(&temp);
 
   // Globally enable interrupts
   __EI();
@@ -350,6 +352,8 @@ int main(void)
     // Check if packet has been received
     if(Packet_Get())
     {
+      LEDs_On(LED_BLUE);
+      FTM_StartTimer(&temp);
       // Execute a command depending on what packet has been received
       ReceivedPacket();
     }

@@ -1592,6 +1592,5 @@ var group___p_e___types__module =
       [ "LDD_USB_ISOCHRONOUS", "group___p_e___types__module.html#gga76a64632dc55a977bd2c3bbe05d653a0a7fe21377d8a56c77d354d4916ad1636c", null ],
       [ "LDD_USB_BULK", "group___p_e___types__module.html#gga76a64632dc55a977bd2c3bbe05d653a0a93b9877686eb7391b37d68f2d9abcea6", null ],
       [ "LDD_USB_INTERRUPT", "group___p_e___types__module.html#gga76a64632dc55a977bd2c3bbe05d653a0a0600d8d9a6f66f347bda02098232a89d", null ]
-    ] ],
-    [ "PE_FillMemory", "group___p_e___types__module.html#ga6cb22864b71fd00f200c9fb3375f4e29", null ]
+    ] ]
 ];

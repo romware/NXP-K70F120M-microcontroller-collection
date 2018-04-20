@@ -1,7 +1,5 @@
 var NAVTREEINDEX25 =
 {
-"group___f_m_c___register___accessor___macros.html#ga4ded34886430cb8d8c26c04a6a4a9110":[4,0,2,0,0,5873],
-"group___f_m_c___register___accessor___macros.html#ga4e03f60fd7f774927f55089ee49acd8e":[4,0,2,0,0,5846],
 "group___f_m_c___register___accessor___macros.html#ga4e0ad9ed74e949eccca99305c3a169ae":[4,0,2,0,0,5863],
 "group___f_m_c___register___accessor___macros.html#ga51ded89a0e3f06a4383d0d27815e0c63":[4,0,2,0,0,5845],
 "group___f_m_c___register___accessor___macros.html#ga576b8b5521486bd2e46495bfc03d730c":[4,0,2,0,0,5874],
@@ -227,8 +225,8 @@ var NAVTREEINDEX25 =
 "group___f_t_f_e___peripheral.html#ga459f4097b9fd3f09e7bf790c17831f83":[4,0,2,0,0,6028],
 "group___f_t_f_e___peripheral.html#ga5ae2dee20c785365da3d603faf7a1dd2":[2,8,22,4],
 "group___f_t_f_e___peripheral.html#ga5ae2dee20c785365da3d603faf7a1dd2":[4,0,2,0,0,6029],
-"group___f_t_f_e___peripheral.html#gad81b9269a2ee19ce1983daae49ba1694":[2,8,22,5],
 "group___f_t_f_e___peripheral.html#gad81b9269a2ee19ce1983daae49ba1694":[4,0,2,0,0,13288],
+"group___f_t_f_e___peripheral.html#gad81b9269a2ee19ce1983daae49ba1694":[2,8,22,5],
 "group___f_t_f_e___register___accessor___macros.html":[2,8,22,0],
 "group___f_t_f_e___register___accessor___macros.html#ga0610d340193874af52c0617b4b57c040":[4,0,2,0,0,6065],
 "group___f_t_f_e___register___accessor___macros.html#ga09e2ce430c887b7206b57bb346e61813":[4,0,2,0,0,6059],
@@ -249,5 +247,7 @@ var NAVTREEINDEX25 =
 "group___f_t_f_e___register___accessor___macros.html#ga3aabda5c75e36fb5c6895b0e66a623be":[4,0,2,0,0,6134],
 "group___f_t_f_e___register___accessor___macros.html#ga477b329c3e07a5ea7856d1d3fbe81bc9":[4,0,2,0,0,6105],
 "group___f_t_f_e___register___accessor___macros.html#ga4ad786f1feef89b2e849ffe41a249bad":[4,0,2,0,0,6108],
-"group___f_t_f_e___register___accessor___macros.html#ga532eb1091cb04bce28c616a9a757a497":[4,0,2,0,0,6129]
+"group___f_t_f_e___register___accessor___macros.html#ga532eb1091cb04bce28c616a9a757a497":[4,0,2,0,0,6129],
+"group___f_t_f_e___register___accessor___macros.html#ga58dcdfdd261f3685d6b89afe1b19aeea":[4,0,2,0,0,6112],
+"group___f_t_f_e___register___accessor___macros.html#ga5c14b90518da27748aa06a69c1010a83":[4,0,2,0,0,6079]
 };

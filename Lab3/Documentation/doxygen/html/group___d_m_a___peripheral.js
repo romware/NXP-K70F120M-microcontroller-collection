@@ -72,7 +72,7 @@ var group___d_m_a___peripheral =
       [ "SLAST", "struct_d_m_a___mem_map.html#a2642aa56631c9a8c9b83ca244f8ce0dd", null ],
       [ "SOFF", "struct_d_m_a___mem_map.html#abbbb3ec6364c286b7db38b8eefb64250", null ],
       [ "SSRT", "struct_d_m_a___mem_map.html#a39ea12b8e20431f54f8c6ba9f08bfc1b", null ],
-      [ "TCD", "struct_d_m_a___mem_map.html#a363f0b02632845c7d7f076a2b83981d1", null ]
+      [ "TCD", "struct_d_m_a___mem_map.html#a73cda81eb3b4f19afe39e086022b431e", null ]
     ] ],
     [ "DMA_BASE_PTR", "group___d_m_a___peripheral.html#ga6997fbc1b1973e9f27170217a3bd6f22", null ],
     [ "DMA_BASE_PTRS", "group___d_m_a___peripheral.html#gada914e90165e25ae4eeddf5175920e77", null ],

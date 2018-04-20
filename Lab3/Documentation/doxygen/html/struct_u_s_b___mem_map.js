@@ -7,7 +7,7 @@ var struct_u_s_b___mem_map =
     [ "BDTPAGE3", "struct_u_s_b___mem_map.html#afd1f5b8867e36b32297641c5fe0b283b", null ],
     [ "CONTROL", "struct_u_s_b___mem_map.html#a98ff4d7ab9c41c673ee41053dc484447", null ],
     [ "CTL", "struct_u_s_b___mem_map.html#a52b35d0e8644631558a65f9b7a9b8b4b", null ],
-    [ "ENDPOINT", "struct_u_s_b___mem_map.html#a1e3cf86ea3033b751fe3b17301e11116", null ],
+    [ "ENDPOINT", "struct_u_s_b___mem_map.html#a13a7ae0b77ad5b334fc0106ef22ef8c7", null ],
     [ "ENDPT", "struct_u_s_b___mem_map.html#a86aaba02227a45a333f72565b0bec378", null ],
     [ "ERREN", "struct_u_s_b___mem_map.html#a810f265a9ad6dc0f51834d0cecf24a79", null ],
     [ "ERRSTAT", "struct_u_s_b___mem_map.html#ad86f18ee95df11168d4b6cf68578e0fa", null ],
