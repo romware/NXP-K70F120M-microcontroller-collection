@@ -40,13 +40,8 @@ static void* UserArgumentsCh7;
  */
 bool FTM_Init()
 {
-  // Enable the Flexible Timer Module in System Clock Gating Control Register 6
-  SIM_SCGC6 |= SIM_SCGC6_FTM0_MASK;
-
   // Ensure global interrupts are disabled
   EnterCritical();
-  FTM0_MODE |= FTM_MODE_WPDIS_MASK;
-  FTM0_MODE |= FTM_MODE_FTMEN_MASK;
 
   // Address     | Vector | IRQ1 | NVIC non-IPR register | NVIC IPR register | Source module | Source description
   // 0x0000_0138 | 78     | 62   | 1                     | 15                | FTM0          | Single interrupt vector for all sources
@@ -58,27 +53,35 @@ bool FTM_Init()
   // Enable interrupts from FTM0 module
   NVICISER1 |= (1 << 30);
 
-  // Set timer overflow interrupt enable to 1
-  //FTM0_SC |= FTM_SC_TOIE_MASK;
+  // Return global interrupts to how they were
+  ExitCritical();
 
+  // Enable the Flexible Timer Module in System Clock Gating Control Register 6
+  SIM_SCGC6 |= SIM_SCGC6_FTM0_MASK;
+
+  // Turn off write protect mode
+  FTM0_MODE |= FTM_MODE_WPDIS_MASK;
+
+  // Enable FTM
+  FTM0_MODE |= FTM_MODE_FTMEN_MASK;
+
+  // Set the BDM mode to 3 for
+  FTM0_CONF |= FTM_CONF_BDMMODE(3);
 
   // Set counter initial value to 0
   FTM0_CNTIN = 0x0000;
 
+  // Set overflow value to 0xFFFF
+  FTM0_MOD = 0xFFFF;
 
   // Write anything to CNT to start it
   FTM0_CNT = 0xFFFF;
 
-  // Set overflow value to 0xFFFF
-  FTM0_MOD = 0xFFFF;
-
-
   // Set clock source to fixed frequency clock (0b10)
   FTM0_SC |= FTM_SC_CLKS(0b10);
 
-  //FTM0_MODE &= ~FTM_MODE_WPDIS_MASK;
-  // Return global interrupts to how they were
-  ExitCritical();
+  // Return to write protect mode
+  FTM0_MODE &= ~FTM_MODE_WPDIS_MASK;
 
   return true;
 }
@@ -103,14 +106,14 @@ bool FTM_Set(const TFTMChannel* const aFTMChannel)
   UserFunctionCh0 = aFTMChannel->userFunction;
   UserArgumentsCh0 = aFTMChannel->userArguments;
 
-  // Set the channel interrupt enable
-  //FTM0_CnSC(aFTMChannel->channelNb) |= FTM_CnSC_CHIE_MASK;
+  // Turn off write protect mode
+  FTM0_MODE |= FTM_MODE_WPDIS_MASK;
 
   // Set the Mode Select A to the LSB of the timer function
   FTM0_CnSC(aFTMChannel->channelNb) |= FTM_CnSC_MSA_MASK & (aFTMChannel->timerFunction << FTM_CnSC_MSA_SHIFT);
 
   // Set the Mode Select B to the MSB of the timer function
-  FTM0_CnSC(aFTMChannel->channelNb) |= FTM_CnSC_MSB_MASK & (aFTMChannel->timerFunction << FTM_CnSC_MSB_SHIFT);
+  FTM0_CnSC(aFTMChannel->channelNb) |= FTM_CnSC_MSB_MASK & (aFTMChannel->timerFunction << FTM_CnSC_MSA_SHIFT);
 
   // Check if timer function is an input capture or output compare
   if(aFTMChannel->timerFunction == TIMER_FUNCTION_INPUT_CAPTURE)
@@ -124,6 +127,8 @@ bool FTM_Set(const TFTMChannel* const aFTMChannel)
     FTM0_CnSC(aFTMChannel->channelNb) |= (FTM_CnSC_ELSA_MASK | FTM_CnSC_ELSB_MASK) & (aFTMChannel->ioType.outputAction << FTM_CnSC_ELSB_SHIFT);
   }
 
+  // Return to write protect mode
+  FTM0_MODE &= ~FTM_MODE_WPDIS_MASK;
   return true;
 }
 
@@ -138,14 +143,11 @@ bool FTM_StartTimer(const TFTMChannel* const aFTMChannel)
 {
   // Set the channel value
   FTM0_CnV(aFTMChannel->channelNb) = (FTM_CNT_COUNT_MASK & FTM0_CNT) + aFTMChannel->delayCount;
-  //uint16_t tempCNT = FTM0_CNT;
-  //uint16_t tempVAL = FTM0_C0V;
-
-
 
   // Clear the channel flag
   FTM0_CnSC(aFTMChannel->channelNb) &= ~FTM_CnSC_CHF_MASK;
 
+  // Enable Channel interrupts
   FTM0_CnSC(aFTMChannel->channelNb) |= FTM_CnSC_CHIE_MASK;
 
   return true;

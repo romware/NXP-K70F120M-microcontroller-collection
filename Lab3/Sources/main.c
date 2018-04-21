@@ -354,6 +354,7 @@ int main(void)
     {
       LEDs_On(LED_BLUE);
       FTM_StartTimer(&temp);
+
       // Execute a command depending on what packet has been received
       ReceivedPacket();
     }
