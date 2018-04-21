@@ -12,9 +12,7 @@
 #define PIT_H
 
 // new types
-#include "Cpu.h"
 #include "types.h"
-#include "MK70F12.h"
 
 /*! @brief Sets up the PIT before first use.
  *

@@ -4,7 +4,10 @@
  *  Created on: 15 Apr 2018
  *      Author: 12403756
  */
+//TODO: file headings and Doxygen for all modules
 #include "PIT.h"
+#include "MK70F12.h"
+#include "Cpu.h"
 
 // Private global variable for PIT
 static uint32_t ModuleClk;
@@ -48,7 +51,6 @@ bool PIT_Init(const uint32_t moduleClk, void (*userFunction)(void*), void* userA
 
   // Enable interrupts flags for PIT0
   PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;
-  //PIT_MCR &= ~PIT_MCR_FRZ_MASK;
 
   // Return global interrupts to how they were
   ExitCritical();
@@ -65,8 +67,11 @@ bool PIT_Init(const uint32_t moduleClk, void (*userFunction)(void*), void* userA
  */
 void PIT_Set(const uint32_t period, const bool restart)
 {
-  // Timer Load Value Register
-  uint32_t locLDVAL = (ModuleClk / 1000000) * (period / 1000) -1;
+  // Calculate nano seconds per tick
+  uint32_t nanoSecondPerTick = 1000000000 / ModuleClk;
+
+  // Calculate timer load value
+  uint32_t locLDVAL = period / nanoSecondPerTick;
 
   // Check if restarting PIT
   if(restart)
@@ -120,5 +125,3 @@ void __attribute__ ((interrupt)) PIT_ISR(void)
   if (UserFunction)
    (*UserFunction)(UserArguments);
 }
-
-

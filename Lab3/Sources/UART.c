@@ -12,6 +12,8 @@
 #include "UART.h"
 #include "FIFO.h"
 #include "MK70F12.h"
+#include "PE_Types.h"
+#include "Cpu.h"
 
 // Receive and transmit FIFOs
 TFIFO RxFIFO, TxFIFO; /*!< comment here */
@@ -26,17 +28,20 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
 {
   // Enable UART2 clock: For System Clock Gating Control Register 4 see 12.2.12 of K70P256M150SF3RM.pdf
   SIM_SCGC4 |= SIM_SCGC4_UART2_MASK;
+
   // Enable PORTE clock: For System Clock Gating Control Register 5 see 12.2.13 of K70P256M150SF3RM.pdf
   SIM_SCGC5 |= SIM_SCGC5_PORTE_MASK;
 
   // Set PTE16 (BGA Map 'J3') to be the UART2_Tx pin by setting to ALT3
   PORTE_PCR16 = PORT_PCR_MUX(3);
+
   // Set PTE17 (BGA Map 'K2') to be the UART2_Rx pin by setting to ALT3
   PORTE_PCR17 = PORT_PCR_MUX(3);
   // For K70 Signal Multiplexing and Pin Assignments see 10.3.1 of K70P256M150SF3RM.pdf
 
   // Confirm UART2_C2 transmit enable is set to 0 to allow setting of the  Baud Rate Divisor Register
   UART2_C2 &= ~UART_C2_TE_MASK;
+
   // Confirm UART2_C2 receive enable is set to 0 to allow setting of the  Baud Rate Divisor Register
   UART2_C2 &= ~UART_C2_RE_MASK;
   // For UART Control Register 2 see 56.3.4 of K70P256M150SF3RM.pdf
@@ -58,10 +63,16 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
 
   // Set UART2_C2 transmit enable to 1
   UART2_C2 |= UART_C2_TE_MASK;
+
   // Set UART2_C2 receive enable to 1
   UART2_C2 |= UART_C2_RE_MASK;
+
+  // Ensure global interrupts are disabled
+  EnterCritical();
+
   // Set UART2_C2 transmit interrupt enable to 0
   UART2_C2 &= ~UART_C2_TIE_MASK;
+
   // Set UART2_C2 receive interrupt enable to 1
   UART2_C2 |= UART_C2_RIE_MASK;
   // For UART Control Register 2 see 56.3.4 of K70P256M150SF3RM.pdf
@@ -72,11 +83,13 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
 
   // Clear any pending interrupts from UART2 (bit 17 of register 1 (IRQ49))
   NVICICPR1 |= (1 << 17);
+
   // Enable interrupt source for UART2 in NVIC (bit 17 of register 1 (IRQ49))
   NVICISER1 |= (1 << 17);
-  // Set the interrupt priority to 1 (NVICIPR from bit 12 to bit 15)
-  //NVICIPR12 = (1 << 15);
   // For NVIC configuration see 3.2.2 of K70P256M150SF3RM.pdf
+
+  // Return global interrupts to how they were
+  ExitCritical();
 
   // Initiate the RxFIFO and TxFIFO
   FIFO_Init(&RxFIFO);

@@ -28,7 +28,7 @@
 /* MODULE main */
 
 
-// CPU module - contains low level hardware initialization routines
+// Included .h files
 #include "types.h"
 #include "Cpu.h"
 #include "Events.h"
@@ -52,7 +52,7 @@
 // Baud rate
 #define BAUD_RATE 115200
 
-// Period of periodic interrupt timer 0
+// Period of periodic interrupt timer 0 in nanoseconds
 const uint32_t PERIOD_LED_GREEN = 500000000;
 
 // Listed command bits of a packet
@@ -278,7 +278,7 @@ void PITCallback(void* arg)
  *
  *  @return void
  */
-void FTMCallback(void* arg)
+void FTMCallbackCh0(void* arg)
 {
   // Turn off blue LED
   LEDs_Off(LED_BLUE);
@@ -321,6 +321,16 @@ int main(void)
 {
   /* Write your local variable definition here */
 
+  TFTMChannel receivedPacketTmr;
+  // Initialize for channel 0, 1 second (24414 cycles at 24414 Hz) output compare, output disconnect
+  receivedPacketTmr.channelNb = 0;
+  receivedPacketTmr.delayCount = 24414;
+  receivedPacketTmr.ioType.inputDetection = TIMER_INPUT_ANY;
+  receivedPacketTmr.ioType.outputAction = TIMER_OUTPUT_DISCONNECT;
+  receivedPacketTmr.timerFunction = TIMER_FUNCTION_OUTPUT_COMPARE;
+  receivedPacketTmr.userFunction = FTMCallbackCh0;
+  receivedPacketTmr.userArguments = NULL;
+
 
   /*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
   PE_low_level_init();
@@ -360,20 +370,12 @@ int main(void)
     // Set the periodic interrupt timer 0 to 500ms
     PIT_Set(PERIOD_LED_GREEN, true);
 
+    // Set the received packet timer to 1 second
+    FTM_Set(&receivedPacketTmr);
+
     // Turn on the orange LED to indicate the tower has initialized successfully
     LEDs_On(LED_ORANGE);
   }
-
-  TFTMChannel temp;
-
-      temp.channelNb = 0;
-      temp.delayCount = 24414;
-      temp.ioType.inputDetection = TIMER_INPUT_ANY;
-      temp.ioType.outputAction = TIMER_OUTPUT_DISCONNECT;
-      temp.timerFunction = TIMER_FUNCTION_OUTPUT_COMPARE;
-      temp.userFunction = FTMCallback;
-      temp.userArguments = NULL;
-      FTM_Set(&temp);
 
   // Globally enable interrupts
   __EI();
@@ -386,8 +388,9 @@ int main(void)
     // Check if packet has been received
     if(Packet_Get())
     {
+      // Turn on the blue LED and start the 1 second timer
       LEDs_On(LED_BLUE);
-      FTM_StartTimer(&temp);
+      FTM_StartTimer(&receivedPacketTmr);
 
       // Execute a command depending on what packet has been received
       ReceivedPacket();

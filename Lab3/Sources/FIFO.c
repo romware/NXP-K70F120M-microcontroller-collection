@@ -11,6 +11,8 @@
 
 // new types
 #include "FIFO.h"
+#include "PE_Types.h"
+#include "Cpu.h"
 
 /*! @brief Initialize the FIFO before first use.
  *

@@ -13,8 +13,6 @@
 
 // new types
 #include "types.h"
-#include "PE_Types.h"
-#include "Cpu.h"
 
 // Number of bytes in a FIFO
 #define FIFO_SIZE 256

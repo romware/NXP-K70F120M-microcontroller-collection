@@ -8,30 +8,9 @@
 #include "MK70F12.h"
 #include "Cpu.h"
 
-// Private global variables for FTM0 Channels
-static void (*UserFunctionCh0)(void*);
-static void* UserArgumentsCh0;
-
-static void (*UserFunctionCh1)(void*);
-static void* UserArgumentsCh1;
-
-static void (*UserFunctionCh2)(void*);
-static void* UserArgumentsCh2;
-
-static void (*UserFunctionCh3)(void*);
-static void* UserArgumentsCh3;
-
-static void (*UserFunctionCh4)(void*);
-static void* UserArgumentsCh4;
-
-static void (*UserFunctionCh5)(void*);
-static void* UserArgumentsCh5;
-
-static void (*UserFunctionCh6)(void*);
-static void* UserArgumentsCh6;
-
-static void (*UserFunctionCh7)(void*);
-static void* UserArgumentsCh7;
+// Private global variable arrays to store parameters for channels 0-7 of FTM0
+static void (*UserFunction[8])(void*);
+static void* UserArguments[8];
 
 /*! @brief Sets up the FTM before first use.
  *
@@ -65,7 +44,7 @@ bool FTM_Init()
   // Enable FTM
   FTM0_MODE |= FTM_MODE_FTMEN_MASK;
 
-  // Set the BDM mode to 3 for
+  // Set the BDM to 3 for functional mode
   FTM0_CONF |= FTM_CONF_BDMMODE(3);
 
   // Set counter initial value to 0
@@ -102,18 +81,15 @@ bool FTM_Init()
  */
 bool FTM_Set(const TFTMChannel* const aFTMChannel)
 {
-  // Store parameters for interrupt routine
-  UserFunctionCh0 = aFTMChannel->userFunction;
-  UserArgumentsCh0 = aFTMChannel->userArguments;
+  // Store parameters for interrupt routine in the private global arrays
+  UserFunction[aFTMChannel->channelNb] = aFTMChannel->userFunction;
+  UserArguments[aFTMChannel->channelNb] = aFTMChannel->userArguments;
 
   // Turn off write protect mode
   FTM0_MODE |= FTM_MODE_WPDIS_MASK;
 
-  // Set the Mode Select A to the LSB of the timer function
-  FTM0_CnSC(aFTMChannel->channelNb) |= FTM_CnSC_MSA_MASK & (aFTMChannel->timerFunction << FTM_CnSC_MSA_SHIFT);
-
-  // Set the Mode Select B to the MSB of the timer function
-  FTM0_CnSC(aFTMChannel->channelNb) |= FTM_CnSC_MSB_MASK & (aFTMChannel->timerFunction << FTM_CnSC_MSA_SHIFT);
+  // Create 2 bit mask for Mode Select A and Mode select B to AND with the input detection bits
+  FTM0_CnSC(aFTMChannel->channelNb) |= (FTM_CnSC_MSA_MASK | FTM_CnSC_MSA_MASK) & (aFTMChannel->timerFunction << FTM_CnSC_MSA_SHIFT);
 
   // Check if timer function is an input capture or output compare
   if(aFTMChannel->timerFunction == TIMER_FUNCTION_INPUT_CAPTURE)
@@ -159,11 +135,20 @@ bool FTM_StartTimer(const TFTMChannel* const aFTMChannel)
  */
 void __attribute__ ((interrupt)) FTM0_ISR(void)
 {
-  // Clear interrupt flag
-  FTM0_CnSC(0) &= ~FTM_CnSC_CHF_MASK;
-  FTM0_CnSC(0) &= ~FTM_CnSC_CHIE_MASK;
+  // Check for set channel flags
+  for(uint8_t i = 0; i < 8; i++)
+    {
+      if(FTM0_CnSC(i) & FTM_CnSC_CHF_MASK)
+      {
+	// Clear the channel flag
+        FTM0_CnSC(i) &= ~FTM_CnSC_CHF_MASK;
 
-  // Call user callback function to turn off the blue LED
-  if (UserFunctionCh0)
-   (*UserFunctionCh0)(UserArgumentsCh0);
+        // Disable the channel interrupt
+	FTM0_CnSC(i) &= ~FTM_CnSC_CHIE_MASK;
+
+	// Call up callback function for channels with set flags
+        if(UserFunction[i])
+	  (*UserFunction[i])(UserArguments[i]);
+      }
+    }
 }

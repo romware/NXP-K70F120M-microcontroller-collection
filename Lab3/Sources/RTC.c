@@ -28,7 +28,7 @@ bool RTC_Init(void (*userFunction)(void*), void* userArguments)
   UserArguments = userArguments;
 
   // Ensure global interrupts are disabled
-    EnterCritical();
+  EnterCritical();
 
   // Address     | Vector | IRQ  | NVIC non-IPR register | NVIC IPR register | Source module | Source description
   // 0x0000_014C | 83     | 67   | 2                     | 16                | RTC           | Seconds interrupt
