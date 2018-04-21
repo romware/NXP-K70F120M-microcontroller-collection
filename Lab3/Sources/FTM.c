@@ -43,9 +43,9 @@ bool FTM_Init()
   // Ensure global interrupts are disabled
   EnterCritical();
 
-  // Address     | Vector | IRQ1 | NVIC non-IPR register | NVIC IPR register | Source module | Source description
+  // Address     | Vector | IRQ  | NVIC non-IPR register | NVIC IPR register | Source module | Source description
   // 0x0000_0138 | 78     | 62   | 1                     | 15                | FTM0          | Single interrupt vector for all sources
-  // IRQ1 modulo 32 = 30
+  // IRQ modulo 32 = 30
 
   // Clear any pending interrupts on FTM0
   NVICICPR1 |= (1 << 30);
@@ -132,7 +132,6 @@ bool FTM_Set(const TFTMChannel* const aFTMChannel)
   return true;
 }
 
-
 /*! @brief Starts a timer if set up for output compare.
  *
  *  @param aFTMChannel is a structure containing the parameters to be used in setting up the timer channel.
@@ -153,7 +152,6 @@ bool FTM_StartTimer(const TFTMChannel* const aFTMChannel)
   return true;
 }
 
-
 /*! @brief Interrupt service routine for the FTM.
  *
  *  If a timer channel was set up as output compare, then the user callback function will be called.
@@ -165,7 +163,7 @@ void __attribute__ ((interrupt)) FTM0_ISR(void)
   FTM0_CnSC(0) &= ~FTM_CnSC_CHF_MASK;
   FTM0_CnSC(0) &= ~FTM_CnSC_CHIE_MASK;
 
-  // Call user callback function to toggle the blue LED
+  // Call user callback function to turn off the blue LED
   if (UserFunctionCh0)
    (*UserFunctionCh0)(UserArgumentsCh0);
 }

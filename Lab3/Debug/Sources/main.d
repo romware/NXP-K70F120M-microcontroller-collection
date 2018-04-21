@@ -11,7 +11,8 @@ Sources/main.o: ../Sources/main.c ../Sources/types.h \
  C:/Users/12403756/git/es18aut13/Lab3/Generated_Code/PE_Const.h \
  C:/Users/12403756/git/es18aut13/Lab3/Generated_Code/IO_Map.h \
  ../Sources/LEDs.h ../Sources/UART.h ../Sources/FIFO.h \
- ../Sources/packet.h ../Sources/Flash.h ../Sources/PIT.h ../Sources/FTM.h
+ ../Sources/packet.h ../Sources/Flash.h ../Sources/PIT.h ../Sources/FTM.h \
+ ../Sources/RTC.h
 
 ../Sources/types.h:
 
@@ -50,3 +51,5 @@ C:/Users/12403756/git/es18aut13/Lab3/Generated_Code/IO_Map.h:
 ../Sources/PIT.h:
 
 ../Sources/FTM.h:
+
+../Sources/RTC.h:

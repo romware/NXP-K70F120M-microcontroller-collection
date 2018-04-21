@@ -45,6 +45,7 @@
 #include "PE_Types.h"
 #include "PIT.h"
 #include "FTM.h"
+#include "RTC.h"
 
 
 
@@ -61,6 +62,8 @@ const uint8_t COMMAND_NUM = 0x0B;
 const uint8_t COMMAND_PROGRAMBYTE = 0x07;
 const uint8_t COMMAND_READBYTE = 0x08;
 const uint8_t COMMAND_MODE = 0x0D;
+const uint8_t COMMAND_TIME = 0x0C;
+const uint8_t COMMAND_SETTIME = 0x0C;
 
 // Get and set bits of packet parameter 1
 const uint8_t PARAM_GET = 1;
@@ -178,6 +181,16 @@ bool HandleTowerMode(void)
   return false;
 }
 
+/*! @brief Sets the Real Time Clock time as requested by PC
+ *
+ *  @return bool - TRUE if Real Clock Time is set successfully
+ */
+bool HandleTowerSetTime(void)
+{
+  RTC_Set(Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
+  return true;
+}
+
 /*! @brief Executes the command depending on what packet has been received
  *
  *  @return void
@@ -219,6 +232,11 @@ void ReceivedPacket(void)
   {
     // Send tower read byte packet
     success = HandleTowerReadByte();
+  }
+  else if(commandIgnoreAck == COMMAND_SETTIME && Packet_Parameter1 < 24 && Packet_Parameter2 < 60 && Packet_Parameter3 < 60)
+  {
+    // Set the Real Time Clock time
+    success = HandleTowerSetTime();
   }
 
   // AND the packet command byte with the ACK MASK to check if ACK is requested
@@ -266,6 +284,21 @@ void FTMCallback(void* arg)
   LEDs_Off(LED_BLUE);
 }
 
+void RTCCallback(void* arg)
+{
+  // Toggle the yellow LED
+  LEDs_Toggle(LED_YELLOW);
+
+  // Declare variable for hours, minutes seconds
+  uint8_t hours, minutes, seconds;
+
+  // Get the current time values
+  RTC_Get(&hours, &minutes, &seconds);
+
+  // Send time to PC
+  Packet_Put(COMMAND_TIME, hours, minutes, seconds);
+}
+
 /*! @brief // Initializes the main tower components by calling the initialization routines of the supporting software modules.
  *
  *  @return void
@@ -277,7 +310,8 @@ bool TowerInit(void)
     LEDs_Init() &&
     Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) &&
     PIT_Init(CPU_BUS_CLK_HZ, PITCallback, NULL) &&
-    FTM_Init()
+    FTM_Init() &&
+    RTC_Init(RTCCallback, NULL)
   );
 }
 
@@ -333,7 +367,7 @@ int main(void)
   TFTMChannel temp;
 
       temp.channelNb = 0;
-      temp.delayCount = 24000;
+      temp.delayCount = 24414;
       temp.ioType.inputDetection = TIMER_INPUT_ANY;
       temp.ioType.outputAction = TIMER_OUTPUT_DISCONNECT;
       temp.timerFunction = TIMER_FUNCTION_OUTPUT_COMPARE;
