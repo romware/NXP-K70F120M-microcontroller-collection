@@ -1,11 +1,11 @@
-/*! @file
+/*! @file packet.h
  *
  *  @brief Routines to implement packet encoding and decoding for the serial port.
  *
  *  This contains the functions for implementing the "Tower to PC Protocol" 5-byte packets.
  *
- *  @author PMcL
- *  @date 2015-07-23
+ *  @author 12403756, 12551519
+ *  @date 2018-04-13
  */
 
 #ifndef PACKET_H

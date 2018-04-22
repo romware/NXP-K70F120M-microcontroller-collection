@@ -1,17 +1,24 @@
-/*
- * RTC.c
+/*! @file RTC.c
  *
- *  Created on: 21 Apr 2018
- *      Author: 12403756
+ *  @brief Routines for controlling the Real Time Clock (RTC) on the TWR-K70F120M.
+ *
+ *  This contains the functions for operating the real time clock (RTC).
+ *
+ *  @author 12403756, 12551519
+ *  @date 2018-04-13
  */
+/*!
+**  @addtogroup RTC_module RTC module documentation
+**  @{
+*/
+/* MODULE RTC */
 
 #include "RTC.h"
 #include "MK70F12.h"
 #include "Cpu.h"
 
-// Private global variables for interrupt routine
-static void (*UserFunction)(void*);
-static void* UserArguments;
+static void (*UserFunction)(void*); /*!< Callback functions for RTC */
+static void* UserArguments;         /*!< Callback parameters for RTC */
 
 /*! @brief Initializes the RTC before first use.
  *
@@ -30,9 +37,10 @@ bool RTC_Init(void (*userFunction)(void*), void* userArguments)
   // Ensure global interrupts are disabled
   EnterCritical();
 
-  // Address     | Vector | IRQ  | NVIC non-IPR register | NVIC IPR register | Source module | Source description
-  // 0x0000_014C | 83     | 67   | 2                     | 16                | RTC           | Seconds interrupt
-  // IRQ modulo 32 = 3
+  /* Address     | Vector | IRQ  | NVIC non-IPR register | NVIC IPR register | Source module | Source description
+   * 0x0000_014C | 83     | 67   | 2                     | 16                | RTC           | Seconds interrupt
+   * IRQ modulo 32 = 3
+   */
 
   // Clear any pending interrupts on FTM0
   NVICICPR2 |= (1 << 3);
@@ -120,7 +128,7 @@ void __attribute__ ((interrupt)) RTC_ISR(void)
   if (UserFunction)
   (*UserFunction)(UserArguments);
 }
-
-
-
-
+/* END RTC */
+/*!
+** @}
+*/

@@ -20,6 +20,8 @@
 ** @brief
 **         Main module.
 **         This module contains user's application code.
+** @author 12403756, 12551519
+** @date 2018-04-13
 */         
 /*!
 **  @addtogroup main_module main module documentation
@@ -27,8 +29,7 @@
 */         
 /* MODULE main */
 
-
-// Included .h files
+// Included header files
 #include "types.h"
 #include "Cpu.h"
 #include "Events.h"
@@ -47,37 +48,26 @@
 #include "FTM.h"
 #include "RTC.h"
 
+#define BAUD_RATE 115200                     /*!< UART2 Baud Rate */
 
+const uint32_t PERIOD_LED_GREEN = 500000000; /*!< Period of Periodic Interrupt Timer 0 in nanoseconds */
 
-// Baud rate
-#define BAUD_RATE 115200
+const uint8_t COMMAND_STARTUP     = 0x04;    /*!< The serial command byte for tower startup */
+const uint8_t COMMAND_VER         = 0x09;    /*!< The serial command byte for tower version */
+const uint8_t COMMAND_NUM         = 0x0B;    /*!< The serial command byte for tower number */
+const uint8_t COMMAND_PROGRAMBYTE = 0x07;    /*!< The serial command byte for tower program byte */
+const uint8_t COMMAND_READBYTE    = 0x08;    /*!< The serial command byte for tower read byte */
+const uint8_t COMMAND_MODE        = 0x0D;    /*!< The serial command byte for tower mode */
+const uint8_t COMMAND_TIME        = 0x0C;    /*!< The serial command byte for tower time */
 
-// Period of periodic interrupt timer 0 in nanoseconds
-const uint32_t PERIOD_LED_GREEN = 500000000;
+const uint8_t PARAM_GET = 1;                 /*!< Get bit of packet parameter 1 */
+const uint8_t PARAM_SET = 2;                 /*!< Set bit of packet parameter 1 */
 
-// Listed command bits of a packet
-const uint8_t COMMAND_STARTUP = 0x04;
-const uint8_t COMMAND_VER = 0x09;
-const uint8_t COMMAND_NUM = 0x0B;
-const uint8_t COMMAND_PROGRAMBYTE = 0x07;
-const uint8_t COMMAND_READBYTE = 0x08;
-const uint8_t COMMAND_MODE = 0x0D;
-const uint8_t COMMAND_TIME = 0x0C;
-const uint8_t COMMAND_SETTIME = 0x0C;
+const uint8_t TOWER_VER_MAJ = 1;             /*!< Tower major version */
+const uint8_t TOWER_VER_MIN = 0;             /*!< Tower minor version */
 
-// Get and set bits of packet parameter 1
-const uint8_t PARAM_GET = 1;
-const uint8_t PARAM_SET = 2;
-
-// Tower major version and minor version
-const uint8_t TOWER_VER_MAJ = 1;
-const uint8_t TOWER_VER_MIN = 0;
-
-// Tower number union pointer to flash
-volatile uint16union_t* NvTowerNb;
-
-// Tower mode union pointer to flash
-volatile uint16union_t* NvTowerMd;
+volatile uint16union_t* NvTowerNb;           /*!< Tower number union pointer to flash */
+volatile uint16union_t* NvTowerMd;           /*!< Tower mode union pointer to flash */
 
 
 /*! @brief Sends the startup packets to the PC
@@ -187,6 +177,7 @@ bool HandleTowerMode(void)
  */
 bool HandleTowerSetTime(void)
 {
+  // Sets the Real Time Clock
   RTC_Set(Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
   return true;
 }
@@ -197,10 +188,9 @@ bool HandleTowerSetTime(void)
  */
 void ReceivedPacket(void)
 {
-  // Initializes the success status of the received packet to false
-  bool success = false;
-  uint8_t commandIgnoreAck = Packet_Command & ~PACKET_ACK_MASK;
-  uint8_t commandAck = Packet_Command & PACKET_ACK_MASK;
+  bool success = false;                                         /*!< The success status of the received packet */
+  uint8_t commandIgnoreAck = Packet_Command & ~PACKET_ACK_MASK; /*!< The command byte ignoring the ACK mask */
+  uint8_t commandAck = Packet_Command & PACKET_ACK_MASK;        /*!< The command byte with the ACK mask */
 
   // AND the packet command byte with the bitwise inverse ACK MASK to ignore if ACK is requested
   if(commandIgnoreAck == COMMAND_STARTUP && Packet_Parameter1 == 0 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
@@ -233,7 +223,7 @@ void ReceivedPacket(void)
     // Send tower read byte packet
     success = HandleTowerReadByte();
   }
-  else if(commandIgnoreAck == COMMAND_SETTIME && Packet_Parameter1 < 24 && Packet_Parameter2 < 60 && Packet_Parameter3 < 60)
+  else if(commandIgnoreAck == COMMAND_TIME && Packet_Parameter1 < 24 && Packet_Parameter2 < 60 && Packet_Parameter3 < 60)
   {
     // Set the Real Time Clock time
     success = HandleTowerSetTime();
@@ -256,11 +246,11 @@ void ReceivedPacket(void)
   }
 
   // Reset the packet variables to 0
-  Packet_Command = 0;
+  Packet_Command    = 0;
   Packet_Parameter1 = 0;
   Packet_Parameter2 = 0;
   Packet_Parameter3 = 0;
-  Packet_Checksum = 0;
+  Packet_Checksum   = 0;
 }
 
 
@@ -299,7 +289,7 @@ void RTCCallback(void* arg)
   Packet_Put(COMMAND_TIME, hours, minutes, seconds);
 }
 
-/*! @brief // Initializes the main tower components by calling the initialization routines of the supporting software modules.
+/*! @brief Initializes the main tower components by calling the initialization routines of the supporting software modules.
  *
  *  @return void
  */
@@ -315,22 +305,61 @@ bool TowerInit(void)
   );
 }
 
+/*! @brief Sets the default or stored values of the tower
+ *
+ *  @return void
+ */
+bool TowerSet(void)
+{
+  // Set the periodic interrupt timer 0 to 500ms
+  PIT_Set(PERIOD_LED_GREEN, true);
+
+  // Allocates an address in Flash memory to the tower number and tower mode
+  if(Flash_AllocateVar((volatile void**)&NvTowerNb, sizeof(*NvTowerNb))
+  && Flash_AllocateVar((volatile void**)&NvTowerMd, sizeof(*NvTowerMd)));
+  {
+    // Success status of writing default values to Flash
+    bool success = true;
+
+    // Checks if tower number is clear
+    if(_FH(NvTowerNb) == 0xFFFF)
+    {
+      // Sets the tower number to the default number
+      if(!Flash_Write16((uint16_t*)NvTowerNb,(uint16_t)1519))
+      {
+        success = false;
+      }
+    }
+
+    // Checks if tower mode is clear
+    if(_FH(NvTowerMd) == 0xFFFF)
+    {
+      // Sets the tower mode to the default mode
+      if(!Flash_Write16((uint16_t*)NvTowerMd,(uint16_t)1))
+      {
+        success = false;
+      }
+    }
+
+    return success;
+  }
+  return false;
+}
+
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
 int main(void)
 /*lint -restore Enable MISRA rule (6.3) checking. */
 {
   /* Write your local variable definition here */
 
-  TFTMChannel receivedPacketTmr;
-  // Initialize for channel 0, 1 second (24414 cycles at 24414 Hz) output compare, output disconnect
-  receivedPacketTmr.channelNb = 0;
-  receivedPacketTmr.delayCount = 24414;
+  TFTMChannel receivedPacketTmr;          /*!< FTM Channel for received packet timer */
+  receivedPacketTmr.channelNb             = 0;
+  receivedPacketTmr.delayCount            = 24414;
   receivedPacketTmr.ioType.inputDetection = TIMER_INPUT_ANY;
-  receivedPacketTmr.ioType.outputAction = TIMER_OUTPUT_DISCONNECT;
-  receivedPacketTmr.timerFunction = TIMER_FUNCTION_OUTPUT_COMPARE;
-  receivedPacketTmr.userFunction = FTMCallbackCh0;
-  receivedPacketTmr.userArguments = NULL;
-
+  receivedPacketTmr.ioType.outputAction   = TIMER_OUTPUT_DISCONNECT;
+  receivedPacketTmr.timerFunction         = TIMER_FUNCTION_OUTPUT_COMPARE;
+  receivedPacketTmr.userFunction          = FTMCallbackCh0;
+  receivedPacketTmr.userArguments         = NULL;
 
   /*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
   PE_low_level_init();
@@ -338,43 +367,18 @@ int main(void)
 
   /* Write your code here */
 
-
   // Globally disable interrupts
   __DI();
 
   // Initializes the main tower components
   if(TowerInit())
   {
-    // Allocates an address in Flash memory to the tower number
-      //TODO: Check bools here.
-    Flash_AllocateVar((volatile void**)&NvTowerNb, sizeof(*NvTowerNb));
-
-    // Allocates an address in Flash memory to the tower mode
-    Flash_AllocateVar((volatile void**)&NvTowerMd, sizeof(*NvTowerMd));
-
-    // Checks if tower number is clear
-    if(_FH(NvTowerNb) == 0xFFFF)
+    // Sets the default or stored values of the main tower components
+    if(TowerSet() && FTM_Set(&receivedPacketTmr))
     {
-      // Sets the tower number to the default number
-	//TODO: Check bools here
-      Flash_Write16((uint16_t*)NvTowerNb,(uint16_t)1519);
+      // Turn on the orange LED to indicate the tower has initialized successfully
+      LEDs_On(LED_ORANGE);
     }
-
-    // Checks if tower mode is clear
-    if(_FH(NvTowerMd) == 0xFFFF)
-    {
-      // Sets the tower mode to the default mode
-      Flash_Write16((uint16_t*)NvTowerMd,(uint16_t)1);
-    }
-
-    // Set the periodic interrupt timer 0 to 500ms
-    PIT_Set(PERIOD_LED_GREEN, true);
-
-    // Set the received packet timer to 1 second
-    FTM_Set(&receivedPacketTmr);
-
-    // Turn on the orange LED to indicate the tower has initialized successfully
-    LEDs_On(LED_ORANGE);
   }
 
   // Globally enable interrupts
@@ -383,14 +387,16 @@ int main(void)
   // Send startup packets to PC
   HandleTowerStartup();
 
-  for (;;)
+  for(;;)
   {
-    // Check if packet has been received
+    // Check if a packet has been received
     if(Packet_Get())
     {
-      // Turn on the blue LED and start the 1 second timer
-      LEDs_On(LED_BLUE);
-      FTM_StartTimer(&receivedPacketTmr);
+      // Turn on the blue LED if the 1 second timer is set
+      if(FTM_StartTimer(&receivedPacketTmr))
+      {
+        LEDs_On(LED_BLUE);
+      }
 
       // Execute a command depending on what packet has been received
       ReceivedPacket();

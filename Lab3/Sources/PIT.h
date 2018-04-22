@@ -1,11 +1,11 @@
-/*! @file
+/*! @file PIT.h
  *
  *  @brief Routines for controlling Periodic Interrupt Timer (PIT) on the TWR-K70F120M.
  *
  *  This contains the functions for operating the periodic interrupt timer (PIT).
  *
- *  @author PMcL
- *  @date 2015-08-22
+ *  @author 12403756, 12551519
+ *  @date 2018-04-13
  */
 
 #ifndef PIT_H

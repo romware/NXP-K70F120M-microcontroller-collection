@@ -6,7 +6,6 @@
  *
  *  @author 12403756, 12551519
  *  @date 2018-04-13
- *  @modified 2018-04-13
  */
 
 #ifndef FLASH_H
@@ -22,18 +21,18 @@ static const uint8_t ERASE_FLASH_SECTOR = 0x09;
 // TFCCOB struct of containing the Flash command, address and 8 data bytes
 typedef struct
 {
-  uint8_t FCMD;
-  uint8_t flashAddress23to16;
-  uint8_t flashAddress15to08;
-  uint8_t flashAddress07to00;
-  uint8_t dataByte0;
-  uint8_t dataByte1;
-  uint8_t dataByte2;
-  uint8_t dataByte3;
-  uint8_t dataByte4;
-  uint8_t dataByte5;
-  uint8_t dataByte6;
-  uint8_t dataByte7;
+  uint8_t FCMD;                /*!< The TFCCOB command byte */
+  uint8_t flashAddress23to16;  /*!< The TFCCOB address higher byte */
+  uint8_t flashAddress15to08;  /*!< The TFCCOB address middle byte */
+  uint8_t flashAddress07to00;  /*!< The TFCCOB address lower byte */
+  uint8_t dataByte0;           /*!< The TFCCOB data byte 0 */
+  uint8_t dataByte1;           /*!< The TFCCOB data byte 1 */
+  uint8_t dataByte2;           /*!< The TFCCOB data byte 2 */
+  uint8_t dataByte3;           /*!< The TFCCOB data byte 3 */
+  uint8_t dataByte4;           /*!< The TFCCOB data byte 4 */
+  uint8_t dataByte5;           /*!< The TFCCOB data byte 5 */
+  uint8_t dataByte6;           /*!< The TFCCOB data byte 6 */
+  uint8_t dataByte7;           /*!< The TFCCOB data byte 7 */
 } TFCCOB;
 
 // FLASH data access

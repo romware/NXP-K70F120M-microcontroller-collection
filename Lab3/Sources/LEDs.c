@@ -6,11 +6,16 @@
  *
  *  @author 12403756, 12551519
  *  @date 2018-04-13
- *  @modified 2018-04-13
  */
+/*!
+**  @addtogroup LEDs_module LEDs module documentation
+**  @{
+*/
+/* MODULE LEDs */
 
 #include "MK70F12.h"
 #include "LEDs.h"
+
 /*! @brief Sets up the LEDs before first use.
  *
  *  @return bool - TRUE if the LEDs were successfully initialized.
@@ -80,4 +85,7 @@ void LEDs_Toggle(const TLED color)
   GPIOA_PTOR |= color;
 }
 
-
+/* END LEDs */
+/*!
+** @}
+*/

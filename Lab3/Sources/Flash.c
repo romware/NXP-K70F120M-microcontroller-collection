@@ -6,13 +6,13 @@
  *
  *  @author 12403756, 12551519
  *  @date 2018-04-13
- *  @modified 2018-04-13
  */
 /*!
-**  @addtogroup flash_module flash module documentation
+**  @addtogroup Flash_module Flash module documentation
 **  @{
 */
-/* MODULE flash */
+/* MODULE Flash */
+
 #include "MK70F12.h"
 #include "LEDs.h"
 #include "Flash.h"
@@ -274,33 +274,34 @@ static bool LaunchCommand(TFCCOB* commonCommandObject)
 static bool WritePhrase(const uint32_t address, const uint64union_t phrase)
 {
   // Erase Flash before writing
-  //TODO: Check that flash erase passed
-  Flash_Erase();
+  if(Flash_Erase())
+  {
+    // Initialize a local TFCCOB structure
+    TFCCOB commonCommandObject;
   
-  // Initialize a local TFCCOB structure
-  TFCCOB commonCommandObject;
+    // Set the FTFE command to program a phrase
+    commonCommandObject.FCMD = PROGRAM_PHRASE;
   
-  // Set the FTFE command to program a phrase
-  commonCommandObject.FCMD = PROGRAM_PHRASE;
+    // Set the FTFE flash address
+    commonCommandObject.flashAddress23to16 = ( (address >> 16) );
+    commonCommandObject.flashAddress15to08 = ( (address >>  8) );
+    commonCommandObject.flashAddress07to00 = ( (address >>  0) );
   
-  // Set the FTFE flash address
-  commonCommandObject.flashAddress23to16 = ( (address >> 16) );
-  commonCommandObject.flashAddress15to08 = ( (address >>  8) );
-  commonCommandObject.flashAddress07to00 = ( (address >>  0) );
-  
-  // Set the FTFE data bytes to be the phrase in big endian
-  commonCommandObject.dataByte0 = ( (phrase.l >> 56) );
-  commonCommandObject.dataByte1 = ( (phrase.l >> 48) );
-  commonCommandObject.dataByte2 = ( (phrase.l >> 40) );
-  commonCommandObject.dataByte3 = ( (phrase.l >> 32) );
+    // Set the FTFE data bytes to be the phrase in big endian
+    commonCommandObject.dataByte0 = ( (phrase.l >> 56) );
+    commonCommandObject.dataByte1 = ( (phrase.l >> 48) );
+    commonCommandObject.dataByte2 = ( (phrase.l >> 40) );
+    commonCommandObject.dataByte3 = ( (phrase.l >> 32) );
 
-  commonCommandObject.dataByte4 = ( (phrase.l >> 24) );
-  commonCommandObject.dataByte5 = ( (phrase.l >> 16) );
-  commonCommandObject.dataByte6 = ( (phrase.l >>  8) );
-  commonCommandObject.dataByte7 = ( (phrase.l >>  0) );
+    commonCommandObject.dataByte4 = ( (phrase.l >> 24) );
+    commonCommandObject.dataByte5 = ( (phrase.l >> 16) );
+    commonCommandObject.dataByte6 = ( (phrase.l >>  8) );
+    commonCommandObject.dataByte7 = ( (phrase.l >>  0) );
 
-  // Run the command to program the phrase
-  return LaunchCommand(&commonCommandObject);
+    // Run the command to program the phrase
+    return LaunchCommand(&commonCommandObject);
+  }
+  return false;
 }
 
 /*! @brief Erases a sector of Flash memory
@@ -325,7 +326,8 @@ static bool EraseSector(const uint32_t address)
   // Run the command to erase the flash sector
   return LaunchCommand(&commonCommandObject);
 }
-/* END flash */
+
+/* END Flash */
 /*!
 ** @}
 */

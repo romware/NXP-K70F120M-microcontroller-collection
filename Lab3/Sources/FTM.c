@@ -1,16 +1,24 @@
-/*
- * FTM.c
+/*! @file FTM.c
  *
- *  Created on: 15 Apr 2018
- *      Author: 12403756
+ *  @brief Routines for setting up the FlexTimer module (FTM) on the TWR-K70F120M.
+ *
+ *  This contains the functions for operating the FlexTimer module (FTM).
+ *
+ *  @author 12403756, 12551519
+ *  @date 2018-04-13
  */
+/*!
+**  @addtogroup FTM_module FTM module documentation
+**  @{
+*/
+/* MODULE FTM */
+
 #include "FTM.h"
 #include "MK70F12.h"
 #include "Cpu.h"
 
-// Private global variable arrays to store parameters for channels 0-7 of FTM0
-static void (*UserFunction[8])(void*);
-static void* UserArguments[8];
+static void (*UserFunction[8])(void*); /*!< Array to store callback functions for channels 0-7 of FTM0 */
+static void* UserArguments[8];         /*!< Array to store callback parameters for channels 0-7 of FTM0 */
 
 /*! @brief Sets up the FTM before first use.
  *
@@ -22,9 +30,10 @@ bool FTM_Init()
   // Ensure global interrupts are disabled
   EnterCritical();
 
-  // Address     | Vector | IRQ  | NVIC non-IPR register | NVIC IPR register | Source module | Source description
-  // 0x0000_0138 | 78     | 62   | 1                     | 15                | FTM0          | Single interrupt vector for all sources
-  // IRQ modulo 32 = 30
+  /* Address     | Vector | IRQ  | NVIC non-IPR register | NVIC IPR register | Source module | Source description
+   * 0x0000_0138 | 78     | 62   | 1                     | 15                | FTM0          | Single interrupt vector for all sources
+   * IRQ modulo 32 = 30
+   */
 
   // Clear any pending interrupts on FTM0
   NVICICPR1 |= (1 << 30);
@@ -89,22 +98,26 @@ bool FTM_Set(const TFTMChannel* const aFTMChannel)
   FTM0_MODE |= FTM_MODE_WPDIS_MASK;
 
   // Create 2 bit mask for Mode Select A and Mode select B to AND with the input detection bits
-  FTM0_CnSC(aFTMChannel->channelNb) |= (FTM_CnSC_MSA_MASK | FTM_CnSC_MSA_MASK) & (aFTMChannel->timerFunction << FTM_CnSC_MSA_SHIFT);
+  FTM0_CnSC(aFTMChannel->channelNb) |= (FTM_CnSC_MSA_MASK | FTM_CnSC_MSB_MASK)
+  & (aFTMChannel->timerFunction << FTM_CnSC_MSA_SHIFT);
 
   // Check if timer function is an input capture or output compare
   if(aFTMChannel->timerFunction == TIMER_FUNCTION_INPUT_CAPTURE)
   {
     // Create 2 bit mask for ELS LSB and MSB to AND with the input detection bits
-    FTM0_CnSC(aFTMChannel->channelNb) |= (FTM_CnSC_ELSA_MASK | FTM_CnSC_ELSB_MASK) & (aFTMChannel->ioType.inputDetection << FTM_CnSC_ELSA_SHIFT);
+    FTM0_CnSC(aFTMChannel->channelNb) |= (FTM_CnSC_ELSA_MASK | FTM_CnSC_ELSB_MASK)
+    & (aFTMChannel->ioType.inputDetection << FTM_CnSC_ELSA_SHIFT);
   }
   else if (aFTMChannel->timerFunction == TIMER_FUNCTION_OUTPUT_COMPARE)
   {
     // Create 2 bit mask for ELS LSB and MSB to AND with the output action bits
-    FTM0_CnSC(aFTMChannel->channelNb) |= (FTM_CnSC_ELSA_MASK | FTM_CnSC_ELSB_MASK) & (aFTMChannel->ioType.outputAction << FTM_CnSC_ELSB_SHIFT);
+    FTM0_CnSC(aFTMChannel->channelNb) |= (FTM_CnSC_ELSA_MASK | FTM_CnSC_ELSB_MASK)
+    & (aFTMChannel->ioType.outputAction << FTM_CnSC_ELSB_SHIFT);
   }
 
   // Return to write protect mode
   FTM0_MODE &= ~FTM_MODE_WPDIS_MASK;
+
   return true;
 }
 
@@ -152,3 +165,7 @@ void __attribute__ ((interrupt)) FTM0_ISR(void)
       }
     }
 }
+/* END FTM */
+/*!
+** @}
+*/

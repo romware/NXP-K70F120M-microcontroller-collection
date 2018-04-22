@@ -1,18 +1,25 @@
-/*
- * PIT.c
+/*! @file PIT.c
  *
- *  Created on: 15 Apr 2018
- *      Author: 12403756
+ *  @brief Routines for controlling Periodic Interrupt Timer (PIT) on the TWR-K70F120M.
+ *
+ *  This contains the functions for operating the periodic interrupt timer (PIT).
+ *
+ *  @author 12403756, 12551519
+ *  @date 2018-04-13
  */
-//TODO: file headings and Doxygen for all modules
+/*!
+**  @addtogroup PIT_module PIT module documentation
+**  @{
+*/
+/* MODULE PIT */
+
 #include "PIT.h"
 #include "MK70F12.h"
 #include "Cpu.h"
 
-// Private global variable for PIT
-static uint32_t ModuleClk;
-static void (*UserFunction)(void*);
-static void* UserArguments;
+static uint32_t ModuleClk;          /*!< Module Clock */
+static void (*UserFunction)(void*); /*!< Callback functions for PIT */
+static void* UserArguments;         /*!< Callback parameters for PIT */
 
 /*! @brief Sets up the PIT before first use.
  *
@@ -36,9 +43,10 @@ bool PIT_Init(const uint32_t moduleClk, void (*userFunction)(void*), void* userA
   // Ensure global interrupts are disabled
   EnterCritical();
 
-  // Address     | Vector | IRQ  | NVIC non-IPR register | NVIC IPR register | Source module | Source description
-  // 0x0000_0150 | 84     | 68   | 2                     | 17                | PIT           | Channel 0
-  // IRQ modulo 32 = 4
+  /* Address     | Vector | IRQ  | NVIC non-IPR register | NVIC IPR register | Source module | Source description
+   * 0x0000_0150 | 84     | 68   | 2                     | 17                | PIT           | Channel 0
+   * IRQ modulo 32 = 4
+   */
 
   // Enable PIT module in PIT_MCR
   PIT_MCR &= ~PIT_MCR_MDIS_MASK;
@@ -67,7 +75,7 @@ bool PIT_Init(const uint32_t moduleClk, void (*userFunction)(void*), void* userA
  */
 void PIT_Set(const uint32_t period, const bool restart)
 {
-  // Calculate nano seconds per tick
+  // Calculate nanoseconds per tick
   uint32_t nanoSecondPerTick = 1000000000 / ModuleClk;
 
   // Calculate timer load value
@@ -125,3 +133,8 @@ void __attribute__ ((interrupt)) PIT_ISR(void)
   if (UserFunction)
    (*UserFunction)(UserArguments);
 }
+
+/* END PIT */
+/*!
+** @}
+*/

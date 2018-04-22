@@ -6,17 +6,20 @@
  *
  *  @author 12403756, 12551519
  *  @date 2018-04-13
- *  @modified 2018-04-13
  */
+/*!
+**  @addtogroup packet_module packet module documentation
+**  @{
+*/
+/* MODULE packet */
 
 #include "types.h"
 #include "UART.h"
 #include "packet.h"
 
-// Bit 7 of byte set to 1
-const uint8_t PACKET_ACK_MASK = 0x80;
+const uint8_t PACKET_ACK_MASK = 0x80; /*!< Bit 7 of byte set to 1 */
 
-TPacket Packet;
+TPacket Packet;                       /*!< Packet structure */
 
 /*! @brief Initializes the packets by calling the initialization routines of the supporting software modules.
  *
@@ -74,3 +77,7 @@ bool Packet_Put(const uint8_t command, const uint8_t parameter1, const uint8_t p
     UART_OutChar(checksum)
   );
 }
+/* END packet */
+/*!
+** @}
+*/

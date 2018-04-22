@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.10"/>
-<title>Lab3: C:/Users/12403756/git/es18aut13/Lab3/sources/UART.c File Reference</title>
+<title>Lab3: C:/Users/12403756/git/12403756/Lab3/sources/UART.c File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -78,154 +78,43 @@ $(document).ready(function(){initNavTree('_u_a_r_t_8c.html','');});
 <div class="textblock"><code>#include &quot;<a class="el" href="_u_a_r_t_8h_source.html">UART.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="_f_i_f_o_8h_source.html">FIFO.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="_m_k70_f12_8h_source.html">MK70F12.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_p_e___types_8h_source.html">PE_Types.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_cpu_8h_source.html">Cpu.h</a>&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ae5760d1a086ec79a33901db253000af9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_u_a_r_t_8c.html#ae5760d1a086ec79a33901db253000af9">UART_Init</a> (const uint32_t baudRate, const uint32_t moduleClk)</td></tr>
-<tr class="memdesc:ae5760d1a086ec79a33901db253000af9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the UART interface before first use.  <a href="#ae5760d1a086ec79a33901db253000af9">More...</a><br /></td></tr>
-<tr class="separator:ae5760d1a086ec79a33901db253000af9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03049bcc3bf9af2a75ee77016d3b0d60"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_u_a_r_t_8c.html#a03049bcc3bf9af2a75ee77016d3b0d60">UART_InChar</a> (uint8_t *const dataPtr)</td></tr>
-<tr class="memdesc:a03049bcc3bf9af2a75ee77016d3b0d60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a character from the receive FIFO if it is not empty.  <a href="#a03049bcc3bf9af2a75ee77016d3b0d60">More...</a><br /></td></tr>
-<tr class="separator:a03049bcc3bf9af2a75ee77016d3b0d60"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab20ebaeefd1f29d31e098ade31189dda"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_u_a_r_t_8c.html#ab20ebaeefd1f29d31e098ade31189dda">UART_OutChar</a> (const uint8_t data)</td></tr>
-<tr class="memdesc:ab20ebaeefd1f29d31e098ade31189dda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Put a byte in the transmit FIFO if it is not full.  <a href="#ab20ebaeefd1f29d31e098ade31189dda">More...</a><br /></td></tr>
-<tr class="separator:ab20ebaeefd1f29d31e098ade31189dda"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a445500277ba0e363873b34cffc015745"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_u_a_r_t_8c.html#a445500277ba0e363873b34cffc015745">__attribute__</a> ((interrupt))</td></tr>
-<tr class="memdesc:a445500277ba0e363873b34cffc015745"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupt service routine for the UART.  <a href="#a445500277ba0e363873b34cffc015745">More...</a><br /></td></tr>
-<tr class="separator:a445500277ba0e363873b34cffc015745"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae5760d1a086ec79a33901db253000af9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t__module.html#gae5760d1a086ec79a33901db253000af9">UART_Init</a> (const uint32_t baudRate, const uint32_t moduleClk)</td></tr>
+<tr class="memdesc:gae5760d1a086ec79a33901db253000af9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the UART interface before first use.  <a href="group___u_a_r_t__module.html#gae5760d1a086ec79a33901db253000af9">More...</a><br /></td></tr>
+<tr class="separator:gae5760d1a086ec79a33901db253000af9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga03049bcc3bf9af2a75ee77016d3b0d60"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t__module.html#ga03049bcc3bf9af2a75ee77016d3b0d60">UART_InChar</a> (uint8_t *const dataPtr)</td></tr>
+<tr class="memdesc:ga03049bcc3bf9af2a75ee77016d3b0d60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a character from the receive FIFO if it is not empty.  <a href="group___u_a_r_t__module.html#ga03049bcc3bf9af2a75ee77016d3b0d60">More...</a><br /></td></tr>
+<tr class="separator:ga03049bcc3bf9af2a75ee77016d3b0d60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab20ebaeefd1f29d31e098ade31189dda"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t__module.html#gab20ebaeefd1f29d31e098ade31189dda">UART_OutChar</a> (const uint8_t data)</td></tr>
+<tr class="memdesc:gab20ebaeefd1f29d31e098ade31189dda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Put a byte in the transmit FIFO if it is not full.  <a href="group___u_a_r_t__module.html#gab20ebaeefd1f29d31e098ade31189dda">More...</a><br /></td></tr>
+<tr class="separator:gab20ebaeefd1f29d31e098ade31189dda"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga445500277ba0e363873b34cffc015745"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t__module.html#ga445500277ba0e363873b34cffc015745">__attribute__</a> ((interrupt))</td></tr>
+<tr class="memdesc:ga445500277ba0e363873b34cffc015745"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupt service routine for the UART.  <a href="group___u_a_r_t__module.html#ga445500277ba0e363873b34cffc015745">More...</a><br /></td></tr>
+<tr class="separator:ga445500277ba0e363873b34cffc015745"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a57a6bee2e32f83a4a1b52c99299794b8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a57a6bee2e32f83a4a1b52c99299794b8"></a>
-<a class="el" href="struct_t_f_i_f_o.html">TFIFO</a>&#160;</td><td class="memItemRight" valign="bottom"><b>RxFIFO</b></td></tr>
-<tr class="separator:a57a6bee2e32f83a4a1b52c99299794b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abfc40789d380623f1ba598e006927b5e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abfc40789d380623f1ba598e006927b5e"></a>
-<a class="el" href="struct_t_f_i_f_o.html">TFIFO</a>&#160;</td><td class="memItemRight" valign="bottom"><b>TxFIFO</b></td></tr>
-<tr class="separator:abfc40789d380623f1ba598e006927b5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga57a6bee2e32f83a4a1b52c99299794b8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_t_f_i_f_o.html">TFIFO</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t__module.html#ga57a6bee2e32f83a4a1b52c99299794b8">RxFIFO</a></td></tr>
+<tr class="separator:ga57a6bee2e32f83a4a1b52c99299794b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gabfc40789d380623f1ba598e006927b5e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_t_f_i_f_o.html">TFIFO</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t__module.html#gabfc40789d380623f1ba598e006927b5e">TxFIFO</a></td></tr>
+<tr class="separator:gabfc40789d380623f1ba598e006927b5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>I/O routines for UART communications on the TWR-K70F120M. </p>
 <p>This contains the functions for operating the UART (serial port).</p>
 <dl class="section author"><dt>Author</dt><dd>12403756, 12551519 </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>2018-04-13  2018-04-13 </dd></dl>
-</div><h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="a445500277ba0e363873b34cffc015745"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void __attribute__ </td>
-          <td>(</td>
-          <td class="paramtype">(interrupt)&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Interrupt service routine for the UART. </p>
-<p>Interrupt service routine for the RTC.</p>
-<p>Interrupt service routine for the PIT.</p>
-<p>Interrupt service routine for the FTM.</p>
-<dl class="section note"><dt>Note</dt><dd>Assumes the transmit and receive FIFOs have been initialized. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a03049bcc3bf9af2a75ee77016d3b0d60"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool UART_InChar </td>
-          <td>(</td>
-          <td class="paramtype">uint8_t *const&#160;</td>
-          <td class="paramname"><em>dataPtr</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get a character from the receive FIFO if it is not empty. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">dataPtr</td><td>A pointer to memory to store the retrieved byte. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>bool - TRUE if the receive FIFO returned a character. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Assumes that UART_Init has been called. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ae5760d1a086ec79a33901db253000af9"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool UART_Init </td>
-          <td>(</td>
-          <td class="paramtype">const uint32_t&#160;</td>
-          <td class="paramname"><em>baudRate</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const uint32_t&#160;</td>
-          <td class="paramname"><em>moduleClk</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Sets up the UART interface before first use. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">baudRate</td><td>The desired baud rate in bits/sec. </td></tr>
-    <tr><td class="paramname">moduleClk</td><td>The module clock rate in Hz </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>bool - TRUE if the UART was successfully initialized. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ab20ebaeefd1f29d31e098ade31189dda"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool UART_OutChar </td>
-          <td>(</td>
-          <td class="paramtype">const uint8_t&#160;</td>
-          <td class="paramname"><em>data</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Put a byte in the transmit FIFO if it is not full. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">data</td><td>The byte to be placed in the transmit FIFO. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>bool - TRUE if the data was placed in the transmit FIFO. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Assumes that UART_Init has been called. </dd></dl>
-
-</div>
-</div>
-</div><!-- contents -->
+<dl class="section date"><dt>Date</dt><dd>2018-04-13 </dd></dl>
+</div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_08d237fc27d4ecd563f71c5d52f2fecc.html">sources</a></li><li class="navelem"><a class="el" href="_u_a_r_t_8c.html">UART.c</a></li>
-    <li class="footer">Generated on Fri Apr 20 2018 18:17:29 for Lab3 by
+    <li class="footer">Generated on Sun Apr 22 2018 13:39:14 for Lab3 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

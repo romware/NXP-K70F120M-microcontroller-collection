@@ -9,9 +9,9 @@ var packet_8h =
     [ "Packet_Parameter2", "packet_8h.html#a45a05df635f3e5b1395d008f1901a4d1", null ],
     [ "Packet_Parameter23", "packet_8h.html#a59d544f3e4a53730d58061ec7203f7ed", null ],
     [ "Packet_Parameter3", "packet_8h.html#a625e727e1e36680f574a360bc3747695", null ],
-    [ "Packet_Get", "packet_8h.html#ac58a17928cd5e556e1567b2fde9f88f0", null ],
-    [ "Packet_Init", "packet_8h.html#a414aa3f521fdfd6e4586d98a946b6ab2", null ],
-    [ "Packet_Put", "packet_8h.html#a431a1e1da25a8214a502ec81f88fc3f1", null ],
-    [ "Packet", "packet_8h.html#ac74c1cf77ae5807a61baefd6df20201e", null ],
-    [ "PACKET_ACK_MASK", "packet_8h.html#a5faca24c448374dc4656ebc31afcae0b", null ]
+    [ "Packet_Get", "group__packet__module.html#gac58a17928cd5e556e1567b2fde9f88f0", null ],
+    [ "Packet_Init", "group__packet__module.html#ga414aa3f521fdfd6e4586d98a946b6ab2", null ],
+    [ "Packet_Put", "group__packet__module.html#ga431a1e1da25a8214a502ec81f88fc3f1", null ],
+    [ "Packet", "group__packet__module.html#gac74c1cf77ae5807a61baefd6df20201e", null ],
+    [ "PACKET_ACK_MASK", "group__packet__module.html#ga5faca24c448374dc4656ebc31afcae0b", null ]
 ];

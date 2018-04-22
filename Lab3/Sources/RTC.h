@@ -1,11 +1,11 @@
-/*! @file
+/*! @file RTC.h
  *
  *  @brief Routines for controlling the Real Time Clock (RTC) on the TWR-K70F120M.
  *
  *  This contains the functions for operating the real time clock (RTC).
  *
- *  @author PMcL
- *  @date 2015-08-24
+ *  @author 12403756, 12551519
+ *  @date 2018-04-13
  */
 
 #ifndef RTC_H

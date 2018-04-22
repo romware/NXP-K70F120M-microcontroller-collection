@@ -6,8 +6,12 @@
  *
  *  @author 12403756, 12551519
  *  @date 2018-04-13
- *  @modified 2018-04-13
  */
+/*!
+**  @addtogroup FIFO_module FIFO module documentation
+**  @{
+*/
+/* MODULE FIFO */
 
 // new types
 #include "FIFO.h"
@@ -93,3 +97,8 @@ bool FIFO_Get(TFIFO * const FIFO, uint8_t * const dataPtr)
   }
   return false;
 }
+
+/* END FIFO */
+/*!
+** @}
+*/

@@ -6,8 +6,12 @@
  *
  *  @author 12403756, 12551519
  *  @date 2018-04-13
- *  @modified 2018-04-13
  */
+/*!
+**  @addtogroup UART_module UART module documentation
+**  @{
+*/
+/* MODULE UART */
 
 #include "UART.h"
 #include "FIFO.h"
@@ -15,8 +19,8 @@
 #include "PE_Types.h"
 #include "Cpu.h"
 
-// Receive and transmit FIFOs
-TFIFO RxFIFO, TxFIFO; /*!< comment here */
+TFIFO RxFIFO; /*!< The Receive FIFO */
+TFIFO TxFIFO; /*!< The Transmit FIFO */
 
 /*! @brief Sets up the UART interface before first use.
  *
@@ -151,8 +155,7 @@ void __attribute__ ((interrupt)) UART_ISR(void)
     }
   }
 }
-
-
-
-
-
+/* END UART */
+/*!
+** @}
+*/

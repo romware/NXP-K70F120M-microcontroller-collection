@@ -1,11 +1,11 @@
-/*! @file
+/*! @file FTM.h
  *
  *  @brief Routines for setting up the FlexTimer module (FTM) on the TWR-K70F120M.
  *
  *  This contains the functions for operating the FlexTimer module (FTM).
  *
- *  @author PMcL
- *  @date 2015-09-04
+ *  @author 12403756, 12551519
+ *  @date 2018-04-13
  */
 
 #ifndef FTM_H

@@ -1,11 +1,11 @@
-/*! @file
+/*! @file LEDs.h
  *
  *  @brief Routines to access the LEDs on the TWR-K70F120M.
  *
  *  This contains the functions for operating the LEDs.
  *
- *  @author PMcL
- *  @date 2015-08-15
+ *  @author 12403756, 12551519
+ *  @date 2018-04-13
  */
 
 #ifndef LEDS_H
