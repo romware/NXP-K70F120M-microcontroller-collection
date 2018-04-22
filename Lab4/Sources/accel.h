@@ -1,11 +1,11 @@
-/*! @file
+/*! @file accel.h
  *
  *  @brief HAL for the accelerometer.
  *
  *  This contains the functions for interfacing to the MMA8451Q accelerometer.
  *
- *  @author PMcL
- *  @date 2015-10-06
+ *  @author 12403756, 12551519
+ *  @date 2018-04-13
  */
 
 #ifndef ACCEL_H

@@ -1,11 +1,11 @@
-/*! @file
+/*! @file I2C.h
  *
  *  @brief I/O routines for the K70 I2C interface.
  *
  *  This contains the functions for operating the I2C (inter-integrated circuit) module.
  *
- *  @author PMcL
- *  @date 2015-09-17
+ *  @author 12403756, 12551519
+ *  @date 2018-04-13
  */
 
 #ifndef I2C_H

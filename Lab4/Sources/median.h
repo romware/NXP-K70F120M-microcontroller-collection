@@ -1,11 +1,11 @@
-/*! @file
+/*! @file median.h
  *
  *  @brief Median filter.
  *
  *  This contains the functions for performing a median filter on byte-sized data.
  *
- *  @author PMcL
- *  @date 2015-10-12
+ *  @author 12403756, 12551519
+ *  @date 2018-04-13
  */
 
 #ifndef MEDIAN_H

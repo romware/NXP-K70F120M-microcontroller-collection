@@ -12,7 +12,9 @@ C_SRCS += \
 ../Sources/PIT.c \
 ../Sources/RTC.c \
 ../Sources/UART.c \
+../Sources/accel.c \
 ../Sources/main.c \
+../Sources/median.c \
 ../Sources/packet.c 
 
 OBJS += \
@@ -24,7 +26,9 @@ OBJS += \
 ./Sources/PIT.o \
 ./Sources/RTC.o \
 ./Sources/UART.o \
+./Sources/accel.o \
 ./Sources/main.o \
+./Sources/median.o \
 ./Sources/packet.o 
 
 C_DEPS += \
@@ -36,7 +40,9 @@ C_DEPS += \
 ./Sources/PIT.d \
 ./Sources/RTC.d \
 ./Sources/UART.d \
+./Sources/accel.d \
 ./Sources/main.d \
+./Sources/median.d \
 ./Sources/packet.d 
 
 
@@ -44,7 +50,7 @@ C_DEPS += \
 Sources/%.o: ../Sources/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: Cross ARM C Compiler'
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O0 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g3 -I"C:/Users/12403756/git/12403756/Lab3/Static_Code/IO_Map" -I"C:/Users/12403756/git/12403756/Lab3/Sources" -I"C:/Users/12403756/git/12403756/Lab3/Generated_Code" -std=c99 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -c -o "$@" "$<"
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O0 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g3 -I"C:/Users/12403756/git/es18aut13/Lab4/Static_Code/IO_Map" -I"C:/Users/12403756/git/es18aut13/Lab4/Sources" -I"C:/Users/12403756/git/es18aut13/Lab4/Generated_Code" -std=c99 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -c -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

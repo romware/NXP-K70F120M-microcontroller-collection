@@ -47,6 +47,9 @@
 #include "PIT.h"
 #include "FTM.h"
 #include "RTC.h"
+#include "accel.h"
+#include "I2C.h"
+#include "median.h"
 
 #define BAUD_RATE 115200                     /*!< UART2 Baud Rate */
 
@@ -386,6 +389,18 @@ int main(void)
 
   // Send startup packets to PC
   HandleTowerStartup();
+
+  uint8_t temp = Median_Filter3(10,11,6);
+
+  temp = Median_Filter3(1,2,3);
+
+  temp = Median_Filter3(50,40,0);
+
+  temp = Median_Filter3(22,22,2);
+
+  temp = Median_Filter3(2,22,22);
+
+  temp = Median_Filter3(22,2,22);
 
   for(;;)
   {
