@@ -257,7 +257,7 @@ void ReceivedPacket(void)
 }
 
 
-/*! @brief Toggles the green LED every time it is called
+/*! @brief Toggles the green LED every time it is called  // TODO: send packet for XYZ
  *
  *  @return void
  */
@@ -277,7 +277,27 @@ void FTMCallbackCh0(void* arg)
   LEDs_Off(LED_BLUE);
 }
 
+/*! @brief Toggles the yellow LED and reads the current time to send to the PC
+ *
+ *  @return void
+ */
 void RTCCallback(void* arg)
+{
+  // Toggle the yellow LED
+  LEDs_Toggle(LED_YELLOW);
+
+  // Declare variable for hours, minutes seconds
+  uint8_t hours, minutes, seconds;
+
+  // Get the current time values
+  RTC_Get(&hours, &minutes, &seconds);
+
+  // Send time to PC
+  Packet_Put(COMMAND_TIME, hours, minutes, seconds);
+}
+
+//TODO: write brief // send packet for XYZ
+void AccelCallback(void* arg)
 {
   // Toggle the yellow LED
   LEDs_Toggle(LED_YELLOW);

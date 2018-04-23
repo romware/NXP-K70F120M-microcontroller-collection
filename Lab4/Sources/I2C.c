@@ -16,9 +16,57 @@
 #include "I2C.h"
 #include "MK70F12.h"
 #include "Cpu.h"
+#include "PE_Types.h"
+
+static void StartCondition();
+static void StopCondition();
+static void WaitCondition();
+static void BusyCondition();
+static void RepeatCondition();
 
 static void (*ReadCompleteCallbackFunction)(void*);  /*!<  Callback functions for I2C. */
 static void* ReadCompleteCallbackArguments;          /*!< Callback parameters for I2C. */
+
+static const uint8_t SlaveDeviceAddress = 0x1D;
+
+/*! @brief Start condition on I2C Bus
+ */
+static void StartCondition()
+{
+  I2C0_C1 |= I2C_C1_MST_MASK;
+  I2C0_C1 |= I2C_C1_TX_MASK;
+}
+
+/*! @brief Stop condition on I2C Bus
+ */
+static void StopCondition()
+{
+  I2C0_C1 &= ~I2C_C1_MST_MASK;
+}
+
+/*! @brief Wait condition on I2C Bus
+ */
+static void WaitCondition()
+{
+  while(I2C0_S & ~I2C_S_IICIF_MASK) {}
+  I2C0_S = I2C_S_IICIF_MASK;
+}
+
+/*! @brief Wait while busy condition on I2C Bus
+ */
+static void BusyCondition()
+{
+  while(I2C0_S & I2C_S_BUSY_MASK) {}
+}
+
+/*! @brief Repeat Start condition on I2C Bus
+ */
+static void RepeatCondition()
+{
+  I2C0_C1 |= I2C_C1_MST_MASK;
+  I2C0_C1 |= I2C_C1_TX_MASK;
+  I2C0_C1 |= I2C_C1_RSTA_MASK;
+}
 
 /*! @brief Sets up the I2C before first use.
  *
@@ -69,9 +117,6 @@ bool I2C_Init(const TI2CModule* const aI2CModule, const uint32_t moduleClk)
   I2C0_F = I2C_F_MULT(0x2);
   I2C0_F = I2C_F_ICR(0x12);
 
-  // Enable I2C Master Mode Select
-  I2C0_C1 |= I2C_C1_MST_MASK;
-
   // Set I2C Enable
   I2C0_C1 |= I2C_C1_IICEN_MASK;
 
@@ -85,7 +130,8 @@ bool I2C_Init(const TI2CModule* const aI2CModule, const uint32_t moduleClk)
  */
 void I2C_SelectSlaveDevice(const uint8_t slaveAddress)
 {
-
+  // select slave address
+  // set mode
 }
 
 /*! @brief Write a byte of data to a specified register
@@ -95,7 +141,23 @@ void I2C_SelectSlaveDevice(const uint8_t slaveAddress)
  */
 void I2C_Write(const uint8_t registerAddress, const uint8_t data)
 {
+  BusyCondition();
 
+  StartCondition();
+
+  I2C0_D = SlaveDeviceAddress << 1;
+
+  WaitCondition();
+
+  I2C0_D = registerAddress;
+
+  WaitCondition();
+
+  I2C0_D = data;
+
+  WaitCondition();
+
+  StopCondition();
 }
 
 /*! @brief Reads data of a specified length starting from a specified register
@@ -131,5 +193,5 @@ void I2C_IntRead(const uint8_t registerAddress, uint8_t* const data, const uint8
 void __attribute__ ((interrupt)) I2C_ISR(void)
 {
   if (ReadCompleteCallbackFunction)
-  (*ReadCompleteCallbackFunction)(ReadCompleteCallbackArguments);
+    (*ReadCompleteCallbackFunction)(ReadCompleteCallbackArguments);
 }

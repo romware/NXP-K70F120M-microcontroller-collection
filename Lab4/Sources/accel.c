@@ -31,6 +31,11 @@
 
 // Accelerometer registers
 #define ADDRESS_OUT_X_MSB 0x01
+#define ADDRESS_OUT_X_LSB 0x02
+#define ADDRESS_OUT_Y_MSB 0x03
+#define ADDRESS_OUT_Y_LSB 0x04
+#define ADDRESS_OUT_Z_MSB 0x05
+#define ADDRESS_OUT_Z_LSB 0x06
 
 #define ADDRESS_INT_SOURCE 0x0C
 
@@ -182,6 +187,72 @@ static union
 #define CTRL_REG5_INT_CFG_TRANS		CTRL_REG5_Union.bits.INT_CFG_TRANS
 #define CTRL_REG5_INT_CFG_FIFO		CTRL_REG5_Union.bits.INT_CFG_FIFO
 #define CTRL_REG5_INT_CFG_ASLP		CTRL_REG5_Union.bits.INT_CFG_ASLP
+
+static void (*UserFunction)(void*); /*!< Callback functions for accel */
+static void* UserArguments;         /*!< Callback parameters for accel */
+
+/*! @brief Initializes the accelerometer by calling the initialization routines of the supporting software modules.
+ *
+ *  @param accelSetup is a pointer to an accelerometer setup structure.
+ *  @return bool - TRUE if the accelerometer module was successfully initialized.
+ */
+bool Accel_Init(const TAccelSetup* const accelSetup)
+{
+  TI2CModule aTI2CModule;
+  aTI2CModule.baudRate = accelSetup->moduleClk;
+  aTI2CModule.primarySlaveAddress = 0x1D;
+  aTI2CModule.readCompleteCallbackFunction = accelSetup->readCompleteCallbackFunction;
+  aTI2CModule.readCompleteCallbackArguments = accelSetup->readCompleteCallbackArguments;
+
+  UserFunction = accelSetup->dataReadyCallbackFunction;
+  UserArguments = accelSetup->dataReadyCallbackArguments;
+
+  I2C_Init(&aTI2CModule, accelSetup->moduleClk);
+
+  Accel_SetMode(ACCEL_POLL);
+
+}
+
+/*! @brief Reads X, Y and Z accelerations.
+ *  @param data is a an array of 3 bytes where the X, Y and Z data are stored.
+ */
+void Accel_ReadXYZ(uint8_t data[3])
+{
+  I2C_PollRead(ADDRESS_OUT_X_MSB, data[0], 1);
+  I2C_PollRead(ADDRESS_OUT_Y_MSB, data[1], 1);
+  I2C_PollRead(ADDRESS_OUT_Z_MSB, data[2], 1);
+}
+
+/*! @brief Set the mode of the accelerometer.
+ *  @param mode specifies either polled or interrupt driven operation.
+ */
+void Accel_SetMode(const TAccelMode mode)
+{
+  // If poll, use 1 sec pit and call readxyz. and check if xyz changed
+  // If INT, set up 1.56 Hz DRDY interrupt in Reg5
+  if(mode == ACCEL_POLL)
+  {
+    I2C_Write(ADDRESS_CTRL_REG4, CTRL_REG4 & ~CTRL_REG4_INT_EN_DRDY);
+  }
+  else if(mode == ACCEL_INT)
+  {
+    I2C_Write(ADDRESS_CTRL_REG4, CTRL_REG4 |= CTRL_REG4_INT_EN_DRDY);
+  }
+}
+
+/*! @brief Interrupt service routine for the accelerometer.
+ *
+ *  The accelerometer has data ready.
+ *  The user callback function will be called.
+ *  @note Assumes the accelerometer has been initialized.
+ */
+void __attribute__ ((interrupt)) AccelDataReady_ISR(void)
+{
+  // Call user callback function when data is ready
+  if (UserFunction)
+   (*UserFunction)(UserArguments);
+}
+
 
 /*!
  * @}

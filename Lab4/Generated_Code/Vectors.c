@@ -59,6 +59,8 @@
 #include "PIT.h"
 #include "RTC.h"
 #include "FTM.h"
+#include "I2C.h"
+#include "accel.h"
 
   /* ISR prototype */
   extern uint32_t __SP_INIT;
