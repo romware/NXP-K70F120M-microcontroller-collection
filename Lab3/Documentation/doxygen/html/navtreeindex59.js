@@ -1,7 +1,5 @@
 var NAVTREEINDEX59 =
 {
-"group___s_p_i___register___accessor___macros.html#ga3b718d889702b5e573fa1d835d043fd3":[4,0,2,0,0,11207],
-"group___s_p_i___register___accessor___macros.html#ga408d7fe306a431e876b78b5e7bb764e5":[4,0,2,0,0,11210],
 "group___s_p_i___register___accessor___macros.html#ga42d844381f1f96dd5d969cccdab12144":[4,0,2,0,0,11244],
 "group___s_p_i___register___accessor___macros.html#ga4c9d49703b2736f1ed039cd51c0a3286":[4,0,2,0,0,11190],
 "group___s_p_i___register___accessor___macros.html#ga4efe07f0a7560ea69ef435e3f3b6cf06":[4,0,2,0,0,11231],
@@ -239,8 +237,8 @@ var NAVTREEINDEX59 =
 "group___sys_tick___peripheral.html":[2,16,53],
 "group___sys_tick___peripheral.html#ga0c9d5fa2fdb81e177e61d0e980507c51":[4,0,2,0,0,11453],
 "group___sys_tick___peripheral.html#ga0c9d5fa2fdb81e177e61d0e980507c51":[2,16,53,4],
-"group___sys_tick___peripheral.html#ga19e2a0c9400dcdfd462a92ca83cff253":[2,16,53,5],
 "group___sys_tick___peripheral.html#ga19e2a0c9400dcdfd462a92ca83cff253":[4,0,2,0,0,13319],
+"group___sys_tick___peripheral.html#ga19e2a0c9400dcdfd462a92ca83cff253":[2,16,53,5],
 "group___sys_tick___peripheral.html#gaeef73642fdef722ce658e468dad877ea":[2,16,53,3],
 "group___sys_tick___peripheral.html#gaeef73642fdef722ce658e468dad877ea":[4,0,2,0,0,11452],
 "group___sys_tick___register___accessor___macros.html":[2,16,53,0],
@@ -249,5 +247,7 @@ var NAVTREEINDEX59 =
 "group___sys_tick___register___accessor___macros.html#ga2d37582dd39f59744e340cce09230250":[4,0,2,0,0,11447],
 "group___sys_tick___register___accessor___macros.html#ga4e8efcc1f2b551dbf3cb0aae1231e380":[4,0,2,0,0,11450],
 "group___sys_tick___register___accessor___macros.html#gab26b3fc75982181f81b185b206e897f6":[4,0,2,0,0,11448],
-"group___sys_tick___register___accessor___macros.html#gab41be68de8d2d31d938d419f9feb900f":[4,0,2,0,0,11456]
+"group___sys_tick___register___accessor___macros.html#gab41be68de8d2d31d938d419f9feb900f":[4,0,2,0,0,11456],
+"group___sys_tick___register___accessor___macros.html#gae3dc4d2dbfdf38c593a5581415fecfed":[4,0,2,0,0,11449],
+"group___sys_tick___register___accessor___macros.html#gae6985161bde8ca82ac983a2d43839595":[4,0,2,0,0,11475]
 };

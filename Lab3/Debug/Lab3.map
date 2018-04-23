@@ -56,8 +56,8 @@ Discarded input sections
  .debug_macro   0x00000000       0x64 ./Sources/Events.o
  .debug_macro   0x00000000    0x174c1 ./Sources/Events.o
  .debug_macro   0x00000000       0x94 ./Sources/Events.o
- .debug_line    0x00000000      0x226 ./Sources/Events.o
- .debug_str     0x00000000    0x8a5db ./Sources/Events.o
+ .debug_line    0x00000000      0x20e ./Sources/Events.o
+ .debug_str     0x00000000    0x8a5cf ./Sources/Events.o
  .comment       0x00000000       0x71 ./Sources/Events.o
  .ARM.attributes
                 0x00000000       0x39 ./Sources/Events.o
@@ -965,44 +965,44 @@ OUTPUT(Lab3.elf elf32-littlearm)
  .debug_macro   0x00019ec2       0x9a ./Generated_Code/Cpu.o
  .debug_macro   0x00019f5c       0xc0 ./Generated_Code/Vectors.o
 
-.debug_line     0x00000000     0x20f7
+.debug_line     0x00000000     0x2097
  .debug_line    0x00000000      0x29e ./Sources/FIFO.o
- .debug_line    0x0000029e      0x2bf ./Sources/FTM.o
- .debug_line    0x0000055d      0x2cd ./Sources/Flash.o
- .debug_line    0x0000082a      0x21f ./Sources/LEDs.o
- .debug_line    0x00000a49      0x2a1 ./Sources/PIT.o
- .debug_line    0x00000cea      0x2a3 ./Sources/RTC.o
- .debug_line    0x00000f8d      0x2c2 ./Sources/UART.o
- .debug_line    0x0000124f      0x432 ./Sources/main.o
- .debug_line    0x00001681      0x1e6 ./Sources/packet.o
- .debug_line    0x00001867      0x3c8 ./Project_Settings/Startup_Code/startup.o
- .debug_line    0x00001c2f      0x270 ./Generated_Code/Cpu.o
- .debug_line    0x00001e9f      0x258 ./Generated_Code/Vectors.o
+ .debug_line    0x0000029e      0x2a7 ./Sources/FTM.o
+ .debug_line    0x00000545      0x2c1 ./Sources/Flash.o
+ .debug_line    0x00000806      0x21f ./Sources/LEDs.o
+ .debug_line    0x00000a25      0x2a1 ./Sources/PIT.o
+ .debug_line    0x00000cc6      0x28b ./Sources/RTC.o
+ .debug_line    0x00000f51      0x2c2 ./Sources/UART.o
+ .debug_line    0x00001213      0x41a ./Sources/main.o
+ .debug_line    0x0000162d      0x1e6 ./Sources/packet.o
+ .debug_line    0x00001813      0x3c8 ./Project_Settings/Startup_Code/startup.o
+ .debug_line    0x00001bdb      0x264 ./Generated_Code/Cpu.o
+ .debug_line    0x00001e3f      0x258 ./Generated_Code/Vectors.o
 
-.debug_str      0x00000000    0x8dcc2
+.debug_str      0x00000000    0x8dce0
  .debug_str     0x00000000    0x8a554 ./Sources/FIFO.o
                               0x8a6c3 (size before relaxing)
- .debug_str     0x0008a554      0x3b9 ./Sources/FTM.o
-                              0x8aa1e (size before relaxing)
- .debug_str     0x0008a90d      0x3ae ./Sources/Flash.o
-                              0x83100 (size before relaxing)
- .debug_str     0x0008acbb       0xd7 ./Sources/LEDs.o
+ .debug_str     0x0008a554      0x3d7 ./Sources/FTM.o
+                              0x8aa12 (size before relaxing)
+ .debug_str     0x0008a92b      0x3ae ./Sources/Flash.o
+                              0x830f4 (size before relaxing)
+ .debug_str     0x0008acd9       0xd7 ./Sources/LEDs.o
                               0x82ee6 (size before relaxing)
- .debug_str     0x0008ad92       0xac ./Sources/PIT.o
+ .debug_str     0x0008adb0       0xac ./Sources/PIT.o
                               0x8a872 (size before relaxing)
- .debug_str     0x0008ae3e       0x8f ./Sources/RTC.o
-                              0x8a849 (size before relaxing)
- .debug_str     0x0008aecd      0x11b ./Sources/UART.o
+ .debug_str     0x0008ae5c       0x8f ./Sources/RTC.o
+                              0x8a83d (size before relaxing)
+ .debug_str     0x0008aeeb      0x11b ./Sources/UART.o
                               0x8a94a (size before relaxing)
- .debug_str     0x0008afe8      0x433 ./Sources/main.o
-                              0x8ae0b (size before relaxing)
- .debug_str     0x0008b41b       0x3f ./Sources/packet.o
-                               0x3268 (size before relaxing)
- .debug_str     0x0008b45a     0x2663 ./Project_Settings/Startup_Code/startup.o
+ .debug_str     0x0008b006      0x433 ./Sources/main.o
+                              0x8adff (size before relaxing)
+ .debug_str     0x0008b439       0x3f ./Sources/packet.o
+                               0x325c (size before relaxing)
+ .debug_str     0x0008b478     0x2663 ./Project_Settings/Startup_Code/startup.o
                               0x853ea (size before relaxing)
- .debug_str     0x0008dabd      0x1e9 ./Generated_Code/Cpu.o
-                              0x8a9dc (size before relaxing)
- .debug_str     0x0008dca6       0x1c ./Generated_Code/Vectors.o
+ .debug_str     0x0008dadb      0x1e9 ./Generated_Code/Cpu.o
+                              0x8a9d0 (size before relaxing)
+ .debug_str     0x0008dcc4       0x1c ./Generated_Code/Vectors.o
                               0x8a690 (size before relaxing)
 
 .comment        0x00000000       0x70

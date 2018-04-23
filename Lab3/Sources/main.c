@@ -274,6 +274,10 @@ void FTMCallbackCh0(void* arg)
   LEDs_Off(LED_BLUE);
 }
 
+/*! @brief Toggles the yellow LED and reads the current time to send to the PC
+ *
+ *  @return void
+ */
 void RTCCallback(void* arg)
 {
   // Toggle the yellow LED

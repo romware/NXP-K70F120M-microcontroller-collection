@@ -1,7 +1,5 @@
 var NAVTREEINDEX55 =
 {
-"group___s_c_b___register___masks.html#ga85fcec5a1a285bf2ead09d715e7fd825":[4,0,2,0,0,10211],
-"group___s_c_b___register___masks.html#ga8951e7b3d18c32e84d100b594c4533df":[4,0,2,0,0,10170],
 "group___s_c_b___register___masks.html#ga8a185fc794df7e755e5f3a8b3a06d042":[4,0,2,0,0,10242],
 "group___s_c_b___register___masks.html#ga8a4e7a6f895fa22ee626cf57cf4a5531":[4,0,2,0,0,10188],
 "group___s_c_b___register___masks.html#ga8ded3691908c76b3b63881a9fa2210a6":[4,0,2,0,0,10190],
@@ -102,8 +100,8 @@ var NAVTREEINDEX55 =
 "group___s_d_h_c___peripheral.html#ga6da8531f7cf8afb4899b93b54ac58054":[2,16,49,5],
 "group___s_d_h_c___peripheral.html#gaba68469bfde58472af9853b68fee61de":[4,0,2,0,0,10361],
 "group___s_d_h_c___peripheral.html#gaba68469bfde58472af9853b68fee61de":[2,16,49,4],
-"group___s_d_h_c___peripheral.html#gaf6d94732d48040eef799143f86be859c":[4,0,2,0,0,10360],
 "group___s_d_h_c___peripheral.html#gaf6d94732d48040eef799143f86be859c":[2,16,49,3],
+"group___s_d_h_c___peripheral.html#gaf6d94732d48040eef799143f86be859c":[4,0,2,0,0,10360],
 "group___s_d_h_c___register___accessor___macros.html":[2,16,49,0],
 "group___s_d_h_c___register___accessor___macros.html#ga06d87f040cfa4a05b7cc9e815aa5f4f3":[4,0,2,0,0,10332],
 "group___s_d_h_c___register___accessor___macros.html#ga0de53147f91ba1d4d621071009e52543":[4,0,2,0,0,10700],
@@ -249,5 +247,7 @@ var NAVTREEINDEX55 =
 "group___s_d_h_c___register___masks.html#ga3d875f5185d1fb805a87aa0c0737ded7":[4,0,2,0,0,10473],
 "group___s_d_h_c___register___masks.html#ga3e226429fe18b447810a75373b0e4e80":[4,0,2,0,0,10569],
 "group___s_d_h_c___register___masks.html#ga3e2cf2283cca7b5b5e6c61c92df6bcd6":[4,0,2,0,0,10427],
-"group___s_d_h_c___register___masks.html#ga3f042673e4eb942992f5f5c670e3f3d7":[4,0,2,0,0,10571]
+"group___s_d_h_c___register___masks.html#ga3f042673e4eb942992f5f5c670e3f3d7":[4,0,2,0,0,10571],
+"group___s_d_h_c___register___masks.html#ga3fea3ced329a19b4f5ef4b596afa1487":[4,0,2,0,0,10645],
+"group___s_d_h_c___register___masks.html#ga3ff92ff3a2de4c2006862e08e92198a2":[4,0,2,0,0,10718]
 };

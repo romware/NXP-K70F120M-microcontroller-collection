@@ -1,7 +1,5 @@
 var NAVTREEINDEX58 =
 {
-"group___s_i_m___register___masks.html#ga810f5e7a0ea3cbda95c0d9ceb8956583":[4,0,2,0,0,10830],
-"group___s_i_m___register___masks.html#ga81bba62820852e946b62f27326ed951b":[4,0,2,0,0,10930],
 "group___s_i_m___register___masks.html#ga81f370e7d63223fa868ec79e3cbd3475":[4,0,2,0,0,10784],
 "group___s_i_m___register___masks.html#ga81f5dc702d1fcc992928e968fa2fe321":[4,0,2,0,0,10776],
 "group___s_i_m___register___masks.html#ga828f3d67b0fb411b1f32f5ac8105964f":[4,0,2,0,0,10786],
@@ -218,14 +216,14 @@ var NAVTREEINDEX58 =
 "group___s_m_c___register___masks.html#gaecab837484639ef513d4c54d68eacc34":[4,0,2,0,0,11161],
 "group___s_m_c___register___masks.html#gaf42160e08664669fce172fdc170e9c5f":[4,0,2,0,0,11178],
 "group___s_p_i___peripheral.html":[2,16,52],
-"group___s_p_i___peripheral.html#ga3a16fecfe27c2052ab60e014be3f66f6":[2,16,52,6],
 "group___s_p_i___peripheral.html#ga3a16fecfe27c2052ab60e014be3f66f6":[4,0,2,0,0,11250],
-"group___s_p_i___peripheral.html#ga78714a4b750aa56fc56d1d223a560069":[2,16,52,5],
+"group___s_p_i___peripheral.html#ga3a16fecfe27c2052ab60e014be3f66f6":[2,16,52,6],
 "group___s_p_i___peripheral.html#ga78714a4b750aa56fc56d1d223a560069":[4,0,2,0,0,11229],
+"group___s_p_i___peripheral.html#ga78714a4b750aa56fc56d1d223a560069":[2,16,52,5],
 "group___s_p_i___peripheral.html#ga7e4e9921e4d56bdbb10a04e77743ff5e":[2,16,52,7],
 "group___s_p_i___peripheral.html#ga7e4e9921e4d56bdbb10a04e77743ff5e":[4,0,2,0,0,13318],
-"group___s_p_i___peripheral.html#ga851f64a97b5919c1f99a34db5918b3b4":[4,0,2,0,0,11187],
 "group___s_p_i___peripheral.html#ga851f64a97b5919c1f99a34db5918b3b4":[2,16,52,3],
+"group___s_p_i___peripheral.html#ga851f64a97b5919c1f99a34db5918b3b4":[4,0,2,0,0,11187],
 "group___s_p_i___peripheral.html#gae28fd789e0602a32076c1c13ca39f5af":[4,0,2,0,0,11208],
 "group___s_p_i___peripheral.html#gae28fd789e0602a32076c1c13ca39f5af":[2,16,52,4],
 "group___s_p_i___register___accessor___macros.html":[2,16,52,0],
@@ -249,5 +247,7 @@ var NAVTREEINDEX58 =
 "group___s_p_i___register___accessor___macros.html#ga2d293ad974a088451144e55191f7566d":[4,0,2,0,0,11232],
 "group___s_p_i___register___accessor___macros.html#ga311e180862c59deeee5e84c30db131db":[4,0,2,0,0,11195],
 "group___s_p_i___register___accessor___macros.html#ga361272e0b4388562e3b354b195055cf3":[4,0,2,0,0,11189],
-"group___s_p_i___register___accessor___macros.html#ga3755813813c378ef7e947689e451323b":[4,0,2,0,0,11226]
+"group___s_p_i___register___accessor___macros.html#ga3755813813c378ef7e947689e451323b":[4,0,2,0,0,11226],
+"group___s_p_i___register___accessor___macros.html#ga3b718d889702b5e573fa1d835d043fd3":[4,0,2,0,0,11207],
+"group___s_p_i___register___accessor___macros.html#ga408d7fe306a431e876b78b5e7bb764e5":[4,0,2,0,0,11210]
 };

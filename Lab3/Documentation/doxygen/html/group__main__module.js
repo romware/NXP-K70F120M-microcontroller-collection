@@ -12,6 +12,7 @@ var group__main__module =
     [ "main", "group__main__module.html#ga840291bc02cba5474a4cb46a9b9566fe", null ],
     [ "PITCallback", "group__main__module.html#ga83e32d3437f8fdbf06974d23242a9462", null ],
     [ "ReceivedPacket", "group__main__module.html#gaf57dd4c5e7e444cfe5571d411f9548c9", null ],
+    [ "RTCCallback", "group__main__module.html#ga2dabe81b72bf8ec8155cd875975beb07", null ],
     [ "TowerInit", "group__main__module.html#gaeda7b585d318b7b1476285b82b6fed11", null ],
     [ "TowerSet", "group__main__module.html#ga2382bc01cdfcddc71b68e53db780590e", null ],
     [ "COMMAND_MODE", "group__main__module.html#gae2909d574bfc1ab702eed1fb28a62505", null ],
