@@ -53,7 +53,8 @@
 
 #define BAUD_RATE 115200                     /*!< UART2 Baud Rate */
 
-const uint32_t PERIOD_LED_GREEN = 500000000; /*!< Period of Periodic Interrupt Timer 0 in nanoseconds */
+const uint32_t PERIOD_LED_GREEN = 500000000;  /*!< Period of Periodic Interrupt Timer 0 in nanoseconds */
+const uint32_t PERIOD_I2C_POLL  = 1000000000; /*!< Period of the I2C polling in polling mode */
 
 const uint8_t COMMAND_STARTUP     = 0x04;    /*!< The serial command byte for tower startup */
 const uint8_t COMMAND_VER         = 0x09;    /*!< The serial command byte for tower version */
@@ -261,7 +262,7 @@ void ReceivedPacket(void)
  *
  *  @return void
  */
-void PITCallback(void* arg)
+void PITCallback(void* arg)  // TODO: Remove this for Lab4?
 {
   // Toggle green LED
   LEDs_Toggle(LED_GREEN);
@@ -299,17 +300,13 @@ void RTCCallback(void* arg)
 //TODO: write brief // send packet for XYZ
 void AccelCallback(void* arg)
 {
-  // Toggle the yellow LED
-  LEDs_Toggle(LED_YELLOW);
+  // Array to store XYZ values
+  uint8_t dataXYZ[3];
 
-  // Declare variable for hours, minutes seconds
-  uint8_t hours, minutes, seconds;
+  // Read data from the accelerometer
+  Accel_ReadXYZ(dataXYZ);
 
-  // Get the current time values
-  RTC_Get(&hours, &minutes, &seconds);
 
-  // Send time to PC
-  Packet_Put(COMMAND_TIME, hours, minutes, seconds);
 }
 
 /*! @brief Initializes the main tower components by calling the initialization routines of the supporting software modules.
@@ -322,7 +319,7 @@ bool TowerInit(void)
     Flash_Init() &&
     LEDs_Init() &&
     Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) &&
-    PIT_Init(CPU_BUS_CLK_HZ, PITCallback, NULL) &&
+    //PIT_Init(CPU_BUS_CLK_HZ, PITCallback, NULL) &&
     FTM_Init() &&
     RTC_Init(RTCCallback, NULL)
   );
@@ -335,7 +332,7 @@ bool TowerInit(void)
 bool TowerSet(void)
 {
   // Set the periodic interrupt timer 0 to 500ms
-  PIT_Set(PERIOD_LED_GREEN, true);
+  // PIT_Set(PERIOD_LED_GREEN, true);
 
   // Allocates an address in Flash memory to the tower number and tower mode
   if(Flash_AllocateVar((volatile void**)&NvTowerNb, sizeof(*NvTowerNb))

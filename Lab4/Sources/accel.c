@@ -25,6 +25,9 @@
 // K70 module registers
 #include "MK70F12.h"
 
+// Periodic Interrupt Timer
+#include "PIT.h"
+
 // CPU and PE_types are needed for critical section variables and the defintion of NULL pointer
 #include "CPU.h"
 #include "PE_types.h"
@@ -188,8 +191,10 @@ static union
 #define CTRL_REG5_INT_CFG_FIFO		CTRL_REG5_Union.bits.INT_CFG_FIFO
 #define CTRL_REG5_INT_CFG_ASLP		CTRL_REG5_Union.bits.INT_CFG_ASLP
 
-static void (*UserFunction)(void*); /*!< Callback functions for accel */
-static void* UserArguments;         /*!< Callback parameters for accel */
+extern const uint32_t PERIOD_I2C_POLL; /*!< Period of the I2C polling in polling mode */
+
+static void (*DataReadyCallbackFunction)(void*); /*!< Callback functions for accel */
+static void* DataReadyCallbackArguments;         /*!< Callback parameters for accel */
 
 /*! @brief Initializes the accelerometer by calling the initialization routines of the supporting software modules.
  *
@@ -204,13 +209,56 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
   aTI2CModule.readCompleteCallbackFunction = accelSetup->readCompleteCallbackFunction;
   aTI2CModule.readCompleteCallbackArguments = accelSetup->readCompleteCallbackArguments;
 
-  UserFunction = accelSetup->dataReadyCallbackFunction;
-  UserArguments = accelSetup->dataReadyCallbackArguments;
+  DataReadyCallbackFunction = accelSetup->dataReadyCallbackFunction;
+  DataReadyCallbackArguments = accelSetup->dataReadyCallbackArguments;
 
   I2C_Init(&aTI2CModule, accelSetup->moduleClk);
 
   Accel_SetMode(ACCEL_POLL);
 
+  // Set up for interrupts from PORTB
+
+  // Ensure global interrupts are disabled
+  EnterCritical();
+
+  /* Address     | Vector | IRQ  | NVIC non-IPR register | NVIC IPR register | Source module       | Source description
+   * 0x0000_01A0 | 104    | 88   | 2                     | 22                | Port control module | Pin detect (Port B)
+   * IRQ modulo 32 = 24
+   */
+
+  // Clear any pending interrupts on pin detect B
+  NVICICPR2 |= (1 << 24);
+
+  // Enable interrupts from pin detect B
+  NVICISER2 |= (1 << 24);
+
+  // Return global interrupts to how they were
+  ExitCritical();
+
+  // Set up PORTB pin 7 for interrupts from the accelerometer INT2 (default).
+  // Enable PORTB in System Clock Gating Control Register 5
+  SIM_SCGC5 |= SIM_SCGC5_PORTB_MASK;
+
+  // Set PTB7 (BGA Map 'L15') to be the I2C data ready interrupt pin by setting to ALT1
+  PORTB_PCR7 = PORT_PCR_MUX(1);
+
+  // Configure PTB7 as a GPIO input
+  GPIOB_PDDR |= (1 << 7);
+
+  // Set pull enable for PTB7
+  PORTB_PCR7 |= PORT_PCR_PE_MASK;
+
+  // Ensure Pull Select is set to 0 (pulldown)
+  PORTB_PCR7 &= ~PORT_PCR_PS_MASK;
+
+  // Disable interrupt flag. This will be enabled in Accel_SetMode if Interrupt mode is selected
+  PORTB_PCR7 = PORT_PCR_IRQC(0b0000);
+
+  // Set up a 1 second Periodic Interrupt Timer for use in I2C polling mode.
+  // Initialize the PIT
+  PIT_Init(accelSetup->moduleClk, accelSetup->dataReadyCallbackFunction, NULL);
+
+  return true;
 }
 
 /*! @brief Reads X, Y and Z accelerations.
@@ -218,9 +266,9 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
  */
 void Accel_ReadXYZ(uint8_t data[3])
 {
-  I2C_PollRead(ADDRESS_OUT_X_MSB, data[0], 1);
-  I2C_PollRead(ADDRESS_OUT_Y_MSB, data[1], 1);
-  I2C_PollRead(ADDRESS_OUT_Z_MSB, data[2], 1);
+  I2C_PollRead(ADDRESS_OUT_X_MSB, data, 3);
+  //I2C_PollRead(ADDRESS_OUT_Y_MSB, &data[1], 1);
+  //I2C_PollRead(ADDRESS_OUT_Z_MSB, &data[2], 1);
 }
 
 /*! @brief Set the mode of the accelerometer.
@@ -232,10 +280,19 @@ void Accel_SetMode(const TAccelMode mode)
   // If INT, set up 1.56 Hz DRDY interrupt in Reg5
   if(mode == ACCEL_POLL)
   {
+    // Disable Interrupts form the
     I2C_Write(ADDRESS_CTRL_REG4, CTRL_REG4 & ~CTRL_REG4_INT_EN_DRDY);
+
+    // Set the 1 second Periodic Interrupt Timer for use with I2C polling
+    PIT_Set(PERIOD_I2C_POLL, true);
+
   }
   else if(mode == ACCEL_INT)
   {
+    // Enable Flag and Interrupt when logic 1 for PTB7
+    PORTB_PCR7 = PORT_PCR_IRQC(0b1100);
+
+    // Enable Data Ready Interrupt from accelerometer
     I2C_Write(ADDRESS_CTRL_REG4, CTRL_REG4 |= CTRL_REG4_INT_EN_DRDY);
   }
 }
@@ -249,8 +306,8 @@ void Accel_SetMode(const TAccelMode mode)
 void __attribute__ ((interrupt)) AccelDataReady_ISR(void)
 {
   // Call user callback function when data is ready
-  if (UserFunction)
-   (*UserFunction)(UserArguments);
+  if (DataReadyCallbackFunction)
+   (*DataReadyCallbackFunction)(DataReadyCallbackArguments);
 }
 
 

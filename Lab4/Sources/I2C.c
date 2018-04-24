@@ -27,12 +27,14 @@ static void RepeatCondition();
 static void (*ReadCompleteCallbackFunction)(void*);  /*!<  Callback functions for I2C. */
 static void* ReadCompleteCallbackArguments;          /*!< Callback parameters for I2C. */
 
-static const uint8_t SlaveDeviceAddress = 0x1D;
+static uint8_t SlaveDeviceAddress = 0x1D;            /*!< Current Slave address for I2C. */
 
 /*! @brief Start condition on I2C Bus
  */
 static void StartCondition()
 {
+  // Wait until the I2C bus is idle
+  BusyCondition();
   I2C0_C1 |= I2C_C1_MST_MASK;
   I2C0_C1 |= I2C_C1_TX_MASK;
 }
@@ -109,7 +111,7 @@ bool I2C_Init(const TI2CModule* const aI2CModule, const uint32_t moduleClk)
   // Set PTE19 (BGA Map 'M3') to be the I2C0 SCL pin by setting to ALT4
   PORTE_PCR19 = PORT_PCR_MUX(4);
 
-  /* Set I2C Frequency Divider Register
+  /* Set I2C Frequency Divider Register  TODO: Write a private function that performs an exhaustive search for these parameters
    * MULT: 0x02;   mul = 4;
    * ICR:  0x12;  SCL divider = 64;  SDA hold value = 13;  SCL hold (start) = 26;  SCL hold (stop) = 33;
    * I2C baud rate = 25Mhz / (4 * 640 = 97,656 bits/second
@@ -122,6 +124,8 @@ bool I2C_Init(const TI2CModule* const aI2CModule, const uint32_t moduleClk)
 
   // Enable I2C interrupts
   I2C0_C1 |= I2C_C1_IICIE_MASK;
+
+  return true;
 }
 
 /*! @brief Selects the current slave device
@@ -131,7 +135,7 @@ bool I2C_Init(const TI2CModule* const aI2CModule, const uint32_t moduleClk)
 void I2C_SelectSlaveDevice(const uint8_t slaveAddress)
 {
   // select slave address
-  // set mode
+  SlaveDeviceAddress = slaveAddress;
 }
 
 /*! @brief Write a byte of data to a specified register
@@ -190,7 +194,7 @@ void I2C_IntRead(const uint8_t registerAddress, uint8_t* const data, const uint8
  *  At the end of reception, the user callback function will be called.
  *  @note Assumes the I2C module has been initialized.
  */
-void __attribute__ ((interrupt)) I2C_ISR(void)
+void __attribute__ ((interrupt)) I2C_ISR(void)    // TODO: We need to work out what this callback function needs to do
 {
   if (ReadCompleteCallbackFunction)
     (*ReadCompleteCallbackFunction)(ReadCompleteCallbackArguments);
