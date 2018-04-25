@@ -63,6 +63,8 @@ const uint8_t COMMAND_PROGRAMBYTE = 0x07;    /*!< The serial command byte for to
 const uint8_t COMMAND_READBYTE    = 0x08;    /*!< The serial command byte for tower read byte */
 const uint8_t COMMAND_MODE        = 0x0D;    /*!< The serial command byte for tower mode */
 const uint8_t COMMAND_TIME        = 0x0C;    /*!< The serial command byte for tower time */
+const uint8_t COMMAND_PROTOCOL    = 0x0A;    /*!< The serial command byte for tower protocol */
+const uint8_t COMMAND_ACCEL       = 0x10;    /*!< The serial command byte for tower accelerometer */
 
 const uint8_t PARAM_GET = 1;                 /*!< Get bit of packet parameter 1 */
 const uint8_t PARAM_SET = 2;                 /*!< Set bit of packet parameter 1 */
@@ -72,6 +74,7 @@ const uint8_t TOWER_VER_MIN = 0;             /*!< Tower minor version */
 
 volatile uint16union_t* NvTowerNb;           /*!< Tower number union pointer to flash */
 volatile uint16union_t* NvTowerMd;           /*!< Tower mode union pointer to flash */
+volatile uint8_t* NvTowerPo;                 /*!< Tower protocol union pointer to flash */
 
 
 /*! @brief Sends the startup packets to the PC
@@ -85,7 +88,8 @@ bool HandleTowerStartup(void)
     Packet_Put(COMMAND_STARTUP,0x00,0x00,0x00) &&
     Packet_Put(COMMAND_VER,'v',TOWER_VER_MAJ,TOWER_VER_MIN) &&
     Packet_Put(COMMAND_NUM,PARAM_GET,NvTowerNb->s.Lo,NvTowerNb->s.Hi) &&
-    Packet_Put(COMMAND_MODE,PARAM_GET,NvTowerMd->s.Lo,NvTowerMd->s.Hi)
+    Packet_Put(COMMAND_MODE,PARAM_GET,NvTowerMd->s.Lo,NvTowerMd->s.Hi) &&
+    Packet_Put(COMMAND_PROTOCOL,PARAM_GET,_FB(NvTowerPo),0)
   );
 }
 
@@ -111,7 +115,7 @@ bool HandleTowerNumber(void)
     // Sends the tower number packet
     return Packet_Put(COMMAND_NUM,PARAM_GET,NvTowerNb->s.Lo,NvTowerNb->s.Hi);
   }
-  else if (Packet_Parameter1 == PARAM_SET)
+  else if(Packet_Parameter1 == PARAM_SET)
   {
     // Sets the tower number
     return Flash_Write16((uint16_t*)NvTowerNb,(uint16_t)Packet_Parameter23);
@@ -126,16 +130,16 @@ bool HandleTowerNumber(void)
 bool HandleTowerProgramByte(void)
 {
   // Check if offset is erase or set
-  if(Packet_Parameter1 == 0x08)
+  if(Packet_Parameter1 == 0x08 && Packet_Parameter2 == 0)
   {
     // Erase Flash
     return Flash_Erase();
   }
-  else if (Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07)
+  else if(Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07 && Packet_Parameter2 == 0)
   {
     // Program byte to Flash
-    volatile uint8_t* nvAddess = (uint8_t*)(FLASH_DATA_START + Packet_Parameter1);
-    return Flash_Write8( (uint8_t*)nvAddess, Packet_Parameter3 );
+    volatile uint8_t* nvAddress = (uint8_t*)(FLASH_DATA_START + Packet_Parameter1);
+    return Flash_Write8( (uint8_t*)nvAddress, Packet_Parameter3 );
   }
   return false;
 }
@@ -147,7 +151,7 @@ bool HandleTowerProgramByte(void)
 bool HandleTowerReadByte(void)
 {
   // Check if offset is within range
-  if (Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07)
+  if(Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Send read byte packet
     return Packet_Put(COMMAND_READBYTE,Packet_Parameter1,0,_FB(FLASH_DATA_START + (uint32_t)Packet_Parameter1));
@@ -157,7 +161,7 @@ bool HandleTowerReadByte(void)
 
 /*! @brief Sets the tower mode or sends the packet to the PC
  *
- *  @return bool - TRUE if packet is sent or number is set
+ *  @return bool - TRUE if packet is sent or mode is set
  */
 bool HandleTowerMode(void)
 {
@@ -181,9 +185,34 @@ bool HandleTowerMode(void)
  */
 bool HandleTowerSetTime(void)
 {
-  // Sets the Real Time Clock
-  RTC_Set(Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
-  return true;
+  // Check if parameters are within tower time limits
+  if(Packet_Parameter1 < 24 && Packet_Parameter2 < 60 && Packet_Parameter3 < 60)
+  {
+      // Sets the Real Time Clock
+      RTC_Set(Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
+      return true;
+  }
+  return false;
+}
+
+/*! @brief Sets the tower protocol or sends the packet to the PC
+ *
+ *  @return bool - TRUE if packet is sent or protocol is set
+ */
+bool HandleTowerProtocol(void)
+{
+  // Check if parameters match tower mode GET or SET parameters
+  if(Packet_Parameter1 == PARAM_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Sends the tower protocol packet
+    return Packet_Put(COMMAND_PROTOCOL,PARAM_GET,_FB(NvTowerPo),0);
+  }
+  else if (Packet_Parameter1 == PARAM_SET && (Packet_Parameter2 == 0 || Packet_Parameter2 == 1) && Packet_Parameter3 == 0)
+  {
+    // Sets the tower protocol
+    return Flash_Write8((uint8_t*)NvTowerPo,(uint8_t)Packet_Parameter2);
+  }
+  return false;
 }
 
 /*! @brief Executes the command depending on what packet has been received
@@ -217,20 +246,25 @@ void ReceivedPacket(void)
     // Check if parameters match tower mode GET or SET parameters
     success = HandleTowerMode();
   }
-  else if(commandIgnoreAck == COMMAND_PROGRAMBYTE && Packet_Parameter2 == 0)
+  else if(commandIgnoreAck == COMMAND_PROGRAMBYTE)
   {
     // Send tower program byte packet
     success = HandleTowerProgramByte();
   }
-  else if(commandIgnoreAck == COMMAND_READBYTE && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  else if(commandIgnoreAck == COMMAND_READBYTE)
   {
     // Send tower read byte packet
     success = HandleTowerReadByte();
   }
-  else if(commandIgnoreAck == COMMAND_TIME && Packet_Parameter1 < 24 && Packet_Parameter2 < 60 && Packet_Parameter3 < 60)
+  else if(commandIgnoreAck == COMMAND_TIME)
   {
     // Set the Real Time Clock time
     success = HandleTowerSetTime();
+  }
+  else if(commandIgnoreAck == COMMAND_PROTOCOL)
+  {
+    // Check if parameters match tower protocol GET or SET parameters
+    success = HandleTowerProtocol();
   }
 
   // AND the packet command byte with the ACK MASK to check if ACK is requested
@@ -255,17 +289,6 @@ void ReceivedPacket(void)
   Packet_Parameter2 = 0;
   Packet_Parameter3 = 0;
   Packet_Checksum   = 0;
-}
-
-
-/*! @brief Toggles the green LED every time it is called  // TODO: send packet for XYZ
- *
- *  @return void
- */
-void PITCallback(void* arg)  // TODO: Remove this for Lab4?
-{
-  // Toggle green LED
-  LEDs_Toggle(LED_GREEN);
 }
 
 /*! @brief Turns off the blue LED every time it is called
@@ -306,7 +329,7 @@ void AccelCallback(void* arg)
   // Read data from the accelerometer
   Accel_ReadXYZ(dataXYZ);
 
-
+  Packet_Put(COMMAND_ACCEL,dataXYZ[0],dataXYZ[1],dataXYZ[2]);
 }
 
 /*! @brief Initializes the main tower components by calling the initialization routines of the supporting software modules.
@@ -336,7 +359,8 @@ bool TowerSet(void)
 
   // Allocates an address in Flash memory to the tower number and tower mode
   if(Flash_AllocateVar((volatile void**)&NvTowerNb, sizeof(*NvTowerNb))
-  && Flash_AllocateVar((volatile void**)&NvTowerMd, sizeof(*NvTowerMd)));
+  && Flash_AllocateVar((volatile void**)&NvTowerMd, sizeof(*NvTowerMd))
+  && Flash_AllocateVar((volatile void**)&NvTowerPo, sizeof(*NvTowerPo)));
   {
     // Success status of writing default values to Flash
     bool success = true;
@@ -356,6 +380,16 @@ bool TowerSet(void)
     {
       // Sets the tower mode to the default mode
       if(!Flash_Write16((uint16_t*)NvTowerMd,(uint16_t)1))
+      {
+        success = false;
+      }
+    }
+
+    // Checks if tower protocol is clear
+    if(_FB(NvTowerPo) == 0xFF)
+    {
+      // Sets the tower protocol to the default protocol
+      if(!Flash_Write8((uint8_t*)NvTowerPo,(uint8_t)ACCEL_POLL))
       {
         success = false;
       }

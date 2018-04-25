@@ -205,7 +205,7 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
   for (int i = 0; i < nbBytes; i++)
   {
     // Wait for receive data to arrive TODO: using I2C_ISR?
-    while(!(I2C0_S & I2C_S_TCF_MASK));
+    while(!(I2C0_S & I2C_S_TCF_MASK)){}
 
     // Load received byte into data
     data[i] = I2C0_D;

@@ -238,7 +238,7 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
   // Enable PORTB in System Clock Gating Control Register 5
   SIM_SCGC5 |= SIM_SCGC5_PORTB_MASK;
 
-  // Set PTB4 (BGA Map 'L15') to be the I2C data ready interrupt pin by setting to ALT1
+  // Set PTB4 (BGA Map 'N15') to be the I2C data ready interrupt pin by setting to ALT1
   PORTB_PCR4 = PORT_PCR_MUX(1);
 
   // Configure PTB4 as a GPIO input
@@ -256,6 +256,8 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
   // Set up a 1 second Periodic Interrupt Timer for use in I2C polling mode.
   // Initialize the PIT
   PIT_Init(accelSetup->moduleClk, accelSetup->dataReadyCallbackFunction, NULL);
+
+  Accel_SetMode(ACCEL_POLL);
 
   return true;
 }
