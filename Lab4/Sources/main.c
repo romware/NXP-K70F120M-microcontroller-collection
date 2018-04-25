@@ -321,7 +321,7 @@ void RTCCallback(void* arg)
 }
 
 //TODO: write brief // send packet for XYZ
-void AccelCallback(void* arg)
+void AccelDataReadyCallback(void* arg)
 {
   // Array to store XYZ values
   uint8_t dataXYZ[3];
@@ -330,6 +330,12 @@ void AccelCallback(void* arg)
   Accel_ReadXYZ(dataXYZ);
 
   Packet_Put(COMMAND_ACCEL,dataXYZ[0],dataXYZ[1],dataXYZ[2]);
+}
+
+//TODO: write brief // send packet for XYZ
+void AccelReadCompleteCallback(void* arg)
+{
+
 }
 
 /*! @brief Initializes the main tower components by calling the initialization routines of the supporting software modules.
@@ -342,7 +348,6 @@ bool TowerInit(void)
     Flash_Init() &&
     LEDs_Init() &&
     Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) &&
-    //PIT_Init(CPU_BUS_CLK_HZ, PITCallback, NULL) &&
     FTM_Init() &&
     RTC_Init(RTCCallback, NULL)
   );
@@ -415,6 +420,13 @@ int main(void)
   receivedPacketTmr.userFunction          = FTMCallbackCh0;
   receivedPacketTmr.userArguments         = NULL;
 
+  TAccelSetup accelerometerSetup;                  /*!< Accelerometer callback setup */
+  accelerometerSetup.moduleClk                     = CPU_BUS_CLK_HZ;
+  accelerometerSetup.dataReadyCallbackFunction     = AccelDataReadyCallback;
+  accelerometerSetup.dataReadyCallbackArguments    = NULL;
+  accelerometerSetup.readCompleteCallbackFunction  = AccelReadCompleteCallback;
+  accelerometerSetup.readCompleteCallbackArguments = NULL;
+
   /*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
   PE_low_level_init();
   /*** End of Processor Expert internal initialization.                    ***/
@@ -427,6 +439,8 @@ int main(void)
   // Initializes the main tower components
   if(TowerInit())
   {
+    Accel_Init(&accelerometerSetup);
+
     // Sets the default or stored values of the main tower components
     if(TowerSet() && FTM_Set(&receivedPacketTmr))
     {
@@ -440,18 +454,6 @@ int main(void)
 
   // Send startup packets to PC
   HandleTowerStartup();
-
-  uint8_t temp = Median_Filter3(10,11,6);
-
-  temp = Median_Filter3(1,2,3);
-
-  temp = Median_Filter3(50,40,0);
-
-  temp = Median_Filter3(22,22,2);
-
-  temp = Median_Filter3(2,22,22);
-
-  temp = Median_Filter3(22,2,22);
 
   for(;;)
   {

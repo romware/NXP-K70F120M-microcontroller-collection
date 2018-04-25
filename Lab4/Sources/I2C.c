@@ -43,15 +43,22 @@ static void StartCondition()
  */
 static void StopCondition()
 {
+
+  I2C0_C1 &= ~I2C_C1_TX_MASK;
   I2C0_C1 &= ~I2C_C1_MST_MASK;
+
+  uint32_t temp1 = I2C0_C1;
+
+
+  uint32_t temp2 = temp1;
 }
 
 /*! @brief Wait condition on I2C Bus
  */
 static void WaitCondition()
 {
-  while(I2C0_S & ~I2C_S_IICIF_MASK) {}
-  I2C0_S = I2C_S_IICIF_MASK;
+  while(I2C0_S & I2C_S_RXAK_MASK) {}
+  //I2C0_S = I2C_S_IICIF_MASK;
 }
 
 /*! @brief Wait while busy condition on I2C Bus
@@ -123,7 +130,7 @@ bool I2C_Init(const TI2CModule* const aI2CModule, const uint32_t moduleClk)
   I2C0_C1 |= I2C_C1_IICEN_MASK;
 
   // Enable I2C interrupts
-  I2C0_C1 |= I2C_C1_IICIE_MASK;
+  //I2C0_C1 |= I2C_C1_IICIE_MASK;
 
   return true;
 }
@@ -212,11 +219,15 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
 
     // Send AK. Clear TXAK and set FACK??
     I2C0_SMB |= I2C_SMB_FACK_MASK;
-    I2C0_C1 &= ~I2C_C1_TXAK_MASK;
+
+    if(i < (nbBytes - 1))
+    {
+	I2C0_C1 &= ~I2C_C1_TXAK_MASK;
+    }
   }
 
   // Send NAK by writing 1 to TXAK
-  I2C0_C1 |= I2C_C1_TX_MASK;
+  I2C0_C1 |= I2C_C1_TXAK_MASK;
 
   // Send Stop
   StopCondition();

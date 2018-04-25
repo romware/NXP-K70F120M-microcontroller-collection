@@ -214,8 +214,6 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
 
   I2C_Init(&aTI2CModule, accelSetup->moduleClk);
 
-  Accel_SetMode(ACCEL_POLL);
-
   // Set up for interrupts from PORTB
   // Ensure global interrupts are disabled
   EnterCritical();
