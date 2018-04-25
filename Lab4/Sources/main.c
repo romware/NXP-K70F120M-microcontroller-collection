@@ -469,6 +469,11 @@ int main(void)
       // Execute a command depending on what packet has been received
       ReceivedPacket();
     }
+
+    uint8_t dataXYZ[3];
+    Accel_ReadXYZ(dataXYZ);
+    Packet_Put(COMMAND_ACCEL,dataXYZ[0],dataXYZ[1],dataXYZ[2]);
+    Packet_Put(0,0,0,0);
   }
 
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/

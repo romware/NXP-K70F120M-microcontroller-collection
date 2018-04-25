@@ -43,7 +43,6 @@ static void StartCondition()
  */
 static void StopCondition()
 {
-
   I2C0_C1 &= ~I2C_C1_TX_MASK;
   I2C0_C1 &= ~I2C_C1_MST_MASK;
 
@@ -202,20 +201,23 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
   // Wait for AK from slave device
   WaitCondition();
 
-  // Change to RX mode
-  I2C0_C1 &= ~I2C_C1_TX_MASK;
-
   // Enable interrupts here?? Maybe make a function MasterRxMode?
-  I2C0_C1 |= I2C_C1_IICIE_MASK;
+  //I2C0_C1 |= I2C_C1_IICIE_MASK;
 
   // Read required number of data bytes
   for (int i = 0; i < nbBytes; i++)
   {
+    // Change to RX mode
+    I2C0_C1 &= ~I2C_C1_TX_MASK;
+
     // Wait for receive data to arrive TODO: using I2C_ISR?
     while(!(I2C0_S & I2C_S_TCF_MASK)){}
 
     // Load received byte into data
     data[i] = I2C0_D;
+
+    // Change to TX mode
+    I2C0_C1 |= I2C_C1_TX_MASK;
 
     // Send AK. Clear TXAK and set FACK??
     I2C0_SMB |= I2C_SMB_FACK_MASK;
