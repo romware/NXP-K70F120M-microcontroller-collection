@@ -71,8 +71,8 @@ static void BusyCondition()
  */
 static void RepeatCondition()
 {
-  I2C0_C1 |= I2C_C1_MST_MASK;
   I2C0_C1 |= I2C_C1_TX_MASK;
+  I2C0_C1 |= I2C_C1_MST_MASK;
   I2C0_C1 |= I2C_C1_RSTA_MASK;
 }
 
@@ -86,7 +86,7 @@ bool I2C_Init(const TI2CModule* const aI2CModule, const uint32_t moduleClk)
 {
   // Store parameters for interrupt routine
   ReadCompleteCallbackFunction = aI2CModule->readCompleteCallbackFunction;
-  ReadCompleteCallbackFunction = aI2CModule->readCompleteCallbackArguments;
+  ReadCompleteCallbackArguments = aI2CModule->readCompleteCallbackArguments;
 
   // Ensure global interrupts are disabled
   EnterCritical();
@@ -129,7 +129,7 @@ bool I2C_Init(const TI2CModule* const aI2CModule, const uint32_t moduleClk)
   I2C0_C1 |= I2C_C1_IICEN_MASK;
 
   // Enable I2C interrupts
-  //I2C0_C1 |= I2C_C1_IICIE_MASK;
+  I2C0_C1 |= I2C_C1_IICIE_MASK;
 
   return true;
 }
@@ -183,6 +183,9 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
   // Send slave device address with write bit
   I2C0_D = SlaveDeviceAddress << 1;
 
+  // Wait for the bus to become busy
+  while(!(I2C0_S & I2C_S_BUSY_MASK)) {}
+
   // Wait for AK from slave
   WaitCondition();
 
@@ -201,11 +204,13 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
   // Wait for AK from slave device
   WaitCondition();
 
+  // Change to RX mode
+  I2C0_C1 &= ~I2C_C1_TX_MASK;
   // Enable interrupts here?? Maybe make a function MasterRxMode?
   //I2C0_C1 |= I2C_C1_IICIE_MASK;
 
   // Read required number of data bytes
-  for (int i = 0; i < nbBytes; i++)
+  /*for (int i = 0; i < nbBytes; i++)
   {
     // Change to RX mode
     I2C0_C1 &= ~I2C_C1_TX_MASK;
@@ -227,7 +232,7 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
 	I2C0_C1 &= ~I2C_C1_TXAK_MASK;
     }
   }
-
+*/
   // Send NAK by writing 1 to TXAK
   I2C0_C1 |= I2C_C1_TXAK_MASK;
 
@@ -255,6 +260,9 @@ void I2C_IntRead(const uint8_t registerAddress, uint8_t* const data, const uint8
  */
 void __attribute__ ((interrupt)) I2C_ISR(void)    // TODO: We need to work out what this callback function needs to do
 {
+  // Clear the interrupt
+  I2C0_S = I2C_S_IICIF_MASK;
   if (ReadCompleteCallbackFunction)
-    (*ReadCompleteCallbackFunction)(ReadCompleteCallbackArguments);
+   (*ReadCompleteCallbackFunction)(ReadCompleteCallbackArguments);
 }
+

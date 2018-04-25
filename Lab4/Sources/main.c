@@ -335,7 +335,23 @@ void AccelDataReadyCallback(void* arg)
 //TODO: write brief // send packet for XYZ
 void AccelReadCompleteCallback(void* arg)
 {
-
+  static uint8_t data[3];
+  static uint8_t count = 0;
+  if(count ==1)
+  {
+    I2C0_C1 |= I2C_C1_TXAK_MASK;
+  }
+  if(count == 2)
+  {
+    I2C0_C1 &= ~I2C_C1_MST_MASK;
+  }
+  data[count] = I2C0_D;
+  count ++;
+  if(count == 3)
+  {
+    Packet_Put(COMMAND_ACCEL,data[0],data[1],data[2]);
+    count = 0;
+  }
 }
 
 /*! @brief Initializes the main tower components by calling the initialization routines of the supporting software modules.
@@ -473,7 +489,7 @@ int main(void)
     uint8_t dataXYZ[3];
     Accel_ReadXYZ(dataXYZ);
     Packet_Put(COMMAND_ACCEL,dataXYZ[0],dataXYZ[1],dataXYZ[2]);
-    Packet_Put(0,0,0,0);
+    //Packet_Put(0,0,0,0);
   }
 
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/
