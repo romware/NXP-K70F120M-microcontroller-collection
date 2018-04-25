@@ -130,8 +130,8 @@ bool HandleTowerProgramByte(void)
   else if (Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07)
   {
     // Program byte to Flash
-    volatile uint8_t* nvAddess = (uint8_t*)(FLASH_DATA_START + Packet_Parameter1);
-    return Flash_Write8( (uint8_t*)nvAddess, Packet_Parameter3 );
+    volatile uint8_t* nvAddress = (uint8_t*)(FLASH_DATA_START + Packet_Parameter1);
+    return Flash_Write8( (uint8_t*)nvAddress, Packet_Parameter3 );
   }
   return false;
 }

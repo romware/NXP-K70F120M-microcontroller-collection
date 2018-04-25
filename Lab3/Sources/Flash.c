@@ -83,7 +83,7 @@ bool Flash_AllocateVar(volatile void** variable, const uint8_t size)
       if(!(occupiedBytes & allocation))
       {
       	// Set the variable value to be the Flash address
-        *variable = (uint16_t* volatile)FLASH_DATA_START + i;
+        *variable = (uint16_t* volatile)((uint32_t)FLASH_DATA_START + i * size);
         
         // Set the occupation bit mask to have the newly allocated address as occupied
         occupiedBytes |= allocation;
