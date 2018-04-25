@@ -35,8 +35,8 @@ static void StartCondition()
 {
   // Wait until the I2C bus is idle
   BusyCondition();
-  I2C0_C1 |= I2C_C1_MST_MASK;
   I2C0_C1 |= I2C_C1_TX_MASK;
+  I2C0_C1 |= I2C_C1_MST_MASK;
 }
 
 /*! @brief Stop condition on I2C Bus
@@ -145,8 +145,6 @@ void I2C_SelectSlaveDevice(const uint8_t slaveAddress)
  */
 void I2C_Write(const uint8_t registerAddress, const uint8_t data)
 {
-  BusyCondition();
-
   StartCondition();
 
   I2C0_D = SlaveDeviceAddress << 1;
@@ -173,7 +171,55 @@ void I2C_Write(const uint8_t registerAddress, const uint8_t data)
  */
 void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint8_t nbBytes)
 {
+  // Initiate communications by sending start signal
+  StartCondition();
 
+  // Send slave device address with write bit
+  I2C0_D = SlaveDeviceAddress << 1;
+
+  // Wait for AK from slave
+  WaitCondition();
+
+  // Send read register address
+  I2C0_D = registerAddress;
+
+  // Wait for AK from slave
+  WaitCondition();
+
+  // Send Repeat start signal to slave
+  RepeatCondition();
+
+  // Send slave device address with read bit
+  I2C0_D = (SlaveDeviceAddress << 1) | 1;
+
+  // Wait for AK from slave device
+  WaitCondition();
+
+  // Change to RX mode
+  I2C0_C1 &= ~I2C_C1_TX_MASK;
+
+  // Enable interrupts here?? Maybe make a function MasterRxMode?
+  I2C0_C1 |= I2C_C1_IICIE_MASK;
+
+  // Read required number of data bytes
+  for (int i = 0; i < nbBytes; i++)
+  {
+    // Wait for receive data to arrive TODO: using I2C_ISR?
+    while(!(I2C0_S & I2C_S_TCF_MASK));
+
+    // Load received byte into data
+    data[i] = I2C0_D;
+
+    // Send AK. Clear TXAK and set FACK??
+    I2C0_SMB |= I2C_SMB_FACK_MASK;
+    I2C0_C1 &= ~I2C_C1_TXAK_MASK;
+  }
+
+  // Send NAK by writing 1 to TXAK
+  I2C0_C1 |= I2C_C1_TX_MASK;
+
+  // Send Stop
+  StopCondition();
 }
 
 /*! @brief Reads data of a specified length starting from a specified register

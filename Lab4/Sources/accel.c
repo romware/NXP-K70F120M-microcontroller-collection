@@ -217,7 +217,6 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
   Accel_SetMode(ACCEL_POLL);
 
   // Set up for interrupts from PORTB
-
   // Ensure global interrupts are disabled
   EnterCritical();
 
@@ -235,24 +234,24 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
   // Return global interrupts to how they were
   ExitCritical();
 
-  // Set up PORTB pin 7 for interrupts from the accelerometer INT2 (default).
+  // Set up PORTB pin 4 for interrupts from the accelerometer INT1
   // Enable PORTB in System Clock Gating Control Register 5
   SIM_SCGC5 |= SIM_SCGC5_PORTB_MASK;
 
-  // Set PTB7 (BGA Map 'L15') to be the I2C data ready interrupt pin by setting to ALT1
-  PORTB_PCR7 = PORT_PCR_MUX(1);
+  // Set PTB4 (BGA Map 'L15') to be the I2C data ready interrupt pin by setting to ALT1
+  PORTB_PCR4 = PORT_PCR_MUX(1);
 
-  // Configure PTB7 as a GPIO input
-  GPIOB_PDDR |= (1 << 7);
+  // Configure PTB4 as a GPIO input
+  GPIOB_PDDR |= (1 << 4);
 
-  // Set pull enable for PTB7
-  PORTB_PCR7 |= PORT_PCR_PE_MASK;
+  // Set pull enable for PTB4
+  PORTB_PCR4 |= PORT_PCR_PE_MASK;
 
   // Ensure Pull Select is set to 0 (pulldown)
-  PORTB_PCR7 &= ~PORT_PCR_PS_MASK;
+  PORTB_PCR4 &= ~PORT_PCR_PS_MASK;
 
   // Disable interrupt flag. This will be enabled in Accel_SetMode if Interrupt mode is selected
-  PORTB_PCR7 = PORT_PCR_IRQC(0b0000);
+  PORTB_PCR4 = PORT_PCR_IRQC(0b0000);
 
   // Set up a 1 second Periodic Interrupt Timer for use in I2C polling mode.
   // Initialize the PIT
@@ -280,17 +279,20 @@ void Accel_SetMode(const TAccelMode mode)
   // If INT, set up 1.56 Hz DRDY interrupt in Reg5
   if(mode == ACCEL_POLL)
   {
-    // Disable Interrupts form the
+    // Disable Interrupts from the accelerometer
     I2C_Write(ADDRESS_CTRL_REG4, CTRL_REG4 & ~CTRL_REG4_INT_EN_DRDY);
 
-    // Set the 1 second Periodic Interrupt Timer for use with I2C polling
+    // Disable Flag and Interrupt when logic 1 for PTB4
+    PORTB_PCR4 = PORT_PCR_IRQC(0b0000);
+
+    // Set the Periodic Interrupt Timer for use with I2C polling
     PIT_Set(PERIOD_I2C_POLL, true);
 
   }
   else if(mode == ACCEL_INT)
   {
-    // Enable Flag and Interrupt when logic 1 for PTB7
-    PORTB_PCR7 = PORT_PCR_IRQC(0b1100);
+    // Enable Flag and Interrupt when logic 1 for PTB4
+    PORTB_PCR4 = PORT_PCR_IRQC(0b1100);
 
     // Enable Data Ready Interrupt from accelerometer
     I2C_Write(ADDRESS_CTRL_REG4, CTRL_REG4 |= CTRL_REG4_INT_EN_DRDY);
