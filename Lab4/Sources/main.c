@@ -433,6 +433,13 @@ int main(void)
 {
   /* Write your local variable definition here */
 
+
+  /*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
+  PE_low_level_init();
+  /*** End of Processor Expert internal initialization.                    ***/
+
+  /* Write your code here */
+
   TFTMChannel receivedPacketTmr;          /*!< FTM Channel for received packet timer */
   receivedPacketTmr.channelNb             = 0;
   receivedPacketTmr.delayCount            = 24414;
@@ -449,11 +456,6 @@ int main(void)
   accelerometerSetup.readCompleteCallbackFunction  = AccelReadCompleteCallback;
   accelerometerSetup.readCompleteCallbackArguments = NULL;
 
-  /*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
-  PE_low_level_init();
-  /*** End of Processor Expert internal initialization.                    ***/
-
-  /* Write your code here */
 
   // Globally disable interrupts
   __DI();
@@ -471,6 +473,7 @@ int main(void)
 
   // Globally enable interrupts
   __EI();
+
 
   // Send startup packets to PC
   HandleTowerStartup();
