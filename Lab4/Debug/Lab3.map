@@ -599,75 +599,75 @@ LOAD c:/freescale/kds_3.0.0/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv7e-
  .text.StartCondition
                 0x00000cc0       0x30 ./Sources/I2C.o
  .text.StopCondition
-                0x00000cf0       0x20 ./Sources/I2C.o
+                0x00000cf0       0x30 ./Sources/I2C.o
  .text.WaitCondition
-                0x00000d10       0x28 ./Sources/I2C.o
+                0x00000d20       0x28 ./Sources/I2C.o
  .text.BusyCondition
-                0x00000d38       0x20 ./Sources/I2C.o
+                0x00000d48       0x20 ./Sources/I2C.o
  .text.RepeatCondition
-                0x00000d58       0x40 ./Sources/I2C.o
+                0x00000d68       0x40 ./Sources/I2C.o
  .text.I2C_Init
-                0x00000d98      0x100 ./Sources/I2C.o
-                0x00000d98                I2C_Init
+                0x00000da8      0x100 ./Sources/I2C.o
+                0x00000da8                I2C_Init
  .text.I2C_Write
-                0x00000e98       0x4c ./Sources/I2C.o
-                0x00000e98                I2C_Write
+                0x00000ea8       0x4c ./Sources/I2C.o
+                0x00000ea8                I2C_Write
  .text.I2C_PollRead
-                0x00000ee4       0xdc ./Sources/I2C.o
-                0x00000ee4                I2C_PollRead
- .text.I2C_ISR  0x00000fc0       0x3c ./Sources/I2C.o
-                0x00000fc0                I2C_ISR
+                0x00000ef4       0xdc ./Sources/I2C.o
+                0x00000ef4                I2C_PollRead
+ .text.I2C_ISR  0x00000fd0       0x3c ./Sources/I2C.o
+                0x00000fd0                I2C_ISR
  .text.LEDs_Init
-                0x00000ffc       0xd4 ./Sources/LEDs.o
-                0x00000ffc                LEDs_Init
- .text.LEDs_On  0x000010d0       0x24 ./Sources/LEDs.o
-                0x000010d0                LEDs_On
+                0x0000100c       0xd4 ./Sources/LEDs.o
+                0x0000100c                LEDs_Init
+ .text.LEDs_On  0x000010e0       0x24 ./Sources/LEDs.o
+                0x000010e0                LEDs_On
  .text.LEDs_Off
-                0x000010f4       0x24 ./Sources/LEDs.o
-                0x000010f4                LEDs_Off
+                0x00001104       0x24 ./Sources/LEDs.o
+                0x00001104                LEDs_Off
  .text.LEDs_Toggle
-                0x00001118       0x24 ./Sources/LEDs.o
-                0x00001118                LEDs_Toggle
+                0x00001128       0x24 ./Sources/LEDs.o
+                0x00001128                LEDs_Toggle
  .text.PIT_Init
-                0x0000113c       0xdc ./Sources/PIT.o
-                0x0000113c                PIT_Init
- .text.PIT_Set  0x00001218       0x58 ./Sources/PIT.o
-                0x00001218                PIT_Set
+                0x0000114c       0xdc ./Sources/PIT.o
+                0x0000114c                PIT_Init
+ .text.PIT_Set  0x00001228       0x58 ./Sources/PIT.o
+                0x00001228                PIT_Set
  .text.PIT_Enable
-                0x00001270       0x40 ./Sources/PIT.o
-                0x00001270                PIT_Enable
- .text.PIT_ISR  0x000012b0       0x40 ./Sources/PIT.o
-                0x000012b0                PIT_ISR
+                0x00001280       0x40 ./Sources/PIT.o
+                0x00001280                PIT_Enable
+ .text.PIT_ISR  0x000012c0       0x40 ./Sources/PIT.o
+                0x000012c0                PIT_ISR
  .text.RTC_Init
-                0x000012f0      0x144 ./Sources/RTC.o
-                0x000012f0                RTC_Init
- .text.RTC_Set  0x00001434       0x5c ./Sources/RTC.o
-                0x00001434                RTC_Set
- .text.RTC_Get  0x00001490       0x9c ./Sources/RTC.o
-                0x00001490                RTC_Get
- .text.RTC_ISR  0x0000152c       0x34 ./Sources/RTC.o
-                0x0000152c                RTC_ISR
+                0x00001300      0x144 ./Sources/RTC.o
+                0x00001300                RTC_Init
+ .text.RTC_Set  0x00001444       0x5c ./Sources/RTC.o
+                0x00001444                RTC_Set
+ .text.RTC_Get  0x000014a0       0x9c ./Sources/RTC.o
+                0x000014a0                RTC_Get
+ .text.RTC_ISR  0x0000153c       0x34 ./Sources/RTC.o
+                0x0000153c                RTC_ISR
  .text.UART_Init
-                0x00001560      0x178 ./Sources/UART.o
-                0x00001560                UART_Init
+                0x00001570      0x178 ./Sources/UART.o
+                0x00001570                UART_Init
  .text.UART_InChar
-                0x000016d8       0x20 ./Sources/UART.o
-                0x000016d8                UART_InChar
+                0x000016e8       0x20 ./Sources/UART.o
+                0x000016e8                UART_InChar
  .text.UART_OutChar
-                0x000016f8       0x40 ./Sources/UART.o
-                0x000016f8                UART_OutChar
+                0x00001708       0x40 ./Sources/UART.o
+                0x00001708                UART_OutChar
  .text.UART_ISR
-                0x00001738       0x90 ./Sources/UART.o
-                0x00001738                UART_ISR
+                0x00001748       0x90 ./Sources/UART.o
+                0x00001748                UART_ISR
  .text.Accel_Init
-                0x000017c8      0x124 ./Sources/accel.o
-                0x000017c8                Accel_Init
+                0x000017d8      0x124 ./Sources/accel.o
+                0x000017d8                Accel_Init
  .text.Accel_ReadXYZ
-                0x000018ec       0x18 ./Sources/accel.o
-                0x000018ec                Accel_ReadXYZ
+                0x000018fc       0x18 ./Sources/accel.o
+                0x000018fc                Accel_ReadXYZ
  .text.Accel_SetMode
-                0x00001904       0xa4 ./Sources/accel.o
-                0x00001904                Accel_SetMode
+                0x00001914       0x94 ./Sources/accel.o
+                0x00001914                Accel_SetMode
  .text.AccelDataReady_ISR
                 0x000019a8       0x34 ./Sources/accel.o
                 0x000019a8                AccelDataReady_ISR
@@ -1135,21 +1135,21 @@ OUTPUT(Lab3.elf elf32-littlearm)
  .debug_macro   0x0001a220       0x9a ./Generated_Code/Cpu.o
  .debug_macro   0x0001a2ba       0xd4 ./Generated_Code/Vectors.o
 
-.debug_line     0x00000000     0x27d6
+.debug_line     0x00000000     0x27db
  .debug_line    0x00000000      0x2a0 ./Sources/FIFO.o
  .debug_line    0x000002a0      0x2c1 ./Sources/FTM.o
  .debug_line    0x00000561      0x2ce ./Sources/Flash.o
- .debug_line    0x0000082f      0x356 ./Sources/I2C.o
- .debug_line    0x00000b85      0x220 ./Sources/LEDs.o
- .debug_line    0x00000da5      0x2a3 ./Sources/PIT.o
- .debug_line    0x00001048      0x2ac ./Sources/RTC.o
- .debug_line    0x000012f4      0x2c4 ./Sources/UART.o
- .debug_line    0x000015b8      0x2dd ./Sources/accel.o
- .debug_line    0x00001895      0x4b2 ./Sources/main.o
- .debug_line    0x00001d47      0x1e6 ./Sources/packet.o
- .debug_line    0x00001f2d      0x3ca ./Project_Settings/Startup_Code/startup.o
- .debug_line    0x000022f7      0x271 ./Generated_Code/Cpu.o
- .debug_line    0x00002568      0x26e ./Generated_Code/Vectors.o
+ .debug_line    0x0000082f      0x357 ./Sources/I2C.o
+ .debug_line    0x00000b86      0x220 ./Sources/LEDs.o
+ .debug_line    0x00000da6      0x2a3 ./Sources/PIT.o
+ .debug_line    0x00001049      0x2ac ./Sources/RTC.o
+ .debug_line    0x000012f5      0x2c4 ./Sources/UART.o
+ .debug_line    0x000015b9      0x2e1 ./Sources/accel.o
+ .debug_line    0x0000189a      0x4b2 ./Sources/main.o
+ .debug_line    0x00001d4c      0x1e6 ./Sources/packet.o
+ .debug_line    0x00001f32      0x3ca ./Project_Settings/Startup_Code/startup.o
+ .debug_line    0x000022fc      0x271 ./Generated_Code/Cpu.o
+ .debug_line    0x0000256d      0x26e ./Generated_Code/Vectors.o
 
 .debug_str      0x00000000    0x8e8d9
  .debug_str     0x00000000    0x8a555 ./Sources/FIFO.o

@@ -41,8 +41,8 @@ static void StartCondition()
  */
 static void StopCondition()
 {
-//  I2C0_C1 &= ~I2C_C1_TX_MASK;
   I2C0_C1 &= ~I2C_C1_MST_MASK;
+  I2C0_C1 &= ~I2C_C1_TX_MASK;
 }
 
 /*! @brief Wait condition on I2C Bus
@@ -218,7 +218,7 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
     // Change to RX mode
     //I2C0_C1 &= ~I2C_C1_TX_MASK;
 
-    // Wait for receive data to arrive TODO: using I2C_ISR?
+    // Wait for receive data to arrive TODO: using I2C_ISR? This does not seem to work for just one byte
     while(!(I2C0_S & I2C_S_TCF_MASK)){}
 
     // Load received byte into data
