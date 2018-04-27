@@ -33,8 +33,6 @@ static uint8_t SlaveDeviceAddress = 0x1D;            /*!< Current Slave address 
  */
 static void StartCondition()
 {
-  // Wait until the I2C bus is idle
-  BusyCondition();
   I2C0_C1 |= I2C_C1_TX_MASK;
   I2C0_C1 |= I2C_C1_MST_MASK;
 }
@@ -43,21 +41,19 @@ static void StartCondition()
  */
 static void StopCondition()
 {
-  I2C0_C1 &= ~I2C_C1_TX_MASK;
+//  I2C0_C1 &= ~I2C_C1_TX_MASK;
   I2C0_C1 &= ~I2C_C1_MST_MASK;
-
-  uint32_t temp1 = I2C0_C1;
-
-
-  uint32_t temp2 = temp1;
 }
 
 /*! @brief Wait condition on I2C Bus
  */
 static void WaitCondition()
 {
-  while(I2C0_S & I2C_S_RXAK_MASK) {}
-  //I2C0_S = I2C_S_IICIF_MASK;
+  while(!(I2C0_S & I2C_S_IICIF_MASK)) {}
+  //while(I2C0_S & I2C_S_RXAK_MASK) {}
+  I2C0_S = I2C_S_IICIF_MASK;
+
+  //BusyCondition();
 }
 
 /*! @brief Wait while busy condition on I2C Bus
@@ -151,6 +147,9 @@ void I2C_SelectSlaveDevice(const uint8_t slaveAddress)
  */
 void I2C_Write(const uint8_t registerAddress, const uint8_t data)
 {
+  // Wait until the I2C bus is idle
+  BusyCondition();
+
   StartCondition();
 
   I2C0_D = SlaveDeviceAddress << 1;
@@ -177,14 +176,18 @@ void I2C_Write(const uint8_t registerAddress, const uint8_t data)
  */
 void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint8_t nbBytes)
 {
+
+  // Wait until the I2C bus is idle
+  BusyCondition();
+
   // Initiate communications by sending start signal
   StartCondition();
 
   // Send slave device address with write bit
   I2C0_D = SlaveDeviceAddress << 1;
 
-  // Wait for the bus to become busy
-  while(!(I2C0_S & I2C_S_BUSY_MASK)) {}
+  // Wait for the bus to not be busy
+  //while(!(I2C0_S & I2C_S_BUSY_MASK)) {}
 
   // Wait for AK from slave
   WaitCondition();
@@ -210,10 +213,10 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
   //I2C0_C1 |= I2C_C1_IICIE_MASK;
 
   // Read required number of data bytes
-  /*for (int i = 0; i < nbBytes; i++)
+  for (int i = 0; i < nbBytes; i++)
   {
     // Change to RX mode
-    I2C0_C1 &= ~I2C_C1_TX_MASK;
+    //I2C0_C1 &= ~I2C_C1_TX_MASK;
 
     // Wait for receive data to arrive TODO: using I2C_ISR?
     while(!(I2C0_S & I2C_S_TCF_MASK)){}
@@ -222,7 +225,7 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
     data[i] = I2C0_D;
 
     // Change to TX mode
-    I2C0_C1 |= I2C_C1_TX_MASK;
+    //I2C0_C1 |= I2C_C1_TX_MASK;
 
     // Send AK. Clear TXAK and set FACK??
     I2C0_SMB |= I2C_SMB_FACK_MASK;
@@ -232,7 +235,7 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
 	I2C0_C1 &= ~I2C_C1_TXAK_MASK;
     }
   }
-*/
+
   // Send NAK by writing 1 to TXAK
   I2C0_C1 |= I2C_C1_TXAK_MASK;
 

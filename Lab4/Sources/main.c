@@ -335,7 +335,7 @@ void AccelDataReadyCallback(void* arg)
 //TODO: write brief // send packet for XYZ
 void AccelReadCompleteCallback(void* arg)
 {
-  static uint8_t data[3];
+  /*static uint8_t data[3];
   static uint8_t count = 0;
   if(count ==1)
   {
@@ -351,7 +351,7 @@ void AccelReadCompleteCallback(void* arg)
   {
     Packet_Put(COMMAND_ACCEL,data[0],data[1],data[2]);
     count = 0;
-  }
+  }*/
 }
 
 /*! @brief Initializes the main tower components by calling the initialization routines of the supporting software modules.
