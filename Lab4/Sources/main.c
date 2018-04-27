@@ -76,6 +76,8 @@ volatile uint16union_t* NvTowerNb;           /*!< Tower number union pointer to 
 volatile uint16union_t* NvTowerMd;           /*!< Tower mode union pointer to flash */
 volatile uint8_t* NvTowerPo;                 /*!< Tower protocol union pointer to flash */
 
+bool AccelRead = 0;     // TODO: Remove
+
 
 /*! @brief Sends the startup packets to the PC
  *
@@ -324,12 +326,15 @@ void RTCCallback(void* arg)
 void AccelDataReadyCallback(void* arg)
 {
   // Array to store XYZ values
-  uint8_t dataXYZ[3];
+  /*uint8_t dataXYZ[3];
 
   // Read data from the accelerometer
   Accel_ReadXYZ(dataXYZ);
 
-  Packet_Put(COMMAND_ACCEL,dataXYZ[0],dataXYZ[1],dataXYZ[2]);
+  Packet_Put(COMMAND_ACCEL,dataXYZ[0],dataXYZ[1],dataXYZ[2]);*/
+
+  AccelRead = 1;
+
 }
 
 //TODO: write brief // send packet for XYZ
@@ -358,14 +363,15 @@ void AccelReadCompleteCallback(void* arg)
  *
  *  @return void
  */
-bool TowerInit(void)
+bool TowerInit(const TAccelSetup* const accelSetup)
 {
   return (
     Flash_Init() &&
     LEDs_Init() &&
     Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) &&
     FTM_Init() &&
-    RTC_Init(RTCCallback, NULL)
+    RTC_Init(RTCCallback, NULL) &&
+    Accel_Init(accelSetup)
   );
 }
 
@@ -453,10 +459,8 @@ int main(void)
   __DI();
 
   // Initializes the main tower components
-  if(TowerInit())
+  if(TowerInit(&accelerometerSetup))
   {
-    Accel_Init(&accelerometerSetup);
-
     // Sets the default or stored values of the main tower components
     if(TowerSet() && FTM_Set(&receivedPacketTmr))
     {
@@ -486,10 +490,24 @@ int main(void)
       ReceivedPacket();
     }
 
-    uint8_t dataXYZ[3];
-    Accel_ReadXYZ(dataXYZ);
-    Packet_Put(COMMAND_ACCEL,dataXYZ[0],dataXYZ[1],dataXYZ[2]);
-    //Packet_Put(0,0,0,0);
+    if(AccelRead)
+    {
+
+
+	  LEDs_Toggle(LED_GREEN);
+	// Array to store XYZ values
+	  uint8_t dataXYZ[3];
+
+	  // Read data from the accelerometer
+	  Accel_ReadXYZ(dataXYZ);
+
+	  if(Packet_Put(COMMAND_ACCEL,dataXYZ[0],dataXYZ[1],dataXYZ[2]))
+	    {
+	      LEDs_Toggle(LED_BLUE);
+	    }
+
+	  AccelRead = 0;
+    }
   }
 
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/

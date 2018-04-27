@@ -253,7 +253,7 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
 
   // Set up a 1 second Periodic Interrupt Timer for use in I2C polling mode.
   // Initialize the PIT
-  //PIT_Init(accelSetup->moduleClk, accelSetup->dataReadyCallbackFunction, NULL);
+  PIT_Init(accelSetup->moduleClk, accelSetup->dataReadyCallbackFunction, NULL);
 
   Accel_SetMode(ACCEL_POLL);
 
@@ -286,7 +286,7 @@ void Accel_SetMode(const TAccelMode mode)
     PORTB_PCR4 = PORT_PCR_IRQC(0b0000);
 
     // Set the Periodic Interrupt Timer for use with I2C polling
-    //PIT_Set(PERIOD_I2C_POLL, true);
+    PIT_Set(PERIOD_I2C_POLL, true);
 
   }
   else if(mode == ACCEL_INT)

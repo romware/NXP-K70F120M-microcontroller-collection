@@ -125,7 +125,7 @@ bool I2C_Init(const TI2CModule* const aI2CModule, const uint32_t moduleClk)
   I2C0_C1 |= I2C_C1_IICEN_MASK;
 
   // Enable I2C interrupts
-  I2C0_C1 |= I2C_C1_IICIE_MASK;
+  //I2C0_C1 |= I2C_C1_IICIE_MASK;
 
   return true;
 }
