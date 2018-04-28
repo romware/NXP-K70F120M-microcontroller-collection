@@ -28,7 +28,7 @@ static void* UserArguments;         /*!< Callback parameters for RTC */
  *  @param userArguments is a pointer to the user arguments to use with the user callback function.
  *  @return bool - TRUE if the RTC was successfully initialized.
  */
-bool RTC_Init(void (*userFunction)(void*), void* userArguments)
+bool RTC_Init(void (*userFunction)(void*), void* userArguments) //TODO: Update this is Lab3 and confirm operation
 {
   // Store parameters for interrupt routine
   UserFunction = userFunction;
@@ -43,10 +43,10 @@ bool RTC_Init(void (*userFunction)(void*), void* userArguments)
    */
 
   // Clear any pending interrupts on FTM0
-  NVICICPR2 |= (1 << 3);
+  NVICICPR2 |= NVIC_ICPR(1 << 3);
 
   // Enable interrupts from FTM0 module
-  NVICISER2 |= (1 << 3);
+  NVICISER2 |= NVIC_ISER_SETENA(1 << 3);
 
   // Return global interrupts to how they were
   ExitCritical();
@@ -54,40 +54,23 @@ bool RTC_Init(void (*userFunction)(void*), void* userArguments)
   // Enable the Real Time Clock in System Clock Gating Control Register 6
   SIM_SCGC6 |= SIM_SCGC6_RTC_MASK;
 
-  //RTC_CR |= RTC_CR_UM_MASK;
-
-  //RTC_CR |= RTC_CR_SWR_MASK;
-
-  //RTC_CR = RTC_CR_SWR_MASK;
-  //RTC_CR &= ~RTC_CR_SWR_MASK;
-
-  uint8_t testlock = RTC_LR;
-  uint8_t testWAR = RTC_WAR;
-  uint8_t testRAR = RTC_RAR;
-
-  // Disable supervisor access
-  //RTC_CR |= RTC_CR_SUP_MASK;
-  uint8_t check = RTC_CR;
-
-  // Set internal capacitance for 32.768 kHz oscillator to 18pF (16pF + 2pF) as per sheet 4 of TWR-K70F120M-SCH.pdf
-  RTC_CR |= (RTC_CR_OSCE_MASK |RTC_CR_SC2P_MASK | RTC_CR_SC16P_MASK);
-
-  //RTC_CR = 0b00000000000000000010010100000100;
-
-  check = RTC_CR;
-
-  // Disable 32.768 kHz clock to other peripherals
-  RTC_CR |= RTC_CR_CLKO_MASK;
-
-  // Enable the 32.768 kHz clock. NOTE: Wait oscillator startup time to allow XTAL to stabilize
+  // Enable the oscillator
   RTC_CR |= RTC_CR_OSCE_MASK;
 
+  // Set internal capacitance for 32.768 kHz oscillator to 18pF (16pF + 2pF) as per sheet 4 of TWR-K70F120M-SCH.pdf
+  RTC_CR |= (RTC_CR_SC2P_MASK | RTC_CR_SC16P_MASK);
 
-  // Enable the time counter
-  RTC_SR |= RTC_SR_TCE_MASK;
+  // If the Time Invalid Flag is set, set a valid time
+  if(RTC_SR & RTC_SR_TIF_MASK)
+  {
+    RTC_Set(0,0,0);
+  }
 
   // Enable 1 second interrupts from the RTC
   RTC_IER |= RTC_IER_TSIE_MASK;
+
+  // Lock the control register so it cannot be written to
+  RTC_LR &= ~RTC_LR_CRL_MASK;
 
   return true;
 }
