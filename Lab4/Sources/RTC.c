@@ -54,42 +54,41 @@ bool RTC_Init(void (*userFunction)(void*), void* userArguments)
   // Enable the Real Time Clock in System Clock Gating Control Register 6
   SIM_SCGC6 |= SIM_SCGC6_RTC_MASK;
 
-  RTC_CR |= RTC_CR_UM_MASK;
+  //RTC_CR |= RTC_CR_UM_MASK;
 
-  RTC_CR |= RTC_CR_SWR_MASK;
+  //RTC_CR |= RTC_CR_SWR_MASK;
 
-  // Unlock lock register
-  RTC_LR |= RTC_LR_LRL_MASK;
+  //RTC_CR = RTC_CR_SWR_MASK;
+  //RTC_CR &= ~RTC_CR_SWR_MASK;
 
-  // Unlock control register
-  RTC_LR |= (RTC_LR_CRL_MASK | RTC_LR_MCHL_MASK | RTC_LR_MCLL_MASK | RTC_LR_MEL_MASK | RTC_LR_SRL_MASK | RTC_LR_SRL_MASK | RTC_LR_TCL_MASK | RTC_LR_TTSL_MASK);
+  uint8_t testlock = RTC_LR;
+  uint8_t testWAR = RTC_WAR;
+  uint8_t testRAR = RTC_RAR;
+
+  // Disable supervisor access
+  //RTC_CR |= RTC_CR_SUP_MASK;
+  uint8_t check = RTC_CR;
 
   // Set internal capacitance for 32.768 kHz oscillator to 18pF (16pF + 2pF) as per sheet 4 of TWR-K70F120M-SCH.pdf
-  RTC_CR |= RTC_CR_SC2P_MASK | RTC_CR_SC16P_MASK;
+  RTC_CR |= (RTC_CR_OSCE_MASK |RTC_CR_SC2P_MASK | RTC_CR_SC16P_MASK);
+
+  //RTC_CR = 0b00000000000000000010010100000100;
+
+  check = RTC_CR;
 
   // Disable 32.768 kHz clock to other peripherals
   RTC_CR |= RTC_CR_CLKO_MASK;
 
   // Enable the 32.768 kHz clock. NOTE: Wait oscillator startup time to allow XTAL to stabilize
-  RTC_CR = RTC_CR_OSCE_MASK;
+  RTC_CR |= RTC_CR_OSCE_MASK;
 
-  // Unlock control register
-  RTC_LR &= ~RTC_LR_CRL_MASK;
-
-  // Unlock status register
-   RTC_LR |= RTC_LR_SRL_MASK;
 
   // Enable the time counter
   RTC_SR |= RTC_SR_TCE_MASK;
 
-  // Lock status register
-  //RTC_LR &= ~RTC_LR_SRL_MASK;
-
   // Enable 1 second interrupts from the RTC
   RTC_IER |= RTC_IER_TSIE_MASK;
 
-  // Lock lock register
-  RTC_LR &= ~RTC_LR_LRL_MASK;
   return true;
 }
 

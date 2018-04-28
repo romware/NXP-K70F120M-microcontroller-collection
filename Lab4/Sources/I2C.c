@@ -33,8 +33,8 @@ static uint8_t SlaveDeviceAddress = 0x1D;            /*!< Current Slave address 
  */
 static void StartCondition()
 {
-  I2C0_C1 |= I2C_C1_TX_MASK;
   I2C0_C1 |= I2C_C1_MST_MASK;
+  I2C0_C1 |= I2C_C1_TX_MASK;
 }
 
 /*! @brief Stop condition on I2C Bus
@@ -42,7 +42,7 @@ static void StartCondition()
 static void StopCondition()
 {
   I2C0_C1 &= ~I2C_C1_MST_MASK;
-  I2C0_C1 &= ~I2C_C1_TX_MASK;
+  //I2C0_C1 &= ~I2C_C1_TX_MASK;
 }
 
 /*! @brief Wait condition on I2C Bus
@@ -67,8 +67,8 @@ static void BusyCondition()
  */
 static void RepeatCondition()
 {
-  I2C0_C1 |= I2C_C1_TX_MASK;
-  I2C0_C1 |= I2C_C1_MST_MASK;
+  //I2C0_C1 |= I2C_C1_TX_MASK;
+  //I2C0_C1 |= I2C_C1_MST_MASK;
   I2C0_C1 |= I2C_C1_RSTA_MASK;
 }
 
@@ -110,8 +110,14 @@ bool I2C_Init(const TI2CModule* const aI2CModule, const uint32_t moduleClk)
   // Set PTE18 (BGA Map 'L4') to be the I2C0 SDA pin by setting to ALT4
   PORTE_PCR18 = PORT_PCR_MUX(4);
 
+  // Enable open drain
+  PORTE_PCR18 |= PORT_PCR_ODE_MASK;
+
   // Set PTE19 (BGA Map 'M3') to be the I2C0 SCL pin by setting to ALT4
   PORTE_PCR19 = PORT_PCR_MUX(4);
+
+  // Enable open drain
+  PORTE_PCR19 |= PORT_PCR_ODE_MASK;
 
   /* Set I2C Frequency Divider Register  TODO: Write a private function that performs an exhaustive search for these parameters
    * MULT: 0x02;   mul = 4;
@@ -209,38 +215,57 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
 
   // Change to RX mode
   I2C0_C1 &= ~I2C_C1_TX_MASK;
+
+  // Ensure TXAK is clear
+  I2C0_C1 &= ~I2C_C1_TXAK_MASK;
+
+  // Dummy read from register
+  data[0] = I2C0_D;
+  WaitCondition();
+
   // Enable interrupts here?? Maybe make a function MasterRxMode?
   //I2C0_C1 |= I2C_C1_IICIE_MASK;
 
-  // Read required number of data bytes
-  for (int i = 0; i < nbBytes; i++)
+  // Read until second last byte of data
+  for (int i = 0; i < nbBytes-1; i++)
   {
     // Change to RX mode
     //I2C0_C1 &= ~I2C_C1_TX_MASK;
 
     // Wait for receive data to arrive TODO: using I2C_ISR? This does not seem to work for just one byte
-    while(!(I2C0_S & I2C_S_TCF_MASK)){}
+    //while(!(I2C0_S & I2C_S_TCF_MASK)){}
 
     // Load received byte into data
     data[i] = I2C0_D;
+
+    WaitCondition();
 
     // Change to TX mode
     //I2C0_C1 |= I2C_C1_TX_MASK;
 
     // Send AK. Clear TXAK and set FACK??
-    I2C0_SMB |= I2C_SMB_FACK_MASK;
-
-    if(i < (nbBytes - 1))
-    {
-	I2C0_C1 &= ~I2C_C1_TXAK_MASK;
-    }
+    //I2C0_SMB |= I2C_SMB_FACK_MASK;
   }
 
-  // Send NAK by writing 1 to TXAK
+  // Set TXACK prior to reading second last byte
   I2C0_C1 |= I2C_C1_TXAK_MASK;
 
-  // Send Stop
+  // Read second last of data
+  data[nbBytes-2] = I2C0_D;
+  WaitCondition();
+
+  // Generate stop signal prior to reading last byte of data
   StopCondition();
+
+  // Read last byte of data
+  data[nbBytes-1] = I2C0_D;
+
+
+  // Send NAK by writing 1 to TXAK
+  //I2C0_C1 |= I2C_C1_TXAK_MASK;
+
+  // Send Stop
+  //StopCondition();
 }
 
 /*! @brief Reads data of a specified length starting from a specified register

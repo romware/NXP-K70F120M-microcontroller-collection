@@ -285,21 +285,22 @@ void Accel_SetMode(const TAccelMode mode)
     // Reset accelerometer
       //I2C_Write(ADDRESS_CTRL_REG2, 0b1000000);
 
+    uint8_t readReg = 0;
+
+    I2C_PollRead(ADDRESS_CTRL_REG1, &readReg, 1);
+
+    uint8_t readReg2 = readReg;
+
+
     // Put accelerometer into standby mode so that Control Register 1 can be modified.
     I2C_Write(ADDRESS_CTRL_REG1, 0);
 
     // Set to fast read (8 bit resolution) and set to active mode
     I2C_Write(ADDRESS_CTRL_REG1, (CTRL_REG1_ACTIVE | CTRL_REG1_F_READ) );
 
-    //uint8_t readReg = 0;
+    I2C_PollRead(ADDRESS_CTRL_REG1, &readReg, 1);
 
-    //I2C_PollRead(ADDRESS_CTRL_REG1, &readReg, 1);
-
-    //uint8_t readReg2 = readReg;
-
-    //I2C_PollRead(ADDRESS_CTRL_REG2, &readReg, 1);
-
-   //readReg2 = readReg;
+    readReg2 = readReg;
 
     // Disable Flag and Interrupt when logic 1 for PTB4
     PORTB_PCR4 = PORT_PCR_IRQC(0b0000);
