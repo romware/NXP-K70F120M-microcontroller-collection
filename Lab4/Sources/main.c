@@ -322,7 +322,7 @@ void RTCCallback(void* arg)
   Packet_Put(COMMAND_TIME, hours, minutes, seconds);
 }
 
-//TODO: write brief // send packet for XYZ
+//TODO: write brief // call read function
 void AccelDataReadyCallback(void* arg)
 {
   // Array to store XYZ values

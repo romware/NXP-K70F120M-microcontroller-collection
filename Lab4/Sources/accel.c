@@ -239,15 +239,6 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
   // Set PTB4 (BGA Map 'N15') to be the I2C data ready interrupt pin by setting to ALT1
   PORTB_PCR4 = PORT_PCR_MUX(1);
 
-  // Configure PTB4 as a GPIO input
-  //GPIOB_PDDR |= (1 << 4);
-
-  // Set pull enable for PTB4
-  //PORTB_PCR4 |= PORT_PCR_PE_MASK;
-
-  // Set to pullup
-  //PORTB_PCR4 |= PORT_PCR_PS_MASK;
-
   // Disable interrupt flag. This will be enabled in Accel_SetMode if Interrupt mode is selected
   PORTB_PCR4 &= ~PORT_PCR_IRQC_MASK;
 
@@ -255,7 +246,7 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
   // Initialize the PIT
   PIT_Init(accelSetup->moduleClk, accelSetup->dataReadyCallbackFunction, NULL);
 
-  Accel_SetMode(ACCEL_POLL);
+  Accel_SetMode(ACCEL_INT);
 
   return true;
 }
@@ -266,8 +257,6 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
 void Accel_ReadXYZ(uint8_t data[3])
 {
   I2C_PollRead(ADDRESS_OUT_X_MSB, data, 3);
-  //I2C_PollRead(ADDRESS_OUT_Y_MSB, &data[1], 1);
-  //I2C_PollRead(ADDRESS_OUT_Z_MSB, &data[2], 1);
 }
 
 /*! @brief Set the mode of the accelerometer.
@@ -285,6 +274,9 @@ void Accel_SetMode(const TAccelMode mode)
     // Disable the DRDY interrupt from the accelerometer
     CTRL_REG4_INT_EN_DRDY = 0;
     I2C_Write(ADDRESS_CTRL_REG4, CTRL_REG4);
+
+    // Disable the interrupt source of PTB4
+    PORTB_PCR4 &= ~PORT_PCR_IRQC_MASK;
 
     // Set to fast read, 12.5 Hz and put back into active mode
     CTRL_REG1_F_READ = 1;
