@@ -192,9 +192,6 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
   // Send slave device address with write bit
   I2C0_D = SlaveDeviceAddress << 1;
 
-  // Wait for the bus to not be busy
-  //while(!(I2C0_S & I2C_S_BUSY_MASK)) {}
-
   // Wait for AK from slave
   WaitCondition();
 
@@ -223,28 +220,13 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
   data[0] = I2C0_D;
   WaitCondition();
 
-  // Enable interrupts here?? Maybe make a function MasterRxMode?
-  //I2C0_C1 |= I2C_C1_IICIE_MASK;
-
   // Read until second last byte of data
-  for (int i = 0; i < nbBytes-1; i++)
+  for (int i = 0; i < nbBytes-2; i++)
   {
-    // Change to RX mode
-    //I2C0_C1 &= ~I2C_C1_TX_MASK;
-
-    // Wait for receive data to arrive TODO: using I2C_ISR? This does not seem to work for just one byte
-    //while(!(I2C0_S & I2C_S_TCF_MASK)){}
-
     // Load received byte into data
     data[i] = I2C0_D;
 
     WaitCondition();
-
-    // Change to TX mode
-    //I2C0_C1 |= I2C_C1_TX_MASK;
-
-    // Send AK. Clear TXAK and set FACK??
-    //I2C0_SMB |= I2C_SMB_FACK_MASK;
   }
 
   // Set TXACK prior to reading second last byte
@@ -259,13 +241,6 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
 
   // Read last byte of data
   data[nbBytes-1] = I2C0_D;
-
-
-  // Send NAK by writing 1 to TXAK
-  //I2C0_C1 |= I2C_C1_TXAK_MASK;
-
-  // Send Stop
-  //StopCondition();
 }
 
 /*! @brief Reads data of a specified length starting from a specified register

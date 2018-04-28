@@ -28,7 +28,7 @@
 // Periodic Interrupt Timer
 #include "PIT.h"
 
-// CPU and PE_types are needed for critical section variables and the defintion of NULL pointer
+// CPU and PE_types are needed for critical section variables and the definition of NULL pointer
 #include "CPU.h"
 #include "PE_types.h"
 
@@ -275,47 +275,36 @@ void Accel_ReadXYZ(uint8_t data[3])
  */
 void Accel_SetMode(const TAccelMode mode)
 {
-  // If poll, use 1 sec pit and call readxyz. and check if xyz changed
-  // If INT, set up 1.56 Hz DRDY interrupt in Reg5
+  // Ensure the Accelerometer out out of active mode allow setting of control registers
+  // Set active to 0
+  CTRL_REG1_ACTIVE = 0;
+
+  // Write to accelerometer
+  I2C_Write(ADDRESS_CTRL_REG1, CTRL_REG1);
+
+  // Set to fast read, 1.56 Hz and put back into active mode
+  CTRL_REG1_F_READ = 1;
+  CTRL_REG1_DR     = DATE_RATE_1_56_HZ;
+  CTRL_REG1_ACTIVE = 1;
+
+  // Write to accelerometer
+  I2C_Write(ADDRESS_CTRL_REG1, CTRL_REG1);
+
   if(mode == ACCEL_POLL)
   {
-    // Disable Interrupts from the accelerometer
-    //I2C_Write(ADDRESS_CTRL_REG4, CTRL_REG4 & ~CTRL_REG4_INT_EN_DRDY);
-
-    // Reset accelerometer
-      //I2C_Write(ADDRESS_CTRL_REG2, 0b1000000);
-
-    uint8_t readReg = 0;
-
-    I2C_PollRead(ADDRESS_CTRL_REG1, &readReg, 1);
-
-    uint8_t readReg2 = readReg;
-
-
-    // Put accelerometer into standby mode so that Control Register 1 can be modified.
-    I2C_Write(ADDRESS_CTRL_REG1, 0);
-
-    // Set to fast read (8 bit resolution) and set to active mode
-    I2C_Write(ADDRESS_CTRL_REG1, (CTRL_REG1_ACTIVE | CTRL_REG1_F_READ) );
-
-    I2C_PollRead(ADDRESS_CTRL_REG1, &readReg, 1);
-
-    readReg2 = readReg;
-
-    // Disable Flag and Interrupt when logic 1 for PTB4
-    PORTB_PCR4 = PORT_PCR_IRQC(0b0000);
-
     // Set the Periodic Interrupt Timer for use with I2C polling
     PIT_Set(PERIOD_I2C_POLL, true);
-
   }
   else if(mode == ACCEL_INT)
   {
-    // Enable Flag and Interrupt when logic 1 for PTB4
+    // Disable the PIT used for Poll
+    PIT_Enable(false);
+
+    // Enable Flag and Interrupt when logic 1 for PTB4  TODO: Check if this is correct. Possibly rising/falling edge?
     PORTB_PCR4 = PORT_PCR_IRQC(0b1100);
 
     // Enable Data Ready Interrupt from accelerometer
-    I2C_Write(ADDRESS_CTRL_REG4, CTRL_REG4 |= CTRL_REG4_INT_EN_DRDY);
+
   }
 }
 
