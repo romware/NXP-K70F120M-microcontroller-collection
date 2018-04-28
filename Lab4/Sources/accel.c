@@ -240,16 +240,16 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
   PORTB_PCR4 = PORT_PCR_MUX(1);
 
   // Configure PTB4 as a GPIO input
-  GPIOB_PDDR |= (1 << 4);
+  //GPIOB_PDDR |= (1 << 4);
 
   // Set pull enable for PTB4
-  PORTB_PCR4 |= PORT_PCR_PE_MASK;
+  //PORTB_PCR4 |= PORT_PCR_PE_MASK;
 
-  // Ensure Pull Select is set to 0 (pulldown)
-  PORTB_PCR4 &= ~PORT_PCR_PS_MASK;
+  // Set to pullup
+  //PORTB_PCR4 |= PORT_PCR_PS_MASK;
 
   // Disable interrupt flag. This will be enabled in Accel_SetMode if Interrupt mode is selected
-  PORTB_PCR4 = PORT_PCR_IRQC(0b0000);
+  PORTB_PCR4 &= ~PORT_PCR_IRQC_MASK;
 
   // Set up a 1 second Periodic Interrupt Timer for use in I2C polling mode.
   // Initialize the PIT
@@ -278,20 +278,20 @@ void Accel_SetMode(const TAccelMode mode)
   // Ensure the Accelerometer out out of active mode allow setting of control registers
   // Set active to 0
   CTRL_REG1_ACTIVE = 0;
-
-  // Write to accelerometer
-  I2C_Write(ADDRESS_CTRL_REG1, CTRL_REG1);
-
-  // Set to fast read, 1.56 Hz and put back into active mode
-  CTRL_REG1_F_READ = 1;
-  CTRL_REG1_DR     = DATE_RATE_1_56_HZ;
-  CTRL_REG1_ACTIVE = 1;
-
-  // Write to accelerometer
   I2C_Write(ADDRESS_CTRL_REG1, CTRL_REG1);
 
   if(mode == ACCEL_POLL)
   {
+    // Disable the DRDY interrupt from the accelerometer
+    CTRL_REG4_INT_EN_DRDY = 0;
+    I2C_Write(ADDRESS_CTRL_REG4, CTRL_REG4);
+
+    // Set to fast read, 12.5 Hz and put back into active mode
+    CTRL_REG1_F_READ = 1;
+    CTRL_REG1_DR     = DATE_RATE_12_5_HZ;   // Set the 12.5 as we want this faster than our read rate to ensure we read new data
+    CTRL_REG1_ACTIVE = 1;
+    I2C_Write(ADDRESS_CTRL_REG1, CTRL_REG1);
+
     // Set the Periodic Interrupt Timer for use with I2C polling
     PIT_Set(PERIOD_I2C_POLL, true);
   }
@@ -300,11 +300,22 @@ void Accel_SetMode(const TAccelMode mode)
     // Disable the PIT used for Poll
     PIT_Enable(false);
 
-    // Enable Flag and Interrupt when logic 1 for PTB4  TODO: Check if this is correct. Possibly rising/falling edge?
-    PORTB_PCR4 = PORT_PCR_IRQC(0b1100);
+    // Route the DRDY interrupt to INT1
+    CTRL_REG5_INT_CFG_DRDY = 1;
+    I2C_Write(ADDRESS_CTRL_REG5, CTRL_REG5);
 
-    // Enable Data Ready Interrupt from accelerometer
+    // Enable/disable the DRDY interrupt
+    CTRL_REG4_INT_EN_DRDY = mode;
+    I2C_Write(ADDRESS_CTRL_REG4, CTRL_REG4);
 
+    // Set to fast read, 1.56 Hz and put back into active mode
+    CTRL_REG1_F_READ = 1;
+    CTRL_REG1_DR     = DATE_RATE_1_56_HZ;
+    CTRL_REG1_ACTIVE = 1;
+    I2C_Write(ADDRESS_CTRL_REG1, CTRL_REG1);
+
+    // Enable Flag and Interrupt on falling edge for PTB4
+    PORTB_PCR4 |= PORT_PCR_IRQC(0b1010);
   }
 }
 
@@ -316,9 +327,16 @@ void Accel_SetMode(const TAccelMode mode)
  */
 void __attribute__ ((interrupt)) AccelDataReady_ISR(void)
 {
-  // Call user callback function when data is ready
-  if (DataReadyCallbackFunction)
-   (*DataReadyCallbackFunction)(DataReadyCallbackArguments);
+  // Check the interrupt is from PTB4
+  if(PORTB_ISFR & (1 << 4))
+    {
+      // Write 1 to clear flag
+      PORTB_ISFR = (1 << 4);
+
+      // Call user callback function when data is ready
+      if (DataReadyCallbackFunction)
+       (*DataReadyCallbackFunction)(DataReadyCallbackArguments);
+    }
 }
 
 

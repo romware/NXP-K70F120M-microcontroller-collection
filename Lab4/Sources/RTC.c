@@ -43,7 +43,7 @@ bool RTC_Init(void (*userFunction)(void*), void* userArguments) //TODO: Update t
    */
 
   // Clear any pending interrupts on FTM0
-  NVICICPR2 |= NVIC_ICPR(1 << 3);
+  NVICICPR2 |= NVIC_ICPR(1 << 3);         //TODO: should we use this macro or not. If yes we need to do it everywhere
 
   // Enable interrupts from FTM0 module
   NVICISER2 |= NVIC_ISER_SETENA(1 << 3);

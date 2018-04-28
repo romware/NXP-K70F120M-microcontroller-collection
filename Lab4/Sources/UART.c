@@ -129,6 +129,7 @@ bool UART_OutChar(const uint8_t data)
     UART2_C2 |= UART_C2_TIE_MASK;
     return true;
   }
+  return false;  // TODO: add this to lab 3 as well
 }
 
 /*! @brief Interrupt service routine for the UART.
