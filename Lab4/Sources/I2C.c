@@ -307,6 +307,7 @@ void __attribute__ ((interrupt)) I2C_ISR(void)    // TODO: We need to work out w
   // Clear the interrupt
   I2C0_S = I2C_S_IICIF_MASK;
 
+
   // If there are more than 2 bytes left to read
   if(readCount < NbBytes - 2)
   {

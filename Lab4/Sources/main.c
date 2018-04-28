@@ -77,6 +77,7 @@ volatile uint16union_t* NvTowerMd;           /*!< Tower mode union pointer to fl
 volatile uint8_t* NvTowerPo;                 /*!< Tower protocol union pointer to flash */
 
 bool AccelRead = 0;     // TODO: Remove
+uint8_t TestData[3];    // TODO: Remove
 
 
 /*! @brief Sends the startup packets to the PC
@@ -333,30 +334,16 @@ void AccelDataReadyCallback(void* arg)
 
   Packet_Put(COMMAND_ACCEL,dataXYZ[0],dataXYZ[1],dataXYZ[2]);*/
 
-  AccelRead = 1;
-
+  //AccelRead = 1;
+  LEDs_Toggle(LED_BLUE);
+  Accel_ReadXYZ(TestData);
 }
 
 //TODO: write brief // send packet for XYZ
 void AccelReadCompleteCallback(void* arg)
 {
-  /*static uint8_t data[3];
-  static uint8_t count = 0;
-  if(count ==1)
-  {
-    I2C0_C1 |= I2C_C1_TXAK_MASK;
-  }
-  if(count == 2)
-  {
-    I2C0_C1 &= ~I2C_C1_MST_MASK;
-  }
-  data[count] = I2C0_D;
-  count ++;
-  if(count == 3)
-  {
-    Packet_Put(COMMAND_ACCEL,data[0],data[1],data[2]);
-    count = 0;
-  }*/
+  Packet_Put(COMMAND_ACCEL, TestData[0], TestData[1], TestData[2]);
+  LEDs_Toggle(LED_GREEN);
 }
 
 /*! @brief Initializes the main tower components by calling the initialization routines of the supporting software modules.
@@ -493,7 +480,7 @@ int main(void)
       ReceivedPacket();
     }
 
-    if(AccelRead)
+    /*if(AccelRead)
     {
 
 
@@ -510,7 +497,7 @@ int main(void)
 	    }
 
 	  AccelRead = 0;
-    }
+    }*/
   }
 
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/
