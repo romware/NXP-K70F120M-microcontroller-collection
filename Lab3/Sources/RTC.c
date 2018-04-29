@@ -42,10 +42,10 @@ bool RTC_Init(void (*userFunction)(void*), void* userArguments)
    * IRQ modulo 32 = 3
    */
 
-  // Clear any pending interrupts on FTM0
+  // Clear any pending interrupts on RTC
   NVICICPR2 |= (1 << 3);
 
-  // Enable interrupts from FTM0 module
+  // Enable interrupts from RTC module
   NVICISER2 |= (1 << 3);
 
   // Return global interrupts to how they were
@@ -54,20 +54,23 @@ bool RTC_Init(void (*userFunction)(void*), void* userArguments)
   // Enable the Real Time Clock in System Clock Gating Control Register 6
   SIM_SCGC6 |= SIM_SCGC6_RTC_MASK;
 
+  // Enable the oscillator
+  RTC_CR |= RTC_CR_OSCE_MASK;
+
   // Set internal capacitance for 32.768 kHz oscillator to 18pF (16pF + 2pF) as per sheet 4 of TWR-K70F120M-SCH.pdf
-  RTC_CR |= RTC_CR_SC2P_MASK | RTC_CR_SC16P_MASK;
+  RTC_CR |= (RTC_CR_SC2P_MASK | RTC_CR_SC16P_MASK);
 
-  // Disable 32.768 kHz clock to other peripherals
-  RTC_CR |= RTC_CR_CLKO_MASK;
-
-  // Enable the 32.768 kHz clock. NOTE: Wait oscillator startup time to allow XTAL to stabilize
-  RTC_CR = RTC_CR_OSCE_MASK;
-
-  // Enable the time counter
-  RTC_SR |= RTC_SR_TCE_MASK;
+  // If the Time Invalid Flag is set, set a valid time
+  if(RTC_SR & RTC_SR_TIF_MASK)
+  {
+    RTC_Set(0,0,0);
+  }
 
   // Enable 1 second interrupts from the RTC
   RTC_IER |= RTC_IER_TSIE_MASK;
+
+  // Lock the control register so it cannot be written to
+  RTC_LR &= ~RTC_LR_CRL_MASK;
 
   return true;
 }

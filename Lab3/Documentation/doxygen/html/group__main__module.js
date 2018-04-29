@@ -14,7 +14,7 @@ var group__main__module =
     [ "ReceivedPacket", "group__main__module.html#gaf57dd4c5e7e444cfe5571d411f9548c9", null ],
     [ "RTCCallback", "group__main__module.html#ga2dabe81b72bf8ec8155cd875975beb07", null ],
     [ "TowerInit", "group__main__module.html#gaeda7b585d318b7b1476285b82b6fed11", null ],
-    [ "TowerSet", "group__main__module.html#ga2382bc01cdfcddc71b68e53db780590e", null ],
+    [ "TowerSet", "group__main__module.html#ga070d7cbf60e00137048168ef91e622ae", null ],
     [ "COMMAND_MODE", "group__main__module.html#gae2909d574bfc1ab702eed1fb28a62505", null ],
     [ "COMMAND_NUM", "group__main__module.html#gab87bb2bd23dd78fbe94f98c0d4d51bfc", null ],
     [ "COMMAND_PROGRAMBYTE", "group__main__module.html#gae8762c85b8519b08700226b967c9581c", null ],

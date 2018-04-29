@@ -122,12 +122,12 @@ bool HandleTowerNumber(void)
 bool HandleTowerProgramByte(void)
 {
   // Check if offset is erase or set
-  if(Packet_Parameter1 == 0x08)
+  if(Packet_Parameter1 == 0x08 && Packet_Parameter2 == 0)
   {
     // Erase Flash
     return Flash_Erase();
   }
-  else if (Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07)
+  else if(Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07 && Packet_Parameter2 == 0)
   {
     // Program byte to Flash
     volatile uint8_t* nvAddress = (uint8_t*)(FLASH_DATA_START + Packet_Parameter1);
@@ -143,7 +143,7 @@ bool HandleTowerProgramByte(void)
 bool HandleTowerReadByte(void)
 {
   // Check if offset is within range
-  if (Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07)
+  if(Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Send read byte packet
     return Packet_Put(COMMAND_READBYTE,Packet_Parameter1,0,_FB(FLASH_DATA_START + (uint32_t)Packet_Parameter1));
@@ -153,7 +153,7 @@ bool HandleTowerReadByte(void)
 
 /*! @brief Sets the tower mode or sends the packet to the PC
  *
- *  @return bool - TRUE if packet is sent or number is set
+ *  @return bool - TRUE if packet is sent or mode is set
  */
 bool HandleTowerMode(void)
 {
@@ -177,9 +177,14 @@ bool HandleTowerMode(void)
  */
 bool HandleTowerSetTime(void)
 {
-  // Sets the Real Time Clock
-  RTC_Set(Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
-  return true;
+  // Check if parameters are within tower time limits
+  if(Packet_Parameter1 < 24 && Packet_Parameter2 < 60 && Packet_Parameter3 < 60)
+  {
+      // Sets the Real Time Clock
+      RTC_Set(Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
+      return true;
+  }
+  return false;
 }
 
 /*! @brief Executes the command depending on what packet has been received
@@ -213,17 +218,17 @@ void ReceivedPacket(void)
     // Check if parameters match tower mode GET or SET parameters
     success = HandleTowerMode();
   }
-  else if(commandIgnoreAck == COMMAND_PROGRAMBYTE && Packet_Parameter2 == 0)
+  else if(commandIgnoreAck == COMMAND_PROGRAMBYTE)
   {
     // Send tower program byte packet
     success = HandleTowerProgramByte();
   }
-  else if(commandIgnoreAck == COMMAND_READBYTE && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  else if(commandIgnoreAck == COMMAND_READBYTE)
   {
     // Send tower read byte packet
     success = HandleTowerReadByte();
   }
-  else if(commandIgnoreAck == COMMAND_TIME && Packet_Parameter1 < 24 && Packet_Parameter2 < 60 && Packet_Parameter3 < 60)
+  else if(commandIgnoreAck == COMMAND_TIME)
   {
     // Set the Real Time Clock time
     success = HandleTowerSetTime();
@@ -313,8 +318,11 @@ bool TowerInit(void)
  *
  *  @return void
  */
-bool TowerSet(void)
+bool TowerSet(const TFTMChannel* const aFTMChannel)
 {
+  // Success status of writing default values to Flash and FTM
+  bool success = true;
+
   // Set the periodic interrupt timer 0 to 500ms
   PIT_Set(PERIOD_LED_GREEN, true);
 
@@ -322,9 +330,6 @@ bool TowerSet(void)
   if(Flash_AllocateVar((volatile void**)&NvTowerNb, sizeof(*NvTowerNb))
   && Flash_AllocateVar((volatile void**)&NvTowerMd, sizeof(*NvTowerMd)));
   {
-    // Success status of writing default values to Flash
-    bool success = true;
-
     // Checks if tower number is clear
     if(_FH(NvTowerNb) == 0xFFFF)
     {
@@ -344,10 +349,15 @@ bool TowerSet(void)
         success = false;
       }
     }
-
-    return success;
   }
-  return false;
+
+  // FTM Channel for received packet timer
+  if(!FTM_Set(aFTMChannel))
+  {
+    success = false;
+  }
+
+  return success;
 }
 
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
@@ -378,7 +388,7 @@ int main(void)
   if(TowerInit())
   {
     // Sets the default or stored values of the main tower components
-    if(TowerSet() && FTM_Set(&receivedPacketTmr))
+    if(TowerSet(&receivedPacketTmr))
     {
       // Turn on the orange LED to indicate the tower has initialized successfully
       LEDs_On(LED_ORANGE);

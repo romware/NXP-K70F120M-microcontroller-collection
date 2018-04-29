@@ -79,7 +79,7 @@ void PIT_Set(const uint32_t period, const bool restart)
   uint32_t nanoSecondPerTick = 1000000000 / ModuleClk;
 
   // Calculate timer load value
-  uint32_t locLDVAL = period / nanoSecondPerTick;
+  uint32_t locLDVAL = (period / nanoSecondPerTick) - 1;
 
   // Check if restarting PIT
   if(restart)
