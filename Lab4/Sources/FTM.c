@@ -48,7 +48,10 @@ bool FTM_Init()
   SIM_SCGC6 |= SIM_SCGC6_FTM0_MASK;
 
   // Turn off write protect mode
-  FTM0_MODE |= FTM_MODE_WPDIS_MASK;
+  if(FTM0_FMS & FTM_FMS_WPEN_MASK)
+  {
+    FTM0_MODE |= FTM_MODE_WPDIS_MASK;
+  }
 
   // Enable FTM
   FTM0_MODE |= FTM_MODE_FTMEN_MASK;
@@ -95,7 +98,10 @@ bool FTM_Set(const TFTMChannel* const aFTMChannel)
   UserArguments[aFTMChannel->channelNb] = aFTMChannel->userArguments;
 
   // Turn off write protect mode
-  FTM0_MODE |= FTM_MODE_WPDIS_MASK;
+  if(FTM0_FMS & FTM_FMS_WPEN_MASK)
+  {
+    FTM0_MODE |= FTM_MODE_WPDIS_MASK;
+  }
 
   // Create 2 bit mask for Mode Select A and Mode select B to AND with the input detection bits
   FTM0_CnSC(aFTMChannel->channelNb) |= (FTM_CnSC_MSA_MASK | FTM_CnSC_MSB_MASK)
