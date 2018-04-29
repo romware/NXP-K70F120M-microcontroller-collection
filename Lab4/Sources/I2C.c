@@ -120,7 +120,7 @@ bool I2C_Init(const TI2CModule* const aI2CModule, const uint32_t moduleClk)
    * MULT: 0x02;   mul = 4;
    * ICR:  0x12;  SCL divider = 64;  SDA hold value = 13;  SCL hold (start) = 26;  SCL hold (stop) = 33;
    * I2C baud rate = 25Mhz / (4 * 640 = 97,656 bits/second
-   */
+   */ //TODO: Test properly, neaten up, remove comments above, also maybe check if result if acceptable otherwise return false??
 
   // Array to store mul and icr
 

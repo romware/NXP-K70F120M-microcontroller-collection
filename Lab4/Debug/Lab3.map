@@ -1155,53 +1155,53 @@ OUTPUT(Lab3.elf elf32-littlearm)
  .debug_macro   0x0001a27f       0x9a ./Generated_Code/Cpu.o
  .debug_macro   0x0001a319       0xd4 ./Generated_Code/Vectors.o
 
-.debug_line     0x00000000     0x2a77
- .debug_line    0x00000000      0x2d2 ./Sources/FIFO.o
- .debug_line    0x000002d2      0x2f5 ./Sources/FTM.o
- .debug_line    0x000005c7      0x2e1 ./Sources/Flash.o
- .debug_line    0x000008a8      0x3db ./Sources/I2C.o
- .debug_line    0x00000c83      0x20d ./Sources/LEDs.o
- .debug_line    0x00000e90      0x27d ./Sources/PIT.o
- .debug_line    0x0000110d      0x280 ./Sources/RTC.o
- .debug_line    0x0000138d      0x2f7 ./Sources/UART.o
- .debug_line    0x00001684      0x319 ./Sources/accel.o
- .debug_line    0x0000199d      0x506 ./Sources/main.o
- .debug_line    0x00001ea3      0x1a4 ./Sources/median.o
- .debug_line    0x00002047      0x1e6 ./Sources/packet.o
- .debug_line    0x0000222d      0x3a4 ./Project_Settings/Startup_Code/startup.o
- .debug_line    0x000025d1      0x25e ./Generated_Code/Cpu.o
- .debug_line    0x0000282f      0x248 ./Generated_Code/Vectors.o
+.debug_line     0x00000000     0x2a8d
+ .debug_line    0x00000000      0x2d6 ./Sources/FIFO.o
+ .debug_line    0x000002d6      0x2f9 ./Sources/FTM.o
+ .debug_line    0x000005cf      0x2e3 ./Sources/Flash.o
+ .debug_line    0x000008b2      0x3db ./Sources/I2C.o
+ .debug_line    0x00000c8d      0x20d ./Sources/LEDs.o
+ .debug_line    0x00000e9a      0x27d ./Sources/PIT.o
+ .debug_line    0x00001117      0x280 ./Sources/RTC.o
+ .debug_line    0x00001397      0x2fb ./Sources/UART.o
+ .debug_line    0x00001692      0x31d ./Sources/accel.o
+ .debug_line    0x000019af      0x50a ./Sources/main.o
+ .debug_line    0x00001eb9      0x1a4 ./Sources/median.o
+ .debug_line    0x0000205d      0x1e6 ./Sources/packet.o
+ .debug_line    0x00002243      0x3a4 ./Project_Settings/Startup_Code/startup.o
+ .debug_line    0x000025e7      0x25e ./Generated_Code/Cpu.o
+ .debug_line    0x00002845      0x248 ./Generated_Code/Vectors.o
 
-.debug_str      0x00000000    0x8ea5d
- .debug_str     0x00000000    0x8a574 ./Sources/FIFO.o
-                              0x8a6e3 (size before relaxing)
- .debug_str     0x0008a574      0x3b9 ./Sources/FTM.o
-                              0x8aa3e (size before relaxing)
- .debug_str     0x0008a92d      0x3ae ./Sources/Flash.o
-                              0x83120 (size before relaxing)
- .debug_str     0x0008acdb      0x25a ./Sources/I2C.o
+.debug_str      0x00000000    0x8eaa9
+ .debug_str     0x00000000    0x8a576 ./Sources/FIFO.o
+                              0x8a6e5 (size before relaxing)
+ .debug_str     0x0008a576      0x3b9 ./Sources/FTM.o
+                              0x8aa40 (size before relaxing)
+ .debug_str     0x0008a92f      0x3ae ./Sources/Flash.o
+                              0x83122 (size before relaxing)
+ .debug_str     0x0008acdd      0x2a4 ./Sources/I2C.o
                               0x8aa2a (size before relaxing)
- .debug_str     0x0008af35       0xb4 ./Sources/LEDs.o
+ .debug_str     0x0008af81       0xb4 ./Sources/LEDs.o
                               0x82ed4 (size before relaxing)
- .debug_str     0x0008afe9       0xa2 ./Sources/PIT.o
+ .debug_str     0x0008b035       0xa2 ./Sources/PIT.o
                               0x8a860 (size before relaxing)
- .debug_str     0x0008b08b       0x8f ./Sources/RTC.o
+ .debug_str     0x0008b0d7       0x8f ./Sources/RTC.o
                               0x8a837 (size before relaxing)
- .debug_str     0x0008b11a      0x112 ./Sources/UART.o
-                              0x8a96a (size before relaxing)
- .debug_str     0x0008b22c      0xa7d ./Sources/accel.o
-                              0x8b43f (size before relaxing)
- .debug_str     0x0008bca9      0x4e3 ./Sources/main.o
-                              0x8afb7 (size before relaxing)
- .debug_str     0x0008c18c       0x2a ./Sources/median.o
+ .debug_str     0x0008b166      0x112 ./Sources/UART.o
+                              0x8a96c (size before relaxing)
+ .debug_str     0x0008b278      0xa7d ./Sources/accel.o
+                              0x8b441 (size before relaxing)
+ .debug_str     0x0008bcf5      0x4e3 ./Sources/main.o
+                              0x8afb9 (size before relaxing)
+ .debug_str     0x0008c1d8       0x2a ./Sources/median.o
                                0x2f73 (size before relaxing)
- .debug_str     0x0008c1b6       0x3f ./Sources/packet.o
+ .debug_str     0x0008c202       0x3f ./Sources/packet.o
                                0x3256 (size before relaxing)
- .debug_str     0x0008c1f5     0x2663 ./Project_Settings/Startup_Code/startup.o
+ .debug_str     0x0008c241     0x2663 ./Project_Settings/Startup_Code/startup.o
                               0x853d8 (size before relaxing)
- .debug_str     0x0008e858      0x1e9 ./Generated_Code/Cpu.o
+ .debug_str     0x0008e8a4      0x1e9 ./Generated_Code/Cpu.o
                               0x8a9ca (size before relaxing)
- .debug_str     0x0008ea41       0x1c ./Generated_Code/Vectors.o
+ .debug_str     0x0008ea8d       0x1c ./Generated_Code/Vectors.o
                               0x8a68e (size before relaxing)
 
 .comment        0x00000000       0x70
