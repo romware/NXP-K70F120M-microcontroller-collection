@@ -254,7 +254,7 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
  */
 void Accel_ReadXYZ(uint8_t data[3])
 {
-  I2C_PollRead(ADDRESS_OUT_X_MSB, data, 3);
+  I2C_IntRead(ADDRESS_OUT_X_MSB, data, 3);
 }
 
 /*! @brief Set the mode of the accelerometer.

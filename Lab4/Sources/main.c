@@ -77,7 +77,7 @@ volatile uint16union_t* NvTowerMd;           /*!< Tower mode union pointer to fl
 volatile uint8_t* NvTowerPo;                 /*!< Tower protocol union pointer to flash */
 
 bool AccelRead = 0;     // TODO: Remove
-uint8_t TestData[3];    // TODO: Remove
+uint8_t AccelNewData[3];    // TODO: Remove
 
 
 /*! @brief Sends the startup packets to the PC
@@ -210,7 +210,7 @@ bool HandleTowerProtocol(void)
     // Sends the tower protocol packet
     return Packet_Put(COMMAND_PROTOCOL,PARAM_GET,_FB(NvTowerPo),0);
   }
-  else if (Packet_Parameter1 == PARAM_SET && (Packet_Parameter2 == 0 || Packet_Parameter2 == 1) && Packet_Parameter3 == 0)
+  else if (Packet_Parameter1 == PARAM_SET && (Packet_Parameter2 == ACCEL_POLL || Packet_Parameter2 == ACCEL_INT) && Packet_Parameter3 == 0)
   {
     // Sets the tower protocol
     Accel_SetMode(Packet_Parameter2);
@@ -327,24 +327,33 @@ void RTCCallback(void* arg)
 //TODO: write brief // call read function
 void AccelDataReadyCallback(void* arg)
 {
-  // Array to store XYZ values
-  /*uint8_t dataXYZ[3];
-
   // Read data from the accelerometer
-  Accel_ReadXYZ(dataXYZ);
-
-  Packet_Put(COMMAND_ACCEL,dataXYZ[0],dataXYZ[1],dataXYZ[2]);*/
-
-  AccelRead = 1;
-  //LEDs_Toggle(LED_BLUE);
-  //Accel_ReadXYZ(TestData);
+  Accel_ReadXYZ(AccelNewData);
 }
 
 //TODO: write brief // send packet for XYZ
 void AccelReadCompleteCallback(void* arg)
 {
-  Packet_Put(COMMAND_ACCEL, TestData[0], TestData[1], TestData[2]);
-  LEDs_Toggle(LED_GREEN);
+  static uint8_t recentData[3][3];
+
+  for(uint8_t i = 0; i < 2; i++)
+  {
+      recentData[i][0] = recentData[i+1][0];
+      recentData[i][1] = recentData[i+1][1];
+      recentData[i][2] = recentData[i+1][2];
+  }
+  recentData[2][0] = AccelNewData[0];
+  recentData[2][1] = AccelNewData[1];
+  recentData[2][2] = AccelNewData[2];
+
+  uint8_t medianX = Median_Filter3(recentData[0][0],recentData[1][0],recentData[2][0]);
+  uint8_t medianY = Median_Filter3(recentData[0][1],recentData[1][1],recentData[2][1]);
+  uint8_t medianZ = Median_Filter3(recentData[0][2],recentData[1][2],recentData[2][2]);
+
+  if(Packet_Put(COMMAND_ACCEL, medianX, medianY, medianZ))
+  {
+    LEDs_Toggle(LED_GREEN);
+  }
 }
 
 /*! @brief Initializes the main tower components by calling the initialization routines of the supporting software modules.
@@ -484,7 +493,7 @@ int main(void)
       // Execute a command depending on what packet has been received
       ReceivedPacket();
     }
-
+/*
     if(AccelRead)
     {
       // Array to store XYZ values
@@ -499,6 +508,7 @@ int main(void)
       }
       AccelRead = 0;
     }
+*/
   }
 
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/

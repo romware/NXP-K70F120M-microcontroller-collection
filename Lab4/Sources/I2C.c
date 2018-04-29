@@ -28,8 +28,9 @@ static void (*ReadCompleteCallbackFunction)(void*);  /*!<  Callback functions fo
 static void* ReadCompleteCallbackArguments;          /*!< Callback parameters for I2C. */
 
 static uint8_t SlaveDeviceAddress = 0x1D;            /*!< Current Slave address for I2C. */
+static uint8_t SlaveDeviceReadAddress;               /*!< Current Slave device read address for I2C. */
 static uint8_t NbBytes = 0;                          /*!< Number of bytes in current read. */
-static uint8_t* Data;                                /*!< Pointer to where to store read bytes. */
+static uint8_t* DataPtr;                             /*!< Pointer to where to store read bytes. */
 
 /*! @brief Start condition on I2C Bus
  */
@@ -247,7 +248,10 @@ void I2C_IntRead(const uint8_t registerAddress, uint8_t* const data, const uint8
   NbBytes = nbBytes;
 
   // Store the pointer to data
-  Data = data;
+  DataPtr = data;
+
+  // Store the slave device read register address
+  SlaveDeviceReadAddress = registerAddress;
 
   // Wait until the I2C bus is idle
   BusyCondition();
@@ -258,35 +262,11 @@ void I2C_IntRead(const uint8_t registerAddress, uint8_t* const data, const uint8
   // Send slave device address with write bit
   I2C0_D = SlaveDeviceAddress << 1;
 
-  // Wait for AK from slave
-  WaitCondition();
-
-  // Send read register address
-  I2C0_D = registerAddress;
-
-  // Wait for AK from slave
-  WaitCondition();
-
-  // Send Repeat start signal to slave
-  RepeatCondition();
-
-  // Send slave device address with read bit
-  I2C0_D = (SlaveDeviceAddress << 1) | 1;
-
-  // Wait for AK from slave device
-  WaitCondition();
-
-  // Change to RX mode
-  I2C0_C1 &= ~I2C_C1_TX_MASK;
-
-  // Ensure TXAK is clear
-  I2C0_C1 &= ~I2C_C1_TXAK_MASK;
-
-  // Dummy read from register
-  data[0] = I2C0_D;
+  // Clear any interrupts
+  I2C0_S = I2C_S_IICIF_MASK;
 
   // Enable interrupts
-  I2C0_C1 |= I2C_C1_IICEN_MASK;
+  I2C0_C1 |= I2C_C1_IICIE_MASK;
 }
 
 /*! @brief Interrupt service routine for the I2C.
@@ -297,51 +277,84 @@ void I2C_IntRead(const uint8_t registerAddress, uint8_t* const data, const uint8
  */
 void __attribute__ ((interrupt)) I2C_ISR(void)    // TODO: We need to work out what this callback function needs to do
 {
+  // To keep track of the current stage in the sequence
+  static uint8_t stage = 0;
+
   // To keep track of bytes read
   static uint8_t readCount = 0;
 
   // Clear the interrupt
   I2C0_S = I2C_S_IICIF_MASK;
 
-
-  // If there are more than 2 bytes left to read
-  if(readCount < NbBytes - 2)
+  switch(stage)
   {
-    // Read byte of data
-    Data[readCount] = I2C0_D;
+    case 0:
+      // Send read register address
+      I2C0_D = SlaveDeviceReadAddress;
+
+      stage++;
+      break;
+
+    case 1:
+      // Send Repeat start signal to slave
+      RepeatCondition();
+
+      // Send slave device address with read bit
+      I2C0_D = (SlaveDeviceAddress << 1) | 1;
+
+      stage++;
+      break;
+
+    case 2:
+      // Change to RX mode
+      I2C0_C1 &= ~I2C_C1_TX_MASK;
+
+      // Ensure TXAK is clear
+      I2C0_C1 &= ~I2C_C1_TXAK_MASK;
+
+      // Dummy read from register
+      DataPtr[0] = I2C0_D;
+
+      stage++;
+      break;
+
+    case 3:
+      if(readCount < NbBytes - 2)
+      {
+        // Load received byte into data
+        DataPtr[readCount] = I2C0_D;
+
+        readCount++;
+      }
+      else if(readCount == NbBytes - 2)
+      {
+        // Set TXACK prior to reading second last byte
+        I2C0_C1 |= I2C_C1_TXAK_MASK;
+
+        // Read second last of data
+        DataPtr[readCount] = I2C0_D;
+
+        readCount++;
+      }
+      else if(readCount == NbBytes - 1)
+      {
+        // Generate stop signal prior to reading last byte of data
+        StopCondition();
+
+        // Read last byte of data
+        DataPtr[readCount] = I2C0_D;
+
+        // Disable interrupts
+        I2C0_C1 &= ~I2C_C1_IICIE_MASK;
+
+        stage = 0;
+        readCount = 0;
+
+        // Call user callback function
+        if (ReadCompleteCallbackFunction)
+          (*ReadCompleteCallbackFunction)(ReadCompleteCallbackArguments);
+      }
+      break;
   }
-
-  // If there are two bytes left to read
-  else if(readCount == NbBytes -2)
-  {
-    // Set TXAK then read second last byte of data
-    I2C0_C1 |= I2C_C1_TXAK_MASK;
-    Data[readCount] = I2C0_D;
-  }
-
-  // If there is one byte left to read
-  else if(readCount == NbBytes -1)
-  {
-    // Generate stop bit and read last byte of data
-    StopCondition();
-    Data[readCount] = I2C0_D;
-
-    // Turn off interrupts
-    I2C0_C1 &= ~I2C_C1_IICEN_MASK;
-
-    // Call user callback function
-    if (ReadCompleteCallbackFunction)
-     (*ReadCompleteCallbackFunction)(ReadCompleteCallbackArguments);
-  }
-
-  // Increment the read count
-  readCount++;
-
-  // If all bytes read, reset variables
-  if(readCount == NbBytes)
-    {
-      readCount = 0;
-      NbBytes   = 0;
-    }
 }
 
