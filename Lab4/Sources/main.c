@@ -213,6 +213,7 @@ bool HandleTowerProtocol(void)
   else if (Packet_Parameter1 == PARAM_SET && (Packet_Parameter2 == 0 || Packet_Parameter2 == 1) && Packet_Parameter3 == 0)
   {
     // Sets the tower protocol
+    Accel_SetMode(Packet_Parameter2);
     return Flash_Write8((uint8_t*)NvTowerPo,(uint8_t)Packet_Parameter2);
   }
   return false;
@@ -334,9 +335,9 @@ void AccelDataReadyCallback(void* arg)
 
   Packet_Put(COMMAND_ACCEL,dataXYZ[0],dataXYZ[1],dataXYZ[2]);*/
 
-  //AccelRead = 1;
-  LEDs_Toggle(LED_BLUE);
-  Accel_ReadXYZ(TestData);
+  AccelRead = 1;
+  //LEDs_Toggle(LED_BLUE);
+  //Accel_ReadXYZ(TestData);
 }
 
 //TODO: write brief // send packet for XYZ
@@ -366,19 +367,16 @@ bool TowerInit(const TAccelSetup* const accelSetup)
  *
  *  @return void
  */
-bool TowerSet(void)
+bool TowerSet(const TFTMChannel* const aFTMChannel)
 {
-  // Set the periodic interrupt timer 0 to 500ms
-  // PIT_Set(PERIOD_LED_GREEN, true);
+  // Success status of writing default values to Flash
+  bool success = true;
 
   // Allocates an address in Flash memory to the tower number and tower mode
   if(Flash_AllocateVar((volatile void**)&NvTowerNb, sizeof(*NvTowerNb))
   && Flash_AllocateVar((volatile void**)&NvTowerMd, sizeof(*NvTowerMd))
   && Flash_AllocateVar((volatile void**)&NvTowerPo, sizeof(*NvTowerPo)));
   {
-    // Success status of writing default values to Flash
-    bool success = true;
-
     // Checks if tower number is clear
     if(_FH(NvTowerNb) == 0xFFFF)
     {
@@ -399,8 +397,8 @@ bool TowerSet(void)
       }
     }
 
-    // Checks if tower protocol is clear
-    if(_FB(NvTowerPo) == 0xFF)
+    // Checks if tower protocol stored in flash is invalid or clear
+    if((_FB(NvTowerPo) != (uint8_t)ACCEL_POLL) && (_FB(NvTowerPo) != (uint8_t)ACCEL_INT))
     {
       // Sets the tower protocol to the default protocol
       if(!Flash_Write8((uint8_t*)NvTowerPo,(uint8_t)ACCEL_POLL))
@@ -409,9 +407,16 @@ bool TowerSet(void)
       }
     }
 
-    return success;
+    Accel_SetMode(_FB(NvTowerPo));
   }
-  return false;
+
+  // FTM Channel for received packet timer
+  if(!FTM_Set(aFTMChannel))
+  {
+    success = false;
+  }
+
+  return success;
 }
 
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
@@ -451,7 +456,7 @@ int main(void)
   if(TowerInit(&accelerometerSetup))
   {
     // Sets the default or stored values of the main tower components
-    if(TowerSet() && FTM_Set(&receivedPacketTmr))
+    if(TowerSet(&receivedPacketTmr))
     {
       // Turn on the orange LED to indicate the tower has initialized successfully
       LEDs_On(LED_ORANGE);
@@ -480,24 +485,20 @@ int main(void)
       ReceivedPacket();
     }
 
-    /*if(AccelRead)
+    if(AccelRead)
     {
+      // Array to store XYZ values
+      uint8_t dataXYZ[3];
 
+      // Read data from the accelerometer
+      Accel_ReadXYZ(dataXYZ);
 
-	  LEDs_Toggle(LED_GREEN);
-	// Array to store XYZ values
-	  uint8_t dataXYZ[3];
-
-	  // Read data from the accelerometer
-	  Accel_ReadXYZ(dataXYZ);
-
-	  if(Packet_Put(COMMAND_ACCEL,dataXYZ[0],dataXYZ[1],dataXYZ[2]))
-	    {
-	      LEDs_Toggle(LED_BLUE);
-	    }
-
-	  AccelRead = 0;
-    }*/
+      if(Packet_Put(COMMAND_ACCEL,dataXYZ[0],dataXYZ[1],dataXYZ[2]))
+      {
+        LEDs_Toggle(LED_BLUE);
+      }
+      AccelRead = 0;
+    }
   }
 
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/

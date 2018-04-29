@@ -52,8 +52,6 @@ static void WaitCondition()
 {
   while(!(I2C0_S & I2C_S_IICIF_MASK)) {}
   I2C0_S = I2C_S_IICIF_MASK;
-
-  //BusyCondition();
 }
 
 /*! @brief Wait while busy condition on I2C Bus
@@ -148,7 +146,6 @@ void I2C_SelectSlaveDevice(const uint8_t slaveAddress)
  */
 void I2C_Write(const uint8_t registerAddress, const uint8_t data)
 {
-  // Wait until the I2C bus is idle
   BusyCondition();
 
   StartCondition();
@@ -177,7 +174,6 @@ void I2C_Write(const uint8_t registerAddress, const uint8_t data)
  */
 void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint8_t nbBytes)
 {
-
   // Wait until the I2C bus is idle
   BusyCondition();
 
