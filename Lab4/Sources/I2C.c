@@ -121,8 +121,53 @@ bool I2C_Init(const TI2CModule* const aI2CModule, const uint32_t moduleClk)
    * ICR:  0x12;  SCL divider = 64;  SDA hold value = 13;  SCL hold (start) = 26;  SCL hold (stop) = 33;
    * I2C baud rate = 25Mhz / (4 * 640 = 97,656 bits/second
    */
-  I2C0_F = I2C_F_MULT(0x2);
-  I2C0_F = I2C_F_ICR(0x12);
+
+  // Array to store mul and icr
+
+  uint8_t mulArray[]  = {1,2,4};
+  uint16_t sclArray[] = {20,22,24,26,28,30,34,40,28,32,36,40,44,48,56,68,48,
+                         56,64,72,80,88,104,128,80,96,112,128,144,160,192,
+			 240,160,192,224,256,288,320,384,448,512,576,640,768,
+			 960,640,768,896,1024,1152,1280,1536,1920,1280,1536,
+			 1792,2048,2304,2560,3072,3840};
+
+  // Variables to store best matches, the difference and the test difference
+  uint8_t bestMul = 0;
+  uint8_t bestScl = 0;
+  uint32_t baudRateDifference = 0xFFFFFFFF;
+  uint32_t testBaudRate;
+
+  for(uint8_t i = 0; i < 3; i++)
+  {
+    for(uint8_t j = 0; j < 64; j++)
+    {
+      testBaudRate = moduleClk / (mulArray[i] * sclArray[j]);
+
+      // If the testBaudRate is smaller than or equal to the desired baud rate
+      if(aI2CModule->baudRate >= testBaudRate)
+      {
+        if((aI2CModule->baudRate - testBaudRate) < baudRateDifference)
+        {
+          baudRateDifference = (aI2CModule->baudRate - testBaudRate);
+          bestMul = i;
+          bestScl = j;
+        }
+      }
+      // IF the testBaudRate is larger than the desired baud rate
+      else if (aI2CModule->baudRate < testBaudRate)
+      {
+        if((testBaudRate - aI2CModule->baudRate) < baudRateDifference)
+        {
+          baudRateDifference = (aI2CModule->baudRate - testBaudRate);
+          bestMul = i;
+          bestScl = j;
+        }
+      }
+    }
+  }
+
+  I2C0_F = I2C_F_MULT(bestMul);
+  I2C0_F = I2C_F_ICR(bestScl);
 
   // Set I2C Enable
   I2C0_C1 |= I2C_C1_IICEN_MASK;
