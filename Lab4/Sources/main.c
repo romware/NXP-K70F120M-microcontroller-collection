@@ -378,7 +378,7 @@ bool TowerInit(const TAccelSetup* const accelSetup)
  */
 bool TowerSet(const TFTMChannel* const aFTMChannel)
 {
-  // Success status of writing default values to Flash
+  // Success status of writing default values to Flash and FTM
   bool success = true;
 
   // Allocates an address in Flash memory to the tower number and tower mode

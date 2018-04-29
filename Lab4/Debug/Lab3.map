@@ -1144,22 +1144,22 @@ OUTPUT(Lab3.elf elf32-littlearm)
  .debug_macro   0x0001a27f       0x9a ./Generated_Code/Cpu.o
  .debug_macro   0x0001a319       0xd4 ./Generated_Code/Vectors.o
 
-.debug_line     0x00000000     0x281a
+.debug_line     0x00000000     0x2816
  .debug_line    0x00000000      0x27a ./Sources/FIFO.o
  .debug_line    0x0000027a      0x29b ./Sources/FTM.o
  .debug_line    0x00000515      0x2bb ./Sources/Flash.o
- .debug_line    0x000007d0      0x35e ./Sources/I2C.o
- .debug_line    0x00000b2e      0x20d ./Sources/LEDs.o
- .debug_line    0x00000d3b      0x27d ./Sources/PIT.o
- .debug_line    0x00000fb8      0x280 ./Sources/RTC.o
- .debug_line    0x00001238      0x29f ./Sources/UART.o
- .debug_line    0x000014d7      0x2c1 ./Sources/accel.o
- .debug_line    0x00001798      0x4ae ./Sources/main.o
- .debug_line    0x00001c46      0x1a4 ./Sources/median.o
- .debug_line    0x00001dea      0x1e6 ./Sources/packet.o
- .debug_line    0x00001fd0      0x3a4 ./Project_Settings/Startup_Code/startup.o
- .debug_line    0x00002374      0x25e ./Generated_Code/Cpu.o
- .debug_line    0x000025d2      0x248 ./Generated_Code/Vectors.o
+ .debug_line    0x000007d0      0x35a ./Sources/I2C.o
+ .debug_line    0x00000b2a      0x20d ./Sources/LEDs.o
+ .debug_line    0x00000d37      0x27d ./Sources/PIT.o
+ .debug_line    0x00000fb4      0x280 ./Sources/RTC.o
+ .debug_line    0x00001234      0x29f ./Sources/UART.o
+ .debug_line    0x000014d3      0x2c1 ./Sources/accel.o
+ .debug_line    0x00001794      0x4ae ./Sources/main.o
+ .debug_line    0x00001c42      0x1a4 ./Sources/median.o
+ .debug_line    0x00001de6      0x1e6 ./Sources/packet.o
+ .debug_line    0x00001fcc      0x3a4 ./Project_Settings/Startup_Code/startup.o
+ .debug_line    0x00002370      0x25e ./Generated_Code/Cpu.o
+ .debug_line    0x000025ce      0x248 ./Generated_Code/Vectors.o
 
 .debug_str      0x00000000    0x8e9d1
  .debug_str     0x00000000    0x8a542 ./Sources/FIFO.o

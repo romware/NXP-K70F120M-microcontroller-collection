@@ -28,7 +28,7 @@ static void* UserArguments;         /*!< Callback parameters for RTC */
  *  @param userArguments is a pointer to the user arguments to use with the user callback function.
  *  @return bool - TRUE if the RTC was successfully initialized.
  */
-bool RTC_Init(void (*userFunction)(void*), void* userArguments) //TODO: Update this is Lab3 and confirm operation
+bool RTC_Init(void (*userFunction)(void*), void* userArguments)
 {
   // Store parameters for interrupt routine
   UserFunction = userFunction;
@@ -43,7 +43,7 @@ bool RTC_Init(void (*userFunction)(void*), void* userArguments) //TODO: Update t
    */
 
   // Clear any pending interrupts on RTC
-  NVICICPR2 |= (1 << 3);         //TODO: should we use this macro or not. If yes we need to do it everywhere
+  NVICICPR2 |= (1 << 3);
 
   // Enable interrupts from RTC module
   NVICISER2 |= (1 << 3);
