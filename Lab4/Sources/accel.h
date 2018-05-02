@@ -5,7 +5,7 @@
  *  This contains the functions for interfacing to the MMA8451Q accelerometer.
  *
  *  @author 12403756, 12551519
- *  @date 2018-04-13
+ *  @date 2018-04-29
  */
 
 #ifndef ACCEL_H

@@ -1,17 +1,17 @@
-/*! @file
+/*! @file accel.c
  *
- *  @brief <Write your description here>.
+ *  @brief HAL for the accelerometer.
  *
- *  <Write your description here>.
+ *  This contains the functions for interfacing to the MMA8451Q accelerometer.
  *
- *  @author <Write your name here>
- *  @date <Write the date here>
+ *  @author 12403756, 12551519
+ *  @date 2018-04-29
  */
-
 /*!
- *  @addtogroup <Your group here>
- *  @{
+**  @addtogroup accel_module accel module documentation
+**  @{
 */
+/* MODULE accel */
 
 // Accelerometer functions
 #include "accel.h"
@@ -283,7 +283,7 @@ void Accel_SetMode(const TAccelMode mode)
     I2C_Write(ADDRESS_CTRL_REG1, CTRL_REG1);
 
     // Set the Periodic Interrupt Timer for use with I2C polling
-    PIT_Set(PERIOD_I2C_POLL, true);
+    PIT_Set(PERIOD_I2C_POLL, true); //TODO: ask about 1.56hz
   }
   else if(mode == ACCEL_INT)
   {

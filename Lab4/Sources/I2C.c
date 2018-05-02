@@ -5,10 +5,10 @@
  *  This contains the functions for operating the I2C (inter-integrated circuit) module.
  *
  *  @author 12403756, 12551519
- *  @date 2018-04-13
+ *  @date 2018-04-29
  */
 /*!
-**  @addtogroup I2C_module median module documentation
+**  @addtogroup I2C_module I2C module documentation
 **  @{
 */
 /* MODULE I2C */

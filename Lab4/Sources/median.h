@@ -5,7 +5,7 @@
  *  This contains the functions for performing a median filter on byte-sized data.
  *
  *  @author 12403756, 12551519
- *  @date 2018-04-13
+ *  @date 2018-04-29
  */
 
 #ifndef MEDIAN_H

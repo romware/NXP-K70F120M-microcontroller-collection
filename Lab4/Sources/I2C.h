@@ -5,7 +5,7 @@
  *  This contains the functions for operating the I2C (inter-integrated circuit) module.
  *
  *  @author 12403756, 12551519
- *  @date 2018-04-13
+ *  @date 2018-04-29
  */
 
 #ifndef I2C_H

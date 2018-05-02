@@ -51,33 +51,32 @@
 #include "I2C.h"
 #include "median.h"
 
-#define BAUD_RATE 115200                     /*!< UART2 Baud Rate */
+#define BAUD_RATE 115200                        /*!< UART2 Baud Rate */
 
-const uint32_t PERIOD_LED_GREEN = 500000000;  /*!< Period of Periodic Interrupt Timer 0 in nanoseconds */
-const uint32_t PERIOD_I2C_POLL  = 1000000000; /*!< Period of the I2C polling in polling mode */
+const uint32_t PERIOD_LED_GREEN   = 500000000;  /*!< Period of Periodic Interrupt Timer 0 in nanoseconds */
+const uint32_t PERIOD_I2C_POLL    = 1000000000; /*!< Period of the I2C polling in polling mode */
 
-const uint8_t COMMAND_STARTUP     = 0x04;    /*!< The serial command byte for tower startup */
-const uint8_t COMMAND_VER         = 0x09;    /*!< The serial command byte for tower version */
-const uint8_t COMMAND_NUM         = 0x0B;    /*!< The serial command byte for tower number */
-const uint8_t COMMAND_PROGRAMBYTE = 0x07;    /*!< The serial command byte for tower program byte */
-const uint8_t COMMAND_READBYTE    = 0x08;    /*!< The serial command byte for tower read byte */
-const uint8_t COMMAND_MODE        = 0x0D;    /*!< The serial command byte for tower mode */
-const uint8_t COMMAND_TIME        = 0x0C;    /*!< The serial command byte for tower time */
-const uint8_t COMMAND_PROTOCOL    = 0x0A;    /*!< The serial command byte for tower protocol */
-const uint8_t COMMAND_ACCEL       = 0x10;    /*!< The serial command byte for tower accelerometer */
+const uint8_t COMMAND_STARTUP     = 0x04;       /*!< The serial command byte for tower startup */
+const uint8_t COMMAND_VER         = 0x09;       /*!< The serial command byte for tower version */
+const uint8_t COMMAND_NUM         = 0x0B;       /*!< The serial command byte for tower number */
+const uint8_t COMMAND_PROGRAMBYTE = 0x07;       /*!< The serial command byte for tower program byte */
+const uint8_t COMMAND_READBYTE    = 0x08;       /*!< The serial command byte for tower read byte */
+const uint8_t COMMAND_MODE        = 0x0D;       /*!< The serial command byte for tower mode */
+const uint8_t COMMAND_TIME        = 0x0C;       /*!< The serial command byte for tower time */
+const uint8_t COMMAND_PROTOCOL    = 0x0A;       /*!< The serial command byte for tower protocol */
+const uint8_t COMMAND_ACCEL       = 0x10;       /*!< The serial command byte for tower accelerometer */
 
-const uint8_t PARAM_GET = 1;                 /*!< Get bit of packet parameter 1 */
-const uint8_t PARAM_SET = 2;                 /*!< Set bit of packet parameter 1 */
+const uint8_t PARAM_GET           = 1;          /*!< Get bit of packet parameter 1 */
+const uint8_t PARAM_SET           = 2;          /*!< Set bit of packet parameter 1 */
 
-const uint8_t TOWER_VER_MAJ = 1;             /*!< Tower major version */
-const uint8_t TOWER_VER_MIN = 0;             /*!< Tower minor version */
+const uint8_t TOWER_VER_MAJ       = 1;          /*!< Tower major version */
+const uint8_t TOWER_VER_MIN       = 0;          /*!< Tower minor version */
 
-volatile uint16union_t* NvTowerNb;           /*!< Tower number union pointer to flash */
-volatile uint16union_t* NvTowerMd;           /*!< Tower mode union pointer to flash */
-volatile uint8_t* NvTowerPo;                 /*!< Tower protocol union pointer to flash */
+volatile uint16union_t* NvTowerNb;              /*!< Tower number union pointer to flash */
+volatile uint16union_t* NvTowerMd;              /*!< Tower mode union pointer to flash */
+volatile uint8_t* NvTowerPo;                    /*!< Tower protocol union pointer to flash */
 
-bool AccelRead = 0;     // TODO: Remove
-uint8_t AccelNewData[3];    // TODO: Remove
+uint8_t AccelNewData[3];                        /*!< Latest XYZ readings from accelerometer */
 
 
 /*! @brief Sends the startup packets to the PC
@@ -443,7 +442,7 @@ int main(void)
 
   TFTMChannel receivedPacketTmr;          /*!< FTM Channel for received packet timer */
   receivedPacketTmr.channelNb             = 0;
-  receivedPacketTmr.delayCount            = 24414;
+  receivedPacketTmr.delayCount            = CPU_MCGFF_CLK_HZ_CONFIG_0;
   receivedPacketTmr.ioType.inputDetection = TIMER_INPUT_ANY;
   receivedPacketTmr.ioType.outputAction   = TIMER_OUTPUT_DISCONNECT;
   receivedPacketTmr.timerFunction         = TIMER_FUNCTION_OUTPUT_COMPARE;
@@ -479,6 +478,14 @@ int main(void)
   // Send startup packets to PC
   HandleTowerStartup();
 
+
+  uint8_t medianX = Median_Filter3(-10,56,-128);
+  uint8_t medianY = Median_Filter3(5,7,127);
+  uint8_t medianZ = Median_Filter3(0,-50,100);
+
+
+  uint8_t medianW = 0;
+
   for(;;)
   {
     // Check if a packet has been received
@@ -493,22 +500,6 @@ int main(void)
       // Execute a command depending on what packet has been received
       ReceivedPacket();
     }
-/*
-    if(AccelRead)
-    {
-      // Array to store XYZ values
-      uint8_t dataXYZ[3];
-
-      // Read data from the accelerometer
-      Accel_ReadXYZ(dataXYZ);
-
-      if(Packet_Put(COMMAND_ACCEL,dataXYZ[0],dataXYZ[1],dataXYZ[2]))
-      {
-        LEDs_Toggle(LED_BLUE);
-      }
-      AccelRead = 0;
-    }
-*/
   }
 
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/
