@@ -323,18 +323,26 @@ void RTCCallback(void* arg)
   Packet_Put(COMMAND_TIME, hours, minutes, seconds);
 }
 
-//TODO: write brief // call read function
+/*! @brief Update the recent accelerometer data with new values
+ *
+ *  @return void
+ */
 void AccelDataReadyCallback(void* arg)
 {
   // Read data from the accelerometer
   Accel_ReadXYZ(AccelNewData);
 }
 
-//TODO: write brief // send packet for XYZ
+/*! @brief Toggles the green LED and reads accelerometer values to send to the PC
+ *
+ *  @return void
+ */
 void AccelReadCompleteCallback(void* arg)
 {
+  // Two dimensional array storing the 3 most recent X, Y and Z values
   static uint8_t recentData[3][3];
 
+  // Shift the recent data up to append the latest accelerations
   for(uint8_t i = 0; i < 2; i++)
   {
       recentData[i][0] = recentData[i+1][0];
@@ -345,12 +353,15 @@ void AccelReadCompleteCallback(void* arg)
   recentData[2][1] = AccelNewData[1];
   recentData[2][2] = AccelNewData[2];
 
+  // Find the median value of the three most recent values for X, Y and Z accelerations
   uint8_t medianX = Median_Filter3(recentData[0][0],recentData[1][0],recentData[2][0]);
   uint8_t medianY = Median_Filter3(recentData[0][1],recentData[1][1],recentData[2][1]);
   uint8_t medianZ = Median_Filter3(recentData[0][2],recentData[1][2],recentData[2][2]);
 
+  // Send the filtered accelerations to the PC
   if(Packet_Put(COMMAND_ACCEL, medianX, medianY, medianZ))
   {
+    // Toggle the green LED
     LEDs_Toggle(LED_GREEN);
   }
 }
@@ -433,7 +444,6 @@ int main(void)
 {
   /* Write your local variable definition here */
 
-
   /*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
   PE_low_level_init();
   /*** End of Processor Expert internal initialization.                    ***/
@@ -477,14 +487,6 @@ int main(void)
 
   // Send startup packets to PC
   HandleTowerStartup();
-
-
-  uint8_t medianX = Median_Filter3(-10,56,-128);
-  uint8_t medianY = Median_Filter3(5,7,127);
-  uint8_t medianZ = Median_Filter3(0,-50,100);
-
-
-  uint8_t medianW = 0;
 
   for(;;)
   {

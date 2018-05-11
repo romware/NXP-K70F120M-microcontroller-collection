@@ -203,18 +203,20 @@ static void* DataReadyCallbackArguments;         /*!< Callback parameters for ac
  */
 bool Accel_Init(const TAccelSetup* const accelSetup)
 {
+  // Set up the accelerometer as an I2C module
   TI2CModule aTI2CModule;
   aTI2CModule.baudRate = accelSetup->moduleClk;
   aTI2CModule.primarySlaveAddress = 0x1D;
   aTI2CModule.readCompleteCallbackFunction = accelSetup->readCompleteCallbackFunction;
   aTI2CModule.readCompleteCallbackArguments = accelSetup->readCompleteCallbackArguments;
 
+  // Set callback functions based on passed setup parameters
   DataReadyCallbackFunction = accelSetup->dataReadyCallbackFunction;
   DataReadyCallbackArguments = accelSetup->dataReadyCallbackArguments;
 
+  // Initialize the accelerometer as an I2C module
   I2C_Init(&aTI2CModule, accelSetup->moduleClk);
 
-  // Set up for interrupts from PORTB
   // Ensure global interrupts are disabled
   EnterCritical();
 
@@ -232,18 +234,16 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
   // Return global interrupts to how they were
   ExitCritical();
 
-  // Set up PORTB pin 4 for interrupts from the accelerometer INT1
   // Enable PORTB in System Clock Gating Control Register 5
   SIM_SCGC5 |= SIM_SCGC5_PORTB_MASK;
 
   // Set PTB4 (BGA Map 'N15') to be the I2C data ready interrupt pin by setting to ALT1
   PORTB_PCR4 = PORT_PCR_MUX(1);
 
-  // Disable interrupt flag. This will be enabled in Accel_SetMode if Interrupt mode is selected
+  // Disable interrupt flag as it will be enabled in Accel_SetMode if Interrupt mode is selected
   PORTB_PCR4 &= ~PORT_PCR_IRQC_MASK;
 
   // Set up a 1 second Periodic Interrupt Timer for use in I2C polling mode.
-  // Initialize the PIT
   PIT_Init(accelSetup->moduleClk, accelSetup->dataReadyCallbackFunction, NULL);
 
   return true;
@@ -254,6 +254,7 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
  */
 void Accel_ReadXYZ(uint8_t data[3])
 {
+  // Reads X, Y and Z accelerations via interrupt reads
   I2C_IntRead(ADDRESS_OUT_X_MSB, data, 3);
 }
 
@@ -262,11 +263,11 @@ void Accel_ReadXYZ(uint8_t data[3])
  */
 void Accel_SetMode(const TAccelMode mode)
 {
-  // Ensure the Accelerometer out out of active mode allow setting of control registers
-  // Set active to 0
+  // Ensure the Accelerometer is out of active mode to allow setting of control registers
   CTRL_REG1_ACTIVE = 0;
   I2C_Write(ADDRESS_CTRL_REG1, CTRL_REG1);
 
+  // Check which mode is to be set
   if(mode == ACCEL_POLL)
   {
     // Disable the DRDY interrupt from the accelerometer
@@ -304,7 +305,7 @@ void Accel_SetMode(const TAccelMode mode)
     CTRL_REG1_ACTIVE = 1;
     I2C_Write(ADDRESS_CTRL_REG1, CTRL_REG1);
 
-    // Enable Flag and Interrupt on falling edge for PTB4
+    // Enable flag and interrupt on falling edge for PTB4
     PORTB_PCR4 |= PORT_PCR_IRQC(0b1010);
   }
 }
@@ -319,17 +320,16 @@ void __attribute__ ((interrupt)) AccelDataReady_ISR(void)
 {
   // Check the interrupt is from PTB4
   if(PORTB_ISFR & (1 << 4))
-    {
-      // Write 1 to clear flag
-      PORTB_ISFR = (1 << 4);
+  {
+    // Write 1 to clear flag
+    PORTB_ISFR = (1 << 4);
 
-      // Call user callback function when data is ready
-      if (DataReadyCallbackFunction)
-       (*DataReadyCallbackFunction)(DataReadyCallbackArguments);
-    }
+    // Call user callback function when data is ready
+    if (DataReadyCallbackFunction)
+     (*DataReadyCallbackFunction)(DataReadyCallbackArguments);
+  }
 }
-
-
+/* END accel */
 /*!
- * @}
+** @}
 */

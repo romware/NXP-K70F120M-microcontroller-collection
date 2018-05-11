@@ -33,39 +33,56 @@ static uint8_t NbBytes = 0;                          /*!< Number of bytes in cur
 static uint8_t* DataPtr;                             /*!< Pointer to where to store read bytes. */
 
 /*! @brief Start condition on I2C Bus
+ *
+ *  @return void
  */
 static void StartCondition()
 {
+  // Generate a start signal by switching to master mode
   I2C0_C1 |= I2C_C1_MST_MASK;
+
+  // Set to transmit mode
   I2C0_C1 |= I2C_C1_TX_MASK;
 }
 
 /*! @brief Stop condition on I2C Bus
+ *
+ *  @return void
  */
 static void StopCondition()
 {
+  // Generate a stop signal by switching from master mode
   I2C0_C1 &= ~I2C_C1_MST_MASK;
 }
 
 /*! @brief Wait condition on I2C Bus
+ *
+ *  @return void
  */
 static void WaitCondition()
 {
+  // Wait for pending interrupts then write 1 to clear flag
   while(!(I2C0_S & I2C_S_IICIF_MASK)) {}
   I2C0_S = I2C_S_IICIF_MASK;
 }
 
 /*! @brief Wait while busy condition on I2C Bus
+ *
+ *  @return void
  */
 static void BusyCondition()
 {
+  // Wait for bus to not be busy
   while(I2C0_S & I2C_S_BUSY_MASK) {}
 }
 
 /*! @brief Repeat Start condition on I2C Bus
+ *
+ *  @return void
  */
 static void RepeatCondition()
 {
+  // Generate a repeated start signal
   I2C0_C1 |= I2C_C1_RSTA_MASK;
 }
 
@@ -169,7 +186,7 @@ bool I2C_Init(const TI2CModule* const aI2CModule, const uint32_t moduleClk)
   I2C0_F = I2C_F_MULT(bestMul);
   I2C0_F = I2C_F_ICR(bestScl);
 
-  // Set I2C Enable
+  // Enable I2C module operation
   I2C0_C1 |= I2C_C1_IICEN_MASK;
 
   return true;
@@ -181,7 +198,7 @@ bool I2C_Init(const TI2CModule* const aI2CModule, const uint32_t moduleClk)
  */
 void I2C_SelectSlaveDevice(const uint8_t slaveAddress)
 {
-  // select slave address
+  // Select slave address
   SlaveDeviceAddress = slaveAddress;
 }
 
@@ -192,22 +209,31 @@ void I2C_SelectSlaveDevice(const uint8_t slaveAddress)
  */
 void I2C_Write(const uint8_t registerAddress, const uint8_t data)
 {
+  // Wait until the I2C bus is idle
   BusyCondition();
 
+  // Generate start condition
   StartCondition();
 
+  // Send slave device address with write bit
   I2C0_D = SlaveDeviceAddress << 1;
 
+  // Wait for AK from slave
   WaitCondition();
 
+  // Send register address to write to
   I2C0_D = registerAddress;
 
+  // Wait for AK from slave
   WaitCondition();
 
+  // Send passed data
   I2C0_D = data;
 
+  // Wait for AK from slave
   WaitCondition();
 
+  // Generate stop signal
   StopCondition();
 }
 
@@ -238,13 +264,13 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
   // Wait for AK from slave
   WaitCondition();
 
-  // Send Repeat start signal to slave
+  // Send repeat start signal to slave
   RepeatCondition();
 
   // Send slave device address with read bit
   I2C0_D = (SlaveDeviceAddress << 1) | 1;
 
-  // Wait for AK from slave device
+  // Wait for AK from slave
   WaitCondition();
 
   // Change to RX mode
@@ -255,6 +281,8 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
 
   // Dummy read from register
   data[0] = I2C0_D;
+
+  // Wait for AK from slave
   WaitCondition();
 
   // Read until second last byte of data
@@ -263,6 +291,7 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
     // Load received byte into data
     data[i] = I2C0_D;
 
+    // Wait for AK from slave
     WaitCondition();
   }
 
@@ -271,6 +300,8 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
 
   // Read second last of data
   data[nbBytes-2] = I2C0_D;
+
+  // Wait for AK from slave
   WaitCondition();
 
   // Generate stop signal prior to reading last byte of data
@@ -307,7 +338,7 @@ void I2C_IntRead(const uint8_t registerAddress, uint8_t* const data, const uint8
   // Send slave device address with write bit
   I2C0_D = SlaveDeviceAddress << 1;
 
-  // Clear any interrupts
+  // Clear any pending interrupts
   I2C0_S = I2C_S_IICIF_MASK;
 
   // Enable interrupts
@@ -320,7 +351,7 @@ void I2C_IntRead(const uint8_t registerAddress, uint8_t* const data, const uint8
  *  At the end of reception, the user callback function will be called.
  *  @note Assumes the I2C module has been initialized.
  */
-void __attribute__ ((interrupt)) I2C_ISR(void)    // TODO: We need to work out what this callback function needs to do
+void __attribute__ ((interrupt)) I2C_ISR(void)
 {
   // To keep track of the current stage in the sequence
   static uint8_t stage = 0;
@@ -351,7 +382,7 @@ void __attribute__ ((interrupt)) I2C_ISR(void)    // TODO: We need to work out w
       break;
 
     case 2:
-      // Change to RX mode
+      // Change to receive mode
       I2C0_C1 &= ~I2C_C1_TX_MASK;
 
       // Ensure TXAK is clear
@@ -392,6 +423,7 @@ void __attribute__ ((interrupt)) I2C_ISR(void)    // TODO: We need to work out w
         // Disable interrupts
         I2C0_C1 &= ~I2C_C1_IICIE_MASK;
 
+        // Reset sequence
         stage = 0;
         readCount = 0;
 
@@ -402,4 +434,7 @@ void __attribute__ ((interrupt)) I2C_ISR(void)    // TODO: We need to work out w
       break;
   }
 }
-
+/* END I2C */
+/*!
+** @}
+*/

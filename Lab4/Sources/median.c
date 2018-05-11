@@ -22,44 +22,38 @@
  *  @param n2 is the second of 3 bytes for which the median is sought.
  *  @param n3 is the third  of 3 bytes for which the median is sought.
  */
-uint8_t Median_Filter3(const uint8_t n1, const uint8_t n2, const uint8_t n3)
+uint8_t Median_Filter3(const int8_t n1, const int8_t n2, const int8_t n3)
 {
-  uint8_t median;
-  uint8_t n1pos = n1 + 128;
-  uint8_t n2pos = n2 + 128;
-  uint8_t n3pos = n3 + 128;
-
-  if (n1pos > n2pos)
+  if (n1 > n2)
   {
-    if (n2pos > n3pos)
+    if (n2 > n3)
     {
-      median = n2pos; // n1 > n2 > n3
+      return n2; // n1 > n2 > n3
     }
-    else if (n1pos > n3pos)
+    else if (n1 > n3)
     {
-      median = n3pos; // n1 > n3 > n2
+      return n3; // n1 > n3 > n2
     }
     else
     {
-      median = n1pos; // n3 > n1 > n2
+      return n1; // n3 > n1 > n2
     }
   }
   else
   {
-    if (n3pos > n2pos)
+    if (n3 > n2)
     {
-      median = n2pos; // n3 > n2 > n1
+      return n2; // n3 > n2 > n1
     }
-    else if (n1pos > n3pos)
+    else if (n1 > n3)
     {
-      median = n1pos; // n2 > n1 > n3
+      return n1; // n2 > n1 > n3
     }
     else
     {
-      median = n3pos; // n2 > n3 > n1
+      return n3; // n2 > n3 > n1
     }
   }
-  return median - 128;
 }
 /* END median */
 /*!
