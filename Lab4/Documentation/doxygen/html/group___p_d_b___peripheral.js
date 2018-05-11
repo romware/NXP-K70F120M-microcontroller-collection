@@ -4,9 +4,9 @@ var group___p_d_b___peripheral =
     [ "PDB Register Masks", "group___p_d_b___register___masks.html", null ],
     [ "PDB_MemMap", "struct_p_d_b___mem_map.html", [
       [ "C1", "struct_p_d_b___mem_map.html#a7f3d427467fd70574b129f2ecd5a84ed", null ],
-      [ "CH", "struct_p_d_b___mem_map.html#a0c3fc818b58add9b89d434d7a3f31262", null ],
+      [ "CH", "struct_p_d_b___mem_map.html#a6542465269e0a946a58dd131602a29c7", null ],
       [ "CNT", "struct_p_d_b___mem_map.html#a2e90754ac53cdee38eec08416fee494e", null ],
-      [ "DAC", "struct_p_d_b___mem_map.html#ab295af94c09a3b5d0c1af12adbabc074", null ],
+      [ "DAC", "struct_p_d_b___mem_map.html#a8834abb19035005831da467b2c045007", null ],
       [ "DLY", "struct_p_d_b___mem_map.html#a101a3b427fd438fc5dd9069f9d3f31d6", null ],
       [ "IDLY", "struct_p_d_b___mem_map.html#abbda47481fef54f3ab340fec07c8b809", null ],
       [ "INT", "struct_p_d_b___mem_map.html#a94d5425758d6d4b2d3141a05603ff7d1", null ],

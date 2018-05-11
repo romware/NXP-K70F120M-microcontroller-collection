@@ -6,7 +6,7 @@ var struct_f_t_m___mem_map =
     [ "CnV", "struct_f_t_m___mem_map.html#a45398334c1dab06457c71ec0d5f5a7aa", null ],
     [ "COMBINE", "struct_f_t_m___mem_map.html#ab00737276f6086e805d6d7c892608100", null ],
     [ "CONF", "struct_f_t_m___mem_map.html#a7b48a7fbd1a47ba72e009b9d82b89cf6", null ],
-    [ "CONTROLS", "struct_f_t_m___mem_map.html#a94145efa14784f73e71b5970558ac599", null ],
+    [ "CONTROLS", "struct_f_t_m___mem_map.html#a0baf4d1e122c39bdf977d22c53ae789f", null ],
     [ "DEADTIME", "struct_f_t_m___mem_map.html#a7a7e6e572834de5c95fc5279659e582c", null ],
     [ "EXTTRIG", "struct_f_t_m___mem_map.html#afe00dccf260f10c5172a9cae5fb72d69", null ],
     [ "FILTER", "struct_f_t_m___mem_map.html#af3c88a62b68d6b62793ce078ae72d31b", null ],

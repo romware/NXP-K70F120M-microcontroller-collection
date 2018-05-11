@@ -8,7 +8,7 @@ var group___d_w_t___peripheral =
       [ "CID2", "struct_d_w_t___mem_map.html#a79b7746489031d3b49004e1b2c400501", null ],
       [ "CID3", "struct_d_w_t___mem_map.html#af719ff30fb65a86a545f97f5b556e0b9", null ],
       [ "COMP", "struct_d_w_t___mem_map.html#ae10b19c1d610d27a71a1dc34a84a0e60", null ],
-      [ "COMPARATOR", "struct_d_w_t___mem_map.html#a138c8f492ed5548cf7b4e73545f5add0", null ],
+      [ "COMPARATOR", "struct_d_w_t___mem_map.html#aa449eb8956e9eec753f6b781562c1170", null ],
       [ "CPICNT", "struct_d_w_t___mem_map.html#ad09ed41fc08aebfa2c29e217afcf9a93", null ],
       [ "CTRL", "struct_d_w_t___mem_map.html#ab3581abb33e428126e7ec339e66514e4", null ],
       [ "CYCCNT", "struct_d_w_t___mem_map.html#adf38ec6a1c7381ff5e894b4f2fc2af1e", null ],

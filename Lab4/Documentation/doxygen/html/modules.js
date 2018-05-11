@@ -1,11 +1,14 @@
 var modules =
 [
+    [ "accel module documentation", "group__accel__module.html", "group__accel__module" ],
     [ "Events module documentation", "group___events__module.html", null ],
     [ "FIFO module documentation", "group___f_i_f_o__module.html", "group___f_i_f_o__module" ],
     [ "Flash module documentation", "group___flash__module.html", "group___flash__module" ],
     [ "FTM module documentation", "group___f_t_m__module.html", "group___f_t_m__module" ],
+    [ "I2C module documentation", "group___i2_c__module.html", "group___i2_c__module" ],
     [ "LEDs module documentation", "group___l_e_ds__module.html", "group___l_e_ds__module" ],
     [ "main module documentation", "group__main__module.html", "group__main__module" ],
+    [ "median module documentation", "group__median__module.html", "group__median__module" ],
     [ "packet module documentation", "group__packet__module.html", "group__packet__module" ],
     [ "PIT module documentation", "group___p_i_t__module.html", "group___p_i_t__module" ],
     [ "RTC module documentation", "group___r_t_c__module.html", "group___r_t_c__module" ],

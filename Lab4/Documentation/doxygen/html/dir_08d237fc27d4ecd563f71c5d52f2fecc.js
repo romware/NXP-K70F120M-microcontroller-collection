@@ -1,5 +1,7 @@
 var dir_08d237fc27d4ecd563f71c5d52f2fecc =
 [
+    [ "accel.c", "accel_8c.html", "accel_8c" ],
+    [ "accel.h", "accel_8h.html", "accel_8h" ],
     [ "Events.c", "_events_8c.html", null ],
     [ "Events.h", "_events_8h.html", null ],
     [ "FIFO.c", "_f_i_f_o_8c.html", "_f_i_f_o_8c" ],
@@ -8,9 +10,13 @@ var dir_08d237fc27d4ecd563f71c5d52f2fecc =
     [ "Flash.h", "_flash_8h.html", "_flash_8h" ],
     [ "FTM.c", "_f_t_m_8c.html", "_f_t_m_8c" ],
     [ "FTM.h", "_f_t_m_8h.html", "_f_t_m_8h" ],
+    [ "I2C.c", "_i2_c_8c.html", "_i2_c_8c" ],
+    [ "I2C.h", "_i2_c_8h.html", "_i2_c_8h" ],
     [ "LEDs.c", "_l_e_ds_8c.html", "_l_e_ds_8c" ],
     [ "LEDs.h", "_l_e_ds_8h.html", "_l_e_ds_8h" ],
     [ "main.c", "main_8c.html", "main_8c" ],
+    [ "median.c", "median_8c.html", "median_8c" ],
+    [ "median.h", "median_8h.html", "median_8h" ],
     [ "packet.c", "packet_8c.html", "packet_8c" ],
     [ "packet.h", "packet_8h.html", "packet_8h" ],
     [ "PIT.c", "_p_i_t_8c.html", "_p_i_t_8c" ],
