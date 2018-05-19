@@ -27,7 +27,4 @@ SUBDIRS := \
 Sources \
 Project_Settings/Startup_Code \
 Generated_Code \
-Debug_old/Sources \
-Debug_old/Project_Settings/Startup_Code \
-Debug_old/Generated_Code \
 

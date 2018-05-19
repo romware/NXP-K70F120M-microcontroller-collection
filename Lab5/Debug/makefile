@@ -11,9 +11,6 @@ RM := rm -rf
 -include Sources/subdir.mk
 -include Project_Settings/Startup_Code/subdir.mk
 -include Generated_Code/subdir.mk
--include Debug_old/Sources/subdir.mk
--include Debug_old/Project_Settings/Startup_Code/subdir.mk
--include Debug_old/Generated_Code/subdir.mk
 -include subdir.mk
 -include objects.mk
 
