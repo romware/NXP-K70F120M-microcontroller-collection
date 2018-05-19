@@ -18,9 +18,13 @@
 #include "MK70F12.h"
 #include "PE_Types.h"
 #include "Cpu.h"
+#include "OS.h"
 
 TFIFO RxFIFO; /*!< The Receive FIFO */
 TFIFO TxFIFO; /*!< The Transmit FIFO */
+
+OS_ECB* RxUART;
+OS_ECB* TxUART;
 
 /*! @brief Sets up the UART interface before first use.
  *
@@ -30,6 +34,9 @@ TFIFO TxFIFO; /*!< The Transmit FIFO */
  */
 bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
 {
+  RxUART = OS_SemaphoreCreate(0);
+  TxUART = OS_SemaphoreCreate(0);
+
   // Enable UART2 clock: For System Clock Gating Control Register 4 see 12.2.12 of K70P256M150SF3RM.pdf
   SIM_SCGC4 |= SIM_SCGC4_UART2_MASK;
 
@@ -138,11 +145,15 @@ bool UART_OutChar(const uint8_t data)
  */
 void __attribute__ ((interrupt)) UART_ISR(void)
 {
+  // Notify RTOS of start of ISR
+  OS_ISREnter();
+
   // Check if UART2 receive interrupt is enabled and the UART2 receive data register full flag is set
   if((UART2_C2 & UART_C2_RIE_MASK) && (UART2_S1 & UART_S1_RDRF_MASK))
   {
     // Put the value in UART2 Data Register (UART2_D) in the RxFIFO
-    FIFO_Put(&RxFIFO, UART2_D);
+    //FIFO_Put(&RxFIFO, UART2_D);
+    OS_SemaphoreSignal(RxUART);
   }
 
   // Check if the UART2 transmit interrupt is enabled and the UART2 transmit data register empty flag is set
@@ -155,6 +166,7 @@ void __attribute__ ((interrupt)) UART_ISR(void)
       UART2_C2 &= ~UART_C2_TIE_MASK;
     }
   }
+  OS_ISRExit();
 }
 /* END UART */
 /*!

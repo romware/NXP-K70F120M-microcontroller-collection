@@ -439,6 +439,20 @@ bool TowerSet(const TFTMChannel* const aFTMChannel)
   return success;
 }
 
+/*! @brief Waits for a signal to get and put data in RxFIFO
+ *
+ *  @note Assumes that FIFO_Init has been called successfully.
+ */
+static void RxFIFOThread(TFIFO * const FIFO)
+{
+  for (;;)
+  {
+    // Wait here until signaled that we can access the RxFIFO
+    (void)OS_SemaphoreWait(/*  create me  */, 0);
+    FIFO_Put()
+  }
+}
+
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
 int main(void)
 /*lint -restore Enable MISRA rule (6.3) checking. */
