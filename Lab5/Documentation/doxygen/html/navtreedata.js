@@ -1,8 +1,7 @@
 var NAVTREE =
 [
-  [ "Lab3", "index.html", [
-    [ "Pins allocation", "page_pinalloc.html", null ],
-    [ "Memory map", "page_memorymap.html", null ],
+  [ "OSExample", "index.html", [
+    [ "Pin Allocation", "page_pinalloc.html", null ],
     [ "Modules", "modules.html", "modules" ],
     [ "Data Structures", "annotated.html", [
       [ "Data Structures", "annotated.html", "annotated_dup" ],
@@ -98,13 +97,13 @@ var NAVTREEINDEX =
 "group___u_s_b_h_s___register___masks.html#ga4f63004a411b3e140d7813f19abbaeea",
 "group___u_s_b_h_s___register___masks.html#gad5efadbf1a79e4f6c5c6e15a1aac7770",
 "group__accel__module.html#ga4f26113eba1169f1d886f8236626f4a7",
-"struct_a_x_b_s___mem_map.html#abd29af23a1cdc627c9e3d58d5f0a572f",
-"struct_d_m_a___mem_map.html#ade1056cf9364888e2d2a33ab9ab6d9b5",
-"struct_e_t_m___mem_map.html#a38e2061e881d7fab2a46b12b5c20ca02",
-"struct_l_d_d___c_a_n___t_frame.html#a9bab04fefdcfc101f718355bc6e20eb4",
-"struct_l_d_d___u_s_b___device___t_t_d___struct.html#aeffbf1300fce5fc9ebf98f5760a96d38",
-"struct_p_i_t___mem_map.html#a99390c5764693e07c37d40ead441a7a4",
-"struct_t_s_i___mem_map.html#a1792ec66ee609674ea272871f5abcf1c"
+"struct_a_x_b_s___mem_map.html#ac84331fa5882422f18454768a5e937a9",
+"struct_d_m_a___mem_map.html#ae2b0e842221342f28893b3399e17cf82",
+"struct_e_t_m___mem_map.html#a3e7f9350f82e25fe0112095043733e96",
+"struct_l_d_d___c_a_n___t_frame.html#aa46516e37548a263726db8a7319c9b2b",
+"struct_l_d_d___u_s_b___host___t_pipe_descr___struct.html",
+"struct_p_i_t___mem_map.html#ad664bbe0f8b53ee1e533727db4da3fb2",
+"struct_t_s_i___mem_map.html#a37c8a06461ca09948d6a65a1289bccd9"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

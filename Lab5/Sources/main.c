@@ -32,6 +32,7 @@
 // Included header files
 #include "types.h"
 #include "Cpu.h"
+#include "OS.h"
 #include "Events.h"
 #include "PE_Types.h"
 #include "PE_Error.h"
