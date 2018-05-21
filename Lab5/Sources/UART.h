@@ -13,6 +13,17 @@
 
 // new types
 #include "types.h"
+#include "OS.h"
+#include "FIFO.h"
+
+//TODO: check this public global
+uint8_t DummyRead;
+
+TFIFO RxFIFO; /*!< The Receive FIFO */
+TFIFO TxFIFO; /*!< The Transmit FIFO */
+
+OS_ECB* RxUART;
+OS_ECB* TxUART;
 
 /*! @brief Sets up the UART interface before first use.
  *

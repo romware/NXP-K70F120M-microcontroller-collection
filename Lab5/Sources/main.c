@@ -79,6 +79,22 @@ volatile uint8_t* NvTowerPo;                    /*!< Tower protocol union pointe
 
 uint8_t AccelNewData[3];                        /*!< Latest XYZ readings from accelerometer */
 
+// Arbitrary thread stack size - big enough for stacking of interrupts and OS use.
+#define THREAD_STACK_SIZE 100
+
+// Thread stacks
+OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE); /*!< The stack for the Tower Init thread. */
+OS_THREAD_STACK(RxUARTThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the RxUART thread. */
+OS_THREAD_STACK(TxUARTThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the TxUART Init thread. */
+OS_THREAD_STACK(RTCThreadStack, THREAD_STACK_SIZE);         /*!< The stack for the RTC thread. */
+OS_THREAD_STACK(FTMThreadStack, THREAD_STACK_SIZE);         /*!< The stack for the FTM thread. */
+OS_THREAD_STACK(PITThreadStack, THREAD_STACK_SIZE);         /*!< The stack for the PIT thread. */
+OS_THREAD_STACK(I2CThreadStack, THREAD_STACK_SIZE);         /*!< The stack for the I2C thread. */
+OS_THREAD_STACK(AccelThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Accel thread. */
+OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the Packet thread. */
+
+
+
 
 /*! @brief Sends the startup packets to the PC
  *
@@ -439,32 +455,63 @@ bool TowerSet(const TFTMChannel* const aFTMChannel)
   return success;
 }
 
-/*! @brief Waits for a signal to get and put data in RxFIFO
+/*! @brief Initialises the modules
  *
- *  @note Assumes that FIFO_Init has been called successfully.
+ *  @param pData is not used but is required by the OS to create a thread.
+ *  @note This thread deletes itself after running for the first time.
  */
-static void RxFIFOThread(TFIFO * const FIFO)
+static void InitModulesThread(void* pData)
+{
+  // Initializes the main tower components
+  if(LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init())
+  {
+    // Turn on the orange LED to indicate the tower has initialized successfully
+    LEDs_On(LED_ORANGE);
+  }
+
+  // We only do this once - therefore delete this thread
+  OS_ThreadDelete(OS_PRIORITY_SELF);
+}
+
+/*! @brief Puts data into the receive FIFO
+ *
+ *  @note Assumes that UART_Init has been called successfully.
+ */
+static void RxUARTThread(void* pData)
 {
   for (;;)
   {
-    // Wait here until signaled that we can access the RxFIFO
-    (void)OS_SemaphoreWait(/*  create me  */, 0);
-    FIFO_Put()
+    OS_SemaphoreWait(RxUART,0);
+
+    // Put the value in UART2 Data Register (UART2_D) in the RxFIFO
+    FIFO_Put(&RxFIFO, DummyRead);
   }
 }
 
-/*lint -save  -e970 Disable MISRA rule (6.3) checking. */
-int main(void)
-/*lint -restore Enable MISRA rule (6.3) checking. */
+/*! @brief Puts data into the transmit FIFO
+ *
+ *  @note Assumes that UART_Init has been called successfully.
+ */
+static void TxUARTThread(void* pData)
 {
-  /* Write your local variable definition here */
+  for (;;)
+  {
+    OS_SemaphoreWait(TxUART,0);
 
-  /*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
-  PE_low_level_init();
-  /*** End of Processor Expert internal initialization.                    ***/
+    // Put the value in TxFIFO into the UART2 Data Register (UART2_D)
+    if(FIFO_Get(&TxFIFO, (uint8_t*)&UART2_D))
+    {
+      UART2_C2 |= UART_C2_TIE_MASK;
+    }
+  }
+}
 
-  /* Write your code here */
-
+/*! @brief Checks if any packets have been received then handles it based on its contents
+ *
+ *  @note Assumes that Packet_Init has been called successfully.
+ */
+static void PacketThread(void* pData)
+{
   TFTMChannel receivedPacketTmr;          /*!< FTM Channel for received packet timer */
   receivedPacketTmr.channelNb             = 0;
   receivedPacketTmr.delayCount            = CPU_MCGFF_CLK_HZ_CONFIG_0;
@@ -474,37 +521,11 @@ int main(void)
   receivedPacketTmr.userFunction          = FTMCallbackCh0;
   receivedPacketTmr.userArguments         = NULL;
 
-  TAccelSetup accelerometerSetup;                  /*!< Accelerometer callback setup */
-  accelerometerSetup.moduleClk                     = CPU_BUS_CLK_HZ;
-  accelerometerSetup.dataReadyCallbackFunction     = AccelDataReadyCallback;
-  accelerometerSetup.dataReadyCallbackArguments    = NULL;
-  accelerometerSetup.readCompleteCallbackFunction  = AccelReadCompleteCallback;
-  accelerometerSetup.readCompleteCallbackArguments = NULL;
+  // FTM Channel for received packet timer
+  FTM_Set(&receivedPacketTmr);
 
-
-  // Globally disable interrupts
-  __DI();
-
-  // Initializes the main tower components
-  if(TowerInit(&accelerometerSetup))
-  {
-    // Sets the default or stored values of the main tower components
-    if(TowerSet(&receivedPacketTmr))
-    {
-      // Turn on the orange LED to indicate the tower has initialized successfully
-      LEDs_On(LED_ORANGE);
-    }
-  }
-
-  // Globally enable interrupts
-  __EI();
-
-
-  // Send startup packets to PC
-  HandleTowerStartup();
-
-  for(;;)
-  {
+  for (;;)
+  {//TODO: think about semaphore waiting
     // Check if a packet has been received
     if(Packet_Get())
     {
@@ -513,20 +534,143 @@ int main(void)
       {
         LEDs_On(LED_BLUE);
       }
-
       // Execute a command depending on what packet has been received
       ReceivedPacket();
     }
   }
+}
 
-  /*** Don't write any code pass this line, or it will be deleted during code generation. ***/
-  /*** RTOS startup code. Macro PEX_RTOS_START is defined by the RTOS component. DON'T MODIFY THIS CODE!!! ***/
-  #ifdef PEX_RTOS_START
-    PEX_RTOS_START();                  /* Startup of the selected RTOS. Macro is defined by the RTOS component. */
-  #endif
+/*lint -save  -e970 Disable MISRA rule (6.3) checking. */
+int main(void)
+/*lint -restore Enable MISRA rule (6.3) checking. */
+{
+  /* Write your local variable definition here */
+  OS_ERROR error;
+
+  /*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
+  PE_low_level_init();
+  /*** End of Processor Expert internal initialization.                    ***/
+
+  /* Write your code here */
+
+  // Initialize the RTOS
+  OS_Init(CPU_CORE_CLK_HZ, false);
+
+  // Create module threads
+
+  // 0th Highest priority
+  error = OS_ThreadCreate(InitModulesThread,
+                          NULL,
+                          &InitModulesThreadStack[THREAD_STACK_SIZE - 1],
+  		          0);
+  // 1st Highest priority
+  error = OS_ThreadCreate(RxUARTThread,
+                          NULL,
+                          &RxUARTThreadStack[THREAD_STACK_SIZE - 1],
+                          1);
+  // 2nd Highest priority
+  error = OS_ThreadCreate(TxUARTThread,
+                          NULL,
+                          &TxUARTThreadStack[THREAD_STACK_SIZE - 1],
+                          2);
+//  // 3rd Highest priority
+//  error = OS_ThreadCreate(RTCThread,
+//                          NULL,
+//                          &RTCThreadStack[THREAD_STACK_SIZE - 1],
+//                          3);
+//  // 4th Highest priority
+//  error = OS_ThreadCreate(FTMThread,
+//                          NULL,
+//                          &FTMThreadStack[THREAD_STACK_SIZE - 1],
+//                          4);
+//  // 5th Highest priority
+//  error = OS_ThreadCreate(PITThread,
+//                          NULL,
+//                          &PITThreadStack[THREAD_STACK_SIZE - 1],
+//                          5);
+//  // 6th Highest priority
+//  error = OS_ThreadCreate(I2CThread,
+//                          NULL,
+//                          &I2CThreadStack[THREAD_STACK_SIZE - 1],
+//                          6);
+//  // 7th Highest priority
+//  error = OS_ThreadCreate(AccelThread,
+//                          NULL,
+//                          &AccelThreadStack[THREAD_STACK_SIZE - 1],
+//                          7);
+  // 8th Highest priority
+  error = OS_ThreadCreate(PacketThread,
+                          NULL,
+                          &PacketThreadStack[THREAD_STACK_SIZE - 1],
+                          8);
+
+  // Start multithreading - never returns!
+  OS_Start();
+
+
+//  TFTMChannel receivedPacketTmr;          /*!< FTM Channel for received packet timer */
+//  receivedPacketTmr.channelNb             = 0;
+//  receivedPacketTmr.delayCount            = CPU_MCGFF_CLK_HZ_CONFIG_0;
+//  receivedPacketTmr.ioType.inputDetection = TIMER_INPUT_ANY;
+//  receivedPacketTmr.ioType.outputAction   = TIMER_OUTPUT_DISCONNECT;
+//  receivedPacketTmr.timerFunction         = TIMER_FUNCTION_OUTPUT_COMPARE;
+//  receivedPacketTmr.userFunction          = FTMCallbackCh0;
+//  receivedPacketTmr.userArguments         = NULL;
+//
+//  TAccelSetup accelerometerSetup;                  /*!< Accelerometer callback setup */
+//  accelerometerSetup.moduleClk                     = CPU_BUS_CLK_HZ;
+//  accelerometerSetup.dataReadyCallbackFunction     = AccelDataReadyCallback;
+//  accelerometerSetup.dataReadyCallbackArguments    = NULL;
+//  accelerometerSetup.readCompleteCallbackFunction  = AccelReadCompleteCallback;
+//  accelerometerSetup.readCompleteCallbackArguments = NULL;
+//
+//
+//  // Globally disable interrupts
+//  __DI();
+//
+//  // Initializes the main tower components
+//  if(TowerInit(&accelerometerSetup))
+//  {
+//    // Sets the default or stored values of the main tower components
+//    if(TowerSet(&receivedPacketTmr))
+//    {
+//      // Turn on the orange LED to indicate the tower has initialized successfully
+//      LEDs_On(LED_ORANGE);
+//    }
+//  }
+//
+//  // Globally enable interrupts
+//  __EI();
+//
+//
+//  // Send startup packets to PC
+//  HandleTowerStartup();
+//
+//  for(;;)
+//  {
+//    // Check if a packet has been received
+//    if(Packet_Get())
+//    {
+//      // Turn on the blue LED if the 1 second timer is set
+//      if(FTM_StartTimer(&receivedPacketTmr))
+//      {
+//        LEDs_On(LED_BLUE);
+//      }
+//
+//      // Execute a command depending on what packet has been received
+//      ReceivedPacket();
+//    }
+//  }
+//
+//
+//  /*** Don't write any code pass this line, or it will be deleted during code generation. ***/
+//  /*** RTOS startup code. Macro PEX_RTOS_START is defined by the RTOS component. DON'T MODIFY THIS CODE!!! ***/
+//  #ifdef PEX_RTOS_START
+//    PEX_RTOS_START();                  /* Startup of the selected RTOS. Macro is defined by the RTOS component. */
+//  #endif
   /*** End of RTOS startup code.  ***/
   /*** Processor Expert end of main routine. DON'T MODIFY THIS CODE!!! ***/
-  for(;;){}
+  //for(;;){}
   /*** Processor Expert end of main routine. DON'T WRITE CODE BELOW!!! ***/
 } /*** End of main routine. DO NOT MODIFY THIS TEXT!!! ***/
 

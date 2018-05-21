@@ -20,11 +20,6 @@
 #include "Cpu.h"
 #include "OS.h"
 
-TFIFO RxFIFO; /*!< The Receive FIFO */
-TFIFO TxFIFO; /*!< The Transmit FIFO */
-
-OS_ECB* RxUART;
-OS_ECB* TxUART;
 
 /*! @brief Sets up the UART interface before first use.
  *
@@ -151,6 +146,9 @@ void __attribute__ ((interrupt)) UART_ISR(void)
   // Check if UART2 receive interrupt is enabled and the UART2 receive data register full flag is set
   if((UART2_C2 & UART_C2_RIE_MASK) && (UART2_S1 & UART_S1_RDRF_MASK))
   {
+    //TODO: dummy read to clear interrupt flag
+    DummyRead = UART2_D;
+
     // Put the value in UART2 Data Register (UART2_D) in the RxFIFO
     //FIFO_Put(&RxFIFO, UART2_D);
     OS_SemaphoreSignal(RxUART);
@@ -160,11 +158,12 @@ void __attribute__ ((interrupt)) UART_ISR(void)
   if((UART2_C2 & UART_C2_TIE_MASK) && (UART2_S1 & UART_S1_TDRE_MASK))
   {
     // Put the value in TxFIFO into the UART2 Data Register (UART2_D)
-    if(!(FIFO_Get(&TxFIFO, (uint8_t*)&UART2_D)))
-    {
+    //if(!(FIFO_Get(&TxFIFO, (uint8_t*)&UART2_D)))
+    //{
       // If the FIFO is empty clear the transmit interrupt enable
       UART2_C2 &= ~UART_C2_TIE_MASK;
-    }
+      OS_SemaphoreSignal(TxUART);
+    //}
   }
   OS_ISRExit();
 }
