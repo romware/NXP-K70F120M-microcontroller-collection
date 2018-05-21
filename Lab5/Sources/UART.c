@@ -125,13 +125,11 @@ bool UART_InChar(uint8_t * const dataPtr)
 bool UART_OutChar(const uint8_t data)
 {
   // Put one character into the TxFIFO.
-  if(FIFO_Put(&TxFIFO, data))
-  {
+  FIFO_Put(&TxFIFO, data);
+
     // Set UART2_C2 transmit interrupt enable to 1
     UART2_C2 |= UART_C2_TIE_MASK;
     return true;
-  }
-  return false;
 }
 
 /*! @brief Interrupt service routine for the UART.

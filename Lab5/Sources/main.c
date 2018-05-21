@@ -482,6 +482,7 @@ static void RxUARTThread(void* pData)
   for (;;)
   {
     OS_SemaphoreWait(RxUART,0);
+    OS_SemaphoreWait(RxFIFO.CanPut,0);
 
     // Put the value in UART2 Data Register (UART2_D) in the RxFIFO
     FIFO_Put(&RxFIFO, DummyRead);
@@ -498,11 +499,13 @@ static void TxUARTThread(void* pData)
   {
     OS_SemaphoreWait(TxUART,0);
 
+    OS_SemaphoreWait(TxFIFO.CanGet,0);
+    OS_SemaphoreSignal(TxFIFO.CanGet);
+
     // Put the value in TxFIFO into the UART2 Data Register (UART2_D)
-    if(FIFO_Get(&TxFIFO, (uint8_t*)&UART2_D))
-    {
-      UART2_C2 |= UART_C2_TIE_MASK;
-    }
+    FIFO_Get(&TxFIFO, (uint8_t*)&UART2_D);
+
+    UART2_C2 |= UART_C2_TIE_MASK;
   }
 }
 
