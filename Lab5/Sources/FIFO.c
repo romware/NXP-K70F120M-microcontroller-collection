@@ -29,7 +29,7 @@ void FIFO_Init(TFIFO * const FIFO)
   FIFO->Start = 0;
   FIFO->End = 0;
   FIFO->CanAccess = OS_SemaphoreCreate(1);
-  FIFO->CanPut = OS_SemaphoreCreate(FIFO_SIZE + 1);
+  FIFO->CanPut = OS_SemaphoreCreate(FIFO_SIZE);
   FIFO->CanGet = OS_SemaphoreCreate(0);
 }
 

@@ -113,7 +113,8 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
 bool UART_InChar(uint8_t * const dataPtr)
 {
   // Get one character from the RxFIFO.
-  return FIFO_Get(&RxFIFO, dataPtr);
+  FIFO_Get(&RxFIFO, dataPtr);
+  return true;
 }
 
 /*! @brief Put a byte in the transmit FIFO if it is not full.
@@ -126,10 +127,8 @@ bool UART_OutChar(const uint8_t data)
 {
   // Put one character into the TxFIFO.
   FIFO_Put(&TxFIFO, data);
-
-    // Set UART2_C2 transmit interrupt enable to 1
-    UART2_C2 |= UART_C2_TIE_MASK;
-    return true;
+  //UART2_C2 |= UART_C2_TIE_MASK;
+  return true;
 }
 
 /*! @brief Interrupt service routine for the UART.
@@ -148,20 +147,19 @@ void __attribute__ ((interrupt)) UART_ISR(void)
     DummyRead = UART2_D;
 
     // Put the value in UART2 Data Register (UART2_D) in the RxFIFO
-    //FIFO_Put(&RxFIFO, UART2_D);
     OS_SemaphoreSignal(RxUART);
   }
 
   // Check if the UART2 transmit interrupt is enabled and the UART2 transmit data register empty flag is set
   if((UART2_C2 & UART_C2_TIE_MASK) && (UART2_S1 & UART_S1_TDRE_MASK))
   {
-    // Put the value in TxFIFO into the UART2 Data Register (UART2_D)
-    //if(!(FIFO_Get(&TxFIFO, (uint8_t*)&UART2_D)))
+    // If the FIFO is empty clear the transmit interrupt enable
+    //if(!TxFIFO.CanGet)
     //{
-      // If the FIFO is empty clear the transmit interrupt enable
-      UART2_C2 &= ~UART_C2_TIE_MASK;
-      OS_SemaphoreSignal(TxUART);
     //}
+
+    OS_SemaphoreSignal(TxUART);
+    UART2_C2 &= ~UART_C2_TIE_MASK;
   }
   OS_ISRExit();
 }

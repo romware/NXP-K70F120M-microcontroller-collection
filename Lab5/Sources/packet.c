@@ -16,10 +16,13 @@
 #include "types.h"
 #include "UART.h"
 #include "packet.h"
+#include "MK70F12.h"
 
 const uint8_t PACKET_ACK_MASK = 0x80; /*!< Bit 7 of byte set to 1 */
 
 TPacket Packet;                       /*!< Packet structure */
+
+static OS_ECB* PacketPutAccess;
 
 /*! @brief Initializes the packets by calling the initialization routines of the supporting software modules.
  *
@@ -29,6 +32,8 @@ TPacket Packet;                       /*!< Packet structure */
  */
 bool Packet_Init(const uint32_t baudRate, const uint32_t moduleClk)
 {
+  PacketPutAccess = OS_SemaphoreCreate(1);
+
   // Sets up the UART interface before first use.
   return UART_Init(baudRate, moduleClk);
 }
@@ -66,16 +71,23 @@ bool Packet_Get(void)
  */
 bool Packet_Put(const uint8_t command, const uint8_t parameter1, const uint8_t parameter2, const uint8_t parameter3)
 {
+  OS_SemaphoreWait(PacketPutAccess,0);
+
   // Generates the XOR checksum of a packet.
   uint8_t checksum = command ^ parameter1 ^ parameter2 ^ parameter3;
+
   // Put each byte of the packet in the transmit FIFO if it is not full.
-  return (
-    UART_OutChar(command) &&
-    UART_OutChar(parameter1) &&
-    UART_OutChar(parameter2) &&
-    UART_OutChar(parameter3) &&
-    UART_OutChar(checksum)
-  );
+  UART_OutChar(command);
+  UART_OutChar(parameter1);
+  UART_OutChar(parameter2);
+  UART_OutChar(parameter3);
+  UART_OutChar(checksum);
+
+  OS_SemaphoreSignal(PacketPutAccess);
+
+  // Set UART2_C2 transmit interrupt enable to 1
+  UART2_C2 |= UART_C2_TIE_MASK;
+  return true;
 }
 /* END packet */
 /*!
