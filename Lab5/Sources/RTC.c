@@ -16,9 +16,8 @@
 #include "RTC.h"
 #include "MK70F12.h"
 #include "Cpu.h"
+#include "OS.h"
 
-static void (*UserFunction)(void*); /*!< Callback functions for RTC */
-static void* UserArguments;         /*!< Callback parameters for RTC */
 
 /*! @brief Initializes the RTC before first use.
  *
@@ -28,11 +27,11 @@ static void* UserArguments;         /*!< Callback parameters for RTC */
  *  @param userArguments is a pointer to the user arguments to use with the user callback function.
  *  @return bool - TRUE if the RTC was successfully initialized.
  */
-bool RTC_Init(void (*userFunction)(void*), void* userArguments)
+bool RTC_Init(void)
 {
   // Store parameters for interrupt routine
-  UserFunction = userFunction;
-  UserArguments = userArguments;
+  //UserFunction = userFunction;
+  //UserArguments = userArguments;
 
   // Ensure global interrupts are disabled
   EnterCritical();
@@ -47,6 +46,9 @@ bool RTC_Init(void (*userFunction)(void*), void* userArguments)
 
   // Enable interrupts from RTC module
   NVICISER2 |= (1 << 3);
+
+  // Initialize semaphore for RTC
+  RTCRead = OS_SemaphoreCreate(0);
 
   // Return global interrupts to how they were
   ExitCritical();
@@ -127,9 +129,12 @@ void RTC_Get(uint8_t* const hours, uint8_t* const minutes, uint8_t* const second
  */
 void __attribute__ ((interrupt)) RTC_ISR(void)
 {
-  // Call user callback function to toggle the yellow LED and send the new time to the PC
-  if (UserFunction)
-    (*UserFunction)(UserArguments);
+  // Notify RTOS of start of ISR
+  OS_ISREnter();
+
+  OS_SemaphoreSignal(RTCRead);
+
+  OS_ISRExit();
 }
 /* END RTC */
 /*!

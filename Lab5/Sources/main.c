@@ -394,7 +394,7 @@ bool TowerInit(const TAccelSetup* const accelSetup)
     LEDs_Init() &&
     Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) &&
     FTM_Init() &&
-    RTC_Init(RTCCallback, NULL) &&
+    RTC_Init() &&
     Accel_Init(accelSetup)
   );
 }
@@ -463,7 +463,7 @@ bool TowerSet(const TFTMChannel* const aFTMChannel)
 static void InitModulesThread(void* pData)
 {
   // Initializes the main tower components
-  if(LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init())
+  if(LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init() && RTC_Init())
   {
     // Turn on the orange LED to indicate the tower has initialized successfully
     LEDs_On(LED_ORANGE);
@@ -545,6 +545,26 @@ static void PacketThread(void* pData)
   }
 }
 
+static void RTCThread(void* pData)
+{
+  for (;;)
+  {
+    OS_SemaphoreWait(RTCRead,0);
+
+    // Toggle the yellow LED
+    LEDs_Toggle(LED_YELLOW);
+
+    // Declare variable for hours, minutes seconds
+    uint8_t hours, minutes, seconds;
+
+    // Get the current time values
+    RTC_Get(&hours, &minutes, &seconds);
+
+    // Send time to PC
+    Packet_Put(COMMAND_TIME, hours, minutes, seconds);
+  }
+}
+
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
 int main(void)
 /*lint -restore Enable MISRA rule (6.3) checking. */
@@ -578,11 +598,11 @@ int main(void)
                           NULL,
                           &TxUARTThreadStack[THREAD_STACK_SIZE - 1],
                           2);
-//  // 3rd Highest priority
-//  error = OS_ThreadCreate(RTCThread,
-//                          NULL,
-//                          &RTCThreadStack[THREAD_STACK_SIZE - 1],
-//                          3);
+  // 3rd Highest priority
+  error = OS_ThreadCreate(RTCThread,
+                          NULL,
+                          &RTCThreadStack[THREAD_STACK_SIZE - 1],
+                          3);
 //  // 4th Highest priority
 //  error = OS_ThreadCreate(FTMThread,
 //                          NULL,

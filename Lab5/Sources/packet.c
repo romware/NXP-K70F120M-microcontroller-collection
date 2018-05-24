@@ -17,6 +17,7 @@
 #include "UART.h"
 #include "packet.h"
 #include "MK70F12.h"
+#include "Cpu.h"
 
 const uint8_t PACKET_ACK_MASK = 0x80; /*!< Bit 7 of byte set to 1 */
 
@@ -73,19 +74,20 @@ bool Packet_Put(const uint8_t command, const uint8_t parameter1, const uint8_t p
 {
   OS_SemaphoreWait(PacketPutAccess,0);
   
-  EnterCritical();
+  //EnterCritical();
   
   // Generates the XOR checksum of a packet.
   uint8_t checksum = command ^ parameter1 ^ parameter2 ^ parameter3;
 
   // Put each byte of the packet in the transmit FIFO if it is not full.
   UART_OutChar(command);
+  UART2_C2 |= UART_C2_TIE_MASK;  //TODO: Why do we need this?
   UART_OutChar(parameter1);
   UART_OutChar(parameter2);
   UART_OutChar(parameter3);
   UART_OutChar(checksum);
 
-  ExitCritical();
+  //ExitCritical();
   
   OS_SemaphoreSignal(PacketPutAccess);
 
