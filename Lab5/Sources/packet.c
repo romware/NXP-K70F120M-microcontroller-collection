@@ -72,7 +72,9 @@ bool Packet_Get(void)
 bool Packet_Put(const uint8_t command, const uint8_t parameter1, const uint8_t parameter2, const uint8_t parameter3)
 {
   OS_SemaphoreWait(PacketPutAccess,0);
-
+  
+  EnterCritical();
+  
   // Generates the XOR checksum of a packet.
   uint8_t checksum = command ^ parameter1 ^ parameter2 ^ parameter3;
 
@@ -83,10 +85,12 @@ bool Packet_Put(const uint8_t command, const uint8_t parameter1, const uint8_t p
   UART_OutChar(parameter3);
   UART_OutChar(checksum);
 
+  ExitCritical();
+  
   OS_SemaphoreSignal(PacketPutAccess);
 
   // Set UART2_C2 transmit interrupt enable to 1
-  UART2_C2 |= UART_C2_TIE_MASK;
+  //UART2_C2 |= UART_C2_TIE_MASK;
   return true;
 }
 /* END packet */

@@ -127,7 +127,9 @@ bool UART_OutChar(const uint8_t data)
 {
   // Put one character into the TxFIFO.
   FIFO_Put(&TxFIFO, data);
-  //UART2_C2 |= UART_C2_TIE_MASK;
+  
+  // Enable transmit interrupts only when data is ready to transmit
+  UART2_C2 |= UART_C2_TIE_MASK;
   return true;
 }
 
@@ -146,21 +148,18 @@ void __attribute__ ((interrupt)) UART_ISR(void)
     //TODO: dummy read to clear interrupt flag
     DummyRead = UART2_D;
 
-    // Put the value in UART2 Data Register (UART2_D) in the RxFIFO
     OS_SemaphoreSignal(RxUART);
   }
 
   // Check if the UART2 transmit interrupt is enabled and the UART2 transmit data register empty flag is set
   if((UART2_C2 & UART_C2_TIE_MASK) && (UART2_S1 & UART_S1_TDRE_MASK))
   {
-    // If the FIFO is empty clear the transmit interrupt enable
-    //if(!TxFIFO.CanGet)
-    //{
-    //}
-
-    OS_SemaphoreSignal(TxUART);
+    // Clear the transmit interrupt enable
     UART2_C2 &= ~UART_C2_TIE_MASK;
+    
+    OS_SemaphoreSignal(TxUART);
   }
+  
   OS_ISRExit();
 }
 /* END UART */

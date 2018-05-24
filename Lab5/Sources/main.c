@@ -498,14 +498,15 @@ static void TxUARTThread(void* pData)
   {
     OS_SemaphoreWait(TxUART,0);
 
-    // Put the value in TxFIFO into the UART2 Data Register (UART2_D)
+    // Check if transmit data is ready
     if(UART2_S1 & UART_S1_TDRE_MASK)
     {
-	FIFO_Get(&TxFIFO, (uint8_t*)&UART2_D);
+      // Put the value in TxFIFO into the UART2 Data Register (UART2_D)
+      FIFO_Get(&TxFIFO, (uint8_t*)&UART2_D);
+      
+      // Enable transmit interrupts only when data is ready to transmit
+      UART2_C2 |= UART_C2_TIE_MASK;
     }
-
-
-    UART2_C2 |= UART_C2_TIE_MASK;
   }
 }
 
