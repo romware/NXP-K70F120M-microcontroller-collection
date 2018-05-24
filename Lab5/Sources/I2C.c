@@ -24,8 +24,8 @@ static void WaitCondition();
 static void BusyCondition();
 static void RepeatCondition();
 
-static void (*ReadCompleteCallbackFunction)(void*);  /*!<  Callback functions for I2C. */
-static void* ReadCompleteCallbackArguments;          /*!< Callback parameters for I2C. */
+//static void (*ReadCompleteCallbackFunction)(void*);  /*!<  Callback functions for I2C. */
+//static void* ReadCompleteCallbackArguments;          /*!< Callback parameters for I2C. */
 
 static uint8_t SlaveDeviceAddress = 0x1D;            /*!< Current Slave address for I2C. */
 static uint8_t SlaveDeviceReadAddress;               /*!< Current Slave device read address for I2C. */
@@ -95,8 +95,8 @@ static void RepeatCondition()
 bool I2C_Init(const TI2CModule* const aI2CModule, const uint32_t moduleClk)
 {
   // Store parameters for interrupt routine
-  ReadCompleteCallbackFunction = aI2CModule->readCompleteCallbackFunction;
-  ReadCompleteCallbackArguments = aI2CModule->readCompleteCallbackArguments;
+  //ReadCompleteCallbackFunction = aI2CModule->readCompleteCallbackFunction;
+  //ReadCompleteCallbackArguments = aI2CModule->readCompleteCallbackArguments;
 
   // Ensure global interrupts are disabled
   EnterCritical();
@@ -111,6 +111,9 @@ bool I2C_Init(const TI2CModule* const aI2CModule, const uint32_t moduleClk)
 
   // Enable interrupts from I2C0 module
   NVICISER0 |= (1 << 24);
+
+  // Initialize semaphore for I2C
+  ReadComplete = OS_SemaphoreCreate(0);
 
   // Return global interrupts to how they were
   ExitCritical();
@@ -352,6 +355,9 @@ void I2C_IntRead(const uint8_t registerAddress, uint8_t* const data, const uint8
  */
 void __attribute__ ((interrupt)) I2C_ISR(void)
 {
+  // Notify RTOS of start of ISR
+  OS_ISREnter();
+
   // To keep track of the current stage in the sequence
   static uint8_t stage = 0;
 
@@ -427,11 +433,14 @@ void __attribute__ ((interrupt)) I2C_ISR(void)
         readCount = 0;
 
         // Call user callback function
-        if (ReadCompleteCallbackFunction)
-          (*ReadCompleteCallbackFunction)(ReadCompleteCallbackArguments);
+//        if (ReadCompleteCallbackFunction)
+//          (*ReadCompleteCallbackFunction)(ReadCompleteCallbackArguments);
+
+        OS_SemaphoreSignal(ReadComplete);
       }
       break;
   }
+  OS_ISRExit();
 }
 /* END I2C */
 /*!

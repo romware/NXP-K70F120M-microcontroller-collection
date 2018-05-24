@@ -130,8 +130,9 @@ void __attribute__ ((interrupt)) PIT_ISR(void)
   PIT_TFLG0 = PIT_TFLG_TIF_MASK;
 
   // Call user callback function to toggle the green LED
-  if (UserFunction)
-   (*UserFunction)(UserArguments);
+//  if (UserFunction)
+//   (*UserFunction)(UserArguments);
+  OS_SemaphoreSignal(AccelDataReady);
 }
 
 /* END PIT */

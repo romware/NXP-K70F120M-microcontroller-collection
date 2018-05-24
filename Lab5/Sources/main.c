@@ -79,6 +79,9 @@ volatile uint8_t* NvTowerPo;                    /*!< Tower protocol union pointe
 
 uint8_t AccelNewData[3];                        /*!< Latest XYZ readings from accelerometer */
 
+
+OS_ECB* AccelDataReady;				//TODO: Not sure if this should be here
+
 // Arbitrary thread stack size - big enough for stacking of interrupts and OS use.
 #define THREAD_STACK_SIZE 100
 
@@ -462,12 +465,30 @@ bool TowerSet(const TFTMChannel* const aFTMChannel)
  */
 static void InitModulesThread(void* pData)
 {
+    TAccelSetup accelerometerSetup;                  /*!< Accelerometer callback setup */
+    accelerometerSetup.moduleClk                     = CPU_BUS_CLK_HZ;
+    accelerometerSetup.dataReadyCallbackFunction     = AccelDataReadyCallback;
+    accelerometerSetup.dataReadyCallbackArguments    = NULL;
+    accelerometerSetup.readCompleteCallbackFunction  = AccelReadCompleteCallback;
+    accelerometerSetup.readCompleteCallbackArguments = NULL;
+
+    TFTMChannel receivedPacketTmr;          /*!< FTM Channel for received packet timer */
+    receivedPacketTmr.channelNb             = 0;
+    receivedPacketTmr.delayCount            = CPU_MCGFF_CLK_HZ_CONFIG_0;
+    receivedPacketTmr.ioType.inputDetection = TIMER_INPUT_ANY;
+    receivedPacketTmr.ioType.outputAction   = TIMER_OUTPUT_DISCONNECT;
+    receivedPacketTmr.timerFunction         = TIMER_FUNCTION_OUTPUT_COMPARE;
+    receivedPacketTmr.userFunction          = FTMCallbackCh0;
+    receivedPacketTmr.userArguments         = NULL;
+
   // Initializes the main tower components
-  if(LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init() && RTC_Init())
+  if(LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init() && RTC_Init() && Accel_Init(&accelerometerSetup))
   {
     // Turn on the orange LED to indicate the tower has initialized successfully
     LEDs_On(LED_ORANGE);
   }
+
+  TowerSet(&receivedPacketTmr);
 
   // We only do this once - therefore delete this thread
   OS_ThreadDelete(OS_PRIORITY_SELF);
@@ -565,6 +586,52 @@ static void RTCThread(void* pData)
   }
 }
 
+static void I2CThread(void* pData)
+{
+  for (;;)
+  {
+    OS_SemaphoreWait(ReadComplete,0);
+
+    // Two dimensional array storing the 3 most recent X, Y and Z values
+    static uint8_t recentData[3][3];
+
+    // Shift the recent data up to append the latest accelerations
+    for(uint8_t i = 0; i < 2; i++)
+    {
+      recentData[i][0] = recentData[i+1][0];
+      recentData[i][1] = recentData[i+1][1];
+      recentData[i][2] = recentData[i+1][2];
+    }
+    recentData[2][0] = AccelNewData[0];
+    recentData[2][1] = AccelNewData[1];
+    recentData[2][2] = AccelNewData[2];
+
+    // Find the median value of the three most recent values for X, Y and Z accelerations
+    uint8_t medianX = Median_Filter3(recentData[0][0],recentData[1][0],recentData[2][0]);
+    uint8_t medianY = Median_Filter3(recentData[0][1],recentData[1][1],recentData[2][1]);
+    uint8_t medianZ = Median_Filter3(recentData[0][2],recentData[1][2],recentData[2][2]);
+
+    // Send the filtered accelerations to the PC
+    if(Packet_Put(COMMAND_ACCEL, medianX, medianY, medianZ))
+    {
+      // Toggle the green LED
+      LEDs_Toggle(LED_GREEN);
+    }
+
+  }
+}
+
+static void AccelThread(void* pData)
+{
+  for (;;)
+  {
+    OS_SemaphoreWait(AccelDataReady,0);
+
+    // Read data from the accelerometer
+    Accel_ReadXYZ(AccelNewData);
+  }
+}
+
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
 int main(void)
 /*lint -restore Enable MISRA rule (6.3) checking. */
@@ -613,16 +680,16 @@ int main(void)
 //                          NULL,
 //                          &PITThreadStack[THREAD_STACK_SIZE - 1],
 //                          5);
-//  // 6th Highest priority
-//  error = OS_ThreadCreate(I2CThread,
-//                          NULL,
-//                          &I2CThreadStack[THREAD_STACK_SIZE - 1],
-//                          6);
-//  // 7th Highest priority
-//  error = OS_ThreadCreate(AccelThread,
-//                          NULL,
-//                          &AccelThreadStack[THREAD_STACK_SIZE - 1],
-//                          7);
+  // 6th Highest priority
+  error = OS_ThreadCreate(I2CThread,
+                          NULL,
+                          &I2CThreadStack[THREAD_STACK_SIZE - 1],
+                          6);
+  // 7th Highest priority
+  error = OS_ThreadCreate(AccelThread,
+                          NULL,
+                          &AccelThreadStack[THREAD_STACK_SIZE - 1],
+                          7);
   // 8th Highest priority
   error = OS_ThreadCreate(PacketThread,
                           NULL,

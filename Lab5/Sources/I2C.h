@@ -13,6 +13,9 @@
 
 // new types
 #include "types.h"
+#include "OS.h"
+
+OS_ECB* ReadComplete;  //TODO:Scope of this
 
 typedef struct
 {

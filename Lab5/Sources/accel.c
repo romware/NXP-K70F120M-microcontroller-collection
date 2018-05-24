@@ -211,8 +211,8 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
   aTI2CModule.readCompleteCallbackArguments = accelSetup->readCompleteCallbackArguments;
 
   // Set callback functions based on passed setup parameters
-  DataReadyCallbackFunction = accelSetup->dataReadyCallbackFunction;
-  DataReadyCallbackArguments = accelSetup->dataReadyCallbackArguments;
+  //DataReadyCallbackFunction = accelSetup->dataReadyCallbackFunction;
+  //DataReadyCallbackArguments = accelSetup->dataReadyCallbackArguments;
 
   // Initialize the accelerometer as an I2C module
   I2C_Init(&aTI2CModule, accelSetup->moduleClk);
@@ -230,6 +230,9 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
 
   // Enable interrupts from pin detect B
   NVICISER2 |= (1 << 24);
+
+  // Initialize semaphore for AccelDataReady
+  AccelDataReady = OS_SemaphoreCreate(0);
 
   // Return global interrupts to how they were
   ExitCritical();
@@ -318,16 +321,22 @@ void Accel_SetMode(const TAccelMode mode)
  */
 void __attribute__ ((interrupt)) AccelDataReady_ISR(void)
 {
+  // Notify RTOS of start of ISR
+  OS_ISREnter();
+
   // Check the interrupt is from PTB4
   if(PORTB_ISFR & (1 << 4))
   {
     // Write 1 to clear flag
     PORTB_ISFR = (1 << 4);
 
-    // Call user callback function when data is ready
-    if (DataReadyCallbackFunction)
-     (*DataReadyCallbackFunction)(DataReadyCallbackArguments);
+//    // Call user callback function when data is ready
+//    if (DataReadyCallbackFunction)
+//     (*DataReadyCallbackFunction)(DataReadyCallbackArguments);
+
+    OS_SemaphoreSignal(AccelDataReady);
   }
+  OS_ISRExit();
 }
 /* END accel */
 /*!

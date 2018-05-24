@@ -13,6 +13,9 @@
 
 // new types
 #include "types.h"
+#include "OS.h"
+
+extern OS_ECB* AccelDataReady;		// TODO: Is this okay
 
 /*! @brief Sets up the PIT before first use.
  *
