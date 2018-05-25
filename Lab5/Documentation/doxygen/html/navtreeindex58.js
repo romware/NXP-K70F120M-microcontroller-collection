@@ -1,5 +1,12 @@
 var NAVTREEINDEX58 =
 {
+"group___s_i_m___register___masks.html#ga5c660cd4a6d8062e6ef4afbc17c27fa4":[3,0,2,0,0,10984],
+"group___s_i_m___register___masks.html#ga5d75d9b0aaf8e1b69da9820bf13ec183":[3,0,2,0,0,10795],
+"group___s_i_m___register___masks.html#ga5da3c6fca63f77898a34a598827be594":[3,0,2,0,0,11122],
+"group___s_i_m___register___masks.html#ga5e11a7f1bcf920349e4fcf9fb6981053":[3,0,2,0,0,10764],
+"group___s_i_m___register___masks.html#ga5e148c582c15e4caa9bf69c5229562ec":[3,0,2,0,0,10863],
+"group___s_i_m___register___masks.html#ga5fcd93b5580791f93521c435e6831d87":[3,0,2,0,0,10759],
+"group___s_i_m___register___masks.html#ga601bb7007f58e3ad5433d3538f4dcef0":[3,0,2,0,0,11006],
 "group___s_i_m___register___masks.html#ga605f729e3f4faddc18e957c077adf61a":[3,0,2,0,0,11065],
 "group___s_i_m___register___masks.html#ga60cab95310a5dc011d1b64075c2e10f1":[3,0,2,0,0,10792],
 "group___s_i_m___register___masks.html#ga613c43e223be94f007c005f0736a5c98":[3,0,2,0,0,10767],
@@ -242,12 +249,5 @@ var NAVTREEINDEX58 =
 "group___s_m_c___peripheral.html#ga31b6c4571795341e6446800243313e56":[1,19,51,3],
 "group___s_m_c___peripheral.html#ga763f87a6b8ebab7acb6dde639e6a47c7":[3,0,2,0,0,13317],
 "group___s_m_c___peripheral.html#ga763f87a6b8ebab7acb6dde639e6a47c7":[1,19,51,5],
-"group___s_m_c___peripheral.html#gae583f3f0917ee513adcac36dd042a5f3":[1,19,51,4],
-"group___s_m_c___peripheral.html#gae583f3f0917ee513adcac36dd042a5f3":[3,0,2,0,0,11156],
-"group___s_m_c___register___accessor___macros.html":[1,19,51,0],
-"group___s_m_c___register___accessor___macros.html#ga376601b24e540392f6d12424bdaebab4":[3,0,2,0,0,11176],
-"group___s_m_c___register___accessor___macros.html#ga43f6628ef790c765722cee208c2c477d":[3,0,2,0,0,11169],
-"group___s_m_c___register___accessor___macros.html#ga4b2bae0309aecee21e9fe70ac7dbe3dc":[3,0,2,0,0,11157],
-"group___s_m_c___register___accessor___macros.html#ga6311e0572e3a1f7d84e1069716b64307":[3,0,2,0,0,11177],
-"group___s_m_c___register___accessor___macros.html#ga77ded725e1d8ccc2781a0ee6dffc8809":[3,0,2,0,0,11181]
+"group___s_m_c___peripheral.html#gae583f3f0917ee513adcac36dd042a5f3":[3,0,2,0,0,11156]
 };

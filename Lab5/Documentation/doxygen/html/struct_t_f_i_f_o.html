@@ -79,10 +79,14 @@ Data Fields</h2></td></tr>
 <tr class="separator:a092a7559431a12616672354641908167"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5063b875898a6f23a97aa3ca17f0544b"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_t_f_i_f_o.html#a5063b875898a6f23a97aa3ca17f0544b">End</a></td></tr>
 <tr class="separator:a5063b875898a6f23a97aa3ca17f0544b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace00017651a266a66a93aa5220967611"><td class="memItemLeft" align="right" valign="top">uint16_t volatile&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_t_f_i_f_o.html#ace00017651a266a66a93aa5220967611">NbBytes</a></td></tr>
-<tr class="separator:ace00017651a266a66a93aa5220967611"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a9d712880dc4f1d5571b96452cd85f8"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_t_f_i_f_o.html#a5a9d712880dc4f1d5571b96452cd85f8">Buffer</a> [FIFO_SIZE]</td></tr>
 <tr class="separator:a5a9d712880dc4f1d5571b96452cd85f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae08fd55cef4bdad0b4fae1c28110b34d"><td class="memItemLeft" align="right" valign="top">OS_ECB *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_t_f_i_f_o.html#ae08fd55cef4bdad0b4fae1c28110b34d">CanAccess</a></td></tr>
+<tr class="separator:ae08fd55cef4bdad0b4fae1c28110b34d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f4fd72a0313ed8a98e22198171c2fc5"><td class="memItemLeft" align="right" valign="top">OS_ECB *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_t_f_i_f_o.html#a9f4fd72a0313ed8a98e22198171c2fc5">CanPut</a></td></tr>
+<tr class="separator:a9f4fd72a0313ed8a98e22198171c2fc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a71a4db58cc625d3160889d91a33125"><td class="memItemLeft" align="right" valign="top">OS_ECB *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_t_f_i_f_o.html#a1a71a4db58cc625d3160889d91a33125">CanGet</a></td></tr>
+<tr class="separator:a1a71a4db58cc625d3160889d91a33125"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Field Documentation</h2>
 <a class="anchor" id="a5a9d712880dc4f1d5571b96452cd85f8"></a>
@@ -98,6 +102,45 @@ Data Fields</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ae08fd55cef4bdad0b4fae1c28110b34d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">OS_ECB* TFIFO::CanAccess</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The semaphore which allows access to the FIFO </p>
+
+</div>
+</div>
+<a class="anchor" id="a1a71a4db58cc625d3160889d91a33125"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">OS_ECB* TFIFO::CanGet</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The semaphore which allows getting from the FIFO </p>
+
+</div>
+</div>
+<a class="anchor" id="a9f4fd72a0313ed8a98e22198171c2fc5"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">OS_ECB* TFIFO::CanPut</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The semaphore which allows putting into the FIFO </p>
+
+</div>
+</div>
 <a class="anchor" id="a5063b875898a6f23a97aa3ca17f0544b"></a>
 <div class="memitem">
 <div class="memproto">
@@ -108,19 +151,6 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>The index of the next available empty position in the FIFO </p>
-
-</div>
-</div>
-<a class="anchor" id="ace00017651a266a66a93aa5220967611"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint16_t volatile TFIFO::NbBytes</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>The number of bytes currently stored in the FIFO </p>
 
 </div>
 </div>
@@ -138,7 +168,7 @@ Data Fields</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li>C:/Users/12551519/Desktop/git/es18aut13/Lab5/sources/<a class="el" href="_f_i_f_o_8h_source.html">FIFO.h</a></li>
+<li>C:/Users/12551519/Desktop/git/Lab5/sources/<a class="el" href="_f_i_f_o_8h_source.html">FIFO.h</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
@@ -146,7 +176,7 @@ Data Fields</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="struct_t_f_i_f_o.html">TFIFO</a></li>
-    <li class="footer">Generated on Sat May 19 2018 18:00:19 for OSExample by
+    <li class="footer">Generated on Fri May 25 2018 20:30:12 for OSExample by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

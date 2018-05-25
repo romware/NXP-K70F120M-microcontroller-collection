@@ -68,9 +68,9 @@ $(document).ready(function(){initNavTree('group___p_i_t__module.html','');});
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gae69097a83912a25b357df1046aea9b52"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___p_i_t__module.html#gae69097a83912a25b357df1046aea9b52">PIT_Init</a> (const uint32_t moduleClk, void(*userFunction)(void *), void *userArguments)</td></tr>
-<tr class="memdesc:gae69097a83912a25b357df1046aea9b52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the PIT before first use.  <a href="#gae69097a83912a25b357df1046aea9b52">More...</a><br /></td></tr>
-<tr class="separator:gae69097a83912a25b357df1046aea9b52"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab6453eb5df109746d1feea81d0cfdbe4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___p_i_t__module.html#gab6453eb5df109746d1feea81d0cfdbe4">PIT_Init</a> (const uint32_t moduleClk, OS_ECB *userSemaphore)</td></tr>
+<tr class="memdesc:gab6453eb5df109746d1feea81d0cfdbe4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the PIT before first use.  <a href="#gab6453eb5df109746d1feea81d0cfdbe4">More...</a><br /></td></tr>
+<tr class="separator:gab6453eb5df109746d1feea81d0cfdbe4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae012c6f6b7396828c558c92ad0a27ed5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___p_i_t__module.html#gae012c6f6b7396828c558c92ad0a27ed5">PIT_Set</a> (const uint32_t period, const bool restart)</td></tr>
 <tr class="memdesc:gae012c6f6b7396828c558c92ad0a27ed5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the value of the desired period of the PIT.  <a href="#gae012c6f6b7396828c558c92ad0a27ed5">More...</a><br /></td></tr>
 <tr class="separator:gae012c6f6b7396828c558c92ad0a27ed5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -131,7 +131,7 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="gae69097a83912a25b357df1046aea9b52"></a>
+<a class="anchor" id="gab6453eb5df109746d1feea81d0cfdbe4"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -144,14 +144,8 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">void(*)(void *)&#160;</td>
-          <td class="paramname"><em>userFunction</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>userArguments</em>&#160;</td>
+          <td class="paramtype">OS_ECB *&#160;</td>
+          <td class="paramname"><em>userSemaphore</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -165,8 +159,7 @@ Functions</h2></td></tr>
 <p>Enables the PIT and freezes the timer when debugging. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">moduleClk</td><td>The module clock rate in Hz. </td></tr>
-    <tr><td class="paramname">userFunction</td><td>is a pointer to a user callback function. </td></tr>
-    <tr><td class="paramname">userArguments</td><td>is a pointer to the user arguments to use with the user callback function. </td></tr>
+    <tr><td class="paramname">userSemaphore</td><td>is a pointer to a semaphore </td></tr>
   </table>
   </dd>
 </dl>
@@ -216,7 +209,7 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Sat May 19 2018 18:00:12 for OSExample by
+    <li class="footer">Generated on Fri May 25 2018 20:30:06 for OSExample by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

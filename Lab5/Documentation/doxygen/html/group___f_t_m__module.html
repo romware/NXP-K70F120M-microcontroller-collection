@@ -60,7 +60,8 @@ $(document).ready(function(){initNavTree('group___f_t_m__module.html','');});
 <div id="doc-content">
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">FTM module documentation</div>  </div>
 </div><!--header-->
@@ -80,6 +81,11 @@ Functions</h2></td></tr>
 <tr class="memitem:ga445500277ba0e363873b34cffc015745"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_t_m__module.html#ga445500277ba0e363873b34cffc015745">__attribute__</a> ((interrupt))</td></tr>
 <tr class="memdesc:ga445500277ba0e363873b34cffc015745"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupt service routine for the FTM.  <a href="#ga445500277ba0e363873b34cffc015745">More...</a><br /></td></tr>
 <tr class="separator:ga445500277ba0e363873b34cffc015745"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:ga8f602853d49f1eb66e95a9b69dba25e1"><td class="memItemLeft" align="right" valign="top">OS_ECB *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_t_m__module.html#ga8f602853d49f1eb66e95a9b69dba25e1">UserSemaphore</a> [8]</td></tr>
+<tr class="separator:ga8f602853d49f1eb66e95a9b69dba25e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <h2 class="groupheader">Function Documentation</h2>
@@ -142,7 +148,7 @@ Functions</h2></td></tr>
 <p>Sets up a timer channel. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">aFTMChannel</td><td>is a structure containing the parameters to be used in setting up the timer channel. channelNb is the channel number of the FTM to use. delayCount is the delay count (in module clock periods) for an output compare event. timerFunction is used to set the timer up as either an input capture or an output compare. ioType is a union that depends on the setting of the channel as input capture or output compare: outputAction is the action to take on a successful output compare. inputDetection is the type of input capture detection. userFunction is a pointer to a user callback function. userArguments is a pointer to the user arguments to use with the user callback function. </td></tr>
+    <tr><td class="paramname">aFTMChannel</td><td>is a structure containing the parameters to be used in setting up the timer channel. channelNb is the channel number of the FTM to use. delayCount is the delay count (in module clock periods) for an output compare event. timerFunction is used to set the timer up as either an input capture or an output compare. ioType is a union that depends on the setting of the channel as input capture or output compare: outputAction is the action to take on a successful output compare. inputDetection is the type of input capture detection. userSemaphore is a pointer to a semaphore </td></tr>
   </table>
   </dd>
 </dl>
@@ -177,12 +183,26 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a class="anchor" id="ga8f602853d49f1eb66e95a9b69dba25e1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">OS_ECB* UserSemaphore[8]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Array to store semaphores for channels 0-7 of FTM0 </p>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Sat May 19 2018 18:00:12 for OSExample by
+    <li class="footer">Generated on Fri May 25 2018 20:30:05 for OSExample by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

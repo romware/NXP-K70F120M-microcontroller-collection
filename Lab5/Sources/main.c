@@ -81,6 +81,7 @@ uint8_t AccelNewData[3];                        /*!< Latest XYZ readings from ac
 OS_ECB* LEDOff;                                 /*!< LED off semaphore for FTM */
 OS_ECB* DataReadySemaphore;                     /*!< Data ready semaphore for accel */
 OS_ECB* ReadCompleteSemaphore;                  /*!< Read complete semaphore for accel */
+OS_ECB* RTCReadSemaphore;                       /*!< Read semaphore for RTC */
 
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Tower Init thread. */
@@ -310,12 +311,17 @@ void ReceivedPacket(void)
  *
  *  @return void
  */
-bool TowerInit(const TAccelSetup* const accelSetup)
+bool TowerInit(void)
 {
   // Success status of writing default values to Flash and FTM
   bool success = false;
 
-  if (Flash_Init() &&  LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init() && RTC_Init() && Accel_Init(accelSetup))
+  TAccelSetup accelSetup;          /*!< Accelerometer setup */
+  accelSetup.moduleClk             = CPU_BUS_CLK_HZ;
+  accelSetup.dataReadySemaphore    = DataReadySemaphore;
+  accelSetup.readCompleteSemaphore = ReadCompleteSemaphore;
+
+  if (Flash_Init() &&  LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init() && RTC_Init(RTCReadSemaphore) && Accel_Init(&accelSetup))
   {
     success = true;
 
@@ -371,14 +377,10 @@ static void InitModulesThread(void* pData)
   LEDOff = OS_SemaphoreCreate(0);
   DataReadySemaphore = OS_SemaphoreCreate(0);
   ReadCompleteSemaphore = OS_SemaphoreCreate(0);
-
-  TAccelSetup accelerometerSetup;          /*!< Accelerometer callback setup */
-  accelerometerSetup.moduleClk             = CPU_BUS_CLK_HZ;
-  accelerometerSetup.dataReadySemaphore    = DataReadySemaphore;
-  accelerometerSetup.readCompleteSemaphore = ReadCompleteSemaphore;
+  RTCReadSemaphore = OS_SemaphoreCreate(0);
 
   // Initializes the main tower components and sets the default or stored values
-  if(TowerInit(&accelerometerSetup))
+  if(TowerInit())
   {
     // Turn on the orange LED to indicate the tower has initialized successfully
     LEDs_On(LED_ORANGE);
@@ -435,7 +437,7 @@ static void RTCThread(void* pData)
 {
   for (;;)
   {
-    OS_SemaphoreWait(RTCRead,0);
+    OS_SemaphoreWait(RTCReadSemaphore,0);
 
     // Toggle the yellow LED
     LEDs_Toggle(LED_YELLOW);

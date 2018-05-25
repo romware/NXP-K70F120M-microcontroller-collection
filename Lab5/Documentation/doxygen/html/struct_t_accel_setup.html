@@ -77,39 +77,22 @@ $(document).ready(function(){initNavTree('struct_t_accel_setup.html','');});
 Data Fields</h2></td></tr>
 <tr class="memitem:adaad597e85b7fd2ac99d3a9ff8753d94"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_t_accel_setup.html#adaad597e85b7fd2ac99d3a9ff8753d94">moduleClk</a></td></tr>
 <tr class="separator:adaad597e85b7fd2ac99d3a9ff8753d94"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a42847219318fea0ddaafb4e195bc4e4d"><td class="memItemLeft" align="right" valign="top">void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_t_accel_setup.html#a42847219318fea0ddaafb4e195bc4e4d">dataReadyCallbackFunction</a> )(void *)</td></tr>
-<tr class="separator:a42847219318fea0ddaafb4e195bc4e4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc5641269681fcde9cf8994dd05e4be3"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_t_accel_setup.html#adc5641269681fcde9cf8994dd05e4be3">dataReadyCallbackArguments</a></td></tr>
-<tr class="separator:adc5641269681fcde9cf8994dd05e4be3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac930caab1e3cd0bdd15b61602683a83a"><td class="memItemLeft" align="right" valign="top">void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_t_accel_setup.html#ac930caab1e3cd0bdd15b61602683a83a">readCompleteCallbackFunction</a> )(void *)</td></tr>
-<tr class="separator:ac930caab1e3cd0bdd15b61602683a83a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a84d89d3fe51a1187dabc09cb1bde3218"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_t_accel_setup.html#a84d89d3fe51a1187dabc09cb1bde3218">readCompleteCallbackArguments</a></td></tr>
-<tr class="separator:a84d89d3fe51a1187dabc09cb1bde3218"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac3cfcbfb450fd63dfae843d1d23c793"><td class="memItemLeft" align="right" valign="top">OS_ECB *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_t_accel_setup.html#aac3cfcbfb450fd63dfae843d1d23c793">dataReadySemaphore</a></td></tr>
+<tr class="separator:aac3cfcbfb450fd63dfae843d1d23c793"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f8d20dd0fc4852e451766e44c053aa1"><td class="memItemLeft" align="right" valign="top">OS_ECB *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_t_accel_setup.html#a5f8d20dd0fc4852e451766e44c053aa1">readCompleteSemaphore</a></td></tr>
+<tr class="separator:a5f8d20dd0fc4852e451766e44c053aa1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Field Documentation</h2>
-<a class="anchor" id="adc5641269681fcde9cf8994dd05e4be3"></a>
+<a class="anchor" id="aac3cfcbfb450fd63dfae843d1d23c793"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void* TAccelSetup::dataReadyCallbackArguments</td>
+          <td class="memname">OS_ECB* TAccelSetup::dataReadySemaphore</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The user's data ready callback function arguments. </p>
-
-</div>
-</div>
-<a class="anchor" id="a42847219318fea0ddaafb4e195bc4e4d"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void(* TAccelSetup::dataReadyCallbackFunction) (void *)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>The user's data ready callback function. </p>
+<p>The user's data ready semaphore </p>
 
 </div>
 </div>
@@ -126,34 +109,21 @@ Data Fields</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a84d89d3fe51a1187dabc09cb1bde3218"></a>
+<a class="anchor" id="a5f8d20dd0fc4852e451766e44c053aa1"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void* TAccelSetup::readCompleteCallbackArguments</td>
+          <td class="memname">OS_ECB* TAccelSetup::readCompleteSemaphore</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The user's read complete callback function arguments. </p>
-
-</div>
-</div>
-<a class="anchor" id="ac930caab1e3cd0bdd15b61602683a83a"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void(* TAccelSetup::readCompleteCallbackFunction) (void *)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>The user's read complete callback function. </p>
+<p>The user's read complete semaphore </p>
 
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li>C:/Users/12551519/Desktop/git/es18aut13/Lab5/sources/<a class="el" href="accel_8h_source.html">accel.h</a></li>
+<li>C:/Users/12551519/Desktop/git/Lab5/sources/<a class="el" href="accel_8h_source.html">accel.h</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
@@ -161,7 +131,7 @@ Data Fields</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="struct_t_accel_setup.html">TAccelSetup</a></li>
-    <li class="footer">Generated on Sat May 19 2018 18:00:19 for OSExample by
+    <li class="footer">Generated on Fri May 25 2018 20:30:12 for OSExample by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

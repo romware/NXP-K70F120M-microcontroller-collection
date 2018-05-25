@@ -15,8 +15,6 @@
 #include "types.h"
 #include "OS.h"
 
-OS_ECB* RTCRead;
-
 /*! @brief Initializes the RTC before first use.
  *
  *  Sets up the control register for the RTC and locks it.
@@ -25,7 +23,7 @@ OS_ECB* RTCRead;
  *  @param userArguments is a pointer to the user arguments to use with the user callback function.
  *  @return bool - TRUE if the RTC was successfully initialized.
  */
-bool RTC_Init(void);
+bool RTC_Init(OS_ECB* readSemaphore);
 
 /*! @brief Sets the value of the real time clock.
  *

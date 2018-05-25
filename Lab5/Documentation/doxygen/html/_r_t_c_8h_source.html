@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.10"/>
-<title>OSExample: C:/Users/12551519/Desktop/git/es18aut13/Lab5/sources/RTC.h Source File</title>
+<title>OSExample: C:/Users/12551519/Desktop/git/Lab5/sources/RTC.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -75,28 +75,31 @@ $(document).ready(function(){initNavTree('_r_t_c_8h_source.html','');});
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment">// new types</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="types_8h.html">types.h</a>&quot;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="group___r_t_c__module.html#ga1eff20f412d72f94182b7fca0b3b0925">RTC_Init</a>(<span class="keywordtype">void</span> (*userFunction)(<span class="keywordtype">void</span>*), <span class="keywordtype">void</span>* userArguments);</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group___r_t_c__module.html#gacbe916e4fad6bfc2ffcde604fa6afb52">RTC_Set</a>(<span class="keyword">const</span> uint8_t hours, <span class="keyword">const</span> uint8_t minutes, <span class="keyword">const</span> uint8_t seconds);</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group___r_t_c__module.html#ga46e1f15e3b27e2de58d7f213a3bc865d">RTC_Get</a>(uint8_t* <span class="keyword">const</span> hours, uint8_t* <span class="keyword">const</span> minutes, uint8_t* <span class="keyword">const</span> seconds);</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__accel__module.html#ga445500277ba0e363873b34cffc015745">__attribute__</a> ((interrupt)) RTC_ISR(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;OS.h&quot;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;OS_ECB* RTCRead;</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="group___r_t_c__module.html#ga6f939736387d778f0c274074bae49ec6">RTC_Init</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group___r_t_c__module.html#gacbe916e4fad6bfc2ffcde604fa6afb52">RTC_Set</a>(<span class="keyword">const</span> uint8_t hours, <span class="keyword">const</span> uint8_t minutes, <span class="keyword">const</span> uint8_t seconds);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group___r_t_c__module.html#ga46e1f15e3b27e2de58d7f213a3bc865d">RTC_Get</a>(uint8_t* <span class="keyword">const</span> hours, uint8_t* <span class="keyword">const</span> minutes, uint8_t* <span class="keyword">const</span> seconds);</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__accel__module.html#ga445500277ba0e363873b34cffc015745">__attribute__</a> ((interrupt)) RTC_ISR(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="types_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div><div class="ttdoc">Declares new types. </div></div>
-<div class="ttc" id="group___r_t_c__module_html_gacbe916e4fad6bfc2ffcde604fa6afb52"><div class="ttname"><a href="group___r_t_c__module.html#gacbe916e4fad6bfc2ffcde604fa6afb52">RTC_Set</a></div><div class="ttdeci">void RTC_Set(const uint8_t hours, const uint8_t minutes, const uint8_t seconds)</div><div class="ttdoc">Sets the value of the real time clock. </div><div class="ttdef"><b>Definition:</b> RTC.c:85</div></div>
-<div class="ttc" id="group___r_t_c__module_html_ga1eff20f412d72f94182b7fca0b3b0925"><div class="ttname"><a href="group___r_t_c__module.html#ga1eff20f412d72f94182b7fca0b3b0925">RTC_Init</a></div><div class="ttdeci">bool RTC_Init(void(*userFunction)(void *), void *userArguments)</div><div class="ttdoc">Initializes the RTC before first use. </div><div class="ttdef"><b>Definition:</b> RTC.c:31</div></div>
-<div class="ttc" id="group___r_t_c__module_html_ga46e1f15e3b27e2de58d7f213a3bc865d"><div class="ttname"><a href="group___r_t_c__module.html#ga46e1f15e3b27e2de58d7f213a3bc865d">RTC_Get</a></div><div class="ttdeci">void RTC_Get(uint8_t *const hours, uint8_t *const minutes, uint8_t *const seconds)</div><div class="ttdoc">Gets the value of the real time clock. </div><div class="ttdef"><b>Definition:</b> RTC.c:107</div></div>
-<div class="ttc" id="group__accel__module_html_ga445500277ba0e363873b34cffc015745"><div class="ttname"><a href="group__accel__module.html#ga445500277ba0e363873b34cffc015745">__attribute__</a></div><div class="ttdeci">void __attribute__((interrupt)) RTC_ISR(void)</div><div class="ttdoc">Interrupt service routine for the RTC. </div><div class="ttdef"><b>Definition:</b> accel.c:319</div></div>
+<div class="ttc" id="group___r_t_c__module_html_gacbe916e4fad6bfc2ffcde604fa6afb52"><div class="ttname"><a href="group___r_t_c__module.html#gacbe916e4fad6bfc2ffcde604fa6afb52">RTC_Set</a></div><div class="ttdeci">void RTC_Set(const uint8_t hours, const uint8_t minutes, const uint8_t seconds)</div><div class="ttdoc">Sets the value of the real time clock. </div><div class="ttdef"><b>Definition:</b> RTC.c:87</div></div>
+<div class="ttc" id="group___r_t_c__module_html_ga6f939736387d778f0c274074bae49ec6"><div class="ttname"><a href="group___r_t_c__module.html#ga6f939736387d778f0c274074bae49ec6">RTC_Init</a></div><div class="ttdeci">bool RTC_Init(void)</div><div class="ttdoc">Initializes the RTC before first use. </div><div class="ttdef"><b>Definition:</b> RTC.c:30</div></div>
+<div class="ttc" id="group___r_t_c__module_html_ga46e1f15e3b27e2de58d7f213a3bc865d"><div class="ttname"><a href="group___r_t_c__module.html#ga46e1f15e3b27e2de58d7f213a3bc865d">RTC_Get</a></div><div class="ttdeci">void RTC_Get(uint8_t *const hours, uint8_t *const minutes, uint8_t *const seconds)</div><div class="ttdoc">Gets the value of the real time clock. </div><div class="ttdef"><b>Definition:</b> RTC.c:109</div></div>
+<div class="ttc" id="group__accel__module_html_ga445500277ba0e363873b34cffc015745"><div class="ttname"><a href="group__accel__module.html#ga445500277ba0e363873b34cffc015745">__attribute__</a></div><div class="ttdeci">void __attribute__((interrupt)) RTC_ISR(void)</div><div class="ttdoc">Interrupt service routine for the RTC. </div><div class="ttdef"><b>Definition:</b> accel.c:314</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_08d237fc27d4ecd563f71c5d52f2fecc.html">sources</a></li><li class="navelem"><a class="el" href="_r_t_c_8h.html">RTC.h</a></li>
-    <li class="footer">Generated on Sat May 19 2018 18:00:10 for OSExample by
+    <li class="footer">Generated on Fri May 25 2018 20:30:04 for OSExample by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

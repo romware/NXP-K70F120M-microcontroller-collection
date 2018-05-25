@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.10"/>
-<title>OSExample: C:/Users/12551519/Desktop/git/es18aut13/Lab5/sources/UART.c File Reference</title>
+<title>OSExample: C:/Users/12551519/Desktop/git/Lab5/sources/UART.c File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -80,9 +80,14 @@ $(document).ready(function(){initNavTree('_u_a_r_t_8c.html','');});
 <code>#include &quot;<a class="el" href="_m_k70_f12_8h_source.html">MK70F12.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="_p_e___types_8h_source.html">PE_Types.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="_cpu_8h_source.html">Cpu.h</a>&quot;</code><br />
+<code>#include &quot;OS.h&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ga2dc6c99815245d0539b23bd5ef9301b1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t__module.html#ga2dc6c99815245d0539b23bd5ef9301b1">OS_THREAD_STACK</a> (RxUARTThreadStack, THREAD_STACK_SIZE)</td></tr>
+<tr class="separator:ga2dc6c99815245d0539b23bd5ef9301b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3256718fed574cf8e1a1a2912218e8ac"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t__module.html#ga3256718fed574cf8e1a1a2912218e8ac">OS_THREAD_STACK</a> (TxUARTThreadStack, THREAD_STACK_SIZE)</td></tr>
+<tr class="separator:ga3256718fed574cf8e1a1a2912218e8ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae5760d1a086ec79a33901db253000af9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t__module.html#gae5760d1a086ec79a33901db253000af9">UART_Init</a> (const uint32_t baudRate, const uint32_t moduleClk)</td></tr>
 <tr class="memdesc:gae5760d1a086ec79a33901db253000af9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the UART interface before first use.  <a href="group___u_a_r_t__module.html#gae5760d1a086ec79a33901db253000af9">More...</a><br /></td></tr>
 <tr class="separator:gae5760d1a086ec79a33901db253000af9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -98,10 +103,16 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:ga4339f0c853f01fbc291b1eb07ea99b0d"><td class="memItemLeft" align="right" valign="top">OS_ECB *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t__module.html#ga4339f0c853f01fbc291b1eb07ea99b0d">RxUARTSemaphore</a></td></tr>
+<tr class="separator:ga4339f0c853f01fbc291b1eb07ea99b0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga38ffbfe2005f45b683a4c00b0a578255"><td class="memItemLeft" align="right" valign="top">OS_ECB *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t__module.html#ga38ffbfe2005f45b683a4c00b0a578255">TxUARTSemaphore</a></td></tr>
+<tr class="separator:ga38ffbfe2005f45b683a4c00b0a578255"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga57a6bee2e32f83a4a1b52c99299794b8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_t_f_i_f_o.html">TFIFO</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t__module.html#ga57a6bee2e32f83a4a1b52c99299794b8">RxFIFO</a></td></tr>
 <tr class="separator:ga57a6bee2e32f83a4a1b52c99299794b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gabfc40789d380623f1ba598e006927b5e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_t_f_i_f_o.html">TFIFO</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t__module.html#gabfc40789d380623f1ba598e006927b5e">TxFIFO</a></td></tr>
 <tr class="separator:gabfc40789d380623f1ba598e006927b5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac7796c8a7e3acba11d9a5c78bab6df3b"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t__module.html#gac7796c8a7e3acba11d9a5c78bab6df3b">DummyRead</a></td></tr>
+<tr class="separator:gac7796c8a7e3acba11d9a5c78bab6df3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>I/O routines for UART communications on the TWR-K70F120M. </p>
@@ -114,7 +125,7 @@ Variables</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_08d237fc27d4ecd563f71c5d52f2fecc.html">sources</a></li><li class="navelem"><a class="el" href="_u_a_r_t_8c.html">UART.c</a></li>
-    <li class="footer">Generated on Sat May 19 2018 18:00:12 for OSExample by
+    <li class="footer">Generated on Fri May 25 2018 20:30:05 for OSExample by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

@@ -18,6 +18,7 @@
 #include "Cpu.h"
 #include "OS.h"
 
+OS_ECB* ReadSemaphore; /*!< Read semaphore for RTC */
 
 /*! @brief Initializes the RTC before first use.
  *
@@ -27,11 +28,9 @@
  *  @param userArguments is a pointer to the user arguments to use with the user callback function.
  *  @return bool - TRUE if the RTC was successfully initialized.
  */
-bool RTC_Init(void)
+bool RTC_Init(OS_ECB* readSemaphore)
 {
-  // Store parameters for interrupt routine
-  //UserFunction = userFunction;
-  //UserArguments = userArguments;
+  ReadSemaphore = readSemaphore;
 
   // Ensure global interrupts are disabled
   EnterCritical();
@@ -46,9 +45,6 @@ bool RTC_Init(void)
 
   // Enable interrupts from RTC module
   NVICISER2 |= (1 << 3);
-
-  // Initialize semaphore for RTC
-  RTCRead = OS_SemaphoreCreate(0);
 
   // Return global interrupts to how they were
   ExitCritical();
@@ -132,7 +128,7 @@ void __attribute__ ((interrupt)) RTC_ISR(void)
   // Notify RTOS of start of ISR
   OS_ISREnter();
 
-  OS_SemaphoreSignal(RTCRead);
+  OS_SemaphoreSignal(ReadSemaphore);
 
   OS_ISRExit();
 }

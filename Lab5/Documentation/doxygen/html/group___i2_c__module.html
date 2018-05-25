@@ -60,7 +60,8 @@ $(document).ready(function(){initNavTree('group___i2_c__module.html','');});
 <div id="doc-content">
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">I2C module documentation</div>  </div>
 </div><!--header-->
@@ -86,6 +87,13 @@ Functions</h2></td></tr>
 <tr class="memitem:ga445500277ba0e363873b34cffc015745"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___i2_c__module.html#ga445500277ba0e363873b34cffc015745">__attribute__</a> ((interrupt))</td></tr>
 <tr class="memdesc:ga445500277ba0e363873b34cffc015745"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupt service routine for the I2C.  <a href="#ga445500277ba0e363873b34cffc015745">More...</a><br /></td></tr>
 <tr class="separator:ga445500277ba0e363873b34cffc015745"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:gaca09309105c6f2a529516974bd760415"><td class="memItemLeft" align="right" valign="top">OS_ECB *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___i2_c__module.html#gaca09309105c6f2a529516974bd760415">ReadCompleteSemaphore</a></td></tr>
+<tr class="separator:gaca09309105c6f2a529516974bd760415"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad1eee5073fca4eb8fa8f911b0a1a4441"><td class="memItemLeft" align="right" valign="top">OS_ECB *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___i2_c__module.html#gad1eee5073fca4eb8fa8f911b0a1a4441">I2CAccess</a></td></tr>
+<tr class="separator:gad1eee5073fca4eb8fa8f911b0a1a4441"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <h2 class="groupheader">Function Documentation</h2>
@@ -292,12 +300,39 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a class="anchor" id="gad1eee5073fca4eb8fa8f911b0a1a4441"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">OS_ECB* I2CAccess</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Mutex semaphore for I2C </p>
+
+</div>
+</div>
+<a class="anchor" id="gaca09309105c6f2a529516974bd760415"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">OS_ECB* ReadCompleteSemaphore</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Read complete semaphore for I2C </p>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Sat May 19 2018 18:00:12 for OSExample by
+    <li class="footer">Generated on Fri May 25 2018 20:30:05 for OSExample by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

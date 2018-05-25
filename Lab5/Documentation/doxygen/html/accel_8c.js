@@ -75,6 +75,7 @@ var accel_8c =
     [ "ASLP_RATE", "accel_8c.html#a15d72faada7955cc863ee2454e499b1b", null ],
     [ "bits", "accel_8c.html#ae22526ad246995fdca2e7faf8b609df0", null ],
     [ "byte", "accel_8c.html#a96f44d20f1dbf1c8785a7bc99a46164c", null ],
+    [ "DataReadySemaphore", "group__accel__module.html#gaf5cded6992056146d61e5e043a13b8d1", null ],
     [ "DR", "accel_8c.html#a2c3e455107759b4d70b168e43fea4219", null ],
     [ "F_READ", "accel_8c.html#a176e6b897e703d742c47a3fdf1b92eb2", null ],
     [ "FIFO_GATE", "accel_8c.html#a22ea01efb74f287ca51a6d0b6552e920", null ],

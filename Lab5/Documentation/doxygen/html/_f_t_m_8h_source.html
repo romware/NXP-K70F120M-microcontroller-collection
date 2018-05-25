@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.10"/>
-<title>OSExample: C:/Users/12551519/Desktop/git/es18aut13/Lab5/sources/FTM.h Source File</title>
+<title>OSExample: C:/Users/12551519/Desktop/git/Lab5/sources/FTM.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -75,41 +75,41 @@ $(document).ready(function(){initNavTree('_f_t_m_8h_source.html','');});
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment">// new types</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="types_8h.html">types.h</a>&quot;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">typedef</span> <span class="keyword">enum</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;{</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  TIMER_FUNCTION_INPUT_CAPTURE,</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  TIMER_FUNCTION_OUTPUT_COMPARE</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;} TTimerFunction;</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">typedef</span> <span class="keyword">enum</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;{</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  TIMER_OUTPUT_DISCONNECT,</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  TIMER_OUTPUT_TOGGLE,</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  TIMER_OUTPUT_LOW,</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  TIMER_OUTPUT_HIGH</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;} TTimerOutputAction;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">typedef</span> <span class="keyword">enum</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;{</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  TIMER_INPUT_OFF,</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  TIMER_INPUT_RISING,</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  TIMER_INPUT_FALLING,</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  TIMER_INPUT_ANY</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;} TTimerInputDetection;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
-<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="struct_t_f_t_m_channel.html">   39</a></span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;{</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  uint8_t channelNb;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  uint16_t delayCount;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  TTimerFunction timerFunction;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keyword">union</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  {</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    TTimerOutputAction outputAction;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    TTimerInputDetection inputDetection;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  } ioType;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  void (*userFunction)(<span class="keywordtype">void</span>*);</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keywordtype">void</span> *userArguments;</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;OS.h&quot;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">typedef</span> <span class="keyword">enum</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;{</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  TIMER_FUNCTION_INPUT_CAPTURE,</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  TIMER_FUNCTION_OUTPUT_COMPARE</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;} TTimerFunction;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keyword">typedef</span> <span class="keyword">enum</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;{</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  TIMER_OUTPUT_DISCONNECT,</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  TIMER_OUTPUT_TOGGLE,</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  TIMER_OUTPUT_LOW,</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  TIMER_OUTPUT_HIGH</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;} TTimerOutputAction;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">typedef</span> <span class="keyword">enum</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;{</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  TIMER_INPUT_OFF,</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  TIMER_INPUT_RISING,</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  TIMER_INPUT_FALLING,</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  TIMER_INPUT_ANY</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;} TTimerInputDetection;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
+<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="struct_t_f_t_m_channel.html">   40</a></span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;{</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  uint8_t channelNb;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  uint16_t delayCount;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  TTimerFunction timerFunction;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keyword">union</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  {</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    TTimerOutputAction outputAction;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    TTimerInputDetection inputDetection;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  } ioType;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  OS_ECB* userSemaphore;</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;} <a class="code" href="struct_t_f_t_m_channel.html">TFTMChannel</a>;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
@@ -125,18 +125,18 @@ $(document).ready(function(){initNavTree('_f_t_m_8h_source.html','');});
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="types_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div><div class="ttdoc">Declares new types. </div></div>
-<div class="ttc" id="group___f_t_m__module_html_gabb34a0dd79d879502fd81c0efa9440ec"><div class="ttname"><a href="group___f_t_m__module.html#gabb34a0dd79d879502fd81c0efa9440ec">FTM_StartTimer</a></div><div class="ttdeci">bool FTM_StartTimer(const TFTMChannel *const aFTMChannel)</div><div class="ttdoc">Starts a timer if set up for output compare. </div><div class="ttdef"><b>Definition:</b> FTM.c:136</div></div>
-<div class="ttc" id="struct_t_f_t_m_channel_html"><div class="ttname"><a href="struct_t_f_t_m_channel.html">TFTMChannel</a></div><div class="ttdef"><b>Definition:</b> FTM.h:39</div></div>
+<div class="ttc" id="group___f_t_m__module_html_gabb34a0dd79d879502fd81c0efa9440ec"><div class="ttname"><a href="group___f_t_m__module.html#gabb34a0dd79d879502fd81c0efa9440ec">FTM_StartTimer</a></div><div class="ttdeci">bool FTM_StartTimer(const TFTMChannel *const aFTMChannel)</div><div class="ttdoc">Starts a timer if set up for output compare. </div><div class="ttdef"><b>Definition:</b> FTM.c:134</div></div>
+<div class="ttc" id="struct_t_f_t_m_channel_html"><div class="ttname"><a href="struct_t_f_t_m_channel.html">TFTMChannel</a></div><div class="ttdef"><b>Definition:</b> FTM.h:40</div></div>
 <div class="ttc" id="group___f_t_m__module_html_ga5f31811e067b5690d5f73c8e77019a6b"><div class="ttname"><a href="group___f_t_m__module.html#ga5f31811e067b5690d5f73c8e77019a6b">FTM_Init</a></div><div class="ttdeci">bool FTM_Init()</div><div class="ttdoc">Sets up the FTM before first use. </div><div class="ttdef"><b>Definition:</b> FTM.c:28</div></div>
-<div class="ttc" id="group___f_t_m__module_html_gae4928af832114c8173e43d10e4144c1f"><div class="ttname"><a href="group___f_t_m__module.html#gae4928af832114c8173e43d10e4144c1f">FTM_Set</a></div><div class="ttdeci">bool FTM_Set(const TFTMChannel *const aFTMChannel)</div><div class="ttdoc">Sets up a timer channel. </div><div class="ttdef"><b>Definition:</b> FTM.c:94</div></div>
-<div class="ttc" id="group__accel__module_html_ga445500277ba0e363873b34cffc015745"><div class="ttname"><a href="group__accel__module.html#ga445500277ba0e363873b34cffc015745">__attribute__</a></div><div class="ttdeci">void __attribute__((interrupt)) FTM0_ISR(void)</div><div class="ttdoc">Interrupt service routine for the FTM. </div><div class="ttdef"><b>Definition:</b> accel.c:319</div></div>
+<div class="ttc" id="group___f_t_m__module_html_gae4928af832114c8173e43d10e4144c1f"><div class="ttname"><a href="group___f_t_m__module.html#gae4928af832114c8173e43d10e4144c1f">FTM_Set</a></div><div class="ttdeci">bool FTM_Set(const TFTMChannel *const aFTMChannel)</div><div class="ttdoc">Sets up a timer channel. </div><div class="ttdef"><b>Definition:</b> FTM.c:93</div></div>
+<div class="ttc" id="group__accel__module_html_ga445500277ba0e363873b34cffc015745"><div class="ttname"><a href="group__accel__module.html#ga445500277ba0e363873b34cffc015745">__attribute__</a></div><div class="ttdeci">void __attribute__((interrupt)) FTM0_ISR(void)</div><div class="ttdoc">Interrupt service routine for the FTM. </div><div class="ttdef"><b>Definition:</b> accel.c:314</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_08d237fc27d4ecd563f71c5d52f2fecc.html">sources</a></li><li class="navelem"><a class="el" href="_f_t_m_8h.html">FTM.h</a></li>
-    <li class="footer">Generated on Sat May 19 2018 18:00:10 for OSExample by
+    <li class="footer">Generated on Fri May 25 2018 20:30:04 for OSExample by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>
