@@ -79,7 +79,6 @@ volatile uint8_t* NvTowerPo;                    /*!< Tower protocol union pointe
 
 uint8_t AccelNewData[3];                        /*!< Latest XYZ readings from accelerometer */
 
-OS_ECB* AccelDataReady;				//TODO: Not sure if this should be here
 
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE); /*!< The stack for the Tower Init thread. */

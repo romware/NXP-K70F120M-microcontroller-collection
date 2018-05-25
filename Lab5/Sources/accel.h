@@ -15,7 +15,7 @@
 #include "types.h"
 #include "OS.h"
 
-extern OS_ECB* AccelDataReady;    // TODO: Is this okay
+OS_ECB* AccelDataReady;    // TODO: Is this okay
 
 typedef enum
 {

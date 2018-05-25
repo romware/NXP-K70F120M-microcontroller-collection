@@ -15,8 +15,6 @@
 #include "types.h"
 #include "OS.h"
 
-extern OS_ECB* AccelDataReady;		// TODO: Is this okay
-
 /*! @brief Sets up the PIT before first use.
  *
  *  Enables the PIT and freezes the timer when debugging.
@@ -26,7 +24,7 @@ extern OS_ECB* AccelDataReady;		// TODO: Is this okay
  *  @return bool - TRUE if the PIT was successfully initialized.
  *  @note Assumes that moduleClk has a period which can be expressed as an integral number of nanoseconds.
  */
-bool PIT_Init(const uint32_t moduleClk, void (*userFunction)(void*), void* userArguments);
+bool PIT_Init(const uint32_t moduleClk, OS_ECB* userSemaphore);
 
 /*! @brief Sets the value of the desired period of the PIT.
  *
