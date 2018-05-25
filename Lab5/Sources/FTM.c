@@ -16,9 +16,12 @@
 #include "FTM.h"
 #include "MK70F12.h"
 #include "Cpu.h"
+#include "OS.h"
 
-static void (*UserFunction[8])(void*); /*!< Array to store callback functions for channels 0-7 of FTM0 */
-static void* UserArguments[8];         /*!< Array to store callback parameters for channels 0-7 of FTM0 */
+//static void (*UserFunction[8])(void*); /*!< Array to store callback functions for channels 0-7 of FTM0 */
+//static void* UserArguments[8];         /*!< Array to store callback parameters for channels 0-7 of FTM0 */
+static OS_ECB* UserSemaphore;
+
 
 /*! @brief Sets up the FTM before first use.
  *
@@ -94,8 +97,9 @@ bool FTM_Init()
 bool FTM_Set(const TFTMChannel* const aFTMChannel)
 {
   // Store parameters for interrupt routine in the private global arrays
-  UserFunction[aFTMChannel->channelNb] = aFTMChannel->userFunction;
-  UserArguments[aFTMChannel->channelNb] = aFTMChannel->userArguments;
+//  UserFunction[aFTMChannel->channelNb] = aFTMChannel->userFunction;
+//  UserArguments[aFTMChannel->channelNb] = aFTMChannel->userArguments;
+  UserSemaphore = aFTMChannel->userSemaphore;
 
   // Turn off write protect mode
   if(FTM0_FMS & FTM_FMS_WPEN_MASK)
@@ -166,8 +170,9 @@ void __attribute__ ((interrupt)) FTM0_ISR(void)
       FTM0_CnSC(i) &= ~FTM_CnSC_CHIE_MASK;
 
       // Call up callback function for channels with set flags
-      if(UserFunction[i])
-        (*UserFunction[i])(UserArguments[i]);
+//      if(UserFunction[i])
+//        (*UserFunction[i])(UserArguments[i]);
+      OS_SemaphoreSignal(UserSemaphore);
     }
   }
 }

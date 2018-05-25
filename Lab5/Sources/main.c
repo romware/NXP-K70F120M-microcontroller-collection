@@ -79,6 +79,7 @@ volatile uint8_t* NvTowerPo;                    /*!< Tower protocol union pointe
 
 uint8_t AccelNewData[3];                        /*!< Latest XYZ readings from accelerometer */
 
+OS_ECB* LEDOff;			//TODO: IS this ok. Should this and new data be static
 
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE); /*!< The stack for the Tower Init thread. */
@@ -438,6 +439,7 @@ bool TowerInit(const TAccelSetup* const accelSetup)
  */
 static void InitModulesThread(void* pData)
 {
+  LEDOff = OS_SemaphoreCreate(0);
   TAccelSetup accelerometerSetup;                  /*!< Accelerometer callback setup */
   accelerometerSetup.moduleClk                     = CPU_BUS_CLK_HZ;
   accelerometerSetup.dataReadyCallbackFunction     = AccelDataReadyCallback;
@@ -472,8 +474,9 @@ static void PacketThread(void* pData)
   receivedPacketTmr.ioType.inputDetection          = TIMER_INPUT_ANY;
   receivedPacketTmr.ioType.outputAction            = TIMER_OUTPUT_DISCONNECT;
   receivedPacketTmr.timerFunction                  = TIMER_FUNCTION_OUTPUT_COMPARE;
-  receivedPacketTmr.userFunction                   = FTMCallbackCh0;
-  receivedPacketTmr.userArguments                  = NULL;
+//  receivedPacketTmr.userFunction                   = FTMCallbackCh0;
+//  receivedPacketTmr.userArguments                  = NULL;
+  receivedPacketTmr.userSemaphore                  = LEDOff;
 
   // Set FTM Channel for received packet timer
   FTM_Set(&receivedPacketTmr);
@@ -576,6 +579,16 @@ static void AccelThread(void* pData)
   }
 }
 
+static void FTMThread(void* pData)
+{
+  for (;;)
+  {
+     OS_SemaphoreWait(LEDOff,0);
+     // Turn off blue LED
+     LEDs_Off(LED_BLUE);
+  }
+}
+
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
 int main(void)
 /*lint -restore Enable MISRA rule (6.3) checking. */
@@ -601,11 +614,11 @@ int main(void)
                           NULL,
                           &RTCThreadStack[THREAD_STACK_SIZE - 1],
                           3);
-//  // 4th Highest priority
-//  error = OS_ThreadCreate(FTMThread,
-//                          NULL,
-//                          &FTMThreadStack[THREAD_STACK_SIZE - 1],
-//                          4);
+  // 4th Highest priority
+  error = OS_ThreadCreate(FTMThread,
+                          NULL,
+                          &FTMThreadStack[THREAD_STACK_SIZE - 1],
+                          4);
 //  // 5th Highest priority
 //  error = OS_ThreadCreate(PITThread,
 //                          NULL,

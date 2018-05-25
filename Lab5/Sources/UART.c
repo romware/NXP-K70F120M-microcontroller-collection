@@ -24,10 +24,10 @@
 OS_THREAD_STACK(RxUARTThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the RxUART thread. */
 OS_THREAD_STACK(TxUARTThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the TxUART thread. */
 
-OS_ECB* RxUART;                                               /*!< The Receive FIFO semaphore */
-OS_ECB* TxUART;                                               /*!< The Transmit FIFO semaphore */
+OS_ECB* RxUART;                                             /*!< The Receive FIFO semaphore */
+OS_ECB* TxUART;                                             /*!< The Transmit FIFO semaphore */
 
-TFIFO RxFIFO;                                               /*!< The Receive FIFO */
+TFIFO RxFIFO;                                               /*!< The Receive FIFO */   //TODO: should this be in .h?
 TFIFO TxFIFO;                                               /*!< The Transmit FIFO */
 
 uint8_t DummyRead;                                          /*!< The dummy read of UART2_D. */
