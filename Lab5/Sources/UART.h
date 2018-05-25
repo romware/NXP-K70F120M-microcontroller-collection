@@ -16,12 +16,6 @@
 #include "OS.h"
 #include "FIFO.h"
 
-TFIFO RxFIFO; /*!< The Receive FIFO */
-TFIFO TxFIFO; /*!< The Transmit FIFO */
-
-OS_ECB* RxUART;
-OS_ECB* TxUART;
-
 /*! @brief Sets up the UART interface before first use.
  *
  *  @param baudRate The desired baud rate in bits/sec.

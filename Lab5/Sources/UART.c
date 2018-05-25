@@ -20,16 +20,17 @@
 #include "Cpu.h"
 #include "OS.h"
 
-// Arbitrary thread stack size - big enough for stacking of interrupts and OS use.
-#define THREAD_STACK_SIZE 100
-
 // Thread stacks
 OS_THREAD_STACK(RxUARTThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the RxUART thread. */
 OS_THREAD_STACK(TxUARTThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the TxUART thread. */
 
+OS_ECB* RxUART;                                               /*!< The Receive FIFO semaphore */
+OS_ECB* TxUART;                                               /*!< The Transmit FIFO semaphore */
 
-//TODO: rename this
-uint8_t DummyRead;
+TFIFO RxFIFO;                                               /*!< The Receive FIFO */
+TFIFO TxFIFO;                                               /*!< The Transmit FIFO */
+
+uint8_t DummyRead;                                          /*!< The dummy read of UART2_D. */
 
 /*! @brief Puts data into the receive FIFO
  *
@@ -103,14 +104,12 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
 
   // Set PTE17 (BGA Map 'K2') to be the UART2_Rx pin by setting to ALT3
   PORTE_PCR17 = PORT_PCR_MUX(3);
-  // For K70 Signal Multiplexing and Pin Assignments see 10.3.1 of K70P256M150SF3RM.pdf
 
   // Confirm UART2_C2 transmit enable is set to 0 to allow setting of the  Baud Rate Divisor Register
   UART2_C2 &= ~UART_C2_TE_MASK;
 
   // Confirm UART2_C2 receive enable is set to 0 to allow setting of the  Baud Rate Divisor Register
   UART2_C2 &= ~UART_C2_RE_MASK;
-  // For UART Control Register 2 see 56.3.4 of K70P256M150SF3RM.pdf
 
   // Declare union to store the baud rate setting, which is a 13 bit divisor.
   // BDL is stored in SBR.s.Lo and BDH is stored in SBR.s.Hi. Note: The working value in BDH does not change until BDL is written.
@@ -120,7 +119,6 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
   // Declare variable to store the Baud Rate Fine Adjust divisor. This number represents 1/32 remainder from the baud rate division.
   // Calculate the BRFA value (%32 remainder). Only use BDL to avoid overflowing the uint32_t.
   uint8_t locBRFA = (2*moduleClk/baudRate)%32;
-  // For SBR and BRFA calculations see 56.4.4 of K70P256M150SF3RM.pdf
 
   // Set the UART2 BDH and BDL. Note: The working value in BDH does not change until BDL is written. BDH is not 8 bits long so it should be masked
   UART2_BDH = UART_BDH_SBR(locSBR.s.Hi);
@@ -141,7 +139,6 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
 
   // Set UART2_C2 receive interrupt enable to 1
   UART2_C2 |= UART_C2_RIE_MASK;
-  // For UART Control Register 2 see 56.3.4 of K70P256M150SF3RM.pdf
 
   // Address     | Vector | IRQ  | NVIC non-IPR register | NVIC IPR register | Source module | Source description
   // 0x0000_0104 | 65     | 49   | 1                     | 12                | UART2         | Single interrupt vector for UART status sources
@@ -152,7 +149,6 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
 
   // Enable interrupt source for UART2 in NVIC (bit 17 of register 1 (IRQ49))
   NVICISER1 |= (1 << 17);
-  // For NVIC configuration see 3.2.2 of K70P256M150SF3RM.pdf
 
   // Return global interrupts to how they were
   ExitCritical();
@@ -205,7 +201,7 @@ void __attribute__ ((interrupt)) UART_ISR(void)
   // Check if UART2 receive interrupt is enabled and the UART2 receive data register full flag is set
   if((UART2_C2 & UART_C2_RIE_MASK) && (UART2_S1 & UART_S1_RDRF_MASK))
   {
-    //TODO: dummy read to clear interrupt flag
+    // Dummy read UART2_D to clear interrupt flag
     DummyRead = UART2_D;
 
     OS_SemaphoreSignal(RxUART);

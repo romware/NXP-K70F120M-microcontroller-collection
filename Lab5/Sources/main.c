@@ -79,11 +79,7 @@ volatile uint8_t* NvTowerPo;                    /*!< Tower protocol union pointe
 
 uint8_t AccelNewData[3];                        /*!< Latest XYZ readings from accelerometer */
 
-
 OS_ECB* AccelDataReady;				//TODO: Not sure if this should be here
-
-// Arbitrary thread stack size - big enough for stacking of interrupts and OS use.
-#define THREAD_STACK_SIZE 100
 
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE); /*!< The stack for the Tower Init thread. */
@@ -93,9 +89,6 @@ OS_THREAD_STACK(PITThreadStack, THREAD_STACK_SIZE);         /*!< The stack for t
 OS_THREAD_STACK(I2CThreadStack, THREAD_STACK_SIZE);         /*!< The stack for the I2C thread. */
 OS_THREAD_STACK(AccelThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Accel thread. */
 OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the Packet thread. */
-
-
-
 
 /*! @brief Sends the startup packets to the PC
  *
@@ -390,67 +383,56 @@ void AccelReadCompleteCallback(void* arg)
  */
 bool TowerInit(const TAccelSetup* const accelSetup)
 {
-  return (
-    Flash_Init() &&
-    LEDs_Init() &&
-    Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) &&
-    FTM_Init() &&
-    RTC_Init() &&
-    Accel_Init(accelSetup)
-  );
-}
-
-/*! @brief Sets the default or stored values of the tower
- *
- *  @return void
- */
-bool TowerSet(void)
-{
   // Success status of writing default values to Flash and FTM
-  bool success = true;
+  bool success = false;
 
-  // Allocates an address in Flash memory to the tower number and tower mode
-  if(Flash_AllocateVar((volatile void**)&NvTowerNb, sizeof(*NvTowerNb))
-  && Flash_AllocateVar((volatile void**)&NvTowerMd, sizeof(*NvTowerMd))
-  && Flash_AllocateVar((volatile void**)&NvTowerPo, sizeof(*NvTowerPo)));
+  if (Flash_Init() &&  LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init() && RTC_Init() && Accel_Init(accelSetup))
   {
-    // Checks if tower number is clear
-    if(_FH(NvTowerNb) == 0xFFFF)
-    {
-      // Sets the tower number to the default number
-      if(!Flash_Write16((uint16_t*)NvTowerNb,(uint16_t)1519))
-      {
-        success = false;
-      }
-    }
+    success = true;
 
-    // Checks if tower mode is clear
-    if(_FH(NvTowerMd) == 0xFFFF)
+    // Allocates an address in Flash memory to the tower number and tower mode
+    if(Flash_AllocateVar((volatile void**)&NvTowerNb, sizeof(*NvTowerNb))
+    && Flash_AllocateVar((volatile void**)&NvTowerMd, sizeof(*NvTowerMd))
+    && Flash_AllocateVar((volatile void**)&NvTowerPo, sizeof(*NvTowerPo)));
     {
-      // Sets the tower mode to the default mode
-      if(!Flash_Write16((uint16_t*)NvTowerMd,(uint16_t)1))
+      // Checks if tower number is clear
+      if(_FH(NvTowerNb) == 0xFFFF)
       {
-        success = false;
+        // Sets the tower number to the default number
+        if(!Flash_Write16((uint16_t*)NvTowerNb,(uint16_t)1519))
+        {
+          success = false;
+        }
       }
-    }
 
-    // Checks if tower protocol stored in flash is invalid or clear
-    if((_FB(NvTowerPo) != (uint8_t)ACCEL_POLL) && (_FB(NvTowerPo) != (uint8_t)ACCEL_INT))
-    {
-      // Sets the tower protocol to the default protocol
-      if(!Flash_Write8((uint8_t*)NvTowerPo,(uint8_t)ACCEL_POLL))
+      // Checks if tower mode is clear
+      if(_FH(NvTowerMd) == 0xFFFF)
       {
-        success = false;
+        // Sets the tower mode to the default mode
+        if(!Flash_Write16((uint16_t*)NvTowerMd,(uint16_t)1))
+        {
+          success = false;
+        }
       }
-    }
 
-    Accel_SetMode(_FB(NvTowerPo));
+      // Checks if tower protocol stored in flash is invalid or clear
+      if((_FB(NvTowerPo) != (uint8_t)ACCEL_POLL) && (_FB(NvTowerPo) != (uint8_t)ACCEL_INT))
+      {
+        // Sets the tower protocol to the default protocol
+        if(!Flash_Write8((uint8_t*)NvTowerPo,(uint8_t)ACCEL_POLL))
+        {
+          success = false;
+        }
+      }
+
+      Accel_SetMode(_FB(NvTowerPo));
+    }
   }
 
   return success;
 }
 
-/*! @brief Initialises the modules
+/*! @brief Initializes the modules
  *
  *  @param pData is not used but is required by the OS to create a thread.
  *  @note This thread deletes itself after running for the first time.
@@ -464,15 +446,11 @@ static void InitModulesThread(void* pData)
   accelerometerSetup.readCompleteCallbackFunction  = AccelReadCompleteCallback;
   accelerometerSetup.readCompleteCallbackArguments = NULL;
 
-  // Initializes the main tower components
+  // Initializes the main tower components and sets the default or stored values
   if(TowerInit(&accelerometerSetup))
   {
-    // Sets the default or stored values of the main tower components
-    if(TowerSet())
-    {
-      // Turn on the orange LED to indicate the tower has initialized successfully
-      LEDs_On(LED_ORANGE);
-    }
+    // Turn on the orange LED to indicate the tower has initialized successfully
+    LEDs_On(LED_ORANGE);
   }
   
   // Send startup packets to PC
@@ -484,6 +462,7 @@ static void InitModulesThread(void* pData)
 
 /*! @brief Checks if any packets have been received then handles it based on its contents
  *
+ *  @param pData is not used but is required by the OS to create a thread.
  *  @note Assumes that Packet_Init has been called successfully.
  */
 static void PacketThread(void* pData)
@@ -501,7 +480,7 @@ static void PacketThread(void* pData)
   FTM_Set(&receivedPacketTmr);
 
   for (;;)
-  {//TODO: think about semaphore waiting
+  {
     // Check if a packet has been received
     if(Packet_Get())
     {
@@ -510,12 +489,18 @@ static void PacketThread(void* pData)
       {
         LEDs_On(LED_BLUE);
       }
+
       // Execute a command depending on what packet has been received
       ReceivedPacket();
     }
   }
 }
 
+/*! @brief Sends the time from the real time clock to the PC
+ *
+ *  @param pData is not used but is required by the OS to create a thread.
+ *  @note Assumes that RTC_Init has been called successfully.
+ */
 static void RTCThread(void* pData)
 {
   for (;;)
@@ -536,6 +521,11 @@ static void RTCThread(void* pData)
   }
 }
 
+/*! @brief Calculates the median of recent accelerometer data and sends it to the PC
+ *
+ *  @param pData is not used but is required by the OS to create a thread.
+ *  @note Assumes that I2C_Init has been called successfully.
+ */
 static void I2CThread(void* pData)
 {
   for (;;)
@@ -571,6 +561,11 @@ static void I2CThread(void* pData)
   }
 }
 
+/*! @brief Reads acceleration values from the accelerometer
+ *
+ *  @param pData is not used but is required by the OS to create a thread.
+ *  @note Assumes that accel_Init has been called successfully.
+ */
 static void AccelThread(void* pData)
 {
   for (;;)
@@ -592,8 +587,6 @@ int main(void)
   /*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
   PE_low_level_init();
   /*** End of Processor Expert internal initialization.                    ***/
-
-  /* Write your code here */
 
   // Initialize the RTOS
   OS_Init(CPU_CORE_CLK_HZ, false);
