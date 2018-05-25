@@ -116,9 +116,9 @@ Functions</h2></td></tr>
 <tr class="memitem:gaf57dd4c5e7e444cfe5571d411f9548c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#gaf57dd4c5e7e444cfe5571d411f9548c9">ReceivedPacket</a> (void)</td></tr>
 <tr class="memdesc:gaf57dd4c5e7e444cfe5571d411f9548c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes the command depending on what packet has been received.  <a href="#gaf57dd4c5e7e444cfe5571d411f9548c9">More...</a><br /></td></tr>
 <tr class="separator:gaf57dd4c5e7e444cfe5571d411f9548c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8ea448495f51fb6cccee38177657b0e4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#ga8ea448495f51fb6cccee38177657b0e4">TowerInit</a> (const <a class="el" href="struct_t_accel_setup.html">TAccelSetup</a> *const accelSetup)</td></tr>
-<tr class="memdesc:ga8ea448495f51fb6cccee38177657b0e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the main tower components by calling the initialization routines of the supporting software modules.  <a href="#ga8ea448495f51fb6cccee38177657b0e4">More...</a><br /></td></tr>
-<tr class="separator:ga8ea448495f51fb6cccee38177657b0e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaeda7b585d318b7b1476285b82b6fed11"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#gaeda7b585d318b7b1476285b82b6fed11">TowerInit</a> (void)</td></tr>
+<tr class="memdesc:gaeda7b585d318b7b1476285b82b6fed11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the main tower components by calling the initialization routines of the supporting software modules.  <a href="#gaeda7b585d318b7b1476285b82b6fed11">More...</a><br /></td></tr>
+<tr class="separator:gaeda7b585d318b7b1476285b82b6fed11"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga840291bc02cba5474a4cb46a9b9566fe"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>main</b> (void)</td></tr>
 <tr class="separator:ga840291bc02cba5474a4cb46a9b9566fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -167,6 +167,8 @@ Variables</h2></td></tr>
 <tr class="separator:gaf5cded6992056146d61e5e043a13b8d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaca09309105c6f2a529516974bd760415"><td class="memItemLeft" align="right" valign="top">OS_ECB *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#gaca09309105c6f2a529516974bd760415">ReadCompleteSemaphore</a></td></tr>
 <tr class="separator:gaca09309105c6f2a529516974bd760415"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gabbf6ae59b445a7d9829f7dc90fca25a2"><td class="memItemLeft" align="right" valign="top">OS_ECB *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#gabbf6ae59b445a7d9829f7dc90fca25a2">RTCReadSemaphore</a></td></tr>
+<tr class="separator:gabbf6ae59b445a7d9829f7dc90fca25a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <h2 class="groupheader">Macro Definition Documentation</h2>
@@ -547,15 +549,15 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ga8ea448495f51fb6cccee38177657b0e4"></a>
+<a class="anchor" id="gaeda7b585d318b7b1476285b82b6fed11"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool TowerInit </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="struct_t_accel_setup.html">TAccelSetup</a> *const&#160;</td>
-          <td class="paramname"><em>accelSetup</em></td><td>)</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -563,6 +565,7 @@ Variables</h2></td></tr>
 
 <p>Initializes the main tower components by calling the initialization routines of the supporting software modules. </p>
 <dl class="section return"><dt>Returns</dt><dd>void </dd></dl>
+<p>&lt; Accelerometer setup </p>
 
 </div>
 </div>
@@ -814,6 +817,19 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="gabbf6ae59b445a7d9829f7dc90fca25a2"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">OS_ECB* RTCReadSemaphore</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Read semaphore for RTC </p>
+
+</div>
+</div>
 <a class="anchor" id="gaf7a418e92b8fc61e43bd6a4b55e308f2"></a>
 <div class="memitem">
 <div class="memproto">
@@ -845,7 +861,7 @@ Variables</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Fri May 25 2018 20:30:05 for OSExample by
+    <li class="footer">Generated on Fri May 25 2018 20:59:29 for OSExample by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

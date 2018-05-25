@@ -17,7 +17,7 @@ var group__main__module =
     [ "OS_THREAD_STACK", "group__main__module.html#ga24fd675b133382d5beb3331e4c418aba", null ],
     [ "OS_THREAD_STACK", "group__main__module.html#gab4c1c0cd94088cbbb7b7caa74232e2b8", null ],
     [ "ReceivedPacket", "group__main__module.html#gaf57dd4c5e7e444cfe5571d411f9548c9", null ],
-    [ "TowerInit", "group__main__module.html#ga8ea448495f51fb6cccee38177657b0e4", null ],
+    [ "TowerInit", "group__main__module.html#gaeda7b585d318b7b1476285b82b6fed11", null ],
     [ "AccelNewData", "group__main__module.html#ga02eda20bf3c11f1e9dac0682de1d6ad6", null ],
     [ "COMMAND_ACCEL", "group__main__module.html#ga2fc0a6886900e1e4df19015cb14cbcbd", null ],
     [ "COMMAND_MODE", "group__main__module.html#gae2909d574bfc1ab702eed1fb28a62505", null ],
@@ -37,6 +37,7 @@ var group__main__module =
     [ "PARAM_SET", "group__main__module.html#gadd09d8fcbae69002598b43a17fe09566", null ],
     [ "PERIOD_I2C_POLL", "group__main__module.html#ga4b8052f26442dadff956fa68b94b62f2", null ],
     [ "ReadCompleteSemaphore", "group__main__module.html#gaca09309105c6f2a529516974bd760415", null ],
+    [ "RTCReadSemaphore", "group__main__module.html#gabbf6ae59b445a7d9829f7dc90fca25a2", null ],
     [ "TOWER_VER_MAJ", "group__main__module.html#gaf7a418e92b8fc61e43bd6a4b55e308f2", null ],
     [ "TOWER_VER_MIN", "group__main__module.html#ga4cb61e8ce9aecb8cc246efa06637d082", null ]
 ];

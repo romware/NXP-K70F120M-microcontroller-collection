@@ -1,6 +1,5 @@
 var NAVTREEINDEX6 =
 {
-"group___backward___compatibility___symbols.html#ga0b5898b6d52bb5469a59dd7360d030d7":[3,0,2,0,0,10970],
 "group___backward___compatibility___symbols.html#ga19ed1a8edba0925831833450843e5ba0":[3,0,2,0,0,7479],
 "group___backward___compatibility___symbols.html#ga409a053fbaebb4e1257f7adc8c897e4f":[3,0,2,0,0,7547],
 "group___backward___compatibility___symbols.html#ga46e568af684b3fd467f42d3e7fdfbbdd":[3,0,2,0,0,7460],
@@ -249,5 +248,6 @@ var NAVTREEINDEX6 =
 "group___c_a_n___register___accessor___macros.html#gaf3b92deba3bebd84889f523b31386a02":[3,0,2,0,0,1412],
 "group___c_a_n___register___accessor___macros.html#gaf4898a0f9b5f0339e298b00f1bb44b26":[3,0,2,0,0,1372],
 "group___c_a_n___register___accessor___macros.html#gaf50fc14369bccf840c6dc34a9111ea5c":[3,0,2,0,0,1335],
-"group___c_a_n___register___accessor___macros.html#gaf5478025bffcc5a1e93616c636ef3036":[3,0,2,0,0,1310]
+"group___c_a_n___register___accessor___macros.html#gaf5478025bffcc5a1e93616c636ef3036":[3,0,2,0,0,1310],
+"group___c_a_n___register___accessor___macros.html#gaf60b8b33935278077935b3d26283c54b":[3,0,2,0,0,1386]
 };

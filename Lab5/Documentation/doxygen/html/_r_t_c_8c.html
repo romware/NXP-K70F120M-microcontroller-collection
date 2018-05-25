@@ -66,7 +66,8 @@ $(document).ready(function(){initNavTree('_r_t_c_8c.html','');});
 <div id="doc-content">
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">RTC.c File Reference</div>  </div>
 </div><!--header-->
@@ -81,9 +82,9 @@ $(document).ready(function(){initNavTree('_r_t_c_8c.html','');});
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga6f939736387d778f0c274074bae49ec6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_t_c__module.html#ga6f939736387d778f0c274074bae49ec6">RTC_Init</a> (void)</td></tr>
-<tr class="memdesc:ga6f939736387d778f0c274074bae49ec6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the RTC before first use.  <a href="group___r_t_c__module.html#ga6f939736387d778f0c274074bae49ec6">More...</a><br /></td></tr>
-<tr class="separator:ga6f939736387d778f0c274074bae49ec6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8f6fdd811ffd21bc967984a6046ec8b4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_t_c__module.html#ga8f6fdd811ffd21bc967984a6046ec8b4">RTC_Init</a> (OS_ECB *readSemaphore)</td></tr>
+<tr class="memdesc:ga8f6fdd811ffd21bc967984a6046ec8b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the RTC before first use.  <a href="group___r_t_c__module.html#ga8f6fdd811ffd21bc967984a6046ec8b4">More...</a><br /></td></tr>
+<tr class="separator:ga8f6fdd811ffd21bc967984a6046ec8b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gacbe916e4fad6bfc2ffcde604fa6afb52"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_t_c__module.html#gacbe916e4fad6bfc2ffcde604fa6afb52">RTC_Set</a> (const uint8_t hours, const uint8_t minutes, const uint8_t seconds)</td></tr>
 <tr class="memdesc:gacbe916e4fad6bfc2ffcde604fa6afb52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the value of the real time clock.  <a href="group___r_t_c__module.html#gacbe916e4fad6bfc2ffcde604fa6afb52">More...</a><br /></td></tr>
 <tr class="separator:gacbe916e4fad6bfc2ffcde604fa6afb52"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -93,6 +94,11 @@ Functions</h2></td></tr>
 <tr class="memitem:ga445500277ba0e363873b34cffc015745"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_t_c__module.html#ga445500277ba0e363873b34cffc015745">__attribute__</a> ((interrupt))</td></tr>
 <tr class="memdesc:ga445500277ba0e363873b34cffc015745"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interrupt service routine for the RTC.  <a href="group___r_t_c__module.html#ga445500277ba0e363873b34cffc015745">More...</a><br /></td></tr>
 <tr class="separator:ga445500277ba0e363873b34cffc015745"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:ga2229141b0a85956c3522709610babc91"><td class="memItemLeft" align="right" valign="top">OS_ECB *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_t_c__module.html#ga2229141b0a85956c3522709610babc91">ReadSemaphore</a></td></tr>
+<tr class="separator:ga2229141b0a85956c3522709610babc91"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Routines for controlling the Real Time Clock (RTC) on the TWR-K70F120M. </p>
@@ -105,7 +111,7 @@ Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_08d237fc27d4ecd563f71c5d52f2fecc.html">sources</a></li><li class="navelem"><a class="el" href="_r_t_c_8c.html">RTC.c</a></li>
-    <li class="footer">Generated on Fri May 25 2018 20:30:05 for OSExample by
+    <li class="footer">Generated on Fri May 25 2018 20:59:28 for OSExample by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

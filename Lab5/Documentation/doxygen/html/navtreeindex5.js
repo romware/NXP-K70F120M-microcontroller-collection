@@ -1,6 +1,5 @@
 var NAVTREEINDEX5 =
 {
-"group___a_i_p_s___register___masks.html#gad7134b017c58391217c18adcf22193b7":[3,0,2,0,0,990],
 "group___a_i_p_s___register___masks.html#gad7234229e79e3e2a5366e9d907a51e0b":[3,0,2,0,0,452],
 "group___a_i_p_s___register___masks.html#gad75b032ecf59e1f8b6140a6928f9c73d":[3,0,2,0,0,462],
 "group___a_i_p_s___register___masks.html#gad77e25d3dc53ceb710cdd7313d51d858":[3,0,2,0,0,996],
@@ -249,5 +248,6 @@ var NAVTREEINDEX5 =
 "group___a_x_b_s___register___masks.html#gaefd2ffd8d80f4eb9fd14f3c5a3a7b629":[3,0,2,0,0,1181],
 "group___a_x_b_s___register___masks.html#gaf63a98f7cff8ba76061096736d5fa14e":[3,0,2,0,0,1234],
 "group___a_x_b_s___register___masks.html#gaf8f91ac5ba555a8dc2a1733463145139":[3,0,2,0,0,1197],
-"group___backward___compatibility___symbols.html":[1,20]
+"group___backward___compatibility___symbols.html":[1,20],
+"group___backward___compatibility___symbols.html#ga0b5898b6d52bb5469a59dd7360d030d7":[3,0,2,0,0,10970]
 };

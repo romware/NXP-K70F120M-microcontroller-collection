@@ -1,6 +1,5 @@
 var NAVTREEINDEX9 =
 {
-"group___c_a_u___register___masks.html#ga54d6732429da2f76aaca8e48c1f24a65":[3,0,2,0,0,1850],
 "group___c_a_u___register___masks.html#ga550505d55e65ebb24f8b93829fc709dc":[3,0,2,0,0,2124],
 "group___c_a_u___register___masks.html#ga56a6980d68ebf41b5b321ed2a9211c1e":[3,0,2,0,0,2005],
 "group___c_a_u___register___masks.html#ga5735753e1d7d46e22b92d806218045b2":[3,0,2,0,0,1906],
@@ -239,15 +238,16 @@ var NAVTREEINDEX9 =
 "group___c_m_p___peripheral.html#ga6f5d370df3839e41b771c2d0b89cbb83":[1,19,5,8],
 "group___c_m_p___peripheral.html#ga732cbf43f95d2d1cd01b4204263940ab":[3,0,2,0,0,2215],
 "group___c_m_p___peripheral.html#ga732cbf43f95d2d1cd01b4204263940ab":[1,19,5,5],
-"group___c_m_p___peripheral.html#ga793306a1014f5112aa61f346fe3bb2c0":[3,0,2,0,0,2222],
 "group___c_m_p___peripheral.html#ga793306a1014f5112aa61f346fe3bb2c0":[1,19,5,6],
+"group___c_m_p___peripheral.html#ga793306a1014f5112aa61f346fe3bb2c0":[3,0,2,0,0,2222],
 "group___c_m_p___peripheral.html#ga91e89d9d49a3f251dcd9026ad403a3e8":[3,0,2,0,0,2208],
 "group___c_m_p___peripheral.html#ga91e89d9d49a3f251dcd9026ad403a3e8":[1,19,5,4],
-"group___c_m_p___peripheral.html#gacc69654296499d45b2060956a3c8e97f":[3,0,2,0,0,2229],
 "group___c_m_p___peripheral.html#gacc69654296499d45b2060956a3c8e97f":[1,19,5,7],
+"group___c_m_p___peripheral.html#gacc69654296499d45b2060956a3c8e97f":[3,0,2,0,0,2229],
 "group___c_m_p___register___accessor___macros.html":[1,19,5,0],
 "group___c_m_p___register___accessor___macros.html#ga032f709b685f855d5110183cf53f79ed":[3,0,2,0,0,2216],
 "group___c_m_p___register___accessor___macros.html#ga078b884bead12ed9b24c285c8f73fd27":[3,0,2,0,0,2283],
 "group___c_m_p___register___accessor___macros.html#ga0b4ea995265b027fb308b236b2f0afd4":[3,0,2,0,0,2202],
-"group___c_m_p___register___accessor___macros.html#ga0cbc568262a074fb920d0534e972853b":[3,0,2,0,0,2212]
+"group___c_m_p___register___accessor___macros.html#ga0cbc568262a074fb920d0534e972853b":[3,0,2,0,0,2212],
+"group___c_m_p___register___accessor___macros.html#ga241a18e5c046627c53ba30229a1a313c":[3,0,2,0,0,2254]
 };

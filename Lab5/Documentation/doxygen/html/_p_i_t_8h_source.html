@@ -77,15 +77,15 @@ $(document).ready(function(){initNavTree('_p_i_t_8h_source.html','');});
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="types_8h.html">types.h</a>&quot;</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;OS.h&quot;</span></div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="group___p_i_t__module.html#gab6453eb5df109746d1feea81d0cfdbe4">PIT_Init</a>(<span class="keyword">const</span> uint32_t moduleClk, OS_ECB* userSemaphore);</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group___p_i_t__module.html#gae012c6f6b7396828c558c92ad0a27ed5">PIT_Set</a>(<span class="keyword">const</span> uint32_t period, <span class="keyword">const</span> <span class="keywordtype">bool</span> restart);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group___p_i_t__module.html#gaed902f6158d6681e4b05d078575e4b09">PIT_Enable</a>(<span class="keyword">const</span> <span class="keywordtype">bool</span> enable);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__accel__module.html#ga445500277ba0e363873b34cffc015745">__attribute__</a> ((interrupt)) PIT_ISR(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="group___p_i_t__module.html#gab6453eb5df109746d1feea81d0cfdbe4">PIT_Init</a>(<span class="keyword">const</span> uint32_t moduleClk, OS_ECB* userSemaphore);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group___p_i_t__module.html#gae012c6f6b7396828c558c92ad0a27ed5">PIT_Set</a>(<span class="keyword">const</span> uint32_t period, <span class="keyword">const</span> <span class="keywordtype">bool</span> restart);</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group___p_i_t__module.html#gaed902f6158d6681e4b05d078575e4b09">PIT_Enable</a>(<span class="keyword">const</span> <span class="keywordtype">bool</span> enable);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__accel__module.html#ga445500277ba0e363873b34cffc015745">__attribute__</a> ((interrupt)) PIT_ISR(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="types_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div><div class="ttdoc">Declares new types. </div></div>
 <div class="ttc" id="group___p_i_t__module_html_gaed902f6158d6681e4b05d078575e4b09"><div class="ttname"><a href="group___p_i_t__module.html#gaed902f6158d6681e4b05d078575e4b09">PIT_Enable</a></div><div class="ttdeci">void PIT_Enable(const bool enable)</div><div class="ttdoc">Enables or disables the PIT. </div><div class="ttdef"><b>Definition:</b> PIT.c:105</div></div>
 <div class="ttc" id="group___p_i_t__module_html_gab6453eb5df109746d1feea81d0cfdbe4"><div class="ttname"><a href="group___p_i_t__module.html#gab6453eb5df109746d1feea81d0cfdbe4">PIT_Init</a></div><div class="ttdeci">bool PIT_Init(const uint32_t moduleClk, OS_ECB *userSemaphore)</div><div class="ttdoc">Sets up the PIT before first use. </div><div class="ttdef"><b>Definition:</b> PIT.c:32</div></div>
@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('_p_i_t_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_08d237fc27d4ecd563f71c5d52f2fecc.html">sources</a></li><li class="navelem"><a class="el" href="_p_i_t_8h.html">PIT.h</a></li>
-    <li class="footer">Generated on Fri May 25 2018 20:30:04 for OSExample by
+    <li class="footer">Generated on Fri May 25 2018 20:59:27 for OSExample by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>
