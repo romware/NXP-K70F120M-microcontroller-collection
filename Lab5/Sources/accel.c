@@ -193,8 +193,7 @@ static union
 
 extern const uint32_t PERIOD_I2C_POLL; /*!< Period of the I2C polling in polling mode */
 
-static void (*DataReadyCallbackFunction)(void*); /*!< Callback functions for accel */
-static void* DataReadyCallbackArguments;         /*!< Callback parameters for accel */
+OS_ECB* DataReadySemaphore;                      /*!< Data ready semaphore for accel */
 
 /*! @brief Initializes the accelerometer by calling the initialization routines of the supporting software modules.
  *
@@ -207,12 +206,8 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
   TI2CModule aTI2CModule;
   aTI2CModule.baudRate = accelSetup->moduleClk;
   aTI2CModule.primarySlaveAddress = 0x1D;
-  aTI2CModule.readCompleteCallbackFunction = accelSetup->readCompleteCallbackFunction;
-  aTI2CModule.readCompleteCallbackArguments = accelSetup->readCompleteCallbackArguments;
-
-  // Set callback functions based on passed setup parameters
-  //DataReadyCallbackFunction = accelSetup->dataReadyCallbackFunction;
-  //DataReadyCallbackArguments = accelSetup->dataReadyCallbackArguments;
+  aTI2CModule.readCompleteSemaphore = accelSetup->readCompleteSemaphore;
+  DataReadySemaphore = accelSetup->dataReadySemaphore;
 
   // Initialize the accelerometer as an I2C module
   I2C_Init(&aTI2CModule, accelSetup->moduleClk);
@@ -231,9 +226,6 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
   // Enable interrupts from pin detect B
   NVICISER2 |= (1 << 24);
 
-  // Initialize semaphore for AccelDataReady
-  AccelDataReady = OS_SemaphoreCreate(0);
-
   // Return global interrupts to how they were
   ExitCritical();
 
@@ -247,7 +239,7 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
   PORTB_PCR4 &= ~PORT_PCR_IRQC_MASK;
 
   // Set up a 1 second Periodic Interrupt Timer for use in I2C polling mode.
-  PIT_Init(accelSetup->moduleClk, AccelDataReady);
+  PIT_Init(accelSetup->moduleClk, DataReadySemaphore);
 
   return true;
 }
@@ -330,11 +322,8 @@ void __attribute__ ((interrupt)) AccelDataReady_ISR(void)
     // Write 1 to clear flag
     PORTB_ISFR = (1 << 4);
 
-//    // Call user callback function when data is ready
-//    if (DataReadyCallbackFunction)
-//     (*DataReadyCallbackFunction)(DataReadyCallbackArguments);
-
-    OS_SemaphoreSignal(AccelDataReady);
+    // Call user callback function when data is ready
+    OS_SemaphoreSignal(DataReadySemaphore);
   }
   OS_ISRExit();
 }

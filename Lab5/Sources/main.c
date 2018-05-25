@@ -54,7 +54,6 @@
 
 #define BAUD_RATE 115200                        /*!< UART2 Baud Rate */
 
-const uint32_t PERIOD_LED_GREEN   = 500000000;  /*!< Period of Periodic Interrupt Timer 0 in nanoseconds */
 const uint32_t PERIOD_I2C_POLL    = 1000000000; /*!< Period of the I2C polling in polling mode */
 
 const uint8_t COMMAND_STARTUP     = 0x04;       /*!< The serial command byte for tower startup */
@@ -75,20 +74,22 @@ const uint8_t TOWER_VER_MIN       = 0;          /*!< Tower minor version */
 
 volatile uint16union_t* NvTowerNb;              /*!< Tower number union pointer to flash */
 volatile uint16union_t* NvTowerMd;              /*!< Tower mode union pointer to flash */
-volatile uint8_t* NvTowerPo;                    /*!< Tower protocol union pointer to flash */
+volatile uint8_t* NvTowerPo;                    /*!< Tower protocol pointer to flash */
 
 uint8_t AccelNewData[3];                        /*!< Latest XYZ readings from accelerometer */
 
-OS_ECB* LEDOff;			//TODO: IS this ok. Should this and new data be static
+OS_ECB* LEDOff;                                 /*!< LED off semaphore for FTM */
+OS_ECB* DataReadySemaphore;                     /*!< Data ready semaphore for accel */
+OS_ECB* ReadCompleteSemaphore;                  /*!< Read complete semaphore for accel */
 
 // Thread stacks
-OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE); /*!< The stack for the Tower Init thread. */
-OS_THREAD_STACK(RTCThreadStack, THREAD_STACK_SIZE);         /*!< The stack for the RTC thread. */
-OS_THREAD_STACK(FTMThreadStack, THREAD_STACK_SIZE);         /*!< The stack for the FTM thread. */
-OS_THREAD_STACK(PITThreadStack, THREAD_STACK_SIZE);         /*!< The stack for the PIT thread. */
-OS_THREAD_STACK(I2CThreadStack, THREAD_STACK_SIZE);         /*!< The stack for the I2C thread. */
-OS_THREAD_STACK(AccelThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Accel thread. */
-OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the Packet thread. */
+OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Tower Init thread. */
+OS_THREAD_STACK(RTCThreadStack, THREAD_STACK_SIZE);               /*!< The stack for the RTC thread. */
+OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);        /*!< The stack for the FTM thread. */
+OS_THREAD_STACK(PITThreadStack, THREAD_STACK_SIZE);               /*!< The stack for the PIT thread. */
+OS_THREAD_STACK(AccelReadCompleteThreadStack, THREAD_STACK_SIZE); /*!< The stack for the AccelReadComplete thread. */
+OS_THREAD_STACK(AccelDataReadyThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the AccelDataReady thread. */
+OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);            /*!< The stack for the Packet thread. */
 
 /*! @brief Sends the startup packets to the PC
  *
@@ -305,78 +306,6 @@ void ReceivedPacket(void)
   Packet_Checksum   = 0;
 }
 
-/*! @brief Turns off the blue LED every time it is called
- *
- *  @return void
- */
-void FTMCallbackCh0(void* arg)
-{
-  // Turn off blue LED
-  LEDs_Off(LED_BLUE);
-}
-
-/*! @brief Toggles the yellow LED and reads the current time to send to the PC
- *
- *  @return void
- */
-void RTCCallback(void* arg)
-{
-  // Toggle the yellow LED
-  LEDs_Toggle(LED_YELLOW);
-
-  // Declare variable for hours, minutes seconds
-  uint8_t hours, minutes, seconds;
-
-  // Get the current time values
-  RTC_Get(&hours, &minutes, &seconds);
-
-  // Send time to PC
-  Packet_Put(COMMAND_TIME, hours, minutes, seconds);
-}
-
-/*! @brief Update the recent accelerometer data with new values
- *
- *  @return void
- */
-void AccelDataReadyCallback(void* arg)
-{
-  // Read data from the accelerometer
-  Accel_ReadXYZ(AccelNewData);
-}
-
-/*! @brief Toggles the green LED and reads accelerometer values to send to the PC
- *
- *  @return void
- */
-void AccelReadCompleteCallback(void* arg)
-{
-  // Two dimensional array storing the 3 most recent X, Y and Z values
-  static uint8_t recentData[3][3];
-
-  // Shift the recent data up to append the latest accelerations
-  for(uint8_t i = 0; i < 2; i++)
-  {
-      recentData[i][0] = recentData[i+1][0];
-      recentData[i][1] = recentData[i+1][1];
-      recentData[i][2] = recentData[i+1][2];
-  }
-  recentData[2][0] = AccelNewData[0];
-  recentData[2][1] = AccelNewData[1];
-  recentData[2][2] = AccelNewData[2];
-
-  // Find the median value of the three most recent values for X, Y and Z accelerations
-  uint8_t medianX = Median_Filter3(recentData[0][0],recentData[1][0],recentData[2][0]);
-  uint8_t medianY = Median_Filter3(recentData[0][1],recentData[1][1],recentData[2][1]);
-  uint8_t medianZ = Median_Filter3(recentData[0][2],recentData[1][2],recentData[2][2]);
-
-  // Send the filtered accelerations to the PC
-  if(Packet_Put(COMMAND_ACCEL, medianX, medianY, medianZ))
-  {
-    // Toggle the green LED
-    LEDs_Toggle(LED_GREEN);
-  }
-}
-
 /*! @brief Initializes the main tower components by calling the initialization routines of the supporting software modules.
  *
  *  @return void
@@ -440,12 +369,13 @@ bool TowerInit(const TAccelSetup* const accelSetup)
 static void InitModulesThread(void* pData)
 {
   LEDOff = OS_SemaphoreCreate(0);
-  TAccelSetup accelerometerSetup;                  /*!< Accelerometer callback setup */
-  accelerometerSetup.moduleClk                     = CPU_BUS_CLK_HZ;
-  accelerometerSetup.dataReadyCallbackFunction     = AccelDataReadyCallback;
-  accelerometerSetup.dataReadyCallbackArguments    = NULL;
-  accelerometerSetup.readCompleteCallbackFunction  = AccelReadCompleteCallback;
-  accelerometerSetup.readCompleteCallbackArguments = NULL;
+  DataReadySemaphore = OS_SemaphoreCreate(0);
+  ReadCompleteSemaphore = OS_SemaphoreCreate(0);
+
+  TAccelSetup accelerometerSetup;          /*!< Accelerometer callback setup */
+  accelerometerSetup.moduleClk             = CPU_BUS_CLK_HZ;
+  accelerometerSetup.dataReadySemaphore    = DataReadySemaphore;
+  accelerometerSetup.readCompleteSemaphore = ReadCompleteSemaphore;
 
   // Initializes the main tower components and sets the default or stored values
   if(TowerInit(&accelerometerSetup))
@@ -474,8 +404,6 @@ static void PacketThread(void* pData)
   receivedPacketTmr.ioType.inputDetection          = TIMER_INPUT_ANY;
   receivedPacketTmr.ioType.outputAction            = TIMER_OUTPUT_DISCONNECT;
   receivedPacketTmr.timerFunction                  = TIMER_FUNCTION_OUTPUT_COMPARE;
-//  receivedPacketTmr.userFunction                   = FTMCallbackCh0;
-//  receivedPacketTmr.userArguments                  = NULL;
   receivedPacketTmr.userSemaphore                  = LEDOff;
 
   // Set FTM Channel for received packet timer
@@ -528,14 +456,17 @@ static void RTCThread(void* pData)
  *  @param pData is not used but is required by the OS to create a thread.
  *  @note Assumes that I2C_Init has been called successfully.
  */
-static void I2CThread(void* pData)
+static void AccelReadCompleteThread(void* pData)
 {
   for (;;)
   {
-    OS_SemaphoreWait(ReadComplete,0);
+    OS_SemaphoreWait(ReadCompleteSemaphore,0);
 
     // Two dimensional array storing the 3 most recent X, Y and Z values
     static uint8_t recentData[3][3];
+
+    // Array storing the last send X, Y and Z values
+    static uint8_t prevAccel[3];
 
     // Shift the recent data up to append the latest accelerations
     for(uint8_t i = 0; i < 2; i++)
@@ -553,13 +484,21 @@ static void I2CThread(void* pData)
     uint8_t medianY = Median_Filter3(recentData[0][1],recentData[1][1],recentData[2][1]);
     uint8_t medianZ = Median_Filter3(recentData[0][2],recentData[1][2],recentData[2][2]);
 
-    // Send the filtered accelerations to the PC
-    if(Packet_Put(COMMAND_ACCEL, medianX, medianY, medianZ))
+    // Check if the data has changed
+    if(medianX != prevAccel[0] || medianY != prevAccel[1] || medianZ != prevAccel[2] || _FB(NvTowerPo) == (uint8_t)ACCEL_POLL)
     {
-      // Toggle the green LED
-      LEDs_Toggle(LED_GREEN);
+      // Send the filtered accelerations to the PC
+      if(Packet_Put(COMMAND_ACCEL, medianX, medianY, medianZ))
+      {
+        // Toggle the green LED
+        LEDs_Toggle(LED_GREEN);
+      }
     }
 
+    // Update the previous acceleration
+    prevAccel[0] = medianX;
+    prevAccel[1] = medianY;
+    prevAccel[2] = medianZ;
   }
 }
 
@@ -568,22 +507,28 @@ static void I2CThread(void* pData)
  *  @param pData is not used but is required by the OS to create a thread.
  *  @note Assumes that accel_Init has been called successfully.
  */
-static void AccelThread(void* pData)
+static void AccelDataReadyThread(void* pData)
 {
   for (;;)
   {
-    OS_SemaphoreWait(AccelDataReady,0);
+    OS_SemaphoreWait(DataReadySemaphore,0);
 
     // Read data from the accelerometer
     Accel_ReadXYZ(AccelNewData);
   }
 }
 
-static void FTMThread(void* pData)
+/*! @brief Turns the Blue LED off after the timer is complete
+ *
+ *  @param pData is not used but is required by the OS to create a thread.
+ *  @note Assumes that FTM_Init has been called successfully.
+ */
+static void FTMLEDsOffThread(void* pData)
 {
   for (;;)
   {
      OS_SemaphoreWait(LEDOff,0);
+
      // Turn off blue LED
      LEDs_Off(LED_BLUE);
   }
@@ -610,35 +555,32 @@ int main(void)
                           &InitModulesThreadStack[THREAD_STACK_SIZE - 1],
   		          0);
   // 3rd Highest priority
-  error = OS_ThreadCreate(RTCThread,
+  error = OS_ThreadCreate(AccelReadCompleteThread,
                           NULL,
-                          &RTCThreadStack[THREAD_STACK_SIZE - 1],
+                          &AccelReadCompleteThreadStack[THREAD_STACK_SIZE - 1],
                           3);
   // 4th Highest priority
-  error = OS_ThreadCreate(FTMThread,
+  error = OS_ThreadCreate(AccelDataReadyThread,
                           NULL,
-                          &FTMThreadStack[THREAD_STACK_SIZE - 1],
+                          &AccelDataReadyThreadStack[THREAD_STACK_SIZE - 1],
                           4);
-//  // 5th Highest priority
-//  error = OS_ThreadCreate(PITThread,
-//                          NULL,
-//                          &PITThreadStack[THREAD_STACK_SIZE - 1],
-//                          5);
-  // 6th Highest priority
-  error = OS_ThreadCreate(I2CThread,
-                          NULL,
-                          &I2CThreadStack[THREAD_STACK_SIZE - 1],
-                          6);
-  // 7th Highest priority
-  error = OS_ThreadCreate(AccelThread,
-                          NULL,
-                          &AccelThreadStack[THREAD_STACK_SIZE - 1],
-                          7);
-  // 8th Highest priority
+  // 5th Highest priority
   error = OS_ThreadCreate(PacketThread,
 			  NULL,
                           &PacketThreadStack[THREAD_STACK_SIZE - 1],
-                          8);
+                          5);
+  // 6th Highest priority
+  error = OS_ThreadCreate(FTMLEDsOffThread,
+                          NULL,
+                          &FTMLEDsOffThreadStack[THREAD_STACK_SIZE - 1],
+                          6);
+  // 7th Highest priority
+  error = OS_ThreadCreate(RTCThread,
+                          NULL,
+                          &RTCThreadStack[THREAD_STACK_SIZE - 1],
+                          7);
+
+
 
   // Start multithreading - never returns!
   OS_Start();

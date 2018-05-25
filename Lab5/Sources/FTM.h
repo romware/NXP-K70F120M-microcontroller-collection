@@ -47,8 +47,6 @@ typedef struct
     TTimerOutputAction outputAction;
     TTimerInputDetection inputDetection;
   } ioType;
-//  void (*userFunction)(void*);		//TODO:Delete if correct
-//  void *userArguments;
   OS_ECB* userSemaphore;
 } TFTMChannel;
 

@@ -15,8 +15,6 @@
 #include "types.h"
 #include "OS.h"
 
-OS_ECB* AccelDataReady;    // TODO: Is this okay
-
 typedef enum
 {
   ACCEL_POLL,
@@ -26,10 +24,8 @@ typedef enum
 typedef struct
 {
   uint32_t moduleClk;				/*!< The module clock rate in Hz. */
-  void (*dataReadyCallbackFunction)(void*);	/*!< The user's data ready callback function. */
-  void* dataReadyCallbackArguments;		/*!< The user's data ready callback function arguments. */
-  void (*readCompleteCallbackFunction)(void*);	/*!< The user's read complete callback function. */
-  void* readCompleteCallbackArguments;		/*!< The user's read complete callback function arguments. */
+  OS_ECB* dataReadySemaphore;                   /*!< The user's data ready semaphore */
+  OS_ECB* readCompleteSemaphore;                /*!< The user's read complete semaphore */
 } TAccelSetup;
 
 #pragma pack(push)

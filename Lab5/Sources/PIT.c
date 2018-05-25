@@ -18,9 +18,7 @@
 #include "Cpu.h"
 
 static uint32_t ModuleClk;          /*!< Module Clock */
-//static void (*UserFunction)(void*); /*!< Callback functions for PIT */
-//static void* UserArguments;         /*!< Callback parameters for PIT */
-static OS_ECB* UserSemaphore;
+static OS_ECB* UserSemaphore;       /*!< User semaphore for PIT */
 
 
 /*! @brief Sets up the PIT before first use.
@@ -39,8 +37,6 @@ bool PIT_Init(const uint32_t moduleClk, OS_ECB* userSemaphore)
 
   // Store parameters for interrupt routine and PIT enable
   ModuleClk = moduleClk;
-//  UserFunction = userFunction;
-//  UserArguments = userArguments;
   UserSemaphore = userSemaphore;
 
   // Ensure global interrupts are disabled
@@ -131,12 +127,11 @@ void __attribute__ ((interrupt)) PIT_ISR(void)
 {
   // Notify RTOS of start of ISR
   OS_ISREnter();
+
   // Clear the timer interrupt flag (W1C)
   PIT_TFLG0 = PIT_TFLG_TIF_MASK;
 
-  // Call user callback function to toggle the green LED
-//  if (UserFunction)
-//   (*UserFunction)(UserArguments);
+  // Signal user semaphore
   OS_SemaphoreSignal(UserSemaphore);
 
   OS_ISRExit();

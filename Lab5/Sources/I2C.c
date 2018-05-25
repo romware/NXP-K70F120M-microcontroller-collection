@@ -24,13 +24,13 @@ static void WaitCondition();
 static void BusyCondition();
 static void RepeatCondition();
 
-//static void (*ReadCompleteCallbackFunction)(void*);  /*!<  Callback functions for I2C. */
-//static void* ReadCompleteCallbackArguments;          /*!< Callback parameters for I2C. */
+OS_ECB* ReadCompleteSemaphore;            /*!< Read complete semaphore for I2C */
+OS_ECB* I2CAccess;                        /*!< Mutex semaphore for I2C */
 
-static uint8_t SlaveDeviceAddress = 0x1D;            /*!< Current Slave address for I2C. */
-static uint8_t SlaveDeviceReadAddress;               /*!< Current Slave device read address for I2C. */
-static uint8_t NbBytes = 0;                          /*!< Number of bytes in current read. */
-static uint8_t* DataPtr;                             /*!< Pointer to where to store read bytes. */
+static uint8_t SlaveDeviceAddress = 0x1D; /*!< Current Slave address for I2C. */
+static uint8_t SlaveDeviceReadAddress;    /*!< Current Slave device read address for I2C. */
+static uint8_t NbBytes = 0;               /*!< Number of bytes in current read. */
+static uint8_t* DataPtr;                  /*!< Pointer to where to store read bytes. */
 
 /*! @brief Start condition on I2C Bus
  *
@@ -95,8 +95,10 @@ static void RepeatCondition()
 bool I2C_Init(const TI2CModule* const aI2CModule, const uint32_t moduleClk)
 {
   // Store parameters for interrupt routine
-  //ReadCompleteCallbackFunction = aI2CModule->readCompleteCallbackFunction;
-  //ReadCompleteCallbackArguments = aI2CModule->readCompleteCallbackArguments;
+  ReadCompleteSemaphore = aI2CModule->readCompleteSemaphore;
+
+  // Mutex to access I2C
+  I2CAccess = OS_SemaphoreCreate(1);
 
   // Ensure global interrupts are disabled
   EnterCritical();
@@ -111,9 +113,6 @@ bool I2C_Init(const TI2CModule* const aI2CModule, const uint32_t moduleClk)
 
   // Enable interrupts from I2C0 module
   NVICISER0 |= (1 << 24);
-
-  // Initialize semaphore for I2C
-  ReadComplete = OS_SemaphoreCreate(0);
 
   // Return global interrupts to how they were
   ExitCritical();
@@ -211,6 +210,8 @@ void I2C_SelectSlaveDevice(const uint8_t slaveAddress)
  */
 void I2C_Write(const uint8_t registerAddress, const uint8_t data)
 {
+  OS_SemaphoreWait(I2CAccess,0);
+
   // Wait until the I2C bus is idle
   BusyCondition();
 
@@ -237,6 +238,8 @@ void I2C_Write(const uint8_t registerAddress, const uint8_t data)
 
   // Generate stop signal
   StopCondition();
+
+  OS_SemaphoreSignal(I2CAccess);
 }
 
 /*! @brief Reads data of a specified length starting from a specified register
@@ -248,6 +251,8 @@ void I2C_Write(const uint8_t registerAddress, const uint8_t data)
  */
 void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint8_t nbBytes)
 {
+  OS_SemaphoreWait(I2CAccess,0);
+
   // Wait until the I2C bus is idle
   BusyCondition();
 
@@ -311,6 +316,8 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
 
   // Read last byte of data
   data[nbBytes-1] = I2C0_D;
+
+  OS_SemaphoreSignal(I2CAccess);
 }
 
 /*! @brief Reads data of a specified length starting from a specified register
@@ -322,6 +329,8 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
  */
 void I2C_IntRead(const uint8_t registerAddress, uint8_t* const data, const uint8_t nbBytes)
 {
+  OS_SemaphoreWait(I2CAccess,0);
+
   // Store the number of bytes to be read
   NbBytes = nbBytes;
 
@@ -432,11 +441,8 @@ void __attribute__ ((interrupt)) I2C_ISR(void)
         stage = 0;
         readCount = 0;
 
-        // Call user callback function
-//        if (ReadCompleteCallbackFunction)
-//          (*ReadCompleteCallbackFunction)(ReadCompleteCallbackArguments);
-
-        OS_SemaphoreSignal(ReadComplete);
+        OS_SemaphoreSignal(ReadCompleteSemaphore);
+        OS_SemaphoreSignal(I2CAccess);
       }
       break;
   }

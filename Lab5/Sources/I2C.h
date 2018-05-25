@@ -15,14 +15,11 @@
 #include "types.h"
 #include "OS.h"
 
-OS_ECB* ReadComplete;  //TODO:Scope of this
-
 typedef struct
 {
   uint8_t primarySlaveAddress;
   uint32_t baudRate;
-  void (*readCompleteCallbackFunction)(void*);  /*!< The user's read complete callback function. */
-  void* readCompleteCallbackArguments;          /*!< The user's read complete callback function arguments. */
+  OS_ECB* readCompleteSemaphore;  /*!< The user's read complete semaphore */
 } TI2CModule;
 
 /*! @brief Sets up the I2C before first use.
