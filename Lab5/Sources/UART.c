@@ -20,6 +20,53 @@
 #include "Cpu.h"
 #include "OS.h"
 
+// Arbitrary thread stack size - big enough for stacking of interrupts and OS use.
+#define THREAD_STACK_SIZE 100
+
+// Thread stacks
+OS_THREAD_STACK(RxUARTThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the RxUART thread. */
+OS_THREAD_STACK(TxUARTThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the TxUART thread. */
+
+
+//TODO: rename this
+uint8_t DummyRead;
+
+/*! @brief Puts data into the receive FIFO
+ *
+ *  @note Assumes that UART_Init has been called successfully.
+ */
+static void RxUARTThread(void* pData)
+{
+  for (;;)
+  {
+    OS_SemaphoreWait(RxUART,0);
+
+    // Put the value in UART2 Data Register (UART2_D) in the RxFIFO
+    FIFO_Put(&RxFIFO, DummyRead);
+  }
+}
+
+/*! @brief Puts data into the transmit FIFO
+ *
+ *  @note Assumes that UART_Init has been called successfully.
+ */
+static void TxUARTThread(void* pData)
+{
+  for (;;)
+  {
+    OS_SemaphoreWait(TxUART,0);
+
+    // Check if transmit data is ready
+    if(UART2_S1 & UART_S1_TDRE_MASK)
+    {
+      // Put the value in TxFIFO into the UART2 Data Register (UART2_D)
+      FIFO_Get(&TxFIFO, (uint8_t*)&UART2_D);
+
+      // Enable transmit interrupts only when data is ready to transmit
+      UART2_C2 |= UART_C2_TIE_MASK;
+    }
+  }
+}
 
 /*! @brief Sets up the UART interface before first use.
  *
@@ -31,6 +78,19 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
 {
   RxUART = OS_SemaphoreCreate(0);
   TxUART = OS_SemaphoreCreate(0);
+
+  OS_ERROR error;
+
+  // 1st Highest priority
+  error = OS_ThreadCreate(RxUARTThread,
+                          NULL,
+                          &RxUARTThreadStack[THREAD_STACK_SIZE - 1],
+                          1);
+  // 2nd Highest priority
+  error = OS_ThreadCreate(TxUARTThread,
+                          NULL,
+                          &TxUARTThreadStack[THREAD_STACK_SIZE - 1],
+                          2);
 
   // Enable UART2 clock: For System Clock Gating Control Register 4 see 12.2.12 of K70P256M150SF3RM.pdf
   SIM_SCGC4 |= SIM_SCGC4_UART2_MASK;

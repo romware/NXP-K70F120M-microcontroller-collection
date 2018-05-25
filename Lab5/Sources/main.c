@@ -87,8 +87,6 @@ OS_ECB* AccelDataReady;				//TODO: Not sure if this should be here
 
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE); /*!< The stack for the Tower Init thread. */
-OS_THREAD_STACK(RxUARTThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the RxUART thread. */
-OS_THREAD_STACK(TxUARTThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the TxUART Init thread. */
 OS_THREAD_STACK(RTCThreadStack, THREAD_STACK_SIZE);         /*!< The stack for the RTC thread. */
 OS_THREAD_STACK(FTMThreadStack, THREAD_STACK_SIZE);         /*!< The stack for the FTM thread. */
 OS_THREAD_STACK(PITThreadStack, THREAD_STACK_SIZE);         /*!< The stack for the PIT thread. */
@@ -406,7 +404,7 @@ bool TowerInit(const TAccelSetup* const accelSetup)
  *
  *  @return void
  */
-bool TowerSet(const TFTMChannel* const aFTMChannel)
+bool TowerSet(void)
 {
   // Success status of writing default values to Flash and FTM
   bool success = true;
@@ -449,12 +447,6 @@ bool TowerSet(const TFTMChannel* const aFTMChannel)
     Accel_SetMode(_FB(NvTowerPo));
   }
 
-  // FTM Channel for received packet timer
-  if(!FTM_Set(aFTMChannel))
-  {
-    success = false;
-  }
-
   return success;
 }
 
@@ -472,20 +464,11 @@ static void InitModulesThread(void* pData)
   accelerometerSetup.readCompleteCallbackFunction  = AccelReadCompleteCallback;
   accelerometerSetup.readCompleteCallbackArguments = NULL;
 
-  TFTMChannel receivedPacketTmr;                   /*!< FTM Channel for received packet timer */
-  receivedPacketTmr.channelNb                      = 0;
-  receivedPacketTmr.delayCount                     = CPU_MCGFF_CLK_HZ_CONFIG_0;
-  receivedPacketTmr.ioType.inputDetection          = TIMER_INPUT_ANY;
-  receivedPacketTmr.ioType.outputAction            = TIMER_OUTPUT_DISCONNECT;
-  receivedPacketTmr.timerFunction                  = TIMER_FUNCTION_OUTPUT_COMPARE;
-  receivedPacketTmr.userFunction                   = FTMCallbackCh0;
-  receivedPacketTmr.userArguments                  = NULL;
-
   // Initializes the main tower components
   if(TowerInit(&accelerometerSetup))
   {
     // Sets the default or stored values of the main tower components
-    if(TowerSet(&receivedPacketTmr))
+    if(TowerSet())
     {
       // Turn on the orange LED to indicate the tower has initialized successfully
       LEDs_On(LED_ORANGE);
@@ -499,60 +482,22 @@ static void InitModulesThread(void* pData)
   OS_ThreadDelete(OS_PRIORITY_SELF);
 }
 
-/*! @brief Puts data into the receive FIFO
- *
- *  @note Assumes that UART_Init has been called successfully.
- */
-static void RxUARTThread(void* pData)
-{
-  for (;;)
-  {
-    OS_SemaphoreWait(RxUART,0);
-
-    // Put the value in UART2 Data Register (UART2_D) in the RxFIFO
-    FIFO_Put(&RxFIFO, DummyRead);
-  }
-}
-
-/*! @brief Puts data into the transmit FIFO
- *
- *  @note Assumes that UART_Init has been called successfully.
- */
-static void TxUARTThread(void* pData)
-{
-  for (;;)
-  {
-    OS_SemaphoreWait(TxUART,0);
-
-    // Check if transmit data is ready
-    if(UART2_S1 & UART_S1_TDRE_MASK)
-    {
-      // Put the value in TxFIFO into the UART2 Data Register (UART2_D)
-      FIFO_Get(&TxFIFO, (uint8_t*)&UART2_D);
-      
-      // Enable transmit interrupts only when data is ready to transmit
-      UART2_C2 |= UART_C2_TIE_MASK;
-    }
-  }
-}
-
-
 /*! @brief Checks if any packets have been received then handles it based on its contents
  *
  *  @note Assumes that Packet_Init has been called successfully.
  */
 static void PacketThread(void* pData)
 {
-  TFTMChannel receivedPacketTmr;          /*!< FTM Channel for received packet timer */
-  receivedPacketTmr.channelNb             = 0;
-  receivedPacketTmr.delayCount            = CPU_MCGFF_CLK_HZ_CONFIG_0;
-  receivedPacketTmr.ioType.inputDetection = TIMER_INPUT_ANY;
-  receivedPacketTmr.ioType.outputAction   = TIMER_OUTPUT_DISCONNECT;
-  receivedPacketTmr.timerFunction         = TIMER_FUNCTION_OUTPUT_COMPARE;
-  receivedPacketTmr.userFunction          = FTMCallbackCh0;
-  receivedPacketTmr.userArguments         = NULL;
+  TFTMChannel receivedPacketTmr;                   /*!< FTM Channel for received packet timer */
+  receivedPacketTmr.channelNb                      = 0;
+  receivedPacketTmr.delayCount                     = CPU_MCGFF_CLK_HZ_CONFIG_0;
+  receivedPacketTmr.ioType.inputDetection          = TIMER_INPUT_ANY;
+  receivedPacketTmr.ioType.outputAction            = TIMER_OUTPUT_DISCONNECT;
+  receivedPacketTmr.timerFunction                  = TIMER_FUNCTION_OUTPUT_COMPARE;
+  receivedPacketTmr.userFunction                   = FTMCallbackCh0;
+  receivedPacketTmr.userArguments                  = NULL;
 
-  // FTM Channel for received packet timer
+  // Set FTM Channel for received packet timer
   FTM_Set(&receivedPacketTmr);
 
   for (;;)
@@ -653,26 +598,12 @@ int main(void)
   // Initialize the RTOS
   OS_Init(CPU_CORE_CLK_HZ, false);
 
-  // Create module threads
-  
-  //TODO: Move TxUART and RxUART to UART
-  //TODO: Initialise FTM struct in main function and parse it into Init and Packet threads
 
-  // 0th Highest priority
+  // Highest priority
   error = OS_ThreadCreate(InitModulesThread,
-                          NULL,
+			  NULL,
                           &InitModulesThreadStack[THREAD_STACK_SIZE - 1],
   		          0);
-  // 1st Highest priority
-  error = OS_ThreadCreate(RxUARTThread,
-                          NULL,
-                          &RxUARTThreadStack[THREAD_STACK_SIZE - 1],
-                          1);
-  // 2nd Highest priority
-  error = OS_ThreadCreate(TxUARTThread,
-                          NULL,
-                          &TxUARTThreadStack[THREAD_STACK_SIZE - 1],
-                          2);
   // 3rd Highest priority
   error = OS_ThreadCreate(RTCThread,
                           NULL,
@@ -700,79 +631,13 @@ int main(void)
                           7);
   // 8th Highest priority
   error = OS_ThreadCreate(PacketThread,
-                          NULL,
+			  NULL,
                           &PacketThreadStack[THREAD_STACK_SIZE - 1],
                           8);
 
   // Start multithreading - never returns!
   OS_Start();
-
-
-//  TFTMChannel receivedPacketTmr;          /*!< FTM Channel for received packet timer */
-//  receivedPacketTmr.channelNb             = 0;
-//  receivedPacketTmr.delayCount            = CPU_MCGFF_CLK_HZ_CONFIG_0;
-//  receivedPacketTmr.ioType.inputDetection = TIMER_INPUT_ANY;
-//  receivedPacketTmr.ioType.outputAction   = TIMER_OUTPUT_DISCONNECT;
-//  receivedPacketTmr.timerFunction         = TIMER_FUNCTION_OUTPUT_COMPARE;
-//  receivedPacketTmr.userFunction          = FTMCallbackCh0;
-//  receivedPacketTmr.userArguments         = NULL;
-//
-//  TAccelSetup accelerometerSetup;                  /*!< Accelerometer callback setup */
-//  accelerometerSetup.moduleClk                     = CPU_BUS_CLK_HZ;
-//  accelerometerSetup.dataReadyCallbackFunction     = AccelDataReadyCallback;
-//  accelerometerSetup.dataReadyCallbackArguments    = NULL;
-//  accelerometerSetup.readCompleteCallbackFunction  = AccelReadCompleteCallback;
-//  accelerometerSetup.readCompleteCallbackArguments = NULL;
-//
-//
-//  // Globally disable interrupts
-//  __DI();
-//
-//  // Initializes the main tower components
-//  if(TowerInit(&accelerometerSetup))
-//  {
-//    // Sets the default or stored values of the main tower components
-//    if(TowerSet(&receivedPacketTmr))
-//    {
-//      // Turn on the orange LED to indicate the tower has initialized successfully
-//      LEDs_On(LED_ORANGE);
-//    }
-//  }
-//
-//  // Globally enable interrupts
-//  __EI();
-//
-//
-//  // Send startup packets to PC
-//  HandleTowerStartup();
-//
-//  for(;;)
-//  {
-//    // Check if a packet has been received
-//    if(Packet_Get())
-//    {
-//      // Turn on the blue LED if the 1 second timer is set
-//      if(FTM_StartTimer(&receivedPacketTmr))
-//      {
-//        LEDs_On(LED_BLUE);
-//      }
-//
-//      // Execute a command depending on what packet has been received
-//      ReceivedPacket();
-//    }
-//  }
-//
-//
-//  /*** Don't write any code pass this line, or it will be deleted during code generation. ***/
-//  /*** RTOS startup code. Macro PEX_RTOS_START is defined by the RTOS component. DON'T MODIFY THIS CODE!!! ***/
-//  #ifdef PEX_RTOS_START
-//    PEX_RTOS_START();                  /* Startup of the selected RTOS. Macro is defined by the RTOS component. */
-//  #endif
-  /*** End of RTOS startup code.  ***/
-  /*** Processor Expert end of main routine. DON'T MODIFY THIS CODE!!! ***/
-  //for(;;){}
-  /*** Processor Expert end of main routine. DON'T WRITE CODE BELOW!!! ***/
-} /*** End of main routine. DO NOT MODIFY THIS TEXT!!! ***/
+}
 
 /* END main */
 /*!

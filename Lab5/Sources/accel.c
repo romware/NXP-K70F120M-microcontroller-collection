@@ -287,7 +287,7 @@ void Accel_SetMode(const TAccelMode mode)
     I2C_Write(ADDRESS_CTRL_REG1, CTRL_REG1);
 
     // Set the Periodic Interrupt Timer for use with I2C polling
-    PIT_Set(PERIOD_I2C_POLL, true); //TODO: ask about 1.56hz
+    PIT_Set(PERIOD_I2C_POLL, true);
   }
   else if(mode == ACCEL_INT)
   {
