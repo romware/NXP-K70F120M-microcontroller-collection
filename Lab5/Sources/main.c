@@ -465,30 +465,35 @@ bool TowerSet(const TFTMChannel* const aFTMChannel)
  */
 static void InitModulesThread(void* pData)
 {
-    TAccelSetup accelerometerSetup;                  /*!< Accelerometer callback setup */
-    accelerometerSetup.moduleClk                     = CPU_BUS_CLK_HZ;
-    accelerometerSetup.dataReadyCallbackFunction     = AccelDataReadyCallback;
-    accelerometerSetup.dataReadyCallbackArguments    = NULL;
-    accelerometerSetup.readCompleteCallbackFunction  = AccelReadCompleteCallback;
-    accelerometerSetup.readCompleteCallbackArguments = NULL;
+  TAccelSetup accelerometerSetup;                  /*!< Accelerometer callback setup */
+  accelerometerSetup.moduleClk                     = CPU_BUS_CLK_HZ;
+  accelerometerSetup.dataReadyCallbackFunction     = AccelDataReadyCallback;
+  accelerometerSetup.dataReadyCallbackArguments    = NULL;
+  accelerometerSetup.readCompleteCallbackFunction  = AccelReadCompleteCallback;
+  accelerometerSetup.readCompleteCallbackArguments = NULL;
 
-    TFTMChannel receivedPacketTmr;          /*!< FTM Channel for received packet timer */
-    receivedPacketTmr.channelNb             = 0;
-    receivedPacketTmr.delayCount            = CPU_MCGFF_CLK_HZ_CONFIG_0;
-    receivedPacketTmr.ioType.inputDetection = TIMER_INPUT_ANY;
-    receivedPacketTmr.ioType.outputAction   = TIMER_OUTPUT_DISCONNECT;
-    receivedPacketTmr.timerFunction         = TIMER_FUNCTION_OUTPUT_COMPARE;
-    receivedPacketTmr.userFunction          = FTMCallbackCh0;
-    receivedPacketTmr.userArguments         = NULL;
+  TFTMChannel receivedPacketTmr;                   /*!< FTM Channel for received packet timer */
+  receivedPacketTmr.channelNb                      = 0;
+  receivedPacketTmr.delayCount                     = CPU_MCGFF_CLK_HZ_CONFIG_0;
+  receivedPacketTmr.ioType.inputDetection          = TIMER_INPUT_ANY;
+  receivedPacketTmr.ioType.outputAction            = TIMER_OUTPUT_DISCONNECT;
+  receivedPacketTmr.timerFunction                  = TIMER_FUNCTION_OUTPUT_COMPARE;
+  receivedPacketTmr.userFunction                   = FTMCallbackCh0;
+  receivedPacketTmr.userArguments                  = NULL;
 
   // Initializes the main tower components
-  if(LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init() && RTC_Init() && Accel_Init(&accelerometerSetup))
+  if(TowerInit(&accelerometerSetup))
   {
-    // Turn on the orange LED to indicate the tower has initialized successfully
-    LEDs_On(LED_ORANGE);
+    // Sets the default or stored values of the main tower components
+    if(TowerSet(&receivedPacketTmr))
+    {
+      // Turn on the orange LED to indicate the tower has initialized successfully
+      LEDs_On(LED_ORANGE);
+    }
   }
-
-  TowerSet(&receivedPacketTmr);
+  
+  // Send startup packets to PC
+  HandleTowerStartup();
 
   // We only do this once - therefore delete this thread
   OS_ThreadDelete(OS_PRIORITY_SELF);
@@ -649,6 +654,9 @@ int main(void)
   OS_Init(CPU_CORE_CLK_HZ, false);
 
   // Create module threads
+  
+  //TODO: Move TxUART and RxUART to UART
+  //TODO: Initialise FTM struct in main function and parse it into Init and Packet threads
 
   // 0th Highest priority
   error = OS_ThreadCreate(InitModulesThread,
