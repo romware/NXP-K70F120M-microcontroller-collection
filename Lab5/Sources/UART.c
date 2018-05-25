@@ -24,10 +24,10 @@
 OS_THREAD_STACK(RxUARTThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the RxUART thread. */
 OS_THREAD_STACK(TxUARTThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the TxUART thread. */
 
-OS_ECB* RxUART;                                             /*!< The Receive FIFO semaphore */
-OS_ECB* TxUART;                                             /*!< The Transmit FIFO semaphore */
+OS_ECB* RxUARTSemaphore;                                    /*!< The Receive FIFO semaphore */
+OS_ECB* TxUARTSemaphore;                                    /*!< The Transmit FIFO semaphore */
 
-TFIFO RxFIFO;                                               /*!< The Receive FIFO */   //TODO: should this be in .h?
+TFIFO RxFIFO;                                               /*!< The Receive FIFO */
 TFIFO TxFIFO;                                               /*!< The Transmit FIFO */
 
 uint8_t DummyRead;                                          /*!< The dummy read of UART2_D. */
@@ -40,7 +40,7 @@ static void RxUARTThread(void* pData)
 {
   for (;;)
   {
-    OS_SemaphoreWait(RxUART,0);
+    OS_SemaphoreWait(RxUARTSemaphore,0);
 
     // Put the value in UART2 Data Register (UART2_D) in the RxFIFO
     FIFO_Put(&RxFIFO, DummyRead);
@@ -55,7 +55,7 @@ static void TxUARTThread(void* pData)
 {
   for (;;)
   {
-    OS_SemaphoreWait(TxUART,0);
+    OS_SemaphoreWait(TxUARTSemaphore,0);
 
     // Check if transmit data is ready
     if(UART2_S1 & UART_S1_TDRE_MASK)
@@ -77,8 +77,8 @@ static void TxUARTThread(void* pData)
  */
 bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
 {
-  RxUART = OS_SemaphoreCreate(0);
-  TxUART = OS_SemaphoreCreate(0);
+  RxUARTSemaphore = OS_SemaphoreCreate(0);
+  TxUARTSemaphore = OS_SemaphoreCreate(0);
 
   OS_ERROR error;
 
@@ -93,10 +93,10 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
                           &TxUARTThreadStack[THREAD_STACK_SIZE - 1],
                           2);
 
-  // Enable UART2 clock: For System Clock Gating Control Register 4 see 12.2.12 of K70P256M150SF3RM.pdf
+  // Enable UART2 clock
   SIM_SCGC4 |= SIM_SCGC4_UART2_MASK;
 
-  // Enable PORTE clock: For System Clock Gating Control Register 5 see 12.2.13 of K70P256M150SF3RM.pdf
+  // Enable PORTE clock
   SIM_SCGC5 |= SIM_SCGC5_PORTE_MASK;
 
   // Set PTE16 (BGA Map 'J3') to be the UART2_Tx pin by setting to ALT3
@@ -112,15 +112,13 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
   UART2_C2 &= ~UART_C2_RE_MASK;
 
   // Declare union to store the baud rate setting, which is a 13 bit divisor.
-  // BDL is stored in SBR.s.Lo and BDH is stored in SBR.s.Hi. Note: The working value in BDH does not change until BDL is written.
   uint16union_t locSBR;
   locSBR.l = moduleClk/(16*baudRate);
 
-  // Declare variable to store the Baud Rate Fine Adjust divisor. This number represents 1/32 remainder from the baud rate division.
-  // Calculate the BRFA value (%32 remainder). Only use BDL to avoid overflowing the uint32_t.
+  // Calculate the BRFA value (%32 remainder)
   uint8_t locBRFA = (2*moduleClk/baudRate)%32;
 
-  // Set the UART2 BDH and BDL. Note: The working value in BDH does not change until BDL is written. BDH is not 8 bits long so it should be masked
+  // Set the UART2 BDH and BDL
   UART2_BDH = UART_BDH_SBR(locSBR.s.Hi);
   UART2_BDL = UART_BDL_SBR(locSBR.s.Lo);
   UART2_C4 = UART_C4_BRFA(locBRFA);
@@ -204,7 +202,7 @@ void __attribute__ ((interrupt)) UART_ISR(void)
     // Dummy read UART2_D to clear interrupt flag
     DummyRead = UART2_D;
 
-    OS_SemaphoreSignal(RxUART);
+    OS_SemaphoreSignal(RxUARTSemaphore);
   }
 
   // Check if the UART2 transmit interrupt is enabled and the UART2 transmit data register empty flag is set
@@ -213,7 +211,7 @@ void __attribute__ ((interrupt)) UART_ISR(void)
     // Clear the transmit interrupt enable
     UART2_C2 &= ~UART_C2_TIE_MASK;
     
-    OS_SemaphoreSignal(TxUART);
+    OS_SemaphoreSignal(TxUARTSemaphore);
   }
   
   OS_ISRExit();

@@ -86,8 +86,7 @@ bool FTM_Init()
  *    ioType is a union that depends on the setting of the channel as input capture or output compare:
  *      outputAction is the action to take on a successful output compare.
  *      inputDetection is the type of input capture detection.
- *    userFunction is a pointer to a user callback function.
- *    userArguments is a pointer to the user arguments to use with the user callback function.
+ *    userSemaphore is a pointer to a semaphore
  *  @return bool - TRUE if the timer was set up successfully.
  *  @note Assumes the FTM has been initialized.
  */

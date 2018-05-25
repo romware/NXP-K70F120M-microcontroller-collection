@@ -22,17 +22,17 @@ NvTowerMd           0x4               ./Sources/main.o
 NvTowerNb           0x4               ./Sources/main.o
 DummyRead           0x1               ./Sources/UART.o
 Packet              0x5               ./Sources/packet.o
-TxUART              0x4               ./Sources/UART.o
 TxFIFO              0x110             ./Sources/UART.o
 RxFIFO              0x110             ./Sources/UART.o
 LEDOff              0x4               ./Sources/main.o
 UserSemaphore       0x20              ./Sources/FTM.o
 SR_reg              0x1               ./Generated_Code/Cpu.o
+RxUARTSemaphore     0x4               ./Sources/UART.o
 NvTowerPo           0x4               ./Sources/main.o
+TxUARTSemaphore     0x4               ./Sources/UART.o
 ReadCompleteSemaphore
                     0x4               ./Sources/I2C.o
 AccelNewData        0x3               ./Sources/main.o
-RxUART              0x4               ./Sources/UART.o
 RTCRead             0x4               ./Sources/RTC.o
 I2CAccess           0x4               ./Sources/I2C.o
 DataReadySemaphore  0x4               ./Sources/accel.o
@@ -1056,10 +1056,10 @@ LOAD c:/freescale/kds_3.0.0/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv7e-
                 0x1fff162c                RTCRead
  COMMON         0x1fff1630      0x22c ./Sources/UART.o
                 0x1fff1630                DummyRead
-                0x1fff1634                TxUART
-                0x1fff1638                TxFIFO
-                0x1fff1748                RxFIFO
-                0x1fff1858                RxUART
+                0x1fff1634                TxFIFO
+                0x1fff1744                RxFIFO
+                0x1fff1854                RxUARTSemaphore
+                0x1fff1858                TxUARTSemaphore
  COMMON         0x1fff185c        0x4 ./Sources/accel.o
                 0x1fff185c                DataReadySemaphore
  COMMON         0x1fff1860       0x13 ./Sources/main.o
@@ -1312,7 +1312,7 @@ OUTPUT(Lab5.elf elf32-littlearm)
  .debug_line    0x00002948      0x28b ./Generated_Code/Vectors.o
  .debug_line    0x00002bd3      0x496 C:\Users\12551519\Desktop\git\Lab5\Library\libOS.a(OS.o)
 
-.debug_str      0x00000000    0x8f005
+.debug_str      0x00000000    0x8f017
  .debug_str     0x00000000    0x8a0eb ./Sources/FIFO.o
                               0x8a269 (size before relaxing)
  .debug_str     0x0008a0eb      0x3b0 ./Sources/FTM.o
@@ -1327,23 +1327,23 @@ OUTPUT(Lab5.elf elf32-littlearm)
                               0x8a3f6 (size before relaxing)
  .debug_str     0x0008abb3       0x97 ./Sources/RTC.o
                               0x8a3b9 (size before relaxing)
- .debug_str     0x0008ac4a      0x223 ./Sources/UART.o
-                              0x8a609 (size before relaxing)
- .debug_str     0x0008ae6d      0xa39 ./Sources/accel.o
+ .debug_str     0x0008ac4a      0x235 ./Sources/UART.o
+                              0x8a61b (size before relaxing)
+ .debug_str     0x0008ae7f      0xa39 ./Sources/accel.o
                               0x8af54 (size before relaxing)
- .debug_str     0x0008b8a6      0xaff ./Sources/main.o
+ .debug_str     0x0008b8b8      0xaff ./Sources/main.o
                               0x8b1dd (size before relaxing)
- .debug_str     0x0008c3a5       0x2c ./Sources/median.o
+ .debug_str     0x0008c3b7       0x2c ./Sources/median.o
                                0x2f8d (size before relaxing)
- .debug_str     0x0008c3d1       0x4f ./Sources/packet.o
+ .debug_str     0x0008c3e3       0x4f ./Sources/packet.o
                               0x8a4ee (size before relaxing)
- .debug_str     0x0008c420     0x2663 ./Project_Settings/Startup_Code/startup.o
+ .debug_str     0x0008c432     0x2663 ./Project_Settings/Startup_Code/startup.o
                               0x853e9 (size before relaxing)
- .debug_str     0x0008ea83      0x1e3 ./Generated_Code/Cpu.o
+ .debug_str     0x0008ea95      0x1e3 ./Generated_Code/Cpu.o
                               0x8a45b (size before relaxing)
- .debug_str     0x0008ec66       0x1c ./Generated_Code/Vectors.o
+ .debug_str     0x0008ec78       0x1c ./Generated_Code/Vectors.o
                               0x8a25c (size before relaxing)
- .debug_str     0x0008ec82      0x383 C:\Users\12551519\Desktop\git\Lab5\Library\libOS.a(OS.o)
+ .debug_str     0x0008ec94      0x383 C:\Users\12551519\Desktop\git\Lab5\Library\libOS.a(OS.o)
                               0x8ad2a (size before relaxing)
 
 .comment        0x00000000       0x70
