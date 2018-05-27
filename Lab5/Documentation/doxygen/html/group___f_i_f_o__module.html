@@ -71,21 +71,21 @@ Functions</h2></td></tr>
 <tr class="memitem:gad9207f49ab9ed061b6dca6063112ca60"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_i_f_o__module.html#gad9207f49ab9ed061b6dca6063112ca60">FIFO_Init</a> (<a class="el" href="struct_t_f_i_f_o.html">TFIFO</a> *const FIFO)</td></tr>
 <tr class="memdesc:gad9207f49ab9ed061b6dca6063112ca60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the FIFO before first use.  <a href="#gad9207f49ab9ed061b6dca6063112ca60">More...</a><br /></td></tr>
 <tr class="separator:gad9207f49ab9ed061b6dca6063112ca60"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gace64ba4e6bd943f990a294693156cc3b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_i_f_o__module.html#gace64ba4e6bd943f990a294693156cc3b">FIFO_Put</a> (<a class="el" href="struct_t_f_i_f_o.html">TFIFO</a> *const FIFO, const uint8_t data)</td></tr>
-<tr class="memdesc:gace64ba4e6bd943f990a294693156cc3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Put one character into the FIFO.  <a href="#gace64ba4e6bd943f990a294693156cc3b">More...</a><br /></td></tr>
-<tr class="separator:gace64ba4e6bd943f990a294693156cc3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga6407e3daf24a826a7f17d3e48865e89a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_i_f_o__module.html#ga6407e3daf24a826a7f17d3e48865e89a">FIFO_Get</a> (<a class="el" href="struct_t_f_i_f_o.html">TFIFO</a> *const FIFO, uint8_t *const dataPtr)</td></tr>
-<tr class="memdesc:ga6407e3daf24a826a7f17d3e48865e89a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get one character from the FIFO.  <a href="#ga6407e3daf24a826a7f17d3e48865e89a">More...</a><br /></td></tr>
-<tr class="separator:ga6407e3daf24a826a7f17d3e48865e89a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaee681f1a1e1fd5672ed23dca0929433a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_i_f_o__module.html#gaee681f1a1e1fd5672ed23dca0929433a">FIFO_Put</a> (<a class="el" href="struct_t_f_i_f_o.html">TFIFO</a> *const FIFO, const uint8_t data)</td></tr>
+<tr class="memdesc:gaee681f1a1e1fd5672ed23dca0929433a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Put one character into the FIFO.  <a href="#gaee681f1a1e1fd5672ed23dca0929433a">More...</a><br /></td></tr>
+<tr class="separator:gaee681f1a1e1fd5672ed23dca0929433a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gabb3392ae9e1170a724586695ab0e5808"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_i_f_o__module.html#gabb3392ae9e1170a724586695ab0e5808">FIFO_Get</a> (<a class="el" href="struct_t_f_i_f_o.html">TFIFO</a> *const FIFO, uint8_t *const dataPtr)</td></tr>
+<tr class="memdesc:gabb3392ae9e1170a724586695ab0e5808"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get one character from the FIFO.  <a href="#gabb3392ae9e1170a724586695ab0e5808">More...</a><br /></td></tr>
+<tr class="separator:gabb3392ae9e1170a724586695ab0e5808"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="ga6407e3daf24a826a7f17d3e48865e89a"></a>
+<a class="anchor" id="gabb3392ae9e1170a724586695ab0e5808"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool FIFO_Get </td>
+          <td class="memname">void FIFO_Get </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="struct_t_f_i_f_o.html">TFIFO</a> *const&#160;</td>
           <td class="paramname"><em>FIFO</em>, </td>
@@ -112,7 +112,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>bool - TRUE if data is successfully retrieved from the FIFO. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>void. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Assumes that FIFO_Init has been called. </dd></dl>
 
 </div>
@@ -142,12 +142,12 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="gace64ba4e6bd943f990a294693156cc3b"></a>
+<a class="anchor" id="gaee681f1a1e1fd5672ed23dca0929433a"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool FIFO_Put </td>
+          <td class="memname">void FIFO_Put </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="struct_t_f_i_f_o.html">TFIFO</a> *const&#160;</td>
           <td class="paramname"><em>FIFO</em>, </td>
@@ -174,7 +174,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>bool - TRUE if data is successfully stored in the FIFO. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>void. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Assumes that FIFO_Init has been called. </dd></dl>
 
 </div>
@@ -184,7 +184,7 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Fri May 25 2018 20:59:29 for OSExample by
+    <li class="footer">Generated on Sun May 27 2018 17:29:43 for OSExample by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

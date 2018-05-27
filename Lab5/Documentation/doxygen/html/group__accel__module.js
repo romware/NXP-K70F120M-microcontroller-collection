@@ -16,7 +16,6 @@ var group__accel__module =
     [ "byte", "group__accel__module.html#ga21c0cbb71a2fe1c4cfd05ca0c2c47e92", null ],
     [ "byte", "group__accel__module.html#ga1e29d61d3add92b09bd96b1d179d3477", null ],
     [ "byte", "group__accel__module.html#ga10f573c97cad2cca809fbd4e62acaa89", null ],
-    [ "DataReadySemaphore", "group__accel__module.html#gaf5cded6992056146d61e5e043a13b8d1", null ],
     [ "DR", "group__accel__module.html#ga56b48c2aeb956562fa36246e2c9bc881", null ],
     [ "F_READ", "group__accel__module.html#gae205668059a828b8bf9bc8036b70d4a6", null ],
     [ "FIFO_GATE", "group__accel__module.html#gacea09e29574e0556535bf5439eca9566", null ],
