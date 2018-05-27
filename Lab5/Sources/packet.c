@@ -33,6 +33,7 @@ static OS_ECB* PacketPutAccess;
  */
 bool Packet_Init(const uint32_t baudRate, const uint32_t moduleClk)
 {
+  // Create Mutex
   PacketPutAccess = OS_SemaphoreCreate(1);
 
   // Sets up the UART interface before first use.
@@ -47,21 +48,20 @@ bool Packet_Get(void)
 {
   uint8_t nextByte;
 
-  // Check if the RxFIFO is not empty
-  if(UART_InChar(&nextByte))
-  {
-    // Shift all packet bytes up and insert last byte from RxFIFO
-    Packet_Command = Packet_Parameter1;
-    Packet_Parameter1 = Packet_Parameter2;
-    Packet_Parameter2 = Packet_Parameter3;
-    Packet_Parameter3 = Packet_Checksum;
-    Packet_Checksum = nextByte;
+  // Get a byte from the RxFIFO
+  UART_InChar(&nextByte);
 
-    // Check if packet checksum is equal to received checksum
-    if((Packet_Command ^ Packet_Parameter1 ^ Packet_Parameter2 ^ Packet_Parameter3) == Packet_Checksum)
-    {
-      return true;
-    }
+  // Shift all packet bytes up and insert last byte from RxFIFO
+  Packet_Command = Packet_Parameter1;
+  Packet_Parameter1 = Packet_Parameter2;
+  Packet_Parameter2 = Packet_Parameter3;
+  Packet_Parameter3 = Packet_Checksum;
+  Packet_Checksum = nextByte;
+
+  // Check if packet checksum is equal to received checksum
+  if((Packet_Command ^ Packet_Parameter1 ^ Packet_Parameter2 ^ Packet_Parameter3) == Packet_Checksum)
+  {
+    return true;
   }
   return false;
 }
@@ -72,6 +72,7 @@ bool Packet_Get(void)
  */
 bool Packet_Put(const uint8_t command, const uint8_t parameter1, const uint8_t parameter2, const uint8_t parameter3)
 {
+  // Take exclusive access of function
   OS_SemaphoreWait(PacketPutAccess,0);
   
   // Generates the XOR checksum of a packet.
@@ -84,6 +85,7 @@ bool Packet_Put(const uint8_t command, const uint8_t parameter1, const uint8_t p
   UART_OutChar(parameter3);
   UART_OutChar(checksum);
   
+  // Release access
   OS_SemaphoreSignal(PacketPutAccess);
   return true;
 }

@@ -30,6 +30,8 @@ OS_ECB* TxUARTSemaphore;                                    /*!< The Transmit FI
 TFIFO RxFIFO;                                               /*!< The Receive FIFO */
 TFIFO TxFIFO;                                               /*!< The Transmit FIFO */
 
+// Dummy/buffer read to allow clearing of RDRF flag
+// and calling blocking functions outside ISR.
 uint8_t DummyRead;                                          /*!< The dummy read of UART2_D. */
 
 /*! @brief Puts data into the receive FIFO
@@ -40,6 +42,7 @@ static void RxUARTThread(void* pData)
 {
   for (;;)
   {
+    // Wait for received data
     OS_SemaphoreWait(RxUARTSemaphore,0);
 
     // Put the value in UART2 Data Register (UART2_D) in the RxFIFO
@@ -55,15 +58,16 @@ static void TxUARTThread(void* pData)
 {
   for (;;)
   {
+    // Wait until ready to transmit data
     OS_SemaphoreWait(TxUARTSemaphore,0);
 
-    // Check if transmit data is ready
+    // Read TDRE flag and put data in to clear
     if(UART2_S1 & UART_S1_TDRE_MASK)
     {
       // Put the value in TxFIFO into the UART2 Data Register (UART2_D)
       FIFO_Get(&TxFIFO, (uint8_t*)&UART2_D);
 
-      // Enable transmit interrupts only when data is ready to transmit
+      // Enable transmit interrupts to allow the ISR to signal the semaphore when complete.
       UART2_C2 |= UART_C2_TIE_MASK;
     }
   }
@@ -161,30 +165,28 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
 /*! @brief Get a character from the receive FIFO if it is not empty.
  *
  *  @param dataPtr A pointer to memory to store the retrieved byte.
- *  @return bool - TRUE if the receive FIFO returned a character.
+ *  @return void.
  *  @note Assumes that UART_Init has been called.
  */
-bool UART_InChar(uint8_t * const dataPtr)
+void UART_InChar(uint8_t * const dataPtr)
 {
   // Get one character from the RxFIFO.
   FIFO_Get(&RxFIFO, dataPtr);
-  return true;
 }
 
 /*! @brief Put a byte in the transmit FIFO if it is not full.
  *
  *  @param data The byte to be placed in the transmit FIFO.
- *  @return bool - TRUE if the data was placed in the transmit FIFO.
+ *  @return void.
  *  @note Assumes that UART_Init has been called.
  */
-bool UART_OutChar(const uint8_t data)
+void UART_OutChar(const uint8_t data)
 {
   // Put one character into the TxFIFO.
   FIFO_Put(&TxFIFO, data);
   
-  // Enable transmit interrupts only when data is ready to transmit
+  // Enable transmit interrupts when data is ready to transmit
   UART2_C2 |= UART_C2_TIE_MASK;
-  return true;
 }
 
 /*! @brief Interrupt service routine for the UART.
@@ -202,6 +204,7 @@ void __attribute__ ((interrupt)) UART_ISR(void)
     // Dummy read UART2_D to clear interrupt flag
     DummyRead = UART2_D;
 
+    // Signal semaphore to allow thread to read another byte
     OS_SemaphoreSignal(RxUARTSemaphore);
   }
 
@@ -211,9 +214,11 @@ void __attribute__ ((interrupt)) UART_ISR(void)
     // Clear the transmit interrupt enable
     UART2_C2 &= ~UART_C2_TIE_MASK;
     
+    // Signal the semaphore to allow thread to put another byte in Data.
     OS_SemaphoreSignal(TxUARTSemaphore);
   }
   
+  // Notify RTOS of exit of ISR
   OS_ISRExit();
 }
 /* END UART */

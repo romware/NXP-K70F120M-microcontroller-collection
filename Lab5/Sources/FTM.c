@@ -18,7 +18,7 @@
 #include "Cpu.h"
 #include "OS.h"
 
-OS_ECB* UserSemaphore[8];  /*!< Array to store semaphores for channels 0-7 of FTM0 */
+static OS_ECB* UserSemaphore[8];  /*!< Array to store semaphores for channels 0-7 of FTM0 */
 
 /*! @brief Sets up the FTM before first use.
  *
@@ -152,6 +152,9 @@ bool FTM_StartTimer(const TFTMChannel* const aFTMChannel)
  */
 void __attribute__ ((interrupt)) FTM0_ISR(void)
 {
+  // Notify RTOS of start of ISR
+  OS_ISREnter();
+
   // Check for set channel flags
   for(uint8_t i = 0; i < 8; i++)
   {
@@ -163,10 +166,13 @@ void __attribute__ ((interrupt)) FTM0_ISR(void)
       // Disable the channel interrupt
       FTM0_CnSC(i) &= ~FTM_CnSC_CHIE_MASK;
 
-      // Call up callback function for channels with set flags
+      // Signal the relevant channel semaphore
       OS_SemaphoreSignal(UserSemaphore[i]);
     }
   }
+
+  // Notify RTOS of exit of ISR
+  OS_ISRExit();
 }
 /* END FTM */
 /*!

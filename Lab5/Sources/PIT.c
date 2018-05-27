@@ -133,6 +133,7 @@ void __attribute__ ((interrupt)) PIT_ISR(void)
   // Signal user semaphore
   OS_SemaphoreSignal(UserSemaphore);
 
+  // Notify RTOS of exit of ISR
   OS_ISRExit();
 }
 

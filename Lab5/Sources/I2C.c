@@ -24,8 +24,8 @@ static void WaitCondition();
 static void BusyCondition();
 static void RepeatCondition();
 
-OS_ECB* ReadCompleteSemaphore;            /*!< Read complete semaphore for I2C */
-OS_ECB* I2CAccess;                        /*!< Mutex semaphore for I2C */
+static OS_ECB* ReadCompleteSemaphore;     /*!< Read complete semaphore for I2C */
+static OS_ECB* I2CAccess;                 /*!< Mutex semaphore for I2C */
 
 static uint8_t SlaveDeviceAddress = 0x1D; /*!< Current Slave address for I2C. */
 static uint8_t SlaveDeviceReadAddress;    /*!< Current Slave device read address for I2C. */
@@ -210,6 +210,7 @@ void I2C_SelectSlaveDevice(const uint8_t slaveAddress)
  */
 void I2C_Write(const uint8_t registerAddress, const uint8_t data)
 {
+  // Gain exclusive access
   OS_SemaphoreWait(I2CAccess,0);
 
   // Wait until the I2C bus is idle
@@ -239,6 +240,7 @@ void I2C_Write(const uint8_t registerAddress, const uint8_t data)
   // Generate stop signal
   StopCondition();
 
+  // Release access
   OS_SemaphoreSignal(I2CAccess);
 }
 
@@ -251,6 +253,7 @@ void I2C_Write(const uint8_t registerAddress, const uint8_t data)
  */
 void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint8_t nbBytes)
 {
+  // Gain exclusive access
   OS_SemaphoreWait(I2CAccess,0);
 
   // Wait until the I2C bus is idle
@@ -317,6 +320,7 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
   // Read last byte of data
   data[nbBytes-1] = I2C0_D;
 
+  // Release access
   OS_SemaphoreSignal(I2CAccess);
 }
 
@@ -329,6 +333,7 @@ void I2C_PollRead(const uint8_t registerAddress, uint8_t* const data, const uint
  */
 void I2C_IntRead(const uint8_t registerAddress, uint8_t* const data, const uint8_t nbBytes)
 {
+  // Gain exclusive access
   OS_SemaphoreWait(I2CAccess,0);
 
   // Store the number of bytes to be read
@@ -441,11 +446,16 @@ void __attribute__ ((interrupt)) I2C_ISR(void)
         stage = 0;
         readCount = 0;
 
+        // Signal ReadComplete semaphore
         OS_SemaphoreSignal(ReadCompleteSemaphore);
+
+        // Release access
         OS_SemaphoreSignal(I2CAccess);
       }
       break;
   }
+
+  // Notify RTOS of exit of ISR
   OS_ISRExit();
 }
 /* END I2C */

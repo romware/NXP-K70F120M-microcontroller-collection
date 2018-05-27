@@ -18,7 +18,7 @@
 #include "Cpu.h"
 #include "OS.h"
 
-OS_ECB* ReadSemaphore; /*!< Read semaphore for RTC */
+static OS_ECB* ReadSemaphore; /*!< Read semaphore for RTC */
 
 /*! @brief Initializes the RTC before first use.
  *
@@ -29,6 +29,7 @@ OS_ECB* ReadSemaphore; /*!< Read semaphore for RTC */
  */
 bool RTC_Init(OS_ECB* readSemaphore)
 {
+  // Store parameters for interrupt routine
   ReadSemaphore = readSemaphore;
 
   // Ensure global interrupts are disabled
@@ -127,8 +128,10 @@ void __attribute__ ((interrupt)) RTC_ISR(void)
   // Notify RTOS of start of ISR
   OS_ISREnter();
 
+  // Signal Read semaphore
   OS_SemaphoreSignal(ReadSemaphore);
 
+  // Notify RTOS of exit of ISR
   OS_ISRExit();
 }
 /* END RTC */

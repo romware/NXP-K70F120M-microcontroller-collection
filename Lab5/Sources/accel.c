@@ -193,7 +193,7 @@ static union
 
 extern const uint32_t PERIOD_I2C_POLL; /*!< Period of the I2C polling in polling mode */
 
-OS_ECB* DataReadySemaphore;                      /*!< Data ready semaphore for accel */
+static OS_ECB* DataReadySemaphore;     /*!< Data ready semaphore for accel */
 
 /*! @brief Initializes the accelerometer by calling the initialization routines of the supporting software modules.
  *
@@ -322,9 +322,11 @@ void __attribute__ ((interrupt)) AccelDataReady_ISR(void)
     // Write 1 to clear flag
     PORTB_ISFR = (1 << 4);
 
-    // Call user callback function when data is ready
+    // Signal DataReady semaphore
     OS_SemaphoreSignal(DataReadySemaphore);
   }
+
+  // Notify RTOS of exit of ISR
   OS_ISRExit();
 }
 /* END accel */

@@ -27,18 +27,18 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk);
 /*! @brief Get a character from the receive FIFO if it is not empty.
  *
  *  @param dataPtr A pointer to memory to store the retrieved byte.
- *  @return bool - TRUE if the receive FIFO returned a character.
+ *  @return void
  *  @note Assumes that UART_Init has been called.
  */
-bool UART_InChar(uint8_t* const dataPtr);
+void UART_InChar(uint8_t* const dataPtr);
  
 /*! @brief Put a byte in the transmit FIFO if it is not full.
  *
  *  @param data The byte to be placed in the transmit FIFO.
- *  @return bool - TRUE if the data was placed in the transmit FIFO.
+ *  @return void.
  *  @note Assumes that UART_Init has been called.
  */
-bool UART_OutChar(const uint8_t data);
+void UART_OutChar(const uint8_t data);
 
 /*! @brief Interrupt service routine for the UART.
  *

@@ -76,12 +76,12 @@ volatile uint16union_t* NvTowerNb;              /*!< Tower number union pointer 
 volatile uint16union_t* NvTowerMd;              /*!< Tower mode union pointer to flash */
 volatile uint8_t* NvTowerPo;                    /*!< Tower protocol pointer to flash */
 
-uint8_t AccelNewData[3];                        /*!< Latest XYZ readings from accelerometer */
+static uint8_t AccelNewData[3];                 /*!< Latest XYZ readings from accelerometer */
 
-OS_ECB* LEDOff;                                 /*!< LED off semaphore for FTM */
-OS_ECB* DataReadySemaphore;                     /*!< Data ready semaphore for accel */
-OS_ECB* ReadCompleteSemaphore;                  /*!< Read complete semaphore for accel */
-OS_ECB* RTCReadSemaphore;                       /*!< Read semaphore for RTC */
+static OS_ECB* LEDOff;                          /*!< LED off semaphore for FTM */
+static OS_ECB* DataReadySemaphore;              /*!< Data ready semaphore for accel */
+static OS_ECB* ReadCompleteSemaphore;           /*!< Read complete semaphore for accel */
+static OS_ECB* RTCReadSemaphore;                /*!< Read semaphore for RTC */
 
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Tower Init thread. */
@@ -363,7 +363,6 @@ bool TowerInit(void)
       Accel_SetMode(_FB(NvTowerPo));
     }
   }
-
   return success;
 }
 
@@ -374,6 +373,7 @@ bool TowerInit(void)
  */
 static void InitModulesThread(void* pData)
 {
+  // Create semaphores for threads
   LEDOff = OS_SemaphoreCreate(0);
   DataReadySemaphore = OS_SemaphoreCreate(0);
   ReadCompleteSemaphore = OS_SemaphoreCreate(0);
@@ -437,6 +437,7 @@ static void RTCThread(void* pData)
 {
   for (;;)
   {
+    // Wait for RTCRead semaphore
     OS_SemaphoreWait(RTCReadSemaphore,0);
 
     // Toggle the yellow LED
@@ -462,6 +463,7 @@ static void AccelReadCompleteThread(void* pData)
 {
   for (;;)
   {
+    // Wait until read is complete
     OS_SemaphoreWait(ReadCompleteSemaphore,0);
 
     // Two dimensional array storing the 3 most recent X, Y and Z values
@@ -513,6 +515,7 @@ static void AccelDataReadyThread(void* pData)
 {
   for (;;)
   {
+    // Wait until data is ready to be read
     OS_SemaphoreWait(DataReadySemaphore,0);
 
     // Read data from the accelerometer
@@ -529,6 +532,7 @@ static void FTMLEDsOffThread(void* pData)
 {
   for (;;)
   {
+      // Wait until signaled to turn LED off
      OS_SemaphoreWait(LEDOff,0);
 
      // Turn off blue LED
