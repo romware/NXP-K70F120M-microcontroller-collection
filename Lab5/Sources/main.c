@@ -489,7 +489,7 @@ static void AccelReadCompleteThread(void* pData)
     uint8_t medianZ = Median_Filter3(recentData[0][2],recentData[1][2],recentData[2][2]);
 
     // Check if the data has changed
-    if(medianX != prevAccel[0] || medianY != prevAccel[1] || medianZ != prevAccel[2] || _FB(NvTowerPo) == (uint8_t)ACCEL_POLL)
+    if(medianX != prevAccel[0] || medianY != prevAccel[1] || medianZ != prevAccel[2] || _FB(NvTowerPo) == (uint8_t)ACCEL_INT)
     {
       // Send the filtered accelerations to the PC
       if(Packet_Put(COMMAND_ACCEL, medianX, medianY, medianZ))
