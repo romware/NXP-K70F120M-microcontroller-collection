@@ -13,7 +13,6 @@
 
 // new types
 #include "types.h"
-#include "OS.h"
 #include "FIFO.h"
 
 /*! @brief Sets up the UART interface before first use.

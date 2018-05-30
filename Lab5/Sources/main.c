@@ -78,7 +78,7 @@ volatile uint8_t* NvTowerPo;                    /*!< Tower protocol pointer to f
 
 static uint8_t AccelNewData[3];                 /*!< Latest XYZ readings from accelerometer */
 
-static OS_ECB* LEDOff;                          /*!< LED off semaphore for FTM */
+static OS_ECB* LEDOffSemaphore;                          /*!< LED off semaphore for FTM */
 static OS_ECB* DataReadySemaphore;              /*!< Data ready semaphore for accel */
 static OS_ECB* ReadCompleteSemaphore;           /*!< Read complete semaphore for accel */
 static OS_ECB* RTCReadSemaphore;                /*!< Read semaphore for RTC */
@@ -374,7 +374,7 @@ bool TowerInit(void)
 static void InitModulesThread(void* pData)
 {
   // Create semaphores for threads
-  LEDOff = OS_SemaphoreCreate(0);
+  LEDOffSemaphore = OS_SemaphoreCreate(0);
   DataReadySemaphore = OS_SemaphoreCreate(0);
   ReadCompleteSemaphore = OS_SemaphoreCreate(0);
   RTCReadSemaphore = OS_SemaphoreCreate(0);
@@ -406,7 +406,7 @@ static void PacketThread(void* pData)
   receivedPacketTmr.ioType.inputDetection          = TIMER_INPUT_ANY;
   receivedPacketTmr.ioType.outputAction            = TIMER_OUTPUT_DISCONNECT;
   receivedPacketTmr.timerFunction                  = TIMER_FUNCTION_OUTPUT_COMPARE;
-  receivedPacketTmr.userSemaphore                  = LEDOff;
+  receivedPacketTmr.userSemaphore                  = LEDOffSemaphore;
 
   // Set FTM Channel for received packet timer
   FTM_Set(&receivedPacketTmr);
@@ -533,7 +533,7 @@ static void FTMLEDsOffThread(void* pData)
   for (;;)
   {
       // Wait until signaled to turn LED off
-     OS_SemaphoreWait(LEDOff,0);
+     OS_SemaphoreWait(LEDOffSemaphore,0);
 
      // Turn off blue LED
      LEDs_Off(LED_BLUE);
