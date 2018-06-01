@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+  Copyright : 2012 Freescale, Inc. All Rights Reserved.
+
+  This configuration file is a standard interchange file that's format is maintained
+  by Freescale, Inc. The configuration file is a derivative work
+  of the Processor Expert Software technology licensed for use by customers
+  as defined as SOFTWARE in the product's End User License Agreement. This file
+  and format are free to use and distribute for read-only purposes. You do not have
+  the right to create these files or modify this format or use for any purposes other
+  than interchange with the Processor Expert Software technology.
+
+  THIS SOFTWARE IS PROVIDED "AS IS".
+
+  NO WARRANTIES, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT NOT
+  LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE APPLY TO THIS SOFTWARE. IN NO EVENT WILL FREESCALE BE LIABLE, WHETHER
+  IN CONTRACT, TORT, OR OTHERWISE, FOR ANY INCIDENTAL, SPECIAL, INDIRECT,
+  CONSEQUENTIAL OR PUNITIVE DAMAGES, INCLUDING, BUT NOT LIMITED TO, DAMAGES FOR
+  ANY LOSS OF USE, LOSS OF TIME, INCONVENIENCE, COMMERCIAL LOSS, OR LOST PROFITS,
+  SAVINGS, OR REVENUES TO THE FULL EXTENT SUCH MAY BE DISCLAIMED BY LAW.
+
+-->
+<export xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ProjectInfoDescription.xsd">
+  <PROCESSOR>
+    <DeviceID>MK70FN1M0xxx12</DeviceID>
+    <CoreNum>1</CoreNum>
+    <Cores>
+      <Core>
+        <CoreSet>Cortex-M4</CoreSet>
+      </Core>
+    </Cores>
+    <SRAMsize>128k</SRAMsize>
+    <FLASHsize>1M</FLASHsize>
+  </PROCESSOR>
+  <PATHS>
+    <LinkerCommandFile>D:\es18aut13\Lab2\Project_Settings\Linker_Files\ProcessorExpert.ld</LinkerCommandFile>
+    <IncludePaths>
+      <Path>D:\es18aut13\Lab2\Static_Code\PDD\</Path>
+      <Path>D:\es18aut13\Lab2\Static_Code\IO_Map\</Path>
+      <Path>D:\es18aut13\Lab2\Sources\</Path>
+      <Path>D:\es18aut13\Lab2\Generated_Code\</Path>
+    </IncludePaths>
+    <SourceCodePaths>
+      <Path>D:\es18aut13\Lab2\Generated_Code\</Path>
+      <Path>D:\es18aut13\Lab2\Project_Settings\Startup_Code\</Path>
+      <Path>D:\es18aut13\Lab2\Sources\</Path>
+    </SourceCodePaths>
+  </PATHS>
+  <FILES>
+    <GeneratedCs>
+      <PathName>D:\es18aut13\Lab2\Generated_Code\Cpu.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Generated_Code\PE_LDD.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Generated_Code\Vectors.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Project_Settings\Startup_Code\startup.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\Events.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\FIFO.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\Flash.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\LEDs.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\UART.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\main.c</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\packet.c</PathName>
+    </GeneratedCs>
+    <GeneratedHs>
+      <PathName>D:\es18aut13\Lab2\Generated_Code\Cpu.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Generated_Code\IO_Map.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Generated_Code\PE_Const.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Generated_Code\PE_Error.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Generated_Code\PE_LDD.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Generated_Code\PE_Types.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\Events.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\FIFO.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\Flash.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\LEDs.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\UART.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\packet.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Sources\types.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Static_Code\IO_Map\MK70F12.h</PathName>
+      <PathName>D:\es18aut13\Lab2\Static_Code\PDD\PDD_Types.h</PathName>
+    </GeneratedHs>
+  </FILES>
+  <OPTIONS>
+  </OPTIONS>
+</export>
