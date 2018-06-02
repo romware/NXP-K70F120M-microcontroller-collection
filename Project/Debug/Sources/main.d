@@ -12,7 +12,9 @@ Sources/main.o: ../Sources/main.c ../Sources/types.h \
  D:/Embedded\ Software/es18aut13/Project/Generated_Code/IO_Map.h \
  ../Sources/LEDs.h ../Sources/UART.h ../Sources/FIFO.h \
  ../Sources/packet.h ../Sources/Flash.h ../Sources/PIT.h ../Sources/FTM.h \
- ../Sources/RTC.h ../Sources/accel.h ../Sources/I2C.h ../Sources/median.h
+ ../Sources/RTC.h ../Sources/accel.h ../Sources/I2C.h ../Sources/median.h \
+ D:\Embedded\ Software\es18aut13\Project\Library/analog.h \
+ D:/Embedded\ Software/es18aut13/Project/Sources/types.h
 
 ../Sources/types.h:
 
@@ -61,3 +63,7 @@ D:/Embedded\ Software/es18aut13/Project/Generated_Code/IO_Map.h:
 ../Sources/I2C.h:
 
 ../Sources/median.h:
+
+D:\Embedded\ Software\es18aut13\Project\Library/analog.h:
+
+D:/Embedded\ Software/es18aut13/Project/Sources/types.h:

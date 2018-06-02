@@ -5,7 +5,9 @@ Sources/PIT.o: ../Sources/PIT.c ../Sources/PIT.h ../Sources/types.h \
  D:/Embedded\ Software/es18aut13/Project/Generated_Code/PE_Types.h \
  D:/Embedded\ Software/es18aut13/Project/Generated_Code/PE_Error.h \
  D:/Embedded\ Software/es18aut13/Project/Generated_Code/PE_Const.h \
- D:/Embedded\ Software/es18aut13/Project/Generated_Code/IO_Map.h
+ D:/Embedded\ Software/es18aut13/Project/Generated_Code/IO_Map.h \
+ D:\Embedded\ Software\es18aut13\Project\Library/analog.h \
+ D:/Embedded\ Software/es18aut13/Project/Sources/types.h
 
 ../Sources/PIT.h:
 
@@ -24,3 +26,7 @@ D:/Embedded\ Software/es18aut13/Project/Generated_Code/PE_Error.h:
 D:/Embedded\ Software/es18aut13/Project/Generated_Code/PE_Const.h:
 
 D:/Embedded\ Software/es18aut13/Project/Generated_Code/IO_Map.h:
+
+D:\Embedded\ Software\es18aut13\Project\Library/analog.h:
+
+D:/Embedded\ Software/es18aut13/Project/Sources/types.h:

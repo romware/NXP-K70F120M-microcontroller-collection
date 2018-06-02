@@ -14,6 +14,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define ADC_BUFFER_SIZE 64
+
 // Unions to efficiently access hi and lo parts of integers and words
 typedef union
 {
@@ -67,5 +69,11 @@ typedef union
     uint16union_t dHi;
   } dParts;
 } TFloat;
+
+typedef struct
+{
+  int16_t ADC_Data[ADC_BUFFER_SIZE];
+  uint8_t LatestData;
+}TVoltageData;
 
 #endif

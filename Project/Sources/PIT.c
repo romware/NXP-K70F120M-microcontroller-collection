@@ -16,6 +16,12 @@
 #include "PIT.h"
 #include "MK70F12.h"
 #include "Cpu.h"
+#include "analog.h"
+
+extern TVoltageData VoltageSamples[3];
+extern OS_ECB* NewADCDataSemaphore;
+
+#define NB_ANALOG_CHANNELS 3        //TODO: How to share with file properly
 
 static uint32_t ModuleClk;          /*!< Module Clock */
 static OS_ECB* UserSemaphore;       /*!< User semaphore for PIT */
@@ -131,7 +137,19 @@ void __attribute__ ((interrupt)) PIT_ISR(void)
   PIT_TFLG0 = PIT_TFLG_TIF_MASK;
 
   // Signal user semaphore
-  OS_SemaphoreSignal(UserSemaphore);
+  //OS_SemaphoreSignal(UserSemaphore);
+
+  for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
+  {
+    Analog_Get(i, &(VoltageSamples[i].ADC_Data[VoltageSamples[i].LatestData]));
+    VoltageSamples[i].LatestData++;
+    if(VoltageSamples[i].LatestData = ADC_BUFFER_SIZE)
+    {
+      VoltageSamples[i].LatestData = 0;
+    }
+  }
+
+  OS_SemaphoreSignal(NewADCDataSemaphore);
 
   // Notify RTOS of exit of ISR
   OS_ISRExit();
