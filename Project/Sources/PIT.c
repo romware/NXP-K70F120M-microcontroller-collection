@@ -19,7 +19,6 @@
 #include "analog.h"
 
 extern TVoltageData VoltageSamples[3];
-extern OS_ECB* NewADCDataSemaphore;
 
 #define NB_ANALOG_CHANNELS 3        //TODO: How to share with file properly
 
@@ -149,7 +148,7 @@ void __attribute__ ((interrupt)) PIT_ISR(void)
     }
   }
 
-  OS_SemaphoreSignal(NewADCDataSemaphore);
+  OS_SemaphoreSignal(UserSemaphore);
 
   // Notify RTOS of exit of ISR
   OS_ISRExit();

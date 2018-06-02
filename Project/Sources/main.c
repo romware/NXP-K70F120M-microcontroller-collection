@@ -94,7 +94,7 @@ static OS_ECB* LEDOffSemaphore;                          /*!< LED off semaphore 
 //static OS_ECB* ReadCompleteSemaphore;           /*!< Read complete semaphore for accel */
 static OS_ECB* RTCReadSemaphore;                /*!< Read semaphore for RTC */
 
-OS_ECB* NewADCDataSemaphore;
+static OS_ECB* NewADCDataSemaphore;
 
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Tower Init thread. */
@@ -332,7 +332,8 @@ bool TowerInit(void)
 //  accelSetup.dataReadySemaphore    = DataReadySemaphore;
 //  accelSetup.readCompleteSemaphore = ReadCompleteSemaphore;
 
-  if (Flash_Init() &&  LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init() && RTC_Init(RTCReadSemaphore) && Analog_Init(CPU_BUS_CLK_HZ)/*&& Accel_Init(&accelSetup)*/)
+  if (Flash_Init() &&  LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init() &&
+      RTC_Init(RTCReadSemaphore) && Analog_Init(CPU_BUS_CLK_HZ && PIT_Init(CPU_BUS_CLK_HZ, NewADCDataSemaphore))/*&& Accel_Init(&accelSetup)*/)
   {
     success = true;
 
@@ -386,7 +387,7 @@ static void InitModulesThread(void* pData)
 {
   // Create semaphores for threads
   LEDOffSemaphore = OS_SemaphoreCreate(0);
-  //DataReadySemaphore = OS_SemaphoreCreate(0);
+  NewADCDataSemaphore = OS_SemaphoreCreate(0);
   //ReadCompleteSemaphore = OS_SemaphoreCreate(0);
   RTCReadSemaphore = OS_SemaphoreCreate(0);
 
@@ -400,8 +401,8 @@ static void InitModulesThread(void* pData)
   // Send startup packets to PC
   HandleTowerStartup();
 
-  PIT_Set((uint32_t)1000000000/(ADC_DEFAULT_FREQUENCY * ADC_SAMPLES_PER_CYCLE), false);
-
+  PIT_Set((uint32_t)1250000000/*1000000000/(ADC_DEFAULT_FREQUENCY * ADC_SAMPLES_PER_CYCLE)*/, false);
+  PIT_Enable(true);
   // We only do this once - therefore delete this thread
   OS_ThreadDelete(OS_PRIORITY_SELF);
 }
@@ -482,6 +483,7 @@ float GetRMS(TVoltageData Data, uint8_t DataSize)
 static void ADCDataProcessThread(void* pData)
 {
   float RMS[NB_ANALOG_CHANNELS];
+  uint16_t wait = 0;
   for (;;)
   {
     // Wait for RTCRead semaphore
@@ -492,6 +494,14 @@ static void ADCDataProcessThread(void* pData)
       RMS[i] = GetRMS(VoltageSamples[i], ADC_BUFFER_SIZE);
     }
 
+    wait++;
+    if(wait >= 400)
+    {
+      wait = 0;
+      uint16union_t send;
+      send.l = (uint16_t)RMS[0];
+      Packet_Put(0x18, 1, send.s.Hi, send.s.Lo);
+    }
 
   }
 }
