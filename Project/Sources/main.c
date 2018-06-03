@@ -333,7 +333,7 @@ bool TowerInit(void)
 //  accelSetup.readCompleteSemaphore = ReadCompleteSemaphore;
 
   if (Flash_Init() &&  LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init() &&
-      RTC_Init(RTCReadSemaphore) && Analog_Init(CPU_BUS_CLK_HZ && PIT_Init(CPU_BUS_CLK_HZ, NewADCDataSemaphore))/*&& Accel_Init(&accelSetup)*/)
+      RTC_Init(RTCReadSemaphore) && Analog_Init(CPU_BUS_CLK_HZ) && PIT_Init(CPU_BUS_CLK_HZ, NewADCDataSemaphore)/*&& Accel_Init(&accelSetup)*/)
   {
     success = true;
 
@@ -401,7 +401,7 @@ static void InitModulesThread(void* pData)
   // Send startup packets to PC
   HandleTowerStartup();
 
-  PIT_Set((uint32_t)1250000000/*1000000000/(ADC_DEFAULT_FREQUENCY * ADC_SAMPLES_PER_CYCLE)*/, false);
+  PIT_Set((uint32_t)1250000/*1000000000/(ADC_DEFAULT_FREQUENCY * ADC_SAMPLES_PER_CYCLE)*/, false);
   PIT_Enable(true);
   // We only do this once - therefore delete this thread
   OS_ThreadDelete(OS_PRIORITY_SELF);
@@ -470,11 +470,13 @@ static void RTCThread(void* pData)
 
 float GetRMS(TVoltageData Data, uint8_t DataSize)
 {
-  uint32_t sum = 0;
+  int16_t test = 0;
+  float sum = 0;
   float  averageOfSquares = 0;
   for (uint8_t i = 0; i < ADC_BUFFER_SIZE; i++)
   {
-    sum += (Data.ADC_Data[i])^2;
+    test = Data.ADC_Data[i];
+    sum += (float)(Data.ADC_Data[i]) * (Data.ADC_Data[i]);
   }
   averageOfSquares = sum / ADC_BUFFER_SIZE;
   return (float)sqrtf(averageOfSquares);
@@ -489,17 +491,17 @@ static void ADCDataProcessThread(void* pData)
     // Wait for RTCRead semaphore
     OS_SemaphoreWait(NewADCDataSemaphore,0);
 
-    for(uint8_t i = 0; i < ADC_BUFFER_SIZE; i++)
+    for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
     {
       RMS[i] = GetRMS(VoltageSamples[i], ADC_BUFFER_SIZE);
     }
 
     wait++;
-    if(wait >= 400)
+    if(wait >= 800)
     {
       wait = 0;
       uint16union_t send;
-      send.l = (uint16_t)RMS[0];
+      send.l = (uint16_t)RMS[1];
       Packet_Put(0x18, 1, send.s.Hi, send.s.Lo);
     }
 

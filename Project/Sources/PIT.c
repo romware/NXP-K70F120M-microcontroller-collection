@@ -135,19 +135,16 @@ void __attribute__ ((interrupt)) PIT_ISR(void)
   // Clear the timer interrupt flag (W1C)
   PIT_TFLG0 = PIT_TFLG_TIF_MASK;
 
-  // Signal user semaphore
-  //OS_SemaphoreSignal(UserSemaphore);
-
   for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
   {
-    Analog_Get(i, &(VoltageSamples[i].ADC_Data[VoltageSamples[i].LatestData]));
+    Analog_Get(i, (int16_t*)(&(VoltageSamples[i].ADC_Data[VoltageSamples[i].LatestData])));
     VoltageSamples[i].LatestData++;
-    if(VoltageSamples[i].LatestData = ADC_BUFFER_SIZE)
+    if(VoltageSamples[i].LatestData == ADC_BUFFER_SIZE)
     {
       VoltageSamples[i].LatestData = 0;
     }
   }
-
+  // Signal user semaphore
   OS_SemaphoreSignal(UserSemaphore);
 
   // Notify RTOS of exit of ISR
