@@ -56,7 +56,7 @@
 
 #define BAUD_RATE 115200                        /*!< UART2 Baud Rate */
 
-#define ADC_SAMPLES_PER_CYCLE 16                /*!< ADC samples per cycle */
+#define ADC_SAMPLES_PER_CYCLE 32                /*!< ADC samples per cycle */
 
 #define NB_ANALOG_CHANNELS 3
 
@@ -401,7 +401,7 @@ static void InitModulesThread(void* pData)
   // Send startup packets to PC
   HandleTowerStartup();
 
-  PIT_Set((uint32_t)1250000/*1000000000/(ADC_DEFAULT_FREQUENCY * ADC_SAMPLES_PER_CYCLE)*/, false);
+  PIT_Set((uint32_t)1000000000/(ADC_DEFAULT_FREQUENCY * ADC_SAMPLES_PER_CYCLE), false);
   PIT_Enable(true);
   // We only do this once - therefore delete this thread
   OS_ThreadDelete(OS_PRIORITY_SELF);
@@ -470,15 +470,13 @@ static void RTCThread(void* pData)
 
 float GetRMS(TVoltageData Data, uint8_t DataSize)
 {
-  int16_t test = 0;
   float sum = 0;
-  float  averageOfSquares = 0;
-  for (uint8_t i = 0; i < ADC_BUFFER_SIZE; i++)
+  float  averageOfSquares;
+  for (uint8_t i = 0; i < DataSize; i++)
   {
-    test = Data.ADC_Data[i];
-    sum += (float)(Data.ADC_Data[i]) * (Data.ADC_Data[i]);
+    sum += (Data.ADC_Data[i]) * (Data.ADC_Data[i]);
   }
-  averageOfSquares = sum / ADC_BUFFER_SIZE;
+  averageOfSquares = sum / DataSize;
   return (float)sqrtf(averageOfSquares);
 }
 
@@ -497,12 +495,16 @@ static void ADCDataProcessThread(void* pData)
     }
 
     wait++;
-    if(wait >= 800)
+    if(wait >= 1600)
     {
       wait = 0;
       uint16union_t send;
-      send.l = (uint16_t)RMS[1];
+      send.l = (uint16_t)RMS[0];
       Packet_Put(0x18, 1, send.s.Hi, send.s.Lo);
+      send.l = (uint16_t)RMS[1];
+      Packet_Put(0x18, 2, send.s.Hi, send.s.Lo);
+      send.l = (uint16_t)RMS[2];
+      Packet_Put(0x18, 3, send.s.Hi, send.s.Lo);
     }
 
   }

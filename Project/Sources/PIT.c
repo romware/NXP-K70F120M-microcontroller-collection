@@ -137,7 +137,7 @@ void __attribute__ ((interrupt)) PIT_ISR(void)
 
   for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
   {
-    Analog_Get(i, (int16_t*)(&(VoltageSamples[i].ADC_Data[VoltageSamples[i].LatestData])));
+    Analog_Get(i, &(VoltageSamples[i].ADC_Data[VoltageSamples[i].LatestData]));
     VoltageSamples[i].LatestData++;
     if(VoltageSamples[i].LatestData == ADC_BUFFER_SIZE)
     {
