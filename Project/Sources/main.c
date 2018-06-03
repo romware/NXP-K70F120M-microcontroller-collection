@@ -472,12 +472,49 @@ float GetRMS(TVoltageData Data, uint8_t DataSize)
 {
   float sum = 0;
   float  averageOfSquares;
-  for (uint8_t i = 0; i < DataSize; i++)
+  for (uint8_t i = 0; i < DataSize; i ++)
   {
     sum += (Data.ADC_Data[i]) * (Data.ADC_Data[i]);
   }
   averageOfSquares = sum / DataSize;
   return (float)sqrtf(averageOfSquares);
+}
+
+float GetFrequency(TVoltageData Data, uint8_t DataSize)
+{
+  // Array to store calculated crossings.
+  float crossings[2 * (ADC_BUFFER_SIZE / ADC_SAMPLES_PER_CYCLE)];
+  uint8_t count = 0;
+
+  for(uint8_t i = 0; i < ADC_BUFFER_SIZE; i ++)
+  {
+    // Check for crossing
+    if((Data.ADC_Data[i] >= 0) && (Data.ADC_Data[i-1] <= 0) || (Data.ADC_Data[i] <= 0) && (Data.ADC_Data[i-1] >= 0))
+    {
+      // Calculate accurate crossing and store in array
+      crossings[count] = (float)(i + (Data.ADC_Data[i] / (Data.ADC_Data[i] - Data.ADC_Data[i -1])));
+      count ++;
+    }
+  }
+
+  // Check for crossing between ends of sample array
+  if((Data.ADC_Data[0] >= 0) && (Data.ADC_Data[ADC_BUFFER_SIZE-1] <= 0) || (Data.ADC_Data[0] <= 0) && (Data.ADC_Data[ADC_BUFFER_SIZE-1] >= 0))
+  {
+    crossings[count] = (float)((ADC_BUFFER_SIZE - 1) + (Data.ADC_Data[ADC_BUFFER_SIZE] / (Data.ADC_Data[ADC_BUFFER_SIZE] - Data.ADC_Data[ADC_BUFFER_SIZE -1])));
+    count ++;
+  }
+
+  // Calculate mean units (representing a time period) between crossings
+  float sum = 0;
+  float mean;
+  for(uint8_t i = count; i > 0; i --)
+  {
+    sum += (crossings[i] - crossings[i -1]);
+  }
+  mean = sum / (count - 1);
+
+  // Return value as frequency
+  return (50 * 2 * mean) / ADC_SAMPLES_PER_CYCLE;   // TODO: Pass in actual last used frequency and calculate from that
 }
 
 static void ADCDataProcessThread(void* pData)
