@@ -483,35 +483,35 @@ float GetRMS(TVoltageData Data, uint8_t DataSize)
 float GetFrequency(TVoltageData Data, uint8_t DataSize)
 {
   // Array to store calculated crossings.
-  float crossings[2 * (ADC_BUFFER_SIZE / ADC_SAMPLES_PER_CYCLE)];
+  float crossings[10/*2 * (DataSize / ADC_SAMPLES_PER_CYCLE)*/];
   uint8_t count = 0;
 
-  for(uint8_t i = 0; i < ADC_BUFFER_SIZE; i ++)
+  for(uint8_t i = 0; i < DataSize; i ++)
   {
     // Check for crossing
-    if((Data.ADC_Data[i] >= 0) && (Data.ADC_Data[i-1] <= 0) || (Data.ADC_Data[i] <= 0) && (Data.ADC_Data[i-1] >= 0))
+    if(((Data.ADC_Data[i] > 0) && (Data.ADC_Data[i + 1] < 0)) || ((Data.ADC_Data[i] < 0) && (Data.ADC_Data[i + 1] > 0)))
     {
       // Calculate accurate crossing and store in array
-      crossings[count] = (float)(i + (Data.ADC_Data[i] / (Data.ADC_Data[i] - Data.ADC_Data[i -1])));
+      crossings[count] = (float)(i + ((- Data.ADC_Data[i]) / (Data.ADC_Data[i + 1] - Data.ADC_Data[i])));
       count ++;
     }
   }
 
-  // Check for crossing between ends of sample array
-  if((Data.ADC_Data[0] >= 0) && (Data.ADC_Data[ADC_BUFFER_SIZE-1] <= 0) || (Data.ADC_Data[0] <= 0) && (Data.ADC_Data[ADC_BUFFER_SIZE-1] >= 0))
-  {
-    crossings[count] = (float)((ADC_BUFFER_SIZE - 1) + (Data.ADC_Data[ADC_BUFFER_SIZE] / (Data.ADC_Data[ADC_BUFFER_SIZE] - Data.ADC_Data[ADC_BUFFER_SIZE -1])));
-    count ++;
-  }
+//  // Check for crossing between ends of sample array
+//  if(((Data.ADC_Data[0] > 0) && (Data.ADC_Data[DataSize-1] < 0)) || ((Data.ADC_Data[0] < 0) && (Data.ADC_Data[DataSize-1] > 0)))
+//  {
+//    crossings[count] = (float)((DataSize - 1) + (- (Data.ADC_Data[DataSize]) / (Data.ADC_Data[DataSize] - Data.ADC_Data[DataSize -1])));
+//    count ++;
+//  }
 
   // Calculate mean units (representing a time period) between crossings
   float sum = 0;
   float mean;
   for(uint8_t i = count; i > 0; i --)
   {
-    sum += (crossings[i] - crossings[i -1]);
+    sum += (float)((crossings[i + 1] - crossings[i]));
   }
-  mean = sum / (count - 1);
+  mean = (float)(sum / (count - 1));
 
   // Return value as frequency
   return (50 * 2 * mean) / ADC_SAMPLES_PER_CYCLE;   // TODO: Pass in actual last used frequency and calculate from that
@@ -521,6 +521,9 @@ static void ADCDataProcessThread(void* pData)
 {
   float RMS[NB_ANALOG_CHANNELS];
   uint16_t wait = 0;
+  uint16_t waitFreq = 2 * ADC_BUFFER_SIZE;
+  float freq;
+  float freqTest;
   for (;;)
   {
     // Wait for RTCRead semaphore
@@ -542,6 +545,12 @@ static void ADCDataProcessThread(void* pData)
       Packet_Put(0x18, 2, send.s.Hi, send.s.Lo);
       send.l = (uint16_t)RMS[2];
       Packet_Put(0x18, 3, send.s.Hi, send.s.Lo);
+    }
+    waitFreq --;
+    if(RMS[0 > 5243] && (waitFreq == 0))
+    {
+      freq = GetFrequency(VoltageSamples[0], ADC_BUFFER_SIZE);
+      freqTest = freq;
     }
 
   }
