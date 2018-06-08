@@ -142,10 +142,11 @@ void __attribute__ ((interrupt)) PIT_ISR(void)
     if(VoltageSamples[i].LatestData == ADC_BUFFER_SIZE)
     {
       VoltageSamples[i].LatestData = 0;
+      // Signal user semaphore
+      OS_SemaphoreSignal(UserSemaphore);
     }
   }
-  // Signal user semaphore
-  OS_SemaphoreSignal(UserSemaphore);
+
 
   // Notify RTOS of exit of ISR
   OS_ISRExit();
