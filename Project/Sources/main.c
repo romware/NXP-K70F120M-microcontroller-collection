@@ -65,9 +65,23 @@ const uint8_t COMMAND_MODE        = 0x0D;       /*!< The serial command byte for
 const uint8_t COMMAND_TIME        = 0x0C;       /*!< The serial command byte for tower time */
 const uint8_t COMMAND_PROTOCOL    = 0x0A;       /*!< The serial command byte for tower protocol */
 const uint8_t COMMAND_ACCEL       = 0x10;       /*!< The serial command byte for tower accelerometer */
+const uint8_t COMMAND_TIMING      = 0x10;       /*!< The serial command byte for tower timing */
+const uint8_t COMMAND_RAISES      = 0x11;       /*!< The serial command byte for tower raises */
+const uint8_t COMMAND_LOWERS      = 0x12;       /*!< The serial command byte for tower lowers */
+const uint8_t COMMAND_FREQUENCY   = 0x17;       /*!< The serial command byte for tower frequency */
+const uint8_t COMMAND_VOLTAGE     = 0x18;       /*!< The serial command byte for tower voltage */
+const uint8_t COMMAND_SPECTRUM    = 0x19;       /*!< The serial command byte for tower spectrum */
 
 const uint8_t PARAM_GET           = 1;          /*!< Get bit of packet parameter 1 */
 const uint8_t PARAM_SET           = 2;          /*!< Set bit of packet parameter 1 */
+
+const uint8_t VRR_GET             = 1;          /*!< Get bit of packet parameter 1 */
+const uint8_t VRR_DEFINITE        = 1;          /*!< Definite bit of packet parameter 1 */
+const uint8_t VRR_INVERSE         = 2;          /*!< Inverse bit of packet parameter 1 */
+const uint8_t VRR_RESET           = 1;          /*!< Reset bit of packet parameter 1 */
+const uint8_t VRR_PHASE_A         = 2;          /*!< Phase A bit of packet parameter 1 */
+const uint8_t VRR_PHASE_B         = 2;          /*!< Phase B bit of packet parameter 1 */
+const uint8_t VRR_PHASE_C         = 2;          /*!< Phase C bit of packet parameter 1 */
 
 const uint8_t TOWER_VER_MAJ       = 1;          /*!< Tower major version */
 const uint8_t TOWER_VER_MIN       = 0;          /*!< Tower minor version */
@@ -78,7 +92,7 @@ volatile uint8_t* NvTowerPo;                    /*!< Tower protocol pointer to f
 
 static uint8_t AccelNewData[3];                 /*!< Latest XYZ readings from accelerometer */
 
-static OS_ECB* LEDOffSemaphore;                          /*!< LED off semaphore for FTM */
+static OS_ECB* LEDOffSemaphore;                 /*!< LED off semaphore for FTM */
 static OS_ECB* DataReadySemaphore;              /*!< Data ready semaphore for accel */
 static OS_ECB* ReadCompleteSemaphore;           /*!< Read complete semaphore for accel */
 static OS_ECB* RTCReadSemaphore;                /*!< Read semaphore for RTC */
@@ -216,7 +230,7 @@ bool HandleTowerSetTime(void)
  */
 bool HandleTowerProtocol(void)
 {
-  // Check if parameters match tower mode GET or SET parameters
+  // Check if parameters match tower protocol GET or SET parameters
   if(Packet_Parameter1 == PARAM_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Sends the tower protocol packet
@@ -228,6 +242,116 @@ bool HandleTowerProtocol(void)
     Accel_SetMode(Packet_Parameter2);
     return Flash_Write8((uint8_t*)NvTowerPo,(uint8_t)Packet_Parameter2);
   }
+  return false;
+}
+
+/*! @brief Sets the tower timing mode or sends the packet to the PC
+ *
+ *  @return bool - TRUE if packet is sent or timing mode is set
+ */
+bool HandleTowerTiming(void)
+{
+  // Check if parameters match tower timing GET, DEFINITE or INVERSE parameters
+  if(Packet_Parameter1 == VRR_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Sends the tower timing mode packet
+  }
+  else if(Packet_Parameter1 == VRR_DEFINITE && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Sends the tower timing mode packet
+  }
+  else if(Packet_Parameter1 == VRR_INVERSE && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Sends the tower timing mode packet
+  }
+  return false;
+}
+
+/*! @brief Resets the number of raises or sends the packet to the PC
+ *
+ *  @return bool - TRUE if packet is sent or number of raises is reset
+ */
+bool HandleTowerRaises(void)
+{
+  // Check if parameters match tower raises GET or RESET parameters
+  if(Packet_Parameter1 == VRR_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Sends the number of raises packet
+  }
+  else if(Packet_Parameter1 == VRR_RESET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Resets the number of raises
+  }
+  return false;
+}
+
+/*! @brief Resets the number of lowers or sends the packet to the PC
+ *
+ *  @return bool - TRUE if packet is sent or number of lowers is reset
+ */
+bool HandleTowerLowers(void)
+{
+  // Check if parameters match tower lowers GET or RESET parameters
+  if(Packet_Parameter1 == VRR_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Sends the number of lowers packet
+  }
+  else if(Packet_Parameter1 == VRR_RESET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Resets the number of lowers
+  }
+  return false;
+}
+
+/*! @brief Sets the tower frequency packet to the PC
+ *
+ *  @return bool - TRUE if frequency is set
+ */
+bool HandleTowerFrequency(void)
+{
+  // Check if parameters frequency low byte and high byte is valid
+
+  return false;
+}
+
+/*! @brief Sets the tower voltage
+ *
+ *  @return bool - TRUE if voltage is set
+ */
+bool HandleTowerVoltage(void)
+{
+  // Check half word
+
+  // Check if parameters match phase A, B or C
+  if(Packet_Parameter1 == VRR_PHASE_A)
+  {
+    // Sends the tower voltage packet
+  }
+  else if(Packet_Parameter1 == VRR_PHASE_B)
+  {
+    // Sends the tower voltage packet
+  }
+  else if(Packet_Parameter1 == VRR_PHASE_C)
+  {
+    // Sends the tower voltage packet
+  }
+  return false;
+}
+
+/*! @brief Sets the tower spectrum
+ *
+ *  @return bool - TRUE if spectrum is set
+ */
+bool HandleTowerSpectrum(void)
+{
+  // Check half word
+
+  // Check if harmonic number is between 0 and 7
+  if(Packet_Parameter1 >= 0 && Packet_Parameter1 <= 7)
+  {
+    // Sends the spectrum packet
+  }
+
   return false;
 }
 
@@ -281,6 +405,36 @@ void ReceivedPacket(void)
   {
     // Check if parameters match tower protocol GET or SET parameters
     success = HandleTowerProtocol();
+  }
+  else if(commandIgnoreAck == COMMAND_TIMING)
+  {
+    // Check if parameters match tower timing GET, DEFINITE or INVERSE parameters
+    success = HandleTowerTiming();
+  }
+  else if(commandIgnoreAck == COMMAND_RAISES)
+  {
+    // Check if parameters match number of raises GET or RESET parameters
+    success = HandleTowerRaises();
+  }
+  else if(commandIgnoreAck == COMMAND_LOWERS)
+  {
+    // Check if parameters match number of lowers GET or RESET parameters
+    success = HandleTowerLowers();
+  }
+  else if(commandIgnoreAck == COMMAND_FREQUENCY)
+  {
+    // Send the tower frequency packet
+    success = HandleTowerFrequency();
+  }
+  else if(commandIgnoreAck == COMMAND_VOLTAGE)
+  {
+    // Send the tower voltage packet for phase A, B or C
+    success = HandleTowerVoltage();
+  }
+  else if(commandIgnoreAck == COMMAND_SPECTRUM)
+  {
+    // Send the tower spectrum packet
+    success = HandleTowerSpectrum();
   }
 
   // AND the packet command byte with the ACK MASK to check if ACK is requested
