@@ -65,6 +65,7 @@ const uint8_t COMMAND_MODE        = 0x0D;       /*!< The serial command byte for
 const uint8_t COMMAND_TIME        = 0x0C;       /*!< The serial command byte for tower time */
 const uint8_t COMMAND_PROTOCOL    = 0x0A;       /*!< The serial command byte for tower protocol */
 const uint8_t COMMAND_ACCEL       = 0x10;       /*!< The serial command byte for tower accelerometer */
+
 const uint8_t COMMAND_TIMING      = 0x10;       /*!< The serial command byte for tower timing */
 const uint8_t COMMAND_RAISES      = 0x11;       /*!< The serial command byte for tower raises */
 const uint8_t COMMAND_LOWERS      = 0x12;       /*!< The serial command byte for tower lowers */
@@ -75,13 +76,13 @@ const uint8_t COMMAND_SPECTRUM    = 0x19;       /*!< The serial command byte for
 const uint8_t PARAM_GET           = 1;          /*!< Get bit of packet parameter 1 */
 const uint8_t PARAM_SET           = 2;          /*!< Set bit of packet parameter 1 */
 
-const uint8_t VRR_GET             = 1;          /*!< Get bit of packet parameter 1 */
+const uint8_t VRR_GET             = 0;          /*!< Get bit of packet parameter 1 */
 const uint8_t VRR_DEFINITE        = 1;          /*!< Definite bit of packet parameter 1 */
 const uint8_t VRR_INVERSE         = 2;          /*!< Inverse bit of packet parameter 1 */
 const uint8_t VRR_RESET           = 1;          /*!< Reset bit of packet parameter 1 */
-const uint8_t VRR_PHASE_A         = 2;          /*!< Phase A bit of packet parameter 1 */
+const uint8_t VRR_PHASE_A         = 1;          /*!< Phase A bit of packet parameter 1 */
 const uint8_t VRR_PHASE_B         = 2;          /*!< Phase B bit of packet parameter 1 */
-const uint8_t VRR_PHASE_C         = 2;          /*!< Phase C bit of packet parameter 1 */
+const uint8_t VRR_PHASE_C         = 3;          /*!< Phase C bit of packet parameter 1 */
 
 const uint8_t TOWER_VER_MAJ       = 1;          /*!< Tower major version */
 const uint8_t TOWER_VER_MIN       = 0;          /*!< Tower minor version */
@@ -708,12 +709,11 @@ int main(void)
   // Initialize the RTOS
   OS_Init(CPU_CORE_CLK_HZ, false);
 
-
   // Highest priority
   error = OS_ThreadCreate(InitModulesThread,
-			  NULL,
+                          NULL,
                           &InitModulesThreadStack[THREAD_STACK_SIZE - 1],
-  		          0);
+  		                    0);
   // 3rd Highest priority
   error = OS_ThreadCreate(AccelReadCompleteThread,
                           NULL,
@@ -726,7 +726,7 @@ int main(void)
                           4);
   // 5th Highest priority
   error = OS_ThreadCreate(PacketThread,
-			  NULL,
+                          NULL,
                           &PacketThreadStack[THREAD_STACK_SIZE - 1],
                           5);
   // 6th Highest priority
@@ -739,8 +739,6 @@ int main(void)
                           NULL,
                           &RTCThreadStack[THREAD_STACK_SIZE - 1],
                           7);
-
-
 
   // Start multithreading - never returns!
   OS_Start();
