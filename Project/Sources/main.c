@@ -71,7 +71,6 @@ const uint8_t COMMAND_PROGRAMBYTE = 0x07;       /*!< The serial command byte for
 const uint8_t COMMAND_READBYTE    = 0x08;       /*!< The serial command byte for tower read byte */
 const uint8_t COMMAND_MODE        = 0x0D;       /*!< The serial command byte for tower mode */
 const uint8_t COMMAND_TIME        = 0x0C;       /*!< The serial command byte for tower time */
-//const uint8_t COMMAND_PROTOCOL    = 0x0A;       /*!< The serial command byte for tower protocol */
 const uint8_t COMMAND_ACCEL       = 0x10;       /*!< The serial command byte for tower accelerometer */
 
 const uint8_t PARAM_GET           = 1;          /*!< Get bit of packet parameter 1 */
@@ -82,16 +81,12 @@ const uint8_t TOWER_VER_MIN       = 0;          /*!< Tower minor version */
 
 volatile uint16union_t* NvTowerNb;              /*!< Tower number union pointer to flash */
 volatile uint16union_t* NvTowerMd;              /*!< Tower mode union pointer to flash */
-//volatile uint8_t* NvTowerPo;                    /*!< Tower protocol pointer to flash */
 
-//static uint8_t AccelNewData[3];                 /*!< Latest XYZ readings from accelerometer */
 
 
 TVoltageData VoltageSamples[3];
 
 static OS_ECB* LEDOffSemaphore;                          /*!< LED off semaphore for FTM */
-//static OS_ECB* DataReadySemaphore;              /*!< Data ready semaphore for accel */
-//static OS_ECB* ReadCompleteSemaphore;           /*!< Read complete semaphore for accel */
 static OS_ECB* RTCReadSemaphore;                /*!< Read semaphore for RTC */
 
 static OS_ECB* NewADCDataSemaphore;
@@ -221,26 +216,6 @@ bool HandleTowerSetTime(void)
   return false;
 }
 
-/*! @brief Sets the tower protocol or sends the packet to the PC
- *
- *  @return bool - TRUE if packet is sent or protocol is set
- */
-//bool HandleTowerProtocol(void)
-//{
-//  // Check if parameters match tower mode GET or SET parameters
-//  if(Packet_Parameter1 == PARAM_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
-//  {
-//    // Sends the tower protocol packet
-//    return Packet_Put(COMMAND_PROTOCOL,PARAM_GET,_FB(NvTowerPo),0);
-//  }
-//  else if (Packet_Parameter1 == PARAM_SET && (Packet_Parameter2 == ACCEL_POLL || Packet_Parameter2 == ACCEL_INT) && Packet_Parameter3 == 0)
-//  {
-//    // Sets the tower protocol
-//    Accel_SetMode(Packet_Parameter2);
-//    return Flash_Write8((uint8_t*)NvTowerPo,(uint8_t)Packet_Parameter2);
-//  }
-//  return false;
-//}
 
 /*! @brief Executes the command depending on what packet has been received
  *
@@ -288,11 +263,6 @@ void ReceivedPacket(void)
     // Set the Real Time Clock time
     success = HandleTowerSetTime();
   }
-//  else if(commandIgnoreAck == COMMAND_PROTOCOL)
-//  {
-//    // Check if parameters match tower protocol GET or SET parameters
-//    success = HandleTowerProtocol();
-//  }
 
   // AND the packet command byte with the ACK MASK to check if ACK is requested
   if(commandAck)
@@ -327,11 +297,6 @@ bool TowerInit(void)
   // Success status of writing default values to Flash and FTM
   bool success = false;
 
-//  TAccelSetup accelSetup;          /*!< Accelerometer setup */
-//  accelSetup.moduleClk             = CPU_BUS_CLK_HZ;
-//  accelSetup.dataReadySemaphore    = DataReadySemaphore;
-//  accelSetup.readCompleteSemaphore = ReadCompleteSemaphore;
-
   if (Flash_Init() &&  LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init() &&
       RTC_Init(RTCReadSemaphore) && Analog_Init(CPU_BUS_CLK_HZ) && PIT_Init(CPU_BUS_CLK_HZ, NewADCDataSemaphore)/*&& Accel_Init(&accelSetup)*/)
   {
@@ -361,18 +326,6 @@ bool TowerInit(void)
           success = false;
         }
       }
-
-//      // Checks if tower protocol stored in flash is invalid or clear
-//      if((_FB(NvTowerPo) != (uint8_t)ACCEL_POLL) && (_FB(NvTowerPo) != (uint8_t)ACCEL_INT))
-//      {
-//        // Sets the tower protocol to the default protocol
-//        if(!Flash_Write8((uint8_t*)NvTowerPo,(uint8_t)ACCEL_POLL))
-//        {
-//          success = false;
-//        }
-//      }
-//
-//      Accel_SetMode(_FB(NvTowerPo));
     }
   }
   return success;
@@ -556,26 +509,22 @@ static void ADCDataProcessThread(void* pData)
       RMS[i] = GetRMS(VoltageSamples[i], ADC_BUFFER_SIZE);
     }
 
-    wait++;
-    if(wait >= 25)
-    {
-      wait = 0;
-      uint16union_t send;
-      send.l = (uint16_t)RMS[0];
-      Packet_Put(0x18, 1, send.s.Hi, send.s.Lo);
-      send.l = (uint16_t)RMS[1];
-      Packet_Put(0x18, 2, send.s.Hi, send.s.Lo);
-      send.l = (uint16_t)RMS[2];
-      Packet_Put(0x18, 3, send.s.Hi, send.s.Lo);
-    }
-    waitFreq --;
-    //TVoltageData test;
-    //test = VoltageSamples[0];
-    if(RMS[0 > 5243] && (waitFreq == 0))
+//    wait++;
+//    if(wait >= 25)
+//    {
+//      wait = 0;
+//      uint16union_t send;
+//      send.l = (uint16_t)RMS[0];
+//      Packet_Put(0x18, 1, send.s.Hi, send.s.Lo);
+//      send.l = (uint16_t)RMS[1];
+//      Packet_Put(0x18, 2, send.s.Hi, send.s.Lo);
+//      send.l = (uint16_t)RMS[2];
+//      Packet_Put(0x18, 3, send.s.Hi, send.s.Lo);
+//    }
+
+    if(RMS[0 > 5243])
     {
       freq = GetFrequency(VoltageSamples[0], ADC_BUFFER_SIZE);
-      lastFreq = freq;
-      waitFreq = 10;
 
       // Load new PIT period
       //PIT_Set((uint32_t)1000000000/((uint32_t)freq * ADC_SAMPLES_PER_CYCLE), false);
@@ -583,74 +532,6 @@ static void ADCDataProcessThread(void* pData)
   }
 }
 
-/*! @brief Calculates the median of recent accelerometer data and sends it to the PC
- *
- *  @param pData is not used but is required by the OS to create a thread.
- *  @note Assumes that I2C_Init has been called successfully.
- */
-//static void AccelReadCompleteThread(void* pData)
-//{
-//  for (;;)
-//  {
-//    // Wait until read is complete
-//    OS_SemaphoreWait(ReadCompleteSemaphore,0);
-//
-//    // Two dimensional array storing the 3 most recent X, Y and Z values
-//    static uint8_t recentData[3][3];
-//
-//    // Array storing the last send X, Y and Z values
-//    static uint8_t prevAccel[3];
-//
-//    // Shift the recent data up to append the latest accelerations
-//    for(uint8_t i = 0; i < 2; i++)
-//    {
-//      recentData[i][0] = recentData[i+1][0];
-//      recentData[i][1] = recentData[i+1][1];
-//      recentData[i][2] = recentData[i+1][2];
-//    }
-//    recentData[2][0] = AccelNewData[0];
-//    recentData[2][1] = AccelNewData[1];
-//    recentData[2][2] = AccelNewData[2];
-//
-//    // Find the median value of the three most recent values for X, Y and Z accelerations
-//    uint8_t medianX = Median_Filter3(recentData[0][0],recentData[1][0],recentData[2][0]);
-//    uint8_t medianY = Median_Filter3(recentData[0][1],recentData[1][1],recentData[2][1]);
-//    uint8_t medianZ = Median_Filter3(recentData[0][2],recentData[1][2],recentData[2][2]);
-//
-//    // Check if the data has changed
-//    if(medianX != prevAccel[0] || medianY != prevAccel[1] || medianZ != prevAccel[2] || _FB(NvTowerPo) == (uint8_t)ACCEL_INT)
-//    {
-//      // Send the filtered accelerations to the PC
-//      if(Packet_Put(COMMAND_ACCEL, medianX, medianY, medianZ))
-//      {
-//        // Toggle the green LED
-//        LEDs_Toggle(LED_GREEN);
-//      }
-//    }
-//
-//    // Update the previous acceleration
-//    prevAccel[0] = medianX;
-//    prevAccel[1] = medianY;
-//    prevAccel[2] = medianZ;
-//  }
-//}
-
-/*! @brief Reads acceleration values from the accelerometer
- *
- *  @param pData is not used but is required by the OS to create a thread.
- *  @note Assumes that accel_Init has been called successfully.
- */
-//static void AccelDataReadyThread(void* pData)
-//{
-//  for (;;)
-//  {
-//    // Wait until data is ready to be read
-//    OS_SemaphoreWait(DataReadySemaphore,0);
-//
-//    // Read data from the accelerometer
-//    Accel_ReadXYZ(AccelNewData);
-//  }
-//}
 
 /*! @brief Turns the Blue LED off after the timer is complete
  *
@@ -693,7 +574,7 @@ int main(void)
   error = OS_ThreadCreate(ADCDataProcessThread,
                           NULL,
                           &ADCDataProcessThreadStack[THREAD_STACK_SIZE - 1],
-                          3);
+                          4);
 //  // 4th Highest priority
 //  error = OS_ThreadCreate(AccelDataReadyThread,
 //                          NULL,
@@ -703,7 +584,7 @@ int main(void)
   error = OS_ThreadCreate(PacketThread,
 			  NULL,
                           &PacketThreadStack[THREAD_STACK_SIZE - 1],
-                          5);
+                          3);
   // 6th Highest priority
   error = OS_ThreadCreate(FTMLEDsOffThread,
                           NULL,

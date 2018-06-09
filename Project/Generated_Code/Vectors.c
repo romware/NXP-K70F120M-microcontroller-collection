@@ -185,7 +185,7 @@ void __attribute__ ((interrupt)) LPTimer_ISR(void);
     (tIsrFunc)&Cpu_Interrupt,          /* 0x65  0x00000194   -   ivINT_LPTimer                  unused by PE */
     (tIsrFunc)&Cpu_Interrupt,          /* 0x66  0x00000198   -   ivINT_Reserved102              unused by PE */
     (tIsrFunc)&Cpu_Interrupt,          /* 0x67  0x0000019C   -   ivINT_PORTA                    unused by PE */
-    (tIsrFunc)&AccelDataReady_ISR,          /* 0x68  0x000001A0   -   ivINT_PORTB                    unused by PE */
+    (tIsrFunc)&AccelDataReady_ISR,     /* 0x68  0x000001A0   -   ivINT_PORTB                    unused by PE */
     (tIsrFunc)&Cpu_Interrupt,          /* 0x69  0x000001A4   -   ivINT_PORTC                    unused by PE */
     (tIsrFunc)&Cpu_Interrupt,          /* 0x6A  0x000001A8   -   ivINT_PORTD                    unused by PE */
     (tIsrFunc)&Cpu_Interrupt,          /* 0x6B  0x000001AC   -   ivINT_PORTE                    unused by PE */

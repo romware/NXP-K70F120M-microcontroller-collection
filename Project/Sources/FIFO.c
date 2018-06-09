@@ -28,7 +28,6 @@ void FIFO_Init(TFIFO * const FIFO)
 {
   FIFO->Start = 0;
   FIFO->End = 0;
-  FIFO->CanAccess = OS_SemaphoreCreate(1);
   FIFO->CanPut = OS_SemaphoreCreate(FIFO_SIZE);
   FIFO->CanGet = OS_SemaphoreCreate(0);
 }
@@ -45,8 +44,7 @@ void FIFO_Put(TFIFO * const FIFO, const uint8_t data)
   // Decrement space available, block until space available
   OS_SemaphoreWait(FIFO->CanPut,0);
 
-  // Gain exclusive access to FIFO
-  OS_SemaphoreWait(FIFO->CanAccess,0);
+  OS_DisableInterrupts();
 
   // Put data byte into the buffer array
   FIFO->Buffer[FIFO->End] = data;
@@ -64,8 +62,7 @@ void FIFO_Put(TFIFO * const FIFO, const uint8_t data)
   // Increment bytes available
   OS_SemaphoreSignal(FIFO->CanGet);
 
-  // Release access to FIFO
-  OS_SemaphoreSignal(FIFO->CanAccess);
+  OS_EnableInterrupts();
 }
 
 /*! @brief Get one character from the FIFO.
@@ -80,8 +77,8 @@ void FIFO_Get(TFIFO * const FIFO, uint8_t * const dataPtr)
   // Decrement bytes available, block until data is available
   OS_SemaphoreWait(FIFO->CanGet,0);
 
-  // Gain exclusive access to FIFO
-  OS_SemaphoreWait(FIFO->CanAccess,0);
+  OS_DisableInterrupts();
+
 
   // Put the Start data byte into *dataPtr
   *dataPtr = FIFO->Buffer[FIFO->Start];
@@ -99,8 +96,7 @@ void FIFO_Get(TFIFO * const FIFO, uint8_t * const dataPtr)
   // Increment space available
   OS_SemaphoreSignal(FIFO->CanPut);
 
-  // Release access to FIFO
-  OS_SemaphoreSignal(FIFO->CanAccess);
+  OS_EnableInterrupts();
 }
 
 /* END FIFO */

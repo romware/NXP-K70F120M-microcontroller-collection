@@ -26,7 +26,6 @@ typedef struct
   uint16_t Start;               /*!< The index of the position of the oldest data in the FIFO */
   uint16_t End;                 /*!< The index of the next available empty position in the FIFO */
   uint8_t Buffer[FIFO_SIZE];    /*!< The actual array of bytes to store the data */
-  OS_ECB* CanAccess;            /*!< The semaphore which allows access to the FIFO */
   OS_ECB* CanPut;               /*!< The semaphore which allows putting into the FIFO */
   OS_ECB* CanGet;               /*!< The semaphore which allows getting from the FIFO */
 } TFIFO;
