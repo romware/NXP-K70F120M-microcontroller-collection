@@ -16,7 +16,7 @@
 #include "OS.h"
 
 // Number of bytes in a FIFO
-#define FIFO_SIZE 256
+#define FIFO_SIZE 512
 
 /*!
  * @struct TFIFO
