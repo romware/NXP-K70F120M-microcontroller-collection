@@ -132,7 +132,7 @@ void __attribute__ ((interrupt)) PIT_ISR(void)
   // Notify RTOS of start of ISR
   OS_ISREnter();
 
-  // Clear the timer interrupt flag (W1C)
+  // Clear the timer interrupt flag (W1C)     //TODO: Maybe go back to callback functions
   PIT_TFLG0 = PIT_TFLG_TIF_MASK;
 
   for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)

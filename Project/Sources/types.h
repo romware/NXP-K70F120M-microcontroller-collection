@@ -14,7 +14,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define ADC_BUFFER_SIZE 64
+#define ADC_BUFFER_SIZE 128
 
 // Unions to efficiently access hi and lo parts of integers and words
 typedef union

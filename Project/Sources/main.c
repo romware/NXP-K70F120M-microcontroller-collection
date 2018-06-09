@@ -86,10 +86,10 @@ volatile uint16union_t* NvTowerMd;              /*!< Tower mode union pointer to
 
 TVoltageData VoltageSamples[3];
 
-static OS_ECB* LEDOffSemaphore;                          /*!< LED off semaphore for FTM */
+static OS_ECB* LEDOffSemaphore;                 /*!< LED off semaphore for FTM */
 static OS_ECB* RTCReadSemaphore;                /*!< Read semaphore for RTC */
-
-static OS_ECB* NewADCDataSemaphore;
+static OS_ECB* AlarmSemaphore;                  /*!< Alarm semaphore for RMS voltage out of range */
+static OS_ECB* NewADCDataSemaphore;             /*!< New ADC data semaphore for ADC Process thread */
 
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Tower Init thread. */
@@ -97,7 +97,7 @@ OS_THREAD_STACK(RTCThreadStack, THREAD_STACK_SIZE);               /*!< The stack
 OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);        /*!< The stack for the FTM thread. */
 //OS_THREAD_STACK(PITThreadStack, THREAD_STACK_SIZE);               /*!< The stack for the PIT thread. */
 OS_THREAD_STACK(ADCDataProcessThreadStack, THREAD_STACK_SIZE); /*!< The stack for the AccelReadComplete thread. */
-//OS_THREAD_STACK(AccelDataReadyThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the AccelDataReady thread. */
+OS_THREAD_STACK(AlarmThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the Alarm thread. */
 OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);            /*!< The stack for the Packet thread. */
 
 /*! @brief Sends the startup packets to the PC
@@ -341,7 +341,7 @@ static void InitModulesThread(void* pData)
   // Create semaphores for threads
   LEDOffSemaphore = OS_SemaphoreCreate(0);
   NewADCDataSemaphore = OS_SemaphoreCreate(0);
-  //ReadCompleteSemaphore = OS_SemaphoreCreate(0);
+  AlarmSemaphore = OS_SemaphoreCreate(0);
   RTCReadSemaphore = OS_SemaphoreCreate(0);
 
   // Initializes the main tower components and sets the default or stored values
@@ -443,53 +443,71 @@ float GetAverage(TVoltageData Data, uint8_t DataSize)
   return sum / DataSize;
 }
 
-float GetFrequency(TVoltageData Data, uint8_t DataSize)
+float GetFrequency(TVoltageData Data, uint8_t DataSize, uint32_t FreqTimesTen)
 {
-  OS_DisableInterrupts();
+  //OS_DisableInterrupts();
   // Array to store calculated crossings.
-  float crossings[8/*2 * (DataSize / ADC_SAMPLES_PER_CYCLE)*/];
+  uint8_t arraySize = (uint8_t)(DataSize / ADC_SAMPLES_PER_CYCLE);
+  float crossings[8];
   uint8_t count = 0;
+  // To store array crossing to be used to find zero crossings
+  uint8_t arrayCrossing;
+  if(Data.LatestData == 0)
+  {
+    arrayCrossing = (DataSize - 1);
+  }
+  else
+  {
+    arrayCrossing = (Data.LatestData - 1);
+  }
 
-  float average = GetAverage(Data, DataSize);
+  //float average = GetAverage(Data, DataSize);
 
   // Find crossings from LatestData to element 0 of array
-  for(uint8_t i = Data.LatestData; i > 0; i --)
+  for(uint8_t i = arrayCrossing; i > 0; i --)
   {
     // Check for crossing
-    if((((float)Data.ADC_Data[i] >= average) && ((float)Data.ADC_Data[i - 1] < average)) || (((float)Data.ADC_Data[i] <= average) && ((float)Data.ADC_Data[i - 1] >= average)))
+    if((((float)Data.ADC_Data[i] >= 0) && ((float)Data.ADC_Data[i - 1] < 0)) || (((float)Data.ADC_Data[i] <= 0) && ((float)Data.ADC_Data[i - 1] >= 0)))
     {
       // Calculate accurate crossing and store in array
       crossings[count] = (float)((i - 1) + (float)((- (float)Data.ADC_Data[i - 1]) / ((float)Data.ADC_Data[i] - (float)Data.ADC_Data[i - 1])));
       count ++;
+      //i -= 10;
     }
   }
 
   // Check for crossing between ends of array
-  if((((float)Data.ADC_Data[0] >= average) && ((float)Data.ADC_Data[DataSize - 1] < average)) || (((float)Data.ADC_Data[0] <= average) && ((float)Data.ADC_Data[DataSize - 1] >= average)))
+  if(Data.LatestData)
   {
-    // Calculate accurate crossing and store in array
-    crossings[count] = (float)((float)(((float)Data.ADC_Data[DataSize - 1]) / ((float)Data.ADC_Data[0] - (float)Data.ADC_Data[DataSize - 1])));
-    count ++;
+    if((((float)Data.ADC_Data[0] >= 0) && ((float)Data.ADC_Data[DataSize - 1] < 0)) || (((float)Data.ADC_Data[0] <= 0) && ((float)Data.ADC_Data[DataSize - 1] >= 0)))
+    {
+      // Calculate accurate crossing and store in array
+      crossings[count] = (float)((float)(((float)Data.ADC_Data[DataSize - 1]) / ((float)Data.ADC_Data[0] - (float)Data.ADC_Data[DataSize - 1])));
+      count ++;
+    }
   }
 
-  for(uint8_t i = DataSize - 1; i > Data.LatestData; i --)
+
+  for(uint8_t i = DataSize - 1; i > arrayCrossing + 1; i --)
   {
     // Check for crossing
-    if((((float)Data.ADC_Data[i] >= average) && ((float)Data.ADC_Data[i - 1] < average)) || (((float)Data.ADC_Data[i] <= average) && ((float)Data.ADC_Data[i - 1] >= average)))
+    if((((float)Data.ADC_Data[i] >= 0) && ((float)Data.ADC_Data[i - 1] < 0)) || (((float)Data.ADC_Data[i] <= 0) && ((float)Data.ADC_Data[i - 1] >= 0)))
     {
       // Calculate accurate crossing and store in array
       crossings[count] = (float)(((i - 1) + (float)((- (float)Data.ADC_Data[i - 1]) / ((float)Data.ADC_Data[i] - (float)Data.ADC_Data[i - 1])))- ((float)DataSize - 1));
       count ++;
+      //i += 10;
     }
   }
 
   float mean;
 
   mean = (float)((crossings[0] - crossings[count - 1]) / (count - 1));
-  OS_EnableInterrupts();
+
+  //OS_EnableInterrupts();
 
   // Return value as frequency
-  return (float)(((float)50 * (float)ADC_SAMPLES_PER_CYCLE) / ((float)2 * mean));
+  return (float)((((float)FreqTimesTen * (float)ADC_SAMPLES_PER_CYCLE) / ((float)2 * mean)) / 10);
 }
 
 static void ADCDataProcessThread(void* pData)
@@ -497,19 +515,22 @@ static void ADCDataProcessThread(void* pData)
   float RMS[NB_ANALOG_CHANNELS];
   uint16_t wait = 0;
   uint16_t waitFreq = 10;
-  float freq;
-  static float lastFreq = 50;
+  static float freq = 50;
+  //static float lastFreq = 50;
   for (;;)
   {
     // Wait for RTCRead semaphore
     OS_SemaphoreWait(NewADCDataSemaphore,0);
+
+    // Load new PIT period
+    PIT_Set((uint32_t)((uint64_t)(10000000000 /((uint32_t)(freq * 10) * ADC_SAMPLES_PER_CYCLE))), false);
 
     for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
     {
       RMS[i] = GetRMS(VoltageSamples[i], ADC_BUFFER_SIZE);
     }
 
-//    wait++;
+    wait++;
 //    if(wait >= 25)
 //    {
 //      wait = 0;
@@ -521,18 +542,48 @@ static void ADCDataProcessThread(void* pData)
 //      send.l = (uint16_t)RMS[2];
 //      Packet_Put(0x18, 3, send.s.Hi, send.s.Lo);
 //    }
+    TVoltageData test;
+    test = VoltageSamples[0];
+    uint16union_t freqSend;
 
-    if(RMS[0 > 5243])
+    freq = GetFrequency(test, ADC_BUFFER_SIZE, (uint32_t)(freq * 10));
+    // Limit lowest frequency
+    if(freq < 47.5)
     {
-      freq = GetFrequency(VoltageSamples[0], ADC_BUFFER_SIZE);
+      freq = 47.5;
+    }
+    // Limit highest frequency
+    else if(freq > 52.5)
+    {
+      freq = 52.5;
+    }
 
-      // Load new PIT period
-      //PIT_Set((uint32_t)1000000000/((uint32_t)freq * ADC_SAMPLES_PER_CYCLE), false);
+    if(RMS[0 > 5243] && wait > 25)
+    {
+
+      freqSend.l = (uint16_t)(10 * freq);
+      Packet_Put(0x17, freqSend.s.Lo, freqSend.s.Hi, 0);
+    }
+    if(RMS[0] < 6553 || RMS[0] > 9830 || RMS[1] < 6553 || RMS[1] > 9830 || RMS[2] < 6553 || RMS[2] > 9830)
+    {
+      uint16union_t send;
+      send.l = (uint16_t)RMS[0];
+      Packet_Put(0x18, 1, send.s.Hi, send.s.Lo);
+      wait = 0;
     }
   }
 }
 
+static void AlarmThread(void* pData)
+{
+  for (;;)
+  {
+      // Wait until signaled to Alarm
+     OS_SemaphoreWait(AlarmSemaphore,0);
 
+
+  }
+}
 /*! @brief Turns the Blue LED off after the timer is complete
  *
  *  @param pData is not used but is required by the OS to create a thread.
@@ -575,11 +626,11 @@ int main(void)
                           NULL,
                           &ADCDataProcessThreadStack[THREAD_STACK_SIZE - 1],
                           4);
-//  // 4th Highest priority
-//  error = OS_ThreadCreate(AccelDataReadyThread,
-//                          NULL,
-//                          &AccelDataReadyThreadStack[THREAD_STACK_SIZE - 1],
-//                          4);
+  // 4th Highest priority
+  error = OS_ThreadCreate(AlarmThread,
+                          NULL,
+                          &AlarmThreadStack[THREAD_STACK_SIZE - 1],
+                          4);
   // 5th Highest priority
   error = OS_ThreadCreate(PacketThread,
 			  NULL,
