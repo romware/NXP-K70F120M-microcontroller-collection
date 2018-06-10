@@ -72,6 +72,12 @@ const uint8_t COMMAND_READBYTE    = 0x08;       /*!< The serial command byte for
 const uint8_t COMMAND_MODE        = 0x0D;       /*!< The serial command byte for tower mode */
 const uint8_t COMMAND_TIME        = 0x0C;       /*!< The serial command byte for tower time */
 const uint8_t COMMAND_ACCEL       = 0x10;       /*!< The serial command byte for tower accelerometer */
+const uint8_t COMMAND_TIMINGMODE  = 0x10;       /*!< The serial command byte for tower timing mode */
+const uint8_t COMMAND_RAISES      = 0x11;       /*!< The serial command byte for tower raises */
+const uint8_t COMMAND_LOWERS      = 0x12;       /*!< The serial command byte for tower lowers */
+const uint8_t COMMAND_FREQUENCY   = 0x17;       /*!< The serial command byte for tower frequency */
+const uint8_t COMMAND_VOLTAGE     = 0x18;       /*!< The serial command byte for tower voltage */
+const uint8_t COMMAND_SPECTRUM    = 0x19;       /*!< The serial command byte for tower spectrum */
 
 const uint8_t PARAM_GET           = 1;          /*!< Get bit of packet parameter 1 */
 const uint8_t PARAM_SET           = 2;          /*!< Set bit of packet parameter 1 */
@@ -81,12 +87,15 @@ const uint8_t TOWER_VER_MIN       = 0;          /*!< Tower minor version */
 
 volatile uint16union_t* NvTowerNb;              /*!< Tower number union pointer to flash */
 volatile uint16union_t* NvTowerMd;              /*!< Tower mode union pointer to flash */
-volatile uint16union_t* NvAlarmCount;           /*!< Alarm count union pointer to flash */
+volatile uint8_t* NvNbRaises;                   /*!< Raise count byte pointer to flash */
+volatile uint8_t* NvNbLowers;                   /*!< Lower count byte pointer to flash */
+volatile uint8_t* NvTimingMd;                   /*!< Timing Mode byte pointer to flash */
 
 
 
 TVoltageData VoltageSamples[NB_ANALOG_CHANNELS];
-static float RMS[NB_ANALOG_CHANNELS];
+static uint16_t RMS[NB_ANALOG_CHANNELS];
+static uint16_t Frequency;
 
 static OS_ECB* LEDOffSemaphore;                 /*!< LED off semaphore for FTM */
 static OS_ECB* RTCReadSemaphore;                /*!< Read semaphore for RTC */
@@ -211,13 +220,123 @@ bool HandleTowerSetTime(void)
   // Check if parameters are within tower time limits
   if(Packet_Parameter1 < 24 && Packet_Parameter2 < 60 && Packet_Parameter3 < 60)
   {
-      // Sets the Real Time Clock
-      RTC_Set(Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
-      return true;
+    // Sets the Real Time Clock
+    RTC_Set(Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
+    return true;
   }
   return false;
 }
 
+/*! @brief Sets or gets timing mode as requested by PC
+ *
+ *  @return bool - TRUE if mode is set or sent
+ */
+bool HandleTowerTimingMode(void)
+{
+  // Check if parameters are within tower time limits and get or set definite or inverse
+  if(Packet_Parameter1 == 0 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Send Timing Mode
+    Packet_Put(COMMAND_TIMINGMODE, _FB(NvTimingMd), 0, 0);
+    return true;
+  }
+  else if((Packet_Parameter1 == 1 || Packet_Parameter1 == 2) && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Set Timing Mode
+    return Flash_Write8((uint8_t*)NvTowerMd,(uint8_t)Packet_Parameter1);
+  }
+  return false;
+}
+
+/*! @brief Sets the number of raises to 0 or sends number of raises to PC
+ *
+ *  @return bool - TRUE if packet is sent or number is set
+ */
+bool HandleTowerRaises(void)
+{
+  // Check if parameters match tower number GET or SET parameters
+  if(Packet_Parameter1 == 0 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Sends the number of raises
+    return Packet_Put(COMMAND_RAISES,_FB(NvNbRaises), 0, 0);            //TODO:Check with Jack if he thinks this should be in param 1
+  }
+  else if(Packet_Parameter1 == 1 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Resets the number of raises
+    return Flash_Write8((uint8_t*)NvNbRaises,(uint8_t)0);
+  }
+  return false;
+}
+
+/*! @brief Sets the number of lowers to 0 or sends number of lowers to PC
+ *
+ *  @return bool - TRUE if packet is sent or number is set
+ */
+bool HandleTowerLowers(void)
+{
+  // Check if parameters match tower number GET or SET parameters
+  if(Packet_Parameter1 == 0 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Sends the number of lowers
+    return Packet_Put(COMMAND_RAISES,_FB(NvNbLowers), 0, 0);            //TODO:Check with Jack if he thinks this should be in param 1
+  }
+  else if(Packet_Parameter1 == 1 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Resets the number of lowers
+    return Flash_Write8((uint8_t*)NvNbLowers,(uint8_t)0);
+  }
+  return false;
+}
+
+/*! @brief Sends the frequency to the PC
+ *
+ *  @return bool - TRUE if packet sent
+ */
+bool HandleTowerFrequency(void)
+{
+  // Local storage of variable as union
+  uint16union_t frequency;
+
+  // Check if parameters are within limits
+  if(Packet_Parameter1 == 0 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Disable interrupts to read variable.
+    OS_DisableInterrupts();
+
+    frequency.l = Frequency;
+
+    OS_EnableInterrupts();
+
+    // Send frequency to PC
+    return Packet_Put(COMMAND_FREQUENCY, frequency.s.Hi, frequency.s.Lo, 0);
+  }
+  return false;
+}
+
+/*! @brief Sends the frequency to the PC
+ *
+ *  @return bool - TRUE if packet sent
+ */
+bool HandleTowerVoltage(void)
+{
+  // Local storage of variable as union
+  uint16union_t rms;
+
+  // Check if parameters are within limits
+  if(Packet_Parameter1 > 0 && Packet_Parameter1 <= NB_ANALOG_CHANNELS && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Disable interrupts to read variable.
+    OS_DisableInterrupts();
+
+    rms.l = RMS[Packet_Parameter1 -1];
+
+    OS_EnableInterrupts();
+
+    // Send Voltage to PC
+    return Packet_Put(COMMAND_VOLTAGE, Packet_Parameter1, rms.s.Hi, rms.s.Lo);
+  }
+  return false;
+}
 
 /*! @brief Executes the command depending on what packet has been received
  *
@@ -265,6 +384,31 @@ void ReceivedPacket(void)
     // Set the Real Time Clock time
     success = HandleTowerSetTime();
   }
+  else if(commandIgnoreAck == COMMAND_TIMINGMODE)
+  {
+    // Handle timing mode command
+    success = HandleTowerTimingMode();
+  }
+  else if(commandIgnoreAck == COMMAND_RAISES)
+  {
+    // Set of Get number of raises
+    success = HandleTowerRaises();
+  }
+  else if(commandIgnoreAck == COMMAND_LOWERS)
+  {
+    // Set of Get number of lowers
+    success = HandleTowerLowers();
+  }
+  else if(commandIgnoreAck == COMMAND_FREQUENCY)
+  {
+    // Send Frequency to Tower
+    success = HandleTowerFrequency();
+  }
+  else if(commandIgnoreAck == COMMAND_VOLTAGE)
+  {
+    // Send Voltage to Tower
+    success = HandleTowerVoltage();
+  }
 
   // AND the packet command byte with the ACK MASK to check if ACK is requested
   if(commandAck)
@@ -304,16 +448,18 @@ bool TowerInit(void)
   {
     success = true;
 
-    // Allocates an address in Flash memory to the tower number and tower mode
+    // Allocates an address in Flash memory to the tower number, tower mode, timing mode, number of raises and number of lowers
     if(Flash_AllocateVar((volatile void**)&NvTowerNb, sizeof(*NvTowerNb))
     && Flash_AllocateVar((volatile void**)&NvTowerMd, sizeof(*NvTowerMd))
-    /*&& Flash_AllocateVar((volatile void**)&NvTowerPo, sizeof(*NvTowerPo))*/);
+    && Flash_AllocateVar((volatile void**)&NvTimingMd, sizeof(*NvTimingMd))
+    && Flash_AllocateVar((volatile void**)&NvNbRaises, sizeof(*NvNbRaises))
+    && Flash_AllocateVar((volatile void**)&NvNbLowers, sizeof(*NvNbLowers)));
     {
       // Checks if tower number is clear
       if(_FH(NvTowerNb) == 0xFFFF)
       {
         // Sets the tower number to the default number
-        if(!Flash_Write16((uint16_t*)NvTowerNb,(uint16_t)1519))
+        if(!Flash_Write16((uint16_t*)NvTowerNb,(uint16_t)3756))
         {
           success = false;
         }
@@ -324,6 +470,36 @@ bool TowerInit(void)
       {
         // Sets the tower mode to the default mode
         if(!Flash_Write16((uint16_t*)NvTowerMd,(uint16_t)1))
+        {
+          success = false;
+        }
+      }
+
+      // Checks if timing mode is clear
+      if(_FH(NvTimingMd) == 0xFF)
+      {
+        // Sets the timing mode to the default mode
+        if(!Flash_Write8((uint8_t*)NvTimingMd,(uint8_t)1))
+        {
+          success = false;
+        }
+      }
+
+      // Checks if number of raises is clear
+      if(_FH(NvTowerMd) == 0xFF)
+      {
+        // Sets the number of raises to 0
+        if(!Flash_Write8((uint8_t*)NvNbRaises,(uint8_t)0))
+        {
+          success = false;
+        }
+      }
+
+      // Checks if number of lowers is clear
+      if(_FH(NvTowerMd) == 0xFF)
+      {
+        // Sets the number of raises to 0
+        if(!Flash_Write8((uint8_t*)NvNbLowers,(uint8_t)0))
         {
           success = false;
         }
@@ -423,7 +599,7 @@ static void RTCThread(void* pData)
   }
 }
 
-float GetRMS(TVoltageData Data, uint8_t DataSize)
+uint16_t GetRMS(TVoltageData Data, uint8_t DataSize)
 {
   float sum = 0;
   float  averageOfSquares;
@@ -432,7 +608,7 @@ float GetRMS(TVoltageData Data, uint8_t DataSize)
     sum += (Data.ADC_Data[i]) * (Data.ADC_Data[i]);
   }
   averageOfSquares = sum / DataSize;
-  return (float)sqrtf(averageOfSquares);
+  return (uint16_t)sqrtf(averageOfSquares);
 }
 
 float GetAverage(TVoltageData Data, uint8_t DataSize)
@@ -510,15 +686,16 @@ float GetFrequency(TVoltageData Data, uint8_t DataSize, uint32_t FreqTimesTen)
 static void ADCDataProcessThread(void* pData)
 {
   TVoltageData currentSamples[NB_ANALOG_CHANNELS];
-  static float freq = 50;
-  //static float lastFreq = 50;
+  static float frequency = 50;
+  uint16_t rms;
+
   for (;;)
   {
     // Wait for New ADC Data Semaphore
     OS_SemaphoreWait(NewADCDataSemaphore,0);
 
     // Load new PIT period
-    PIT_Set((uint32_t)((uint64_t)(10000000000 /((uint32_t)(freq * 10) * ADC_SAMPLES_PER_CYCLE))), false);
+    PIT_Set((uint32_t)((uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE))), false);
 
     // Store a local copy of data for analysis
     for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
@@ -529,24 +706,40 @@ static void ADCDataProcessThread(void* pData)
     // Calculate RMS for all channels
     for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
     {
-      RMS[i] = GetRMS(currentSamples[i], ADC_BUFFER_SIZE);
+      rms = GetRMS(currentSamples[i], ADC_BUFFER_SIZE);
+
+      // Update global RMS variable, disabling interrupts to restrict access during operation.
+      OS_DisableInterrupts();
+
+      RMS[i] = rms;
+
+      OS_EnableInterrupts();
     }
 
-    if(RMS[0 > 5243])
+    // Get frequency if VRMS > 1.6 V
+    if(RMS[0] > 5243)
     {
-      freq = GetFrequency(currentSamples[0], ADC_BUFFER_SIZE, (uint32_t)(freq * 10));
+      frequency = GetFrequency(currentSamples[0], ADC_BUFFER_SIZE, (uint32_t)(frequency * 10));
     }
 
     // Limit lowest frequency
-    if(freq < 47.5)
+    if(frequency < 47.5)
     {
-      freq = 47.5;
+      frequency = 47.5;
     }
+
     // Limit highest frequency
-    else if(freq > 52.5)
+    else if(frequency > 52.5)
     {
-      freq = 52.5;
+      frequency = 52.5;
     }
+    
+    // Update global frequency variable, disabling interrupts to restrict access during operation.
+    OS_DisableInterrupts();
+
+    Frequency = (uint16_t)(frequency * 10);           //TODO: Does this typecast always round down??
+
+    OS_EnableInterrupts();
   }
 }
 
