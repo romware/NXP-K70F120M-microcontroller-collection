@@ -96,10 +96,11 @@ volatile uint8_t* NvTimingMd;                   /*!< Timing Mode byte pointer to
 TVoltageData VoltageSamples[NB_ANALOG_CHANNELS];
 static uint16_t RMS[NB_ANALOG_CHANNELS];
 static uint16_t Frequency;
+static uint64_t OutOfRangeTimer = 5000000000;
 
 static OS_ECB* LEDOffSemaphore;                 /*!< LED off semaphore for FTM */
 static OS_ECB* RTCReadSemaphore;                /*!< Read semaphore for RTC */
-static OS_ECB* AlarmSemaphore;                  /*!< Alarm semaphore for RMS voltage out of range */
+static OS_ECB* OutOfRangeSemaphore;             /*!< Out of range semaphore for RMS voltage out of range */
 static OS_ECB* NewADCDataSemaphore;             /*!< New ADC data semaphore for ADC Process thread */
 
 // Thread stacks
@@ -108,7 +109,7 @@ OS_THREAD_STACK(RTCThreadStack, THREAD_STACK_SIZE);               /*!< The stack
 OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);        /*!< The stack for the FTM thread. */
 //OS_THREAD_STACK(PITThreadStack, THREAD_STACK_SIZE);               /*!< The stack for the PIT thread. */
 OS_THREAD_STACK(ADCDataProcessThreadStack, THREAD_STACK_SIZE); /*!< The stack for the AccelReadComplete thread. */
-OS_THREAD_STACK(AlarmThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the Alarm thread. */
+OS_THREAD_STACK(OutOfRangeThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the Alarm thread. */
 OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);            /*!< The stack for the Packet thread. */
 
 /*! @brief Sends the startup packets to the PC
@@ -519,7 +520,7 @@ static void InitModulesThread(void* pData)
   // Create semaphores for threads
   LEDOffSemaphore = OS_SemaphoreCreate(0);
   NewADCDataSemaphore = OS_SemaphoreCreate(0);
-  AlarmSemaphore = OS_SemaphoreCreate(0);
+  OutOfRangeSemaphore = OS_SemaphoreCreate(0);
   RTCReadSemaphore = OS_SemaphoreCreate(0);
 
   // Initializes the main tower components and sets the default or stored values
@@ -599,7 +600,7 @@ static void RTCThread(void* pData)
   }
 }
 
-uint16_t GetRMS(TVoltageData Data, uint8_t DataSize)
+uint16_t GetRMS(const TVoltageData Data, const uint8_t DataSize)
 {
   float sum = 0;
   for (uint8_t i = 0; i < DataSize; i ++)
@@ -609,7 +610,7 @@ uint16_t GetRMS(TVoltageData Data, uint8_t DataSize)
   return (uint16_t)sqrtf(sum / DataSize);
 }
 
-float GetAverage(TVoltageData Data, uint8_t DataSize)
+float GetAverage(const TVoltageData Data, const uint8_t DataSize)
 {
   float sum = 0;
   for(uint8_t i = 0; i < DataSize; i ++)
@@ -619,7 +620,7 @@ float GetAverage(TVoltageData Data, uint8_t DataSize)
   return sum / DataSize;
 }
 
-float GetFrequency(TVoltageData Data, uint8_t DataSize, uint32_t FreqTimesTen)
+float GetFrequency(const TVoltageData Data,  const uint8_t DataSize,  const uint32_t FreqTimesTen)
 {
   // Array to store calculated crossings.
   float crossings[8];
@@ -695,11 +696,15 @@ static void ADCDataProcessThread(void* pData)
     // Load new PIT period
     PIT_Set((uint32_t)((uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE))), false);
 
-    // Store a local copy of data for analysis
+    // Store a local copy of data for analysis, disabling interrupts to restrict access during operation.
+    OS_DisableInterrupts();
+
     for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
     {
       currentSamples[i] = VoltageSamples[i];
     }
+
+    OS_EnableInterrupts();
 
     // Calculate RMS for all channels
     for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
@@ -714,8 +719,8 @@ static void ADCDataProcessThread(void* pData)
       OS_EnableInterrupts();
     }
 
-    // Get frequency if VRMS > 1.6 V
-    if(RMS[0] > 5243)
+    // Get frequency if VRMS > 1.5 V
+    if(RMS[0] > 4915)
     {
       frequency = GetFrequency(currentSamples[0], ADC_BUFFER_SIZE, (uint32_t)(frequency * 10));
     }
@@ -741,12 +746,19 @@ static void ADCDataProcessThread(void* pData)
   }
 }
 
-static void AlarmThread(void* pData)
+static void OutOfRangeThread(void* pData)
 {
   for (;;)
   {
-      // Wait until signaled to Alarm
-     OS_SemaphoreWait(AlarmSemaphore,0);
+    // Wait until signaled as out of range
+    OS_SemaphoreWait(OutOfRangeSemaphore,0);
+
+    // Set alarm output on channel 3 to 5 volts
+    Analog_Put(3, 16384);
+
+    // Check mode then subtract amount from
+
+
 
 
   }
@@ -760,11 +772,11 @@ static void FTMLEDsOffThread(void* pData)
 {
   for (;;)
   {
-      // Wait until signaled to turn LED off
-     OS_SemaphoreWait(LEDOffSemaphore,0);
+    // Wait until signaled to turn LED off
+    OS_SemaphoreWait(LEDOffSemaphore,0);
 
-     // Turn off blue LED
-     LEDs_Off(LED_BLUE);
+    // Turn off blue LED
+    LEDs_Off(LED_BLUE);
   }
 }
 
@@ -794,9 +806,9 @@ int main(void)
                           &ADCDataProcessThreadStack[THREAD_STACK_SIZE - 1],
                           4);
   // 4th Highest priority
-  error = OS_ThreadCreate(AlarmThread,
+  error = OS_ThreadCreate(OutOfRangeThread,
                           NULL,
-                          &AlarmThreadStack[THREAD_STACK_SIZE - 1],
+                          &OutOfRangeThreadStack[THREAD_STACK_SIZE - 1],
                           5);
   // 5th Highest priority
   error = OS_ThreadCreate(PacketThread,
