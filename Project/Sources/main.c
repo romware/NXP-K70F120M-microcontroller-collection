@@ -602,13 +602,11 @@ static void RTCThread(void* pData)
 uint16_t GetRMS(TVoltageData Data, uint8_t DataSize)
 {
   float sum = 0;
-  float  averageOfSquares;
   for (uint8_t i = 0; i < DataSize; i ++)
   {
     sum += (Data.ADC_Data[i]) * (Data.ADC_Data[i]);
   }
-  averageOfSquares = sum / DataSize;
-  return (uint16_t)sqrtf(averageOfSquares);
+  return (uint16_t)sqrtf(sum / DataSize);
 }
 
 float GetAverage(TVoltageData Data, uint8_t DataSize)
