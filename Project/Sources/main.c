@@ -62,6 +62,12 @@
 
 #define ADC_DEFAULT_FREQUENCY 50
 
+#define RMS_UPPER_LIMIT    9830
+#define RMS_LOWER_LIMIT    6554
+#define RMS_FREQUENCY_MIN  4915
+#define DAC_5V_OUT         16384
+#define DAC_0V_OUT          0
+
 const uint32_t PERIOD_I2C_POLL    = 1000000000; /*!< Period of the I2C polling in polling mode */
 
 const uint8_t COMMAND_STARTUP     = 0x04;       /*!< The serial command byte for tower startup */
@@ -100,16 +106,18 @@ static uint64_t OutOfRangeTimer = 5000000000;
 
 static OS_ECB* LEDOffSemaphore;                 /*!< LED off semaphore for FTM */
 static OS_ECB* RTCReadSemaphore;                /*!< Read semaphore for RTC */
-static OS_ECB* OutOfRangeSemaphore;             /*!< Out of range semaphore for RMS voltage out of range */
+static OS_ECB* OutOfRangeSemaphore;             /*!< Out of range semaphore for RMS  */
+static OS_ECB* WithinRangeSemaphore;            /*!< Within range semaphore for RMS  */
 static OS_ECB* NewADCDataSemaphore;             /*!< New ADC data semaphore for ADC Process thread */
 
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Tower Init thread. */
 OS_THREAD_STACK(RTCThreadStack, THREAD_STACK_SIZE);               /*!< The stack for the RTC thread. */
 OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);        /*!< The stack for the FTM thread. */
-//OS_THREAD_STACK(PITThreadStack, THREAD_STACK_SIZE);               /*!< The stack for the PIT thread. */
-OS_THREAD_STACK(ADCDataProcessThreadStack, THREAD_STACK_SIZE); /*!< The stack for the AccelReadComplete thread. */
-OS_THREAD_STACK(OutOfRangeThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the Alarm thread. */
+//OS_THREAD_STACK(PITThreadStack, THREAD_STACK_SIZE);             /*!< The stack for the PIT thread. */
+OS_THREAD_STACK(ADCDataProcessThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the AccelReadComplete thread. */
+OS_THREAD_STACK(OutOfRangeThreadStack, THREAD_STACK_SIZE);        /*!< The stack for the OutOfRange thread. */
+OS_THREAD_STACK(WithinRangeThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the WithinRange thread. */
 OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);            /*!< The stack for the Packet thread. */
 
 /*! @brief Sends the startup packets to the PC
@@ -535,6 +543,7 @@ static void InitModulesThread(void* pData)
   LEDOffSemaphore = OS_SemaphoreCreate(0);
   NewADCDataSemaphore = OS_SemaphoreCreate(0);
   OutOfRangeSemaphore = OS_SemaphoreCreate(0);
+  WithinRangeSemaphore = OS_SemaphoreCreate(0);
   RTCReadSemaphore = OS_SemaphoreCreate(0);
 
   // Initializes the main tower components and sets the default or stored values
@@ -616,7 +625,7 @@ static void RTCThread(void* pData)
 
 uint16_t GetRMS(const TVoltageData Data, const uint8_t DataSize)
 {
-  float sum = 0;
+  float sum = 0;      //TODO: use different data type??
   for (uint8_t i = 0; i < DataSize; i ++)
   {
     sum += (Data.ADC_Data[i]) * (Data.ADC_Data[i]);
@@ -711,14 +720,14 @@ static void ADCDataProcessThread(void* pData)
     PIT_Set((uint32_t)((uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE))), false);
 
     // Store a local copy of data for analysis, disabling interrupts to restrict access during operation.
-    //OS_DisableInterrupts();
+    OS_DisableInterrupts();
 
     for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
     {
       currentSamples[i] = VoltageSamples[i];
     }
 
-   //OS_EnableInterrupts();
+   OS_EnableInterrupts();
 
     // Calculate RMS for all channels
     for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
@@ -731,10 +740,20 @@ static void ADCDataProcessThread(void* pData)
       RMS[i] = rms;
 
       OS_EnableInterrupts();
+
+      if(rms > RMS_UPPER_LIMIT || rms < RMS_LOWER_LIMIT)
+      {
+        OS_SemaphoreSignal(OutOfRangeSemaphore);
+      }
+      else
+      {
+        OS_SemaphoreSignal(WithinRangeSemaphore);
+      }
     }
 
+
     // Get frequency if VRMS > 1.5 V
-    if(RMS[0] > 4915)
+    if(RMS[0] > RMS_FREQUENCY_MIN)
     {
       frequency = GetFrequency(currentSamples[0], ADC_BUFFER_SIZE, (uint32_t)(frequency * 10));
     }
@@ -756,7 +775,7 @@ static void ADCDataProcessThread(void* pData)
 
     Frequency = (uint16_t)(frequency * 10);           //TODO: Does this typecast always round down??
 
-    OS_EnableInterrupts();
+   OS_EnableInterrupts();
   }
 }
 
@@ -768,11 +787,25 @@ static void OutOfRangeThread(void* pData)
     OS_SemaphoreWait(OutOfRangeSemaphore,0);
 
     // Set alarm output on channel 3 to 5 volts
-    Analog_Put(3, 16384);
+    Analog_Put(3, DAC_5V_OUT);
 
     // Check mode then subtract amount from
 
 
+  }
+}
+
+static void WithinRangeThread(void* pData)
+{
+  for (;;)
+  {
+    // Wait until signaled as out of range
+    OS_SemaphoreWait(WithinRangeSemaphore,0);
+
+    // Set alarm output on channel 3 to 0 volts
+    Analog_Put(3, DAC_0V_OUT);
+
+    // Check mode then subtract amount from
 
 
   }
@@ -815,31 +848,36 @@ int main(void)
 			  NULL,
                           &InitModulesThreadStack[THREAD_STACK_SIZE - 1],
   		          0);
-  // 3rd Highest priority
+  // 7thd Highest priority
   error = OS_ThreadCreate(ADCDataProcessThread,
                           NULL,
                           &ADCDataProcessThreadStack[THREAD_STACK_SIZE - 1],
-                          3);
+                          7);
   // 4th Highest priority
+  error = OS_ThreadCreate(WithinRangeThread,
+                          NULL,
+                          &WithinRangeThreadStack[THREAD_STACK_SIZE - 1],
+                          11);
+  // 5th Highest priority
   error = OS_ThreadCreate(OutOfRangeThread,
                           NULL,
                           &OutOfRangeThreadStack[THREAD_STACK_SIZE - 1],
-                          5);
-  // 5th Highest priority
+                          10);
+  // 9th Highest priority
   error = OS_ThreadCreate(PacketThread,
 			  NULL,
                           &PacketThreadStack[THREAD_STACK_SIZE - 1],
-                          4);
-  // 6th Highest priority
+                          9);
+  // 29th Highest priority
   error = OS_ThreadCreate(FTMLEDsOffThread,
                           NULL,
                           &FTMLEDsOffThreadStack[THREAD_STACK_SIZE - 1],
-                          6);
-  // 7th Highest priority
+                          29);
+  // 30th Highest priority
   error = OS_ThreadCreate(RTCThread,
                           NULL,
                           &RTCThreadStack[THREAD_STACK_SIZE - 1],
-                          7);
+                          30);
 
 
 

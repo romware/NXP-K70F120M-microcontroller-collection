@@ -27,7 +27,7 @@
 // y = size of stack
 
 #define OS_THREAD_STACK(x, y) static uint32_t x[y] __attribute__ ((aligned(0x08)))
-#define THREAD_STACK_SIZE 400
+#define THREAD_STACK_SIZE 500
 
 // ----------------------------------------
 // OS error codes
