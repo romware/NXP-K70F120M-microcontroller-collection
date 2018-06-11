@@ -53,6 +53,8 @@
 // Analog functions
 #include "analog.h"
 
+#include <math.h>
+
 #define BAUD_RATE 115200                        /*!< UART2 Baud Rate */
 
 const uint32_t PERIOD_ANALOG_POLL = 1250000;    /*!< Period of the Analog polling (1 seconds) */
@@ -99,17 +101,26 @@ OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);        /*!< The stack
 OS_THREAD_STACK(PITThreadStack, THREAD_STACK_SIZE);               /*!< The stack for the PIT thread. */
 OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);            /*!< The stack for the Packet thread. */
 
+const float VRR_VOLT = 3276.8;
+const float VRR_LIMIT_HIGH = 9830.4;
+const float VRR_LIMIT_LOW = 6553.6;
+const float VRR_ALARM = 16384;
+
 #define NB_ANALOG_CHANNELS 3
 
 static uint32_t AnalogThreadStacks[NB_ANALOG_CHANNELS][THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));
+static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS][THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));
 
 /*! @brief Data structure used to pass Analog configuration to a user thread
  *
  */
 typedef struct AnalogThreadData
 {
-  OS_ECB* semaphore;
+  OS_ECB* semaphoreRead;
+  OS_ECB* semaphoreRMS;
   uint8_t channelNb;
+  int16_t sampleData[16]; // TODO: 16 should be constant sample
+  uint16_t sampleDataIndex;
 } TAnalogThreadData;
 
 /*! @brief Analog thread configuration data
@@ -118,18 +129,65 @@ typedef struct AnalogThreadData
 static TAnalogThreadData AnalogThreadData[NB_ANALOG_CHANNELS] =
 {
   {
-    .semaphore = NULL,
-    .channelNb = 0
+    .semaphoreRead = NULL,
+    .semaphoreRMS = NULL,
+    .channelNb = 0,
+    .sampleDataIndex = 0
   },
   {
-    .semaphore = NULL,
-    .channelNb = 1
+    .semaphoreRead = NULL,
+    .semaphoreRMS = NULL,
+    .channelNb = 1,
+    .sampleDataIndex = 0
   },
   {
-    .semaphore = NULL,
-    .channelNb = 2
+    .semaphoreRead = NULL,
+    .semaphoreRMS = NULL,
+    .channelNb = 2,
+    .sampleDataIndex = 0
   }
 };
+
+/*! @brief Calculates the RMS value on an ADC channel.
+ *
+ */
+void CalculateRMSThread(void* pData)
+{
+  // Make the code easier to read by giving a name to the typecast'ed pointer
+  #define analogData ((TAnalogThreadData*)pData)
+
+  for (;;)
+  {
+    (void)OS_SemaphoreWait(analogData->semaphoreRMS, 0);
+
+    int64_t sum = 0;
+
+    for(uint8_t i = 0; i < 16; i++) // TODO: 16 should be constant sample
+    {
+      sum += (analogData->sampleData[i])*(analogData->sampleData[i]);
+    }
+
+    float rms = sqrt((float)(sum/16));
+
+    OS_DisableInterrupts();
+    if(rms < VRR_LIMIT_LOW)
+    {
+      Analog_Put(2, VRR_ALARM); // TODO: alarm number should be constant
+    }
+    else if(rms > VRR_LIMIT_HIGH)
+    {
+      Analog_Put(2, VRR_ALARM);
+    }
+    else
+    {
+      Analog_Put(2, 0);
+    }
+
+    analogData->sampleDataIndex = 0;
+
+    OS_EnableInterrupts();
+  }
+}
 
 /*! @brief Samples a value on an ADC channel and sends it to the corresponding DAC channel.
  *
@@ -143,11 +201,23 @@ void AnalogLoopbackThread(void* pData)
   {
     int16_t analogInputValue;
 
-    (void)OS_SemaphoreWait(analogData->semaphore, 0);
+    (void)OS_SemaphoreWait(analogData->semaphoreRead, 0);
+
+    OS_DisableInterrupts();
     // Get analog sample
     Analog_Get(analogData->channelNb, &analogInputValue);
-    // Put analog sample
-    Analog_Put(analogData->channelNb, analogInputValue);
+    OS_EnableInterrupts();
+
+    if(analogData->sampleDataIndex == 16)
+    {
+      (void)OS_SemaphoreSignal(AnalogThreadData[analogData->channelNb].semaphoreRMS);
+    }
+    else
+    {
+      analogData->sampleData[analogData->sampleDataIndex] = analogInputValue;
+      analogData->sampleDataIndex++;
+    }
+
   }
 }
 
@@ -159,7 +229,7 @@ void PITCallback(void* arg)
 {
   // Signal the analog channels to take a sample
   for (uint8_t analogNb = 0; analogNb < NB_ANALOG_CHANNELS; analogNb++)
-    (void)OS_SemaphoreSignal(AnalogThreadData[analogNb].semaphore);
+    (void)OS_SemaphoreSignal(AnalogThreadData[analogNb].semaphoreRead);
 }
 
 
@@ -544,7 +614,10 @@ static void InitModulesThread(void* pData)
 
   // Generate the global analog semaphores
   for (uint8_t analogNb = 0; analogNb < NB_ANALOG_CHANNELS; analogNb++)
-    AnalogThreadData[analogNb].semaphore = OS_SemaphoreCreate(0);
+  {
+    AnalogThreadData[analogNb].semaphoreRead = OS_SemaphoreCreate(0);
+    AnalogThreadData[analogNb].semaphoreRMS = OS_SemaphoreCreate(0);
+  }
 
   //TODO:PIT_Init
   PIT_Init(CPU_BUS_CLK_HZ, PITCallback, NULL);
@@ -667,21 +740,8 @@ int main(void)
                           NULL,
                           &InitModulesThreadStack[THREAD_STACK_SIZE - 1],
   		                    0);
-  // 3rd Highest priority
-  error = OS_ThreadCreate(PacketThread,
-                          NULL,
-                          &PacketThreadStack[THREAD_STACK_SIZE - 1],
-                          3);
-  // 4th Highest priority
-  error = OS_ThreadCreate(FTMLEDsOffThread,
-                          NULL,
-                          &FTMLEDsOffThreadStack[THREAD_STACK_SIZE - 1],
-                          4);
-  // 5th Highest priority
-  error = OS_ThreadCreate(RTCThread,
-                          NULL,
-                          &RTCThreadStack[THREAD_STACK_SIZE - 1],
-                          5);
+
+  uint8_t analogPriority = 3;
 
   // Create threads for analog loopback channels
   for (uint8_t threadNb = 0; threadNb < NB_ANALOG_CHANNELS; threadNb++)
@@ -689,8 +749,35 @@ int main(void)
     error = OS_ThreadCreate(AnalogLoopbackThread,
                             &AnalogThreadData[threadNb],
                             &AnalogThreadStacks[threadNb][THREAD_STACK_SIZE - 1],
-                            (6 + threadNb));
+                            analogPriority);
+    analogPriority++;
   }
+
+  // Create threads for analog RMS channels
+  for (uint8_t threadNb = 0; threadNb < NB_ANALOG_CHANNELS; threadNb++)
+  {
+    error = OS_ThreadCreate(CalculateRMSThread,
+                            &AnalogThreadData[threadNb],
+                            &RMSThreadStacks[threadNb][THREAD_STACK_SIZE - 1],
+                            analogPriority);
+    analogPriority++;
+  }
+
+  // 3rd Highest priority
+  error = OS_ThreadCreate(PacketThread,
+                          NULL,
+                          &PacketThreadStack[THREAD_STACK_SIZE - 1],
+                          9);
+  // 4th Highest priority
+  error = OS_ThreadCreate(FTMLEDsOffThread,
+                          NULL,
+                          &FTMLEDsOffThreadStack[THREAD_STACK_SIZE - 1],
+                          10);
+  // 5th Highest priority
+  error = OS_ThreadCreate(RTCThread,
+                          NULL,
+                          &RTCThreadStack[THREAD_STACK_SIZE - 1],
+                          11);
 
   // Start multithreading - never returns!
   OS_Start();
