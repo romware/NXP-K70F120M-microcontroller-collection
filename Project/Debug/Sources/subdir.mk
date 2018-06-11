@@ -8,12 +8,10 @@ C_SRCS += \
 ../Sources/FIFO.c \
 ../Sources/FTM.c \
 ../Sources/Flash.c \
-../Sources/I2C.c \
 ../Sources/LEDs.c \
 ../Sources/PIT.c \
 ../Sources/RTC.c \
 ../Sources/UART.c \
-../Sources/accel.c \
 ../Sources/main.c \
 ../Sources/median.c \
 ../Sources/packet.c 
@@ -23,12 +21,10 @@ OBJS += \
 ./Sources/FIFO.o \
 ./Sources/FTM.o \
 ./Sources/Flash.o \
-./Sources/I2C.o \
 ./Sources/LEDs.o \
 ./Sources/PIT.o \
 ./Sources/RTC.o \
 ./Sources/UART.o \
-./Sources/accel.o \
 ./Sources/main.o \
 ./Sources/median.o \
 ./Sources/packet.o 
@@ -38,12 +34,10 @@ C_DEPS += \
 ./Sources/FIFO.d \
 ./Sources/FTM.d \
 ./Sources/Flash.d \
-./Sources/I2C.d \
 ./Sources/LEDs.d \
 ./Sources/PIT.d \
 ./Sources/RTC.d \
 ./Sources/UART.d \
-./Sources/accel.d \
 ./Sources/main.d \
 ./Sources/median.d \
 ./Sources/packet.d 
@@ -53,7 +47,7 @@ C_DEPS += \
 Sources/%.o: ../Sources/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: Cross ARM C Compiler'
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O0 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g3 -I"C:\Users\12551519\Desktop\project\es18aut13\Project\Library" -I"C:/Users/12551519/Desktop/project/es18aut13/Project/Static_Code/IO_Map" -I"C:/Users/12551519/Desktop/project/es18aut13/Project/Sources" -I"C:/Users/12551519/Desktop/project/es18aut13/Project/Generated_Code" -std=c99 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -c -o "$@" "$<"
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O0 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g3 -I"C:\Users\135035\Desktop\workspace\es18aut13\Project\Library" -I"C:/Users/135035/Desktop/workspace/es18aut13/Project/Static_Code/IO_Map" -I"C:/Users/135035/Desktop/workspace/es18aut13/Project/Sources" -I"C:/Users/135035/Desktop/workspace/es18aut13/Project/Generated_Code" -std=c99 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -c -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

@@ -48,13 +48,14 @@
 #include "PIT.h"
 #include "FTM.h"
 #include "RTC.h"
-#include "accel.h"
-#include "I2C.h"
 #include "median.h"
+
+// Analog functions
+#include "analog.h"
 
 #define BAUD_RATE 115200                        /*!< UART2 Baud Rate */
 
-const uint32_t PERIOD_I2C_POLL    = 1000000000; /*!< Period of the I2C polling in polling mode */
+const uint32_t PERIOD_ANALOG_POLL = 1250000;    /*!< Period of the Analog polling (1 seconds) */
 
 const uint8_t COMMAND_STARTUP     = 0x04;       /*!< The serial command byte for tower startup */
 const uint8_t COMMAND_VER         = 0x09;       /*!< The serial command byte for tower version */
@@ -63,8 +64,6 @@ const uint8_t COMMAND_PROGRAMBYTE = 0x07;       /*!< The serial command byte for
 const uint8_t COMMAND_READBYTE    = 0x08;       /*!< The serial command byte for tower read byte */
 const uint8_t COMMAND_MODE        = 0x0D;       /*!< The serial command byte for tower mode */
 const uint8_t COMMAND_TIME        = 0x0C;       /*!< The serial command byte for tower time */
-const uint8_t COMMAND_PROTOCOL    = 0x0A;       /*!< The serial command byte for tower protocol */
-const uint8_t COMMAND_ACCEL       = 0x10;       /*!< The serial command byte for tower accelerometer */
 
 const uint8_t COMMAND_TIMING      = 0x10;       /*!< The serial command byte for tower timing */
 const uint8_t COMMAND_RAISES      = 0x11;       /*!< The serial command byte for tower raises */
@@ -89,13 +88,8 @@ const uint8_t TOWER_VER_MIN       = 0;          /*!< Tower minor version */
 
 volatile uint16union_t* NvTowerNb;              /*!< Tower number union pointer to flash */
 volatile uint16union_t* NvTowerMd;              /*!< Tower mode union pointer to flash */
-volatile uint8_t* NvTowerPo;                    /*!< Tower protocol pointer to flash */
-
-static uint8_t AccelNewData[3];                 /*!< Latest XYZ readings from accelerometer */
 
 static OS_ECB* LEDOffSemaphore;                 /*!< LED off semaphore for FTM */
-static OS_ECB* DataReadySemaphore;              /*!< Data ready semaphore for accel */
-static OS_ECB* ReadCompleteSemaphore;           /*!< Read complete semaphore for accel */
 static OS_ECB* RTCReadSemaphore;                /*!< Read semaphore for RTC */
 
 // Thread stacks
@@ -103,9 +97,71 @@ OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);       /*!< The stack
 OS_THREAD_STACK(RTCThreadStack, THREAD_STACK_SIZE);               /*!< The stack for the RTC thread. */
 OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);        /*!< The stack for the FTM thread. */
 OS_THREAD_STACK(PITThreadStack, THREAD_STACK_SIZE);               /*!< The stack for the PIT thread. */
-OS_THREAD_STACK(AccelReadCompleteThreadStack, THREAD_STACK_SIZE); /*!< The stack for the AccelReadComplete thread. */
-OS_THREAD_STACK(AccelDataReadyThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the AccelDataReady thread. */
 OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);            /*!< The stack for the Packet thread. */
+
+#define NB_ANALOG_CHANNELS 3
+
+static uint32_t AnalogThreadStacks[NB_ANALOG_CHANNELS][THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));
+
+/*! @brief Data structure used to pass Analog configuration to a user thread
+ *
+ */
+typedef struct AnalogThreadData
+{
+  OS_ECB* semaphore;
+  uint8_t channelNb;
+} TAnalogThreadData;
+
+/*! @brief Analog thread configuration data
+ *
+ */
+static TAnalogThreadData AnalogThreadData[NB_ANALOG_CHANNELS] =
+{
+  {
+    .semaphore = NULL,
+    .channelNb = 0
+  },
+  {
+    .semaphore = NULL,
+    .channelNb = 1
+  },
+  {
+    .semaphore = NULL,
+    .channelNb = 2
+  }
+};
+
+/*! @brief Samples a value on an ADC channel and sends it to the corresponding DAC channel.
+ *
+ */
+void AnalogLoopbackThread(void* pData)
+{
+  // Make the code easier to read by giving a name to the typecast'ed pointer
+  #define analogData ((TAnalogThreadData*)pData)
+
+  for (;;)
+  {
+    int16_t analogInputValue;
+
+    (void)OS_SemaphoreWait(analogData->semaphore, 0);
+    // Get analog sample
+    Analog_Get(analogData->channelNb, &analogInputValue);
+    // Put analog sample
+    Analog_Put(analogData->channelNb, analogInputValue);
+  }
+}
+
+/*! @brief Reads analog data every time it is called
+ *
+ *  @return void
+ */
+void PITCallback(void* arg)
+{
+  // Signal the analog channels to take a sample
+  for (uint8_t analogNb = 0; analogNb < NB_ANALOG_CHANNELS; analogNb++)
+    (void)OS_SemaphoreSignal(AnalogThreadData[analogNb].semaphore);
+}
+
 
 /*! @brief Sends the startup packets to the PC
  *
@@ -118,8 +174,7 @@ bool HandleTowerStartup(void)
     Packet_Put(COMMAND_STARTUP,0x00,0x00,0x00) &&
     Packet_Put(COMMAND_VER,'v',TOWER_VER_MAJ,TOWER_VER_MIN) &&
     Packet_Put(COMMAND_NUM,PARAM_GET,NvTowerNb->s.Lo,NvTowerNb->s.Hi) &&
-    Packet_Put(COMMAND_MODE,PARAM_GET,NvTowerMd->s.Lo,NvTowerMd->s.Hi) &&
-    Packet_Put(COMMAND_PROTOCOL,PARAM_GET,_FB(NvTowerPo),0)
+    Packet_Put(COMMAND_MODE,PARAM_GET,NvTowerMd->s.Lo,NvTowerMd->s.Hi)
   );
 }
 
@@ -221,27 +276,6 @@ bool HandleTowerSetTime(void)
       // Sets the Real Time Clock
       RTC_Set(Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
       return true;
-  }
-  return false;
-}
-
-/*! @brief Sets the tower protocol or sends the packet to the PC
- *
- *  @return bool - TRUE if packet is sent or protocol is set
- */
-bool HandleTowerProtocol(void)
-{
-  // Check if parameters match tower protocol GET or SET parameters
-  if(Packet_Parameter1 == PARAM_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
-  {
-    // Sends the tower protocol packet
-    return Packet_Put(COMMAND_PROTOCOL,PARAM_GET,_FB(NvTowerPo),0);
-  }
-  else if (Packet_Parameter1 == PARAM_SET && (Packet_Parameter2 == ACCEL_POLL || Packet_Parameter2 == ACCEL_INT) && Packet_Parameter3 == 0)
-  {
-    // Sets the tower protocol
-    Accel_SetMode(Packet_Parameter2);
-    return Flash_Write8((uint8_t*)NvTowerPo,(uint8_t)Packet_Parameter2);
   }
   return false;
 }
@@ -402,11 +436,6 @@ void ReceivedPacket(void)
     // Set the Real Time Clock time
     success = HandleTowerSetTime();
   }
-  else if(commandIgnoreAck == COMMAND_PROTOCOL)
-  {
-    // Check if parameters match tower protocol GET or SET parameters
-    success = HandleTowerProtocol();
-  }
   else if(commandIgnoreAck == COMMAND_TIMING)
   {
     // Check if parameters match tower timing GET, DEFINITE or INVERSE parameters
@@ -471,19 +500,13 @@ bool TowerInit(void)
   // Success status of writing default values to Flash and FTM
   bool success = false;
 
-  TAccelSetup accelSetup;          /*!< Accelerometer setup */
-  accelSetup.moduleClk             = CPU_BUS_CLK_HZ;
-  accelSetup.dataReadySemaphore    = DataReadySemaphore;
-  accelSetup.readCompleteSemaphore = ReadCompleteSemaphore;
-
-  if (Flash_Init() &&  LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init() && RTC_Init(RTCReadSemaphore) && Accel_Init(&accelSetup))
+  if (Flash_Init() &&  LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init() && RTC_Init(RTCReadSemaphore))
   {
     success = true;
 
     // Allocates an address in Flash memory to the tower number and tower mode
     if(Flash_AllocateVar((volatile void**)&NvTowerNb, sizeof(*NvTowerNb))
-    && Flash_AllocateVar((volatile void**)&NvTowerMd, sizeof(*NvTowerMd))
-    && Flash_AllocateVar((volatile void**)&NvTowerPo, sizeof(*NvTowerPo)));
+    && Flash_AllocateVar((volatile void**)&NvTowerMd, sizeof(*NvTowerMd)));
     {
       // Checks if tower number is clear
       if(_FH(NvTowerNb) == 0xFFFF)
@@ -504,18 +527,6 @@ bool TowerInit(void)
           success = false;
         }
       }
-
-      // Checks if tower protocol stored in flash is invalid or clear
-      if((_FB(NvTowerPo) != (uint8_t)ACCEL_POLL) && (_FB(NvTowerPo) != (uint8_t)ACCEL_INT))
-      {
-        // Sets the tower protocol to the default protocol
-        if(!Flash_Write8((uint8_t*)NvTowerPo,(uint8_t)ACCEL_POLL))
-        {
-          success = false;
-        }
-      }
-
-      Accel_SetMode(_FB(NvTowerPo));
     }
   }
   return success;
@@ -528,10 +539,18 @@ bool TowerInit(void)
  */
 static void InitModulesThread(void* pData)
 {
+  // Analog
+  (void)Analog_Init(CPU_BUS_CLK_HZ);
+
+  // Generate the global analog semaphores
+  for (uint8_t analogNb = 0; analogNb < NB_ANALOG_CHANNELS; analogNb++)
+    AnalogThreadData[analogNb].semaphore = OS_SemaphoreCreate(0);
+
+  //TODO:PIT_Init
+  PIT_Init(CPU_BUS_CLK_HZ, PITCallback, NULL);
+
   // Create semaphores for threads
   LEDOffSemaphore = OS_SemaphoreCreate(0);
-  DataReadySemaphore = OS_SemaphoreCreate(0);
-  ReadCompleteSemaphore = OS_SemaphoreCreate(0);
   RTCReadSemaphore = OS_SemaphoreCreate(0);
 
   // Initializes the main tower components and sets the default or stored values
@@ -541,6 +560,9 @@ static void InitModulesThread(void* pData)
     LEDs_On(LED_ORANGE);
   }
   
+  //TODO:PIT_Set
+  PIT_Set(PERIOD_ANALOG_POLL, true);
+
   // Send startup packets to PC
   HandleTowerStartup();
 
@@ -609,75 +631,6 @@ static void RTCThread(void* pData)
   }
 }
 
-/*! @brief Calculates the median of recent accelerometer data and sends it to the PC
- *
- *  @param pData is not used but is required by the OS to create a thread.
- *  @note Assumes that I2C_Init has been called successfully.
- */
-static void AccelReadCompleteThread(void* pData)
-{
-  for (;;)
-  {
-    // Wait until read is complete
-    OS_SemaphoreWait(ReadCompleteSemaphore,0);
-
-    // Two dimensional array storing the 3 most recent X, Y and Z values
-    static uint8_t recentData[3][3];
-
-    // Array storing the last send X, Y and Z values
-    static uint8_t prevAccel[3];
-
-    // Shift the recent data up to append the latest accelerations
-    for(uint8_t i = 0; i < 2; i++)
-    {
-      recentData[i][0] = recentData[i+1][0];
-      recentData[i][1] = recentData[i+1][1];
-      recentData[i][2] = recentData[i+1][2];
-    }
-    recentData[2][0] = AccelNewData[0];
-    recentData[2][1] = AccelNewData[1];
-    recentData[2][2] = AccelNewData[2];
-
-    // Find the median value of the three most recent values for X, Y and Z accelerations
-    uint8_t medianX = Median_Filter3(recentData[0][0],recentData[1][0],recentData[2][0]);
-    uint8_t medianY = Median_Filter3(recentData[0][1],recentData[1][1],recentData[2][1]);
-    uint8_t medianZ = Median_Filter3(recentData[0][2],recentData[1][2],recentData[2][2]);
-
-    // Check if the data has changed
-    if(medianX != prevAccel[0] || medianY != prevAccel[1] || medianZ != prevAccel[2] || _FB(NvTowerPo) == (uint8_t)ACCEL_INT)
-    {
-      // Send the filtered accelerations to the PC
-      if(Packet_Put(COMMAND_ACCEL, medianX, medianY, medianZ))
-      {
-        // Toggle the green LED
-        LEDs_Toggle(LED_GREEN);
-      }
-    }
-
-    // Update the previous acceleration
-    prevAccel[0] = medianX;
-    prevAccel[1] = medianY;
-    prevAccel[2] = medianZ;
-  }
-}
-
-/*! @brief Reads acceleration values from the accelerometer
- *
- *  @param pData is not used but is required by the OS to create a thread.
- *  @note Assumes that accel_Init has been called successfully.
- */
-static void AccelDataReadyThread(void* pData)
-{
-  for (;;)
-  {
-    // Wait until data is ready to be read
-    OS_SemaphoreWait(DataReadySemaphore,0);
-
-    // Read data from the accelerometer
-    Accel_ReadXYZ(AccelNewData);
-  }
-}
-
 /*! @brief Turns the Blue LED off after the timer is complete
  *
  *  @param pData is not used but is required by the OS to create a thread.
@@ -715,30 +668,29 @@ int main(void)
                           &InitModulesThreadStack[THREAD_STACK_SIZE - 1],
   		                    0);
   // 3rd Highest priority
-  error = OS_ThreadCreate(AccelReadCompleteThread,
-                          NULL,
-                          &AccelReadCompleteThreadStack[THREAD_STACK_SIZE - 1],
-                          3);
-  // 4th Highest priority
-  error = OS_ThreadCreate(AccelDataReadyThread,
-                          NULL,
-                          &AccelDataReadyThreadStack[THREAD_STACK_SIZE - 1],
-                          4);
-  // 5th Highest priority
   error = OS_ThreadCreate(PacketThread,
                           NULL,
                           &PacketThreadStack[THREAD_STACK_SIZE - 1],
-                          5);
-  // 6th Highest priority
+                          3);
+  // 4th Highest priority
   error = OS_ThreadCreate(FTMLEDsOffThread,
                           NULL,
                           &FTMLEDsOffThreadStack[THREAD_STACK_SIZE - 1],
-                          6);
-  // 7th Highest priority
+                          4);
+  // 5th Highest priority
   error = OS_ThreadCreate(RTCThread,
                           NULL,
                           &RTCThreadStack[THREAD_STACK_SIZE - 1],
-                          7);
+                          5);
+
+  // Create threads for analog loopback channels
+  for (uint8_t threadNb = 0; threadNb < NB_ANALOG_CHANNELS; threadNb++)
+  {
+    error = OS_ThreadCreate(AnalogLoopbackThread,
+                            &AnalogThreadData[threadNb],
+                            &AnalogThreadStacks[threadNb][THREAD_STACK_SIZE - 1],
+                            (6 + threadNb));
+  }
 
   // Start multithreading - never returns!
   OS_Start();

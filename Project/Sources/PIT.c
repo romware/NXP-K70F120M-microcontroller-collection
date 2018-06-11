@@ -16,27 +16,31 @@
 #include "PIT.h"
 #include "MK70F12.h"
 #include "Cpu.h"
+#include "OS.h"
 
 static uint32_t ModuleClk;          /*!< Module Clock */
-static OS_ECB* UserSemaphore;       /*!< User semaphore for PIT */
+static void (*UserFunction)(void*); /*!< Callback functions for PIT */
+static void* UserArguments;         /*!< Callback parameters for PIT */
 
 
 /*! @brief Sets up the PIT before first use.
  *
  *  Enables the PIT and freezes the timer when debugging.
  *  @param moduleClk The module clock rate in Hz.
- *  @param userSemaphore is a pointer to a semaphore
+ *  @param userFunction is a pointer to a user callback function.
+ *  @param userArguments is a pointer to the user arguments to use with the user callback function.
  *  @return bool - TRUE if the PIT was successfully initialized.
  *  @note Assumes that moduleClk has a period which can be expressed as an integral number of nanoseconds.
  */
-bool PIT_Init(const uint32_t moduleClk, OS_ECB* userSemaphore)
+bool PIT_Init(const uint32_t moduleClk, void (*userFunction)(void*), void* userArguments)
 {
   // Enable the Periodic Interrupt Timer in System Clock Gating Control Register 6
   SIM_SCGC6 |= SIM_SCGC6_PIT_MASK;
 
   // Store parameters for interrupt routine and PIT enable
   ModuleClk = moduleClk;
-  UserSemaphore = userSemaphore;
+  UserFunction = userFunction;
+  UserArguments = userArguments;
 
   // Ensure global interrupts are disabled
   EnterCritical();
@@ -130,8 +134,9 @@ void __attribute__ ((interrupt)) PIT_ISR(void)
   // Clear the timer interrupt flag (W1C)
   PIT_TFLG0 = PIT_TFLG_TIF_MASK;
 
-  // Signal user semaphore
-  OS_SemaphoreSignal(UserSemaphore);
+  // Call user callback function to toggle the green LED
+  if (UserFunction)
+   (*UserFunction)(UserArguments);
 
   // Notify RTOS of exit of ISR
   OS_ISRExit();
