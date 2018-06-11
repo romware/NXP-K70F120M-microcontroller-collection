@@ -14,7 +14,7 @@
 // new types
 #include "types.h"
 #include "FIFO.h"
-#define THREAD_STACK_SIZE 400
+
 
 /*! @brief Sets up the UART interface before first use.
  *

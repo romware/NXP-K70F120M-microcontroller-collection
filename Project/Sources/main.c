@@ -56,7 +56,7 @@
 
 #define BAUD_RATE 115200                        /*!< UART2 Baud Rate */
 
-#define ADC_SAMPLES_PER_CYCLE 32                /*!< ADC samples per cycle */
+#define ADC_SAMPLES_PER_CYCLE 16                /*!< ADC samples per cycle */
 
 #define NB_ANALOG_CHANNELS 3
 
@@ -93,7 +93,7 @@ volatile uint8_t* NvTimingMd;                   /*!< Timing Mode byte pointer to
 
 
 
-TVoltageData VoltageSamples[NB_ANALOG_CHANNELS];
+static TVoltageData VoltageSamples[NB_ANALOG_CHANNELS];
 static uint16_t RMS[NB_ANALOG_CHANNELS];
 static uint16_t Frequency;
 static uint64_t OutOfRangeTimer = 5000000000;
@@ -435,6 +435,20 @@ void ReceivedPacket(void)
   Packet_Checksum   = 0;
 }
 
+void ADCReadCallback(void* arg)  //TODO: Info
+{
+  for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
+  {
+    Analog_Get(i, &(VoltageSamples[i].ADC_Data[VoltageSamples[i].LatestData]));
+    VoltageSamples[i].LatestData++;
+    if(VoltageSamples[i].LatestData == ADC_BUFFER_SIZE)
+    {
+      VoltageSamples[i].LatestData = 0;
+      OS_SemaphoreSignal(NewADCDataSemaphore);
+    }
+  }
+}
+
 /*! @brief Initializes the main tower components by calling the initialization routines of the supporting software modules.
  *
  *  @return void
@@ -445,7 +459,7 @@ bool TowerInit(void)
   bool success = false;
 
   if (Flash_Init() &&  LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init() &&
-      RTC_Init(RTCReadSemaphore) && Analog_Init(CPU_BUS_CLK_HZ) && PIT_Init(CPU_BUS_CLK_HZ, NewADCDataSemaphore)/*&& Accel_Init(&accelSetup)*/)
+      RTC_Init(RTCReadSemaphore) && Analog_Init(CPU_BUS_CLK_HZ) && PIT_Init(CPU_BUS_CLK_HZ, ADCReadCallback, NULL)/*&& Accel_Init(&accelSetup)*/)
   {
     success = true;
 
@@ -697,14 +711,14 @@ static void ADCDataProcessThread(void* pData)
     PIT_Set((uint32_t)((uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE))), false);
 
     // Store a local copy of data for analysis, disabling interrupts to restrict access during operation.
-    OS_DisableInterrupts();
+    //OS_DisableInterrupts();
 
     for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
     {
       currentSamples[i] = VoltageSamples[i];
     }
 
-    OS_EnableInterrupts();
+   //OS_EnableInterrupts();
 
     // Calculate RMS for all channels
     for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
@@ -780,6 +794,7 @@ static void FTMLEDsOffThread(void* pData)
   }
 }
 
+
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
 int main(void)
 /*lint -restore Enable MISRA rule (6.3) checking. */
@@ -804,7 +819,7 @@ int main(void)
   error = OS_ThreadCreate(ADCDataProcessThread,
                           NULL,
                           &ADCDataProcessThreadStack[THREAD_STACK_SIZE - 1],
-                          4);
+                          3);
   // 4th Highest priority
   error = OS_ThreadCreate(OutOfRangeThread,
                           NULL,
@@ -814,7 +829,7 @@ int main(void)
   error = OS_ThreadCreate(PacketThread,
 			  NULL,
                           &PacketThreadStack[THREAD_STACK_SIZE - 1],
-                          3);
+                          4);
   // 6th Highest priority
   error = OS_ThreadCreate(FTMLEDsOffThread,
                           NULL,

@@ -39,7 +39,7 @@
 // Thread set up
 // ----------------------------------------
 // Arbitrary thread stack size - big enough for stacking of interrupts and OS use.
-#define THREAD_STACK_SIZE 100
+
 #define NB_ANALOG_CHANNELS 2
 
 // Thread stacks

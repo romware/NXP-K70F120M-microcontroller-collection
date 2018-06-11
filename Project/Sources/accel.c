@@ -239,7 +239,7 @@ bool Accel_Init(const TAccelSetup* const accelSetup)
   PORTB_PCR4 &= ~PORT_PCR_IRQC_MASK;
 
   // Set up a 1 second Periodic Interrupt Timer for use in I2C polling mode.
-  PIT_Init(accelSetup->moduleClk, DataReadySemaphore);
+  // PIT_Init(accelSetup->moduleClk, DataReadySemaphore);
 
   return true;
 }
