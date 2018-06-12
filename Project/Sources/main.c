@@ -116,8 +116,6 @@ OS_THREAD_STACK(RTCThreadStack, THREAD_STACK_SIZE);               /*!< The stack
 OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);        /*!< The stack for the FTM thread. */
 //OS_THREAD_STACK(PITThreadStack, THREAD_STACK_SIZE);             /*!< The stack for the PIT thread. */
 OS_THREAD_STACK(ADCDataProcessThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the AccelReadComplete thread. */
-OS_THREAD_STACK(OutOfRangeThreadStack, THREAD_STACK_SIZE);        /*!< The stack for the OutOfRange thread. */
-OS_THREAD_STACK(WithinRangeThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the WithinRange thread. */
 OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);            /*!< The stack for the Packet thread. */
 
 /*! @brief Sends the startup packets to the PC
@@ -542,8 +540,6 @@ static void InitModulesThread(void* pData)
   // Create semaphores for threads
   LEDOffSemaphore = OS_SemaphoreCreate(0);
   NewADCDataSemaphore = OS_SemaphoreCreate(0);
-  OutOfRangeSemaphore = OS_SemaphoreCreate(0);
-  WithinRangeSemaphore = OS_SemaphoreCreate(0);
   RTCReadSemaphore = OS_SemaphoreCreate(0);
 
   // Initializes the main tower components and sets the default or stored values
@@ -717,7 +713,6 @@ static void ADCDataProcessThread(void* pData)
   float frequency = 50;
   int64_t OutOfRangeTimer = 5000000000;
   uint16_t rms;
-  static bool alarm = 0;
 
   for (;;)
   {
@@ -728,14 +723,14 @@ static void ADCDataProcessThread(void* pData)
     PIT_Set((uint32_t)((uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE))), false);
 
     // Store a local copy of data for analysis, disabling interrupts to restrict access during operation.
-    OS_DisableInterrupts();
+    //OS_DisableInterrupts();
 
     for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
     {
       currentSamples[i] = VoltageSamples[i];
     }
 
-   OS_EnableInterrupts();
+    //OS_EnableInterrupts();
 
     // Calculate RMS for all channels
     for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
@@ -749,12 +744,10 @@ static void ADCDataProcessThread(void* pData)
 
       OS_EnableInterrupts();
 
-      if((rms > RMS_UPPER_LIMIT || rms < RMS_LOWER_LIMIT) && !alarm)
+      if(rms > RMS_UPPER_LIMIT || rms < RMS_LOWER_LIMIT)
       {
         // Set alarm output on channel 3 to 5 volts
         Analog_Put(3, DAC_5V_OUT);
-
-        alarm = 1;
 
         // Check mode then subtract amount from
 
@@ -767,18 +760,15 @@ static void ADCDataProcessThread(void* pData)
            //OutOfRangeTimer = 0;
          }
       }
-      else if(alarm)
+      else
       {
         // Set alarm output on channel 3 to 0 volts
         Analog_Put(3, DAC_0V_OUT);
-
-        alarm = 0;
 
         // Reset counter
         //OutOfRangeTimer = 5000000000;
       }
     }
-
 
     // Get frequency if VRMS > 1.5 V
     if(RMS[0] > RMS_FREQUENCY_MIN)
@@ -807,38 +797,7 @@ static void ADCDataProcessThread(void* pData)
   }
 }
 
-static void OutOfRangeThread(void* pData)
-{
-  for (;;)
-  {
-    // Wait until signaled as out of range
-    OS_SemaphoreWait(OutOfRangeSemaphore,0);
 
-    // Set alarm output on channel 3 to 5 volts
-    Analog_Put(3, DAC_5V_OUT);
-
-    // Check mode then subtract amount from
-
-
-
-  }
-}
-
-static void WithinRangeThread(void* pData)
-{
-  for (;;)
-  {
-    // Wait until signaled as out of range
-    OS_SemaphoreWait(WithinRangeSemaphore,0);
-
-    // Set alarm output on channel 3 to 0 volts
-    Analog_Put(3, DAC_0V_OUT);
-
-    // Check mode then subtract amount from
-
-
-  }
-}
 /*! @brief Turns the Blue LED off after the timer is complete
  *
  *  @param pData is not used but is required by the OS to create a thread.
