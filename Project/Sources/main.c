@@ -102,7 +102,7 @@ volatile uint8_t* NvTimingMd;                   /*!< Timing Mode byte pointer to
 static TVoltageData VoltageSamples[NB_ANALOG_CHANNELS];
 static uint16_t RMS[NB_ANALOG_CHANNELS];
 static uint16_t Frequency;
-static uint64_t OutOfRangeTimer = 5000000000;
+
 
 static OS_ECB* LEDOffSemaphore;                 /*!< LED off semaphore for FTM */
 static OS_ECB* RTCReadSemaphore;                /*!< Read semaphore for RTC */
@@ -666,10 +666,12 @@ float GetFrequency(const TVoltageData Data,  const uint8_t DataSize,  const uint
   for(uint8_t i = arrayCrossing; i > 0; i --)
   {
     // Check for crossing
-    if((((float)Data.ADC_Data[i] >= 0) && ((float)Data.ADC_Data[i - 1] < 0)) || (((float)Data.ADC_Data[i] <= 0) && ((float)Data.ADC_Data[i - 1] >= 0)))
+    if((((float)Data.ADC_Data[i] >= 0) && ((float)Data.ADC_Data[i - 1] < 0))
+       || (((float)Data.ADC_Data[i] <= 0) && ((float)Data.ADC_Data[i - 1] >= 0)))
     {
       // Calculate accurate crossing and store in array
-      crossings[count] = (float)((i - 1) + (float)((- (float)Data.ADC_Data[i - 1]) / ((float)Data.ADC_Data[i] - (float)Data.ADC_Data[i - 1])));
+      crossings[count] = (float)((i - 1) + (float)((- (float)Data.ADC_Data[i - 1])
+          / ((float)Data.ADC_Data[i] - (float)Data.ADC_Data[i - 1])));
       count ++;
       //i -= 10;
     }
@@ -678,10 +680,12 @@ float GetFrequency(const TVoltageData Data,  const uint8_t DataSize,  const uint
   // Check for crossing between ends of array
   if(Data.LatestData)
   {
-    if((((float)Data.ADC_Data[0] >= 0) && ((float)Data.ADC_Data[DataSize - 1] < 0)) || (((float)Data.ADC_Data[0] <= 0) && ((float)Data.ADC_Data[DataSize - 1] >= 0)))
+    if((((float)Data.ADC_Data[0] >= 0) && ((float)Data.ADC_Data[DataSize - 1] < 0))
+        || (((float)Data.ADC_Data[0] <= 0) && ((float)Data.ADC_Data[DataSize - 1] >= 0)))
     {
       // Calculate accurate crossing and store in array
-      crossings[count] = (float)((float)(((float)Data.ADC_Data[DataSize - 1]) / ((float)Data.ADC_Data[0] - (float)Data.ADC_Data[DataSize - 1])));
+      crossings[count] = (float)((float)(((float)Data.ADC_Data[DataSize - 1])
+          / ((float)Data.ADC_Data[0] - (float)Data.ADC_Data[DataSize - 1])));
       count ++;
     }
   }
@@ -690,10 +694,12 @@ float GetFrequency(const TVoltageData Data,  const uint8_t DataSize,  const uint
   for(uint8_t i = DataSize - 1; i > arrayCrossing + 1; i --)
   {
     // Check for crossing
-    if((((float)Data.ADC_Data[i] >= 0) && ((float)Data.ADC_Data[i - 1] < 0)) || (((float)Data.ADC_Data[i] <= 0) && ((float)Data.ADC_Data[i - 1] >= 0)))
+    if((((float)Data.ADC_Data[i] >= 0) && ((float)Data.ADC_Data[i - 1] < 0))
+       || (((float)Data.ADC_Data[i] <= 0) && ((float)Data.ADC_Data[i - 1] >= 0)))
     {
       // Calculate accurate crossing and store in array
-      crossings[count] = (float)(((i - 1) + (float)((- (float)Data.ADC_Data[i - 1]) / ((float)Data.ADC_Data[i] - (float)Data.ADC_Data[i - 1])))- ((float)DataSize - 1));
+      crossings[count] = (float)(((i - 1) + (float)((- (float)Data.ADC_Data[i - 1])
+          / ((float)Data.ADC_Data[i] - (float)Data.ADC_Data[i - 1])))- ((float)DataSize - 1));
       count ++;
       //i += 10;
     }
@@ -708,8 +714,10 @@ float GetFrequency(const TVoltageData Data,  const uint8_t DataSize,  const uint
 static void ADCDataProcessThread(void* pData)
 {
   TVoltageData currentSamples[NB_ANALOG_CHANNELS];
-  static float frequency = 50;
+  float frequency = 50;
+  int64_t OutOfRangeTimer = 5000000000;
   uint16_t rms;
+  static bool alarm = 0;
 
   for (;;)
   {
@@ -741,13 +749,33 @@ static void ADCDataProcessThread(void* pData)
 
       OS_EnableInterrupts();
 
-      if(rms > RMS_UPPER_LIMIT || rms < RMS_LOWER_LIMIT)
+      if((rms > RMS_UPPER_LIMIT || rms < RMS_LOWER_LIMIT) && !alarm)
       {
-        OS_SemaphoreSignal(OutOfRangeSemaphore);
+        // Set alarm output on channel 3 to 5 volts
+        Analog_Put(3, DAC_5V_OUT);
+
+        alarm = 1;
+
+        // Check mode then subtract amount from
+
+        //OutOfRangeTimer -= (10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE));
+
+        if(OutOfRangeTimer <=  0)
+         {
+           //Analog_Put(1, DAC_5V_OUT);
+
+           //OutOfRangeTimer = 0;
+         }
       }
-      else
+      else if(alarm)
       {
-        OS_SemaphoreSignal(WithinRangeSemaphore);
+        // Set alarm output on channel 3 to 0 volts
+        Analog_Put(3, DAC_0V_OUT);
+
+        alarm = 0;
+
+        // Reset counter
+        //OutOfRangeTimer = 5000000000;
       }
     }
 
@@ -790,6 +818,7 @@ static void OutOfRangeThread(void* pData)
     Analog_Put(3, DAC_5V_OUT);
 
     // Check mode then subtract amount from
+
 
 
   }
@@ -847,22 +876,22 @@ int main(void)
   error = OS_ThreadCreate(InitModulesThread,
 			  NULL,
                           &InitModulesThreadStack[THREAD_STACK_SIZE - 1],
-  		          0);
+  		                    0);
   // 7thd Highest priority
   error = OS_ThreadCreate(ADCDataProcessThread,
                           NULL,
                           &ADCDataProcessThreadStack[THREAD_STACK_SIZE - 1],
                           7);
-  // 4th Highest priority
-  error = OS_ThreadCreate(WithinRangeThread,
-                          NULL,
-                          &WithinRangeThreadStack[THREAD_STACK_SIZE - 1],
-                          11);
-  // 5th Highest priority
-  error = OS_ThreadCreate(OutOfRangeThread,
-                          NULL,
-                          &OutOfRangeThreadStack[THREAD_STACK_SIZE - 1],
-                          10);
+//  // 4th Highest priority
+//  error = OS_ThreadCreate(WithinRangeThread,
+//                          NULL,
+//                          &WithinRangeThreadStack[THREAD_STACK_SIZE - 1],
+//                          11);
+//  // 5th Highest priority
+//  error = OS_ThreadCreate(OutOfRangeThread,
+//                          NULL,
+//                          &OutOfRangeThreadStack[THREAD_STACK_SIZE - 1],
+//                          10);
   // 9th Highest priority
   error = OS_ThreadCreate(PacketThread,
 			  NULL,
