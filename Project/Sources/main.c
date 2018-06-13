@@ -58,6 +58,8 @@
 
 #define ADC_SAMPLES_PER_CYCLE 16                /*!< ADC samples per cycle */
 
+#define ADC_BUFFER_SIZE 64
+
 #define NB_ANALOG_CHANNELS 3
 
 #define ADC_DEFAULT_FREQUENCY 50
@@ -67,6 +69,12 @@
 #define RMS_FREQUENCY_MIN  4915
 #define DAC_5V_OUT         16384
 #define DAC_0V_OUT          0
+
+typedef struct
+{
+  int16_t ADC_Data[ADC_BUFFER_SIZE];
+  uint8_t LatestData;
+}TVoltageData;
 
 const uint32_t PERIOD_I2C_POLL    = 1000000000; /*!< Period of the I2C polling in polling mode */
 
@@ -450,9 +458,10 @@ void ADCReadCallback(void* arg)  //TODO: Info
     if(VoltageSamples[i].LatestData == ADC_BUFFER_SIZE)
     {
       VoltageSamples[i].LatestData = 0;
-      OS_SemaphoreSignal(NewADCDataSemaphore);
     }
   }
+  OS_SemaphoreSignal(NewADCDataSemaphore);
+
 }
 
 /*! @brief Initializes the main tower components by calling the initialization routines of the supporting software modules.
@@ -674,7 +683,7 @@ float GetFrequency(const TVoltageData Data,  const uint8_t DataSize,  const uint
   }
 
   // Check for crossing between ends of array
-  if(Data.LatestData)
+  if(1/*Data.LatestData*/)
   {
     if((((float)Data.ADC_Data[0] >= 0) && ((float)Data.ADC_Data[DataSize - 1] < 0))
         || (((float)Data.ADC_Data[0] <= 0) && ((float)Data.ADC_Data[DataSize - 1] >= 0)))
@@ -709,33 +718,21 @@ float GetFrequency(const TVoltageData Data,  const uint8_t DataSize,  const uint
 
 static void ADCDataProcessThread(void* pData)
 {
-  TVoltageData currentSamples[NB_ANALOG_CHANNELS];
   float frequency = 50;
   int64_t OutOfRangeTimer = 5000000000;
   uint16_t rms;
+  uint8_t count = 0;
 
   for (;;)
   {
     // Wait for New ADC Data Semaphore
     OS_SemaphoreWait(NewADCDataSemaphore,0);
 
-    // Load new PIT period
-    PIT_Set((uint32_t)((uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE))), false);
-
-    // Store a local copy of data for analysis, disabling interrupts to restrict access during operation.
-    //OS_DisableInterrupts();
-
-    for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
-    {
-      currentSamples[i] = VoltageSamples[i];
-    }
-
-    //OS_EnableInterrupts();
 
     // Calculate RMS for all channels
     for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
     {
-      rms = GetRMS(currentSamples[i], ADC_BUFFER_SIZE);
+      rms = GetRMS(VoltageSamples[i], ADC_BUFFER_SIZE);
 
       // Update global RMS variable, disabling interrupts to restrict access during operation.
       OS_DisableInterrupts();
@@ -746,54 +743,68 @@ static void ADCDataProcessThread(void* pData)
 
       if(rms > RMS_UPPER_LIMIT || rms < RMS_LOWER_LIMIT)
       {
+        OS_DisableInterrupts();
         // Set alarm output on channel 3 to 5 volts
         Analog_Put(3, DAC_5V_OUT);
+
+        OS_EnableInterrupts();
 
         // Check mode then subtract amount from
 
         //OutOfRangeTimer -= (10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE));
 
         if(OutOfRangeTimer <=  0)
-         {
-           //Analog_Put(1, DAC_5V_OUT);
+        {
+          //Analog_Put(1, DAC_5V_OUT);
 
-           //OutOfRangeTimer = 0;
-         }
+          //OutOfRangeTimer = 0;
+        }
       }
       else
       {
+        OS_DisableInterrupts();
         // Set alarm output on channel 3 to 0 volts
         Analog_Put(3, DAC_0V_OUT);
+
+        OS_EnableInterrupts();
 
         // Reset counter
         //OutOfRangeTimer = 5000000000;
       }
     }
-
-    // Get frequency if VRMS > 1.5 V
-    if(RMS[0] > RMS_FREQUENCY_MIN)
+    count ++;
+    if(count == ADC_BUFFER_SIZE)
     {
-      frequency = GetFrequency(currentSamples[0], ADC_BUFFER_SIZE, (uint32_t)(frequency * 10));
+      count = 0;
+
+      // Get frequency if VRMS > 1.5 V
+      if(RMS[0] > RMS_FREQUENCY_MIN)
+      {
+        frequency = GetFrequency(VoltageSamples[0], ADC_BUFFER_SIZE, (uint32_t)(frequency * 10));
+      }
+
+      // Limit lowest frequency
+      if(frequency < 47.5)
+      {
+        frequency = 47.5;
+      }
+
+      // Limit highest frequency
+      else if(frequency > 52.5)
+      {
+        frequency = 52.5;
+      }
+
+      // Update global frequency variable, disabling interrupts to restrict access during operation.
+      OS_DisableInterrupts();
+
+      Frequency = (uint16_t)(frequency * 10);           //TODO: Does this typecast always round down??
+
+      OS_EnableInterrupts();
+
+      // Load new PIT period
+      PIT_Set((uint32_t)((uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE))), false);
     }
-
-    // Limit lowest frequency
-    if(frequency < 47.5)
-    {
-      frequency = 47.5;
-    }
-
-    // Limit highest frequency
-    else if(frequency > 52.5)
-    {
-      frequency = 52.5;
-    }
-    
-    // Update global frequency variable, disabling interrupts to restrict access during operation.
-    OS_DisableInterrupts();
-
-    Frequency = (uint16_t)(frequency * 10);           //TODO: Does this typecast always round down??
-
-   OS_EnableInterrupts();
   }
 }
 
