@@ -722,11 +722,17 @@ static void ADCDataProcessThread(void* pData)
   int64_t OutOfRangeTimer = 5000000000;
   uint16_t rms;
   uint8_t count = 0;
+  bool voltageHigh[NB_ANALOG_CHANNELS];
+  bool voltageLow[NB_ANALOG_CHANNELS];
+  bool alarm;
 
   for (;;)
   {
     // Wait for New ADC Data Semaphore
     OS_SemaphoreWait(NewADCDataSemaphore,0);
+
+    // Clear alarm flag
+    alarm = false;
 
 
     // Calculate RMS for all channels
@@ -741,37 +747,71 @@ static void ADCDataProcessThread(void* pData)
 
       OS_EnableInterrupts();
 
-      if(rms > RMS_UPPER_LIMIT || rms < RMS_LOWER_LIMIT)
+      if(rms > RMS_UPPER_LIMIT)
       {
-        OS_DisableInterrupts();
-        // Set alarm output on channel 3 to 5 volts
-        Analog_Put(3, DAC_5V_OUT);
-
-        OS_EnableInterrupts();
-
-        // Check mode then subtract amount from
-
-        //OutOfRangeTimer -= (10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE));
-
-        if(OutOfRangeTimer <=  0)
-        {
-          //Analog_Put(1, DAC_5V_OUT);
-
-          //OutOfRangeTimer = 0;
-        }
+        voltageHigh[i] = true;
+        alarm = true;
+      }
+      else if(rms < RMS_LOWER_LIMIT)
+      {
+        voltageLow[i] = true;
+        alarm = true;
       }
       else
       {
-        OS_DisableInterrupts();
-        // Set alarm output on channel 3 to 0 volts
-        Analog_Put(3, DAC_0V_OUT);
-
-        OS_EnableInterrupts();
-
-        // Reset counter
-        //OutOfRangeTimer = 5000000000;
+        voltageHigh[i] = false;
+        voltageLow[i] = false;
       }
     }
+
+    if(alarm)
+    {
+      OS_DisableInterrupts();
+      Analog_Put(3, DAC_5V_OUT);
+      OS_EnableInterrupts();
+
+      if(1/*definite mode*/)
+      {
+        OutOfRangeTimer -= (uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE));
+
+        if(OutOfRangeTimer <= 0)
+        {
+          // Set Lower signal if voltage high
+          if(voltageHigh[0] || voltageHigh[1] || voltageHigh[2])
+          {
+            OS_DisableInterrupts();
+            Analog_Put(2, DAC_5V_OUT);
+            OS_EnableInterrupts();
+          }
+
+          // Set raise signal if voltage low
+          if(voltageLow[0] || voltageLow[1] || voltageLow[2])
+          {
+            OS_DisableInterrupts();
+            Analog_Put(1, DAC_5V_OUT);
+            OS_EnableInterrupts();
+          }
+
+          // Set to zero to avoid underflow
+          OutOfRangeTimer = 0;
+        }
+      }
+
+      else /*inverse mode*/
+      {
+
+      }
+    }
+    else
+    {
+      OS_DisableInterrupts();
+      Analog_Put(1, DAC_0V_OUT);
+      Analog_Put(2, DAC_0V_OUT);
+      Analog_Put(3, DAC_0V_OUT);
+      OS_EnableInterrupts();
+      OutOfRangeTimer = 5000000000;
+    }
+
     count ++;
     if(count == ADC_BUFFER_SIZE)
     {
@@ -780,7 +820,7 @@ static void ADCDataProcessThread(void* pData)
       // Get frequency if VRMS > 1.5 V
       if(RMS[0] > RMS_FREQUENCY_MIN)
       {
-        frequency = GetFrequency(VoltageSamples[0], ADC_BUFFER_SIZE, (uint32_t)(frequency * 10));
+        frequency = GetFrequency(VoltageSamples[0], ADC_BUFFER_SIZE, (uint32_t)(frequency * 10));   //TODO: Protect from interrupts
       }
 
       // Limit lowest frequency
