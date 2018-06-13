@@ -720,11 +720,16 @@ static void ADCDataProcessThread(void* pData)
 {
   float frequency = 50;
   int64_t OutOfRangeTimer = 5000000000;
+  uint32_t minTimeCheck;
   uint16_t rms;
   uint8_t count = 0;
   bool voltageHigh[NB_ANALOG_CHANNELS];
   bool voltageLow[NB_ANALOG_CHANNELS];
   bool alarm;
+  bool adjusting = false;
+  float deltaVoltage;
+  float test;
+  float test1;
 
   for (;;)
   {
@@ -770,36 +775,60 @@ static void ADCDataProcessThread(void* pData)
       Analog_Put(3, DAC_5V_OUT);
       OS_EnableInterrupts();
 
-      if(1/*definite mode*/)
+      if(0/*definite mode*/ && !adjusting)
       {
         OutOfRangeTimer -= (uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE));
+      }
 
-        if(OutOfRangeTimer <= 0)
+      else if(!adjusting) /*inverse mode*/
+      {
+        //Find first out of voltage channel. TODO: what to do for independent channels??
+        for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
         {
-          // Set Lower signal if voltage high
-          if(voltageHigh[0] || voltageHigh[1] || voltageHigh[2])
+          if(voltageHigh[i])
           {
-            OS_DisableInterrupts();
-            Analog_Put(2, DAC_5V_OUT);
-            OS_EnableInterrupts();
+            deltaVoltage = ((float)RMS[i] - (float)RMS_UPPER_LIMIT);
+            break;
+          }
+          else if(voltageLow[i])
+          {
+            deltaVoltage = ((float)RMS_LOWER_LIMIT - (float)RMS[i]);
+            break;
           }
 
-          // Set raise signal if voltage low
-          if(voltageLow[0] || voltageLow[1] || voltageLow[2])
-          {
-            OS_DisableInterrupts();
-            Analog_Put(1, DAC_5V_OUT);
-            OS_EnableInterrupts();
-          }
+          // Keep track of actual time
+          minTimeCheck += (10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE));
 
-          // Set to zero to avoid underflow
-          OutOfRangeTimer = 0;
+          // Count down relative amount.
+          // Note: unusual type casting in order to round time the same way PIT did, but then use floats before going back to uint.
+          test = (uint32_t)((deltaVoltage / (float) 0.5) * (float)(((uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE)))));
+          OutOfRangeTimer -= (int32_t)((deltaVoltage / (float) 0.5) * (float)(((uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE)))));
         }
       }
 
-      else /*inverse mode*/
+      // Check if raise or lower signals should be set
+      if(OutOfRangeTimer <= 0)
       {
+        // Set Lower signal if voltage high
+        if(voltageHigh[0] || voltageHigh[1] || voltageHigh[2])
+        {
+          OS_DisableInterrupts();
+          Analog_Put(2, DAC_5V_OUT);
+          OS_EnableInterrupts();
+          adjusting = true;
+        }
 
+        // Set raise signal if voltage low
+        else if(voltageLow[0] || voltageLow[1] || voltageLow[2])
+        {
+          OS_DisableInterrupts();
+          Analog_Put(1, DAC_5V_OUT);
+          OS_EnableInterrupts();
+          adjusting = true;
+        }
+
+        // Set to zero to avoid underflow
+        OutOfRangeTimer = 0;
       }
     }
     else
@@ -810,6 +839,7 @@ static void ADCDataProcessThread(void* pData)
       Analog_Put(3, DAC_0V_OUT);
       OS_EnableInterrupts();
       OutOfRangeTimer = 5000000000;
+      adjusting = false;
     }
 
     count ++;
