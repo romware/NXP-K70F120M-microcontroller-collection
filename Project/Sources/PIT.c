@@ -134,7 +134,7 @@ void __attribute__ ((interrupt)) PIT_ISR(void)
   // Clear the timer interrupt flag (W1C)
   PIT_TFLG0 = PIT_TFLG_TIF_MASK;
 
-  // Call user callback function to toggle the green LED
+  // Call user callback function
   if (UserFunction)
    (*UserFunction)(UserArguments);
 

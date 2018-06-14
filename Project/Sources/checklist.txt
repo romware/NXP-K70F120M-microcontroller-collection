@@ -1,7 +1,7 @@
 VRR – Basic Functionality
 
 /2 G A P Voltage sampling.
-Three channels have synchronous sampling.						- Moslty done
+Three channels have synchronous sampling.						- Done
 16 samples per cycle at 50 Hz.									- Mostly done, Switch to sliding window
 Hard real-time constraint met.									- Done
 
@@ -17,7 +17,7 @@ Alarm signal.													- Done
 Non-volatile storage of number of raise/lower events.			- Mostly done. Check threads are ok for writing to flash
 
 /6 G A P Timing. 
-Definite.
+Definite.														- In progress with counter
 Inverse.
 Accuracy.
 

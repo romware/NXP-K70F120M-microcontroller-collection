@@ -48,7 +48,6 @@
 #include "PIT.h"
 #include "FTM.h"
 #include "RTC.h"
-#include "median.h"
 
 // Analog functions
 #include "analog.h"
@@ -67,22 +66,22 @@
 
 const uint32_t PERIOD_ANALOG_POLL = 1250000;    /*!< Period of the Analog polling (1 second) 1,000,000,000 / (f) 50,000 / cycles (16) */
 
-const uint8_t COMMAND_TIMING      = 0x10;       /*!< The serial command byte for tower timing */
-const uint8_t COMMAND_RAISES      = 0x11;       /*!< The serial command byte for tower raises */
-const uint8_t COMMAND_LOWERS      = 0x12;       /*!< The serial command byte for tower lowers */
-const uint8_t COMMAND_FREQUENCY   = 0x17;       /*!< The serial command byte for tower frequency */
-const uint8_t COMMAND_VOLTAGE     = 0x18;       /*!< The serial command byte for tower voltage */
-const uint8_t COMMAND_SPECTRUM    = 0x19;       /*!< The serial command byte for tower spectrum */
+const uint8_t COMMAND_TIMING      =    0x10;    /*!< The serial command byte for tower timing */
+const uint8_t COMMAND_RAISES      =    0x11;    /*!< The serial command byte for tower raises */
+const uint8_t COMMAND_LOWERS      =    0x12;    /*!< The serial command byte for tower lowers */
+const uint8_t COMMAND_FREQUENCY   =    0x17;    /*!< The serial command byte for tower frequency */
+const uint8_t COMMAND_VOLTAGE     =    0x18;    /*!< The serial command byte for tower voltage */
+const uint8_t COMMAND_SPECTRUM    =    0x19;    /*!< The serial command byte for tower spectrum */
 
-const uint8_t PARAM_PHASE_A         = 1;        /*!< Phase A bit of packet parameter 1 */
-const uint8_t PARAM_PHASE_B         = 2;        /*!< Phase B bit of packet parameter 1 */
-const uint8_t PARAM_PHASE_C         = 3;        /*!< Phase C bit of packet parameter 1 */
+const uint8_t PARAM_PHASE_A       =       1;    /*!< Phase A bit of packet parameter 1 */
+const uint8_t PARAM_PHASE_B       =       2;    /*!< Phase B bit of packet parameter 1 */
+const uint8_t PARAM_PHASE_C       =       3;    /*!< Phase C bit of packet parameter 1 */
 
-const int16_t VRR_ZERO = 0.0;        // 0
-const int16_t VRR_VOLT = 3277;       // (2^15 - 1) / 10
-const int16_t VRR_LIMIT_LOW = 6553;  // VRR_VOLT * 2
-const int16_t VRR_LIMIT_HIGH = 9830; // VRR_VOLT * 3
-const int16_t VRR_OUTPUT_5V = 16384;     // VRR_VOLT * 5
+const int16_t VRR_ZERO            =       0;    // 0
+const int16_t VRR_VOLT            =    3277;    // (2^15 - 1) / 10
+const int16_t VRR_LIMIT_LOW       =    6553;    // VRR_VOLT * 2
+const int16_t VRR_LIMIT_HIGH      =    9830;    // VRR_VOLT * 3 TDO: clean up doxygen and naming conventions
+const int16_t VRR_OUTPUT_5V       =   16384;    // VRR_VOLT * 5
 
 uint8_t Timing_Mode = 1;
 
@@ -174,34 +173,51 @@ void CalculateRMSThread(void* pData)
 
     OS_DisableInterrupts();
 
+    static uint32 counter = 1000;
+
     static bool alarmTriggered = false;
 
     if(rms < VRR_LIMIT_LOW)
     {
-      if(!alarmTriggered)
+      if(!counter)
       {
-        Flash_Write8((uint8_t*)NvCountRaises,_FB(NvCountRaises)+1);
-      }
+        if(!alarmTriggered)
+        {
+          Flash_Write8((uint8_t*)NvCountRaises,_FB(NvCountRaises)+1);
+        }
 
-      Analog_Put(ANALOG_CHANNEL_1, VRR_OUTPUT_5V);
-      Analog_Put(ANALOG_CHANNEL_2, VRR_ZERO);
-      Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
-      alarmTriggered = true;
+        Analog_Put(ANALOG_CHANNEL_1, VRR_OUTPUT_5V);
+        Analog_Put(ANALOG_CHANNEL_2, VRR_ZERO);
+        Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
+        alarmTriggered = true;
+      }
+      else
+      {
+        counter--;
+      }
     }
     else if(rms > VRR_LIMIT_HIGH)
     {
-      if(!alarmTriggered)
+      if(!counter)
       {
-        Flash_Write8((uint8_t*)NvCountLowers,_FB(NvCountLowers)+1);
-      }
+        if(!alarmTriggered)
+        {
+          Flash_Write8((uint8_t*)NvCountLowers,_FB(NvCountLowers)+1);
+        }
 
-      Analog_Put(ANALOG_CHANNEL_1, VRR_ZERO);
-      Analog_Put(ANALOG_CHANNEL_2, VRR_OUTPUT_5V);
-      Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
-      alarmTriggered = true;
+        Analog_Put(ANALOG_CHANNEL_1, VRR_ZERO);
+        Analog_Put(ANALOG_CHANNEL_2, VRR_OUTPUT_5V);
+        Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
+        alarmTriggered = true;
+      }
+      else
+      {
+        counter--;
+      }
     }
     else
     {
+      counter = 1000;
       Analog_Put(ANALOG_CHANNEL_1, VRR_ZERO);
       Analog_Put(ANALOG_CHANNEL_2, VRR_ZERO);
       Analog_Put(ANALOG_CHANNEL_3, VRR_ZERO);
