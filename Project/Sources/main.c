@@ -64,6 +64,7 @@
 
 #define VRR_SAMPLE_PERIOD 16
 
+const uint64_t PERIOD_TIMER_DELAY = 5000000000; /*!< Period of the Analog timer delay (5 seconds) 5,000,000,000 */
 const uint32_t PERIOD_ANALOG_POLL = 1250000;    /*!< Period of the Analog polling (1 second) 1,000,000,000 / (f) 50,000 / cycles (16) */
 
 const uint8_t COMMAND_TIMING      =    0x10;    /*!< The serial command byte for tower timing */
@@ -78,6 +79,7 @@ const uint8_t PARAM_PHASE_B       =       2;    /*!< Phase B bit of packet param
 const uint8_t PARAM_PHASE_C       =       3;    /*!< Phase C bit of packet parameter 1 */
 
 const int16_t VRR_ZERO            =       0;    // 0
+const int16_t VRR_VOLT_HALF       =    1638;    // VRR_VOLT / 2
 const int16_t VRR_VOLT            =    3277;    // (2^15 - 1) / 10
 const int16_t VRR_LIMIT_LOW       =    6553;    // VRR_VOLT * 2
 const int16_t VRR_LIMIT_HIGH      =    9830;    // VRR_VOLT * 3 TDO: clean up doxygen and naming conventions
@@ -158,6 +160,13 @@ void CalculateRMSThread(void* pData)
   // Make the code easier to read by giving a name to the typecast'ed pointer
   #define analogData ((TAnalogThreadData*)pData)
 
+  static uint64_t originalDelay;
+  static uint64_t timerDelay;
+  static bool alarmTriggered = false;
+  static bool adjustmentTriggered = false;
+
+  timerDelay = PERIOD_TIMER_DELAY;
+
   for (;;)
   {
     (void)OS_SemaphoreWait(analogData->semaphoreRMS, 0);
@@ -173,55 +182,77 @@ void CalculateRMSThread(void* pData)
 
     OS_DisableInterrupts();
 
-    static uint32 counter = 1000;
-
-    static bool alarmTriggered = false;
-
     if(rms < VRR_LIMIT_LOW)
     {
-      if(!counter)
+      if(!alarmTriggered)
       {
-        if(!alarmTriggered)
-        {
-          Flash_Write8((uint8_t*)NvCountRaises,_FB(NvCountRaises)+1);
-        }
+        alarmTriggered = true;
+        Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
 
+        timerDelay = PERIOD_TIMER_DELAY;
+        if(Timing_Mode == TIMING_INVERSE)
+        {
+          timerDelay *= (VRR_VOLT_HALF / (VRR_LIMIT_LOW - rms));
+          originalDelay = timerDelay;
+        }
+      }
+      else if(timerDelay >= PERIOD_ANALOG_POLL*16)
+      {
+        if(Timing_Mode == TIMING_INVERSE)
+        {
+          float percentLeft = (float)(originalDelay - timerDelay) / (float)originalDelay;
+          float newDelay = (float)((VRR_VOLT_HALF / (VRR_LIMIT_LOW - rms)) * PERIOD_TIMER_DELAY) * percentLeft;
+          timerDelay = newDelay;
+        }
+        timerDelay -= PERIOD_ANALOG_POLL*16;
+      }
+      else if(timerDelay < PERIOD_ANALOG_POLL*16 && !adjustmentTriggered)
+      {
+        adjustmentTriggered = true;
+        Flash_Write8((uint8_t*)NvCountRaises,_FB(NvCountRaises)+1);
         Analog_Put(ANALOG_CHANNEL_1, VRR_OUTPUT_5V);
         Analog_Put(ANALOG_CHANNEL_2, VRR_ZERO);
-        Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
-        alarmTriggered = true;
-      }
-      else
-      {
-        counter--;
       }
     }
     else if(rms > VRR_LIMIT_HIGH)
     {
-      if(!counter)
+      if(!alarmTriggered)
       {
-        if(!alarmTriggered)
-        {
-          Flash_Write8((uint8_t*)NvCountLowers,_FB(NvCountLowers)+1);
-        }
+        alarmTriggered = true;
+        Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
 
+        timerDelay = PERIOD_TIMER_DELAY;
+        if(Timing_Mode == TIMING_INVERSE)
+        {
+          timerDelay *= (VRR_VOLT_HALF / (rms - VRR_LIMIT_HIGH));
+          originalDelay = timerDelay;
+        }
+      }
+      else if(timerDelay >= PERIOD_ANALOG_POLL*16)
+      {
+        if(Timing_Mode == TIMING_INVERSE)
+        {
+          float percentLeft = (float)(originalDelay - timerDelay) / (float)originalDelay;
+          float newDelay = (float)((VRR_VOLT_HALF / (rms - VRR_LIMIT_HIGH)) * PERIOD_TIMER_DELAY) * percentLeft;
+          timerDelay = newDelay;
+        }
+        timerDelay -= PERIOD_ANALOG_POLL*16;
+      }
+      else if(timerDelay < PERIOD_ANALOG_POLL*16 && !adjustmentTriggered)
+      {
+        adjustmentTriggered = true;
+        Flash_Write8((uint8_t*)NvCountLowers,_FB(NvCountLowers)+1);
         Analog_Put(ANALOG_CHANNEL_1, VRR_ZERO);
         Analog_Put(ANALOG_CHANNEL_2, VRR_OUTPUT_5V);
-        Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
-        alarmTriggered = true;
-      }
-      else
-      {
-        counter--;
       }
     }
-    else
+    else if(alarmTriggered)
     {
-      counter = 1000;
+      alarmTriggered = false;
+      adjustmentTriggered = false;
       Analog_Put(ANALOG_CHANNEL_1, VRR_ZERO);
       Analog_Put(ANALOG_CHANNEL_2, VRR_ZERO);
       Analog_Put(ANALOG_CHANNEL_3, VRR_ZERO);
-      alarmTriggered = false;
     }
 
     analogData->sampleDataIndex = 0;
@@ -524,6 +555,10 @@ static void InitModulesThread(void* pData)
   
   // Set the PIT with the analog polling period
   PIT_Set(PERIOD_ANALOG_POLL, true);
+
+  Analog_Put(ANALOG_CHANNEL_1, VRR_ZERO);
+  Analog_Put(ANALOG_CHANNEL_2, VRR_ZERO);
+  Analog_Put(ANALOG_CHANNEL_3, VRR_ZERO);
 
   // We only do this once - therefore delete this thread
   OS_ThreadDelete(OS_PRIORITY_SELF);
