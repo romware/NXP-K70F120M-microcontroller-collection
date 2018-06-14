@@ -52,7 +52,7 @@ all: Project.elf secondary-outputs
 Project.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross ARM C++ Linker'
-	arm-none-eabi-g++ -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O0 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g3 -T "C:/Users/12551519/Desktop/es18aut13/Project/Project_Settings/Linker_Files/ProcessorExpert.ld" -Xlinker --gc-sections -L"C:\Users\12551519\Desktop\es18aut13\Project\Library" -Wl,-Map,"Project.map" -specs=nano.specs -specs=nosys.specs -o "Project.elf" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-none-eabi-g++ -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O0 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g3 -T "C:/Users/12551519/Desktop/git/Project/Project_Settings/Linker_Files/ProcessorExpert.ld" -Xlinker --gc-sections -L"C:\Users\12551519\Desktop\git\Project\Library" -Wl,-Map,"Project.map" -specs=nano.specs -specs=nosys.specs -o "Project.elf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

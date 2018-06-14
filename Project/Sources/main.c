@@ -82,7 +82,7 @@ const int16_t VRR_ZERO = 0.0;        // 0
 const int16_t VRR_VOLT = 3277;       // (2^15 - 1) / 10
 const int16_t VRR_LIMIT_LOW = 6553;  // VRR_VOLT * 2
 const int16_t VRR_LIMIT_HIGH = 9830; // VRR_VOLT * 3
-const int16_t VRR_ALARM = 16384;     // VRR_VOLT * 5
+const int16_t VRR_OUTPUT_5V = 16384;     // VRR_VOLT * 5
 
 uint8_t Timing_Mode = 1;
 
@@ -165,7 +165,7 @@ void CalculateRMSThread(void* pData)
 
     int64_t sum = 0;
 
-    for(uint8_t i = 0; i < VRR_SAMPLE_PERIOD; i++)
+    for(uint8_t i = 0; i < VRR_SAMPLE_PERIOD; i++) //TODO: Make sliding window of 16 samples not every 16 samples
     {
       sum += (analogData->sampleData[i])*(analogData->sampleData[i]);
     }
@@ -174,17 +174,38 @@ void CalculateRMSThread(void* pData)
 
     OS_DisableInterrupts();
 
+    static bool alarmTriggered = false;
+
     if(rms < VRR_LIMIT_LOW)
     {
-      Analog_Put(ANALOG_CHANNEL_3, VRR_ALARM);
+      if(!alarmTriggered)
+      {
+        Flash_Write8((uint8_t*)NvCountRaises,_FB(NvCountRaises)+1);
+      }
+
+      Analog_Put(ANALOG_CHANNEL_1, VRR_OUTPUT_5V);
+      Analog_Put(ANALOG_CHANNEL_2, VRR_ZERO);
+      Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
+      alarmTriggered = true;
     }
     else if(rms > VRR_LIMIT_HIGH)
     {
-      Analog_Put(ANALOG_CHANNEL_3, VRR_ALARM);
+      if(!alarmTriggered)
+      {
+        Flash_Write8((uint8_t*)NvCountLowers,_FB(NvCountLowers)+1);
+      }
+
+      Analog_Put(ANALOG_CHANNEL_1, VRR_ZERO);
+      Analog_Put(ANALOG_CHANNEL_2, VRR_OUTPUT_5V);
+      Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
+      alarmTriggered = true;
     }
     else
     {
+      Analog_Put(ANALOG_CHANNEL_1, VRR_ZERO);
+      Analog_Put(ANALOG_CHANNEL_2, VRR_ZERO);
       Analog_Put(ANALOG_CHANNEL_3, VRR_ZERO);
+      alarmTriggered = false;
     }
 
     analogData->sampleDataIndex = 0;
@@ -209,7 +230,6 @@ void AnalogReadThread(void* pData)
 
     OS_DisableInterrupts();
 
-    // Get analog sample
     Analog_Get(analogData->channelNb, &analogInputValue);
 
     OS_EnableInterrupts();
@@ -434,7 +454,7 @@ bool TowerInit(void)
     && Flash_AllocateVar((volatile void**)&NvCountLowers, sizeof(*NvCountLowers)));
     {
       // Checks if number of raises is clear
-      if(_FB(NvCountRaises) == 0xFFFF)
+      if(_FB(NvCountRaises) == 0xFF)
       {
         // Sets the number of raises to the default number
         if(!Flash_Write8((uint8_t*)NvCountRaises,(uint8_t)0))
@@ -443,7 +463,7 @@ bool TowerInit(void)
         }
       }
       // Checks if number of lowers is clear
-      if(_FB(NvCountLowers) == 0xFFFF)
+      if(_FB(NvCountLowers) == 0xFF)
       {
         // Sets the number of lowers to the default number
         if(!Flash_Write8((uint8_t*)NvCountLowers,(uint8_t)0))
