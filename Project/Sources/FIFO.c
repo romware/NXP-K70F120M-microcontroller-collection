@@ -58,11 +58,11 @@ void FIFO_Put(TFIFO * const FIFO, const uint8_t data)
     // If so, move to element 0
     FIFO->End = 0;
   }
-
+  OS_EnableInterrupts();
   // Increment bytes available
   OS_SemaphoreSignal(FIFO->CanGet);
 
-  OS_EnableInterrupts();
+
 }
 
 /*! @brief Get one character from the FIFO.
@@ -92,11 +92,11 @@ void FIFO_Get(TFIFO * const FIFO, uint8_t * const dataPtr)
     // If so, move to element 0
     FIFO->Start = 0;
   }
-
+  OS_EnableInterrupts();
   // Increment space available
   OS_SemaphoreSignal(FIFO->CanPut);
 
-  OS_EnableInterrupts();
+
 }
 
 /* END FIFO */

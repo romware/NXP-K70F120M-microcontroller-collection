@@ -76,6 +76,13 @@ typedef struct
   uint8_t LatestData;
 }TVoltageData;
 
+typedef enum
+{
+  TIMING_GET,
+  TIMING_DEFINITE,
+  TIMING_INVERSE
+}TTimingMode;
+
 const uint32_t PERIOD_I2C_POLL    = 1000000000; /*!< Period of the I2C polling in polling mode */
 
 const uint8_t COMMAND_STARTUP     = 0x04;       /*!< The serial command byte for tower startup */
@@ -110,6 +117,7 @@ volatile uint8_t* NvTimingMd;                   /*!< Timing Mode byte pointer to
 static TVoltageData VoltageSamples[NB_ANALOG_CHANNELS];
 static uint16_t RMS[NB_ANALOG_CHANNELS];
 static uint16_t Frequency;
+static uint16_t TimingMode;
 
 
 static OS_ECB* LEDOffSemaphore;                 /*!< LED off semaphore for FTM */
@@ -122,7 +130,6 @@ static OS_ECB* NewADCDataSemaphore;             /*!< New ADC data semaphore for 
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Tower Init thread. */
 OS_THREAD_STACK(RTCThreadStack, THREAD_STACK_SIZE);               /*!< The stack for the RTC thread. */
 OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);        /*!< The stack for the FTM thread. */
-//OS_THREAD_STACK(PITThreadStack, THREAD_STACK_SIZE);             /*!< The stack for the PIT thread. */
 OS_THREAD_STACK(ADCDataProcessThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the AccelReadComplete thread. */
 OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);            /*!< The stack for the Packet thread. */
 
@@ -249,16 +256,22 @@ bool HandleTowerSetTime(void)
 bool HandleTowerTimingMode(void)
 {
   // Check if parameters are within tower time limits and get or set definite or inverse
-  if(Packet_Parameter1 == 0 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  if(Packet_Parameter1 == TIMING_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Send Timing Mode
     Packet_Put(COMMAND_TIMINGMODE, _FB(NvTimingMd), 0, 0);
     return true;
   }
-  else if((Packet_Parameter1 == 1 || Packet_Parameter1 == 2) && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  else if((Packet_Parameter1 == TIMING_DEFINITE || Packet_Parameter1 == TIMING_INVERSE) && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Set Timing Mode
-    return Flash_Write8((uint8_t*)NvTowerMd,(uint8_t)Packet_Parameter1);
+    if (Flash_Write8((uint8_t*)NvTimingMd,(uint8_t)Packet_Parameter1))
+    {
+      OS_DisableInterrupts();
+      TimingMode = _FB(NvTimingMd);
+      OS_EnableInterrupts();
+      return true;
+    }
   }
   return false;
 }
@@ -505,18 +518,24 @@ bool TowerInit(void)
         }
       }
 
-      // Checks if timing mode is clear
-      if(_FH(NvTimingMd) == 0xFF)
+      // Checks if timing mode is valid
+      if((_FB(NvTimingMd) != TIMING_DEFINITE) && (_FB(NvTimingMd) != TIMING_INVERSE))
       {
         // Sets the timing mode to the default mode
-        if(!Flash_Write8((uint8_t*)NvTimingMd,(uint8_t)1))
+        if(!Flash_Write8((uint8_t*)NvTimingMd, (uint8_t)TIMING_DEFINITE))
         {
           success = false;
         }
+        TimingMode = _FB(NvTimingMd);
+      }
+
+      else if((_FB(NvTimingMd) == TIMING_DEFINITE) || (_FB(NvTimingMd) == TIMING_INVERSE))
+      {
+        TimingMode = _FB(NvTimingMd);
       }
 
       // Checks if number of raises is clear
-      if(_FH(NvTowerMd) == 0xFF)
+      if(_FB(NvNbRaises) == 0xFF)
       {
         // Sets the number of raises to 0
         if(!Flash_Write8((uint8_t*)NvNbRaises,(uint8_t)0))
@@ -526,7 +545,7 @@ bool TowerInit(void)
       }
 
       // Checks if number of lowers is clear
-      if(_FH(NvTowerMd) == 0xFF)
+      if(_FB(NvNbLowers) == 0xFF)
       {
         // Sets the number of raises to 0
         if(!Flash_Write8((uint8_t*)NvNbLowers,(uint8_t)0))
@@ -769,18 +788,18 @@ static void ADCDataProcessThread(void* pData)
       }
     }
 
-    if(alarm)
+    if(alarm && !adjusting)
     {
       OS_DisableInterrupts();
       Analog_Put(3, DAC_5V_OUT);
       OS_EnableInterrupts();
 
-      if(0/*definite mode*/ && !adjusting)
+      if(TimingMode == TIMING_DEFINITE)
       {
         OutOfRangeTimer -= (uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE));
       }
 
-      else if(!adjusting) /*inverse mode*/
+      if(TimingMode == TIMING_INVERSE) /*inverse mode*/
       {
         //Find first out of voltage channel. TODO: what to do for independent channels??
         for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
@@ -795,19 +814,20 @@ static void ADCDataProcessThread(void* pData)
             deltaVoltage = ((float)RMS_LOWER_LIMIT - (float)RMS[i]);
             break;
           }
-
-          // Keep track of actual time
-          minTimeCheck += (10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE));
-
-          // Count down relative amount.
-          // Note: unusual type casting in order to round time the same way PIT did, but then use floats before going back to uint.
-          test = (uint32_t)((deltaVoltage / (float) 0.5) * (float)(((uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE)))));
-          OutOfRangeTimer -= (int32_t)((deltaVoltage / (float) 0.5) * (float)(((uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE)))));
         }
+
+        // Keep track of actual time
+        minTimeCheck += (10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE));
+
+        // Count down relative amount.
+        // Note: unusual type casting in order to round time the same way PIT did, but then use floats before going back to uint.
+
+        OutOfRangeTimer -= (int32_t)((deltaVoltage / (float) 1638) * (float)(((uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE)))));
+
       }
 
       // Check if raise or lower signals should be set
-      if(OutOfRangeTimer <= 0)
+      if(OutOfRangeTimer <= 0 && !adjusting && minTimeCheck >= 1000000000)
       {
         // Set Lower signal if voltage high
         if(voltageHigh[0] || voltageHigh[1] || voltageHigh[2])
@@ -827,11 +847,12 @@ static void ADCDataProcessThread(void* pData)
           adjusting = true;
         }
 
-        // Set to zero to avoid underflow
+        // Set to avoid underflow overflow
         OutOfRangeTimer = 0;
+        //minTimeCheck = 1000000000;
       }
     }
-    else
+    else if(!alarm)
     {
       OS_DisableInterrupts();
       Analog_Put(1, DAC_0V_OUT);
@@ -922,16 +943,7 @@ int main(void)
                           NULL,
                           &ADCDataProcessThreadStack[THREAD_STACK_SIZE - 1],
                           7);
-//  // 4th Highest priority
-//  error = OS_ThreadCreate(WithinRangeThread,
-//                          NULL,
-//                          &WithinRangeThreadStack[THREAD_STACK_SIZE - 1],
-//                          11);
-//  // 5th Highest priority
-//  error = OS_ThreadCreate(OutOfRangeThread,
-//                          NULL,
-//                          &OutOfRangeThreadStack[THREAD_STACK_SIZE - 1],
-//                          10);
+
   // 9th Highest priority
   error = OS_ThreadCreate(PacketThread,
 			  NULL,
