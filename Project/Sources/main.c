@@ -160,10 +160,10 @@ void CalculateRMSThread(void* pData)
   // Make the code easier to read by giving a name to the typecast'ed pointer
   #define analogData ((TAnalogThreadData*)pData)
 
-  static uint64_t originalDelay;
-  static uint64_t timerDelay;
-  static bool alarmTriggered = false;
-  static bool adjustmentTriggered = false;
+  uint64_t originalDelay;
+  uint64_t timerDelay;
+  bool alarmTriggered = false;
+  bool adjustmentTriggered = false;
 
   timerDelay = PERIOD_TIMER_DELAY;
 
@@ -173,7 +173,7 @@ void CalculateRMSThread(void* pData)
 
     int64_t sum = 0;
 
-    for(uint8_t i = 0; i < VRR_SAMPLE_PERIOD; i++) //TODO: Make sliding window of 16 samples not every 16 samples
+    for(uint8_t i = 0; i < VRR_SAMPLE_PERIOD; i++)
     {
       sum += (analogData->sampleData[i])*(analogData->sampleData[i]);
     }
@@ -196,7 +196,7 @@ void CalculateRMSThread(void* pData)
           originalDelay = timerDelay;
         }
       }
-      else if(timerDelay >= PERIOD_ANALOG_POLL*16)
+      else if(timerDelay >= PERIOD_ANALOG_POLL)
       {
         if(Timing_Mode == TIMING_INVERSE)
         {
@@ -204,9 +204,9 @@ void CalculateRMSThread(void* pData)
           float newDelay = (float)((VRR_VOLT_HALF / (VRR_LIMIT_LOW - rms)) * PERIOD_TIMER_DELAY) * percentLeft;
           timerDelay = newDelay;
         }
-        timerDelay -= PERIOD_ANALOG_POLL*16;
+        timerDelay -= PERIOD_ANALOG_POLL;
       }
-      else if(timerDelay < PERIOD_ANALOG_POLL*16 && !adjustmentTriggered)
+      else if(timerDelay < PERIOD_ANALOG_POLL && !adjustmentTriggered)
       {
         adjustmentTriggered = true;
         Flash_Write8((uint8_t*)NvCountRaises,_FB(NvCountRaises)+1);
@@ -228,7 +228,7 @@ void CalculateRMSThread(void* pData)
           originalDelay = timerDelay;
         }
       }
-      else if(timerDelay >= PERIOD_ANALOG_POLL*16)
+      else if(timerDelay >= PERIOD_ANALOG_POLL)
       {
         if(Timing_Mode == TIMING_INVERSE)
         {
@@ -236,9 +236,9 @@ void CalculateRMSThread(void* pData)
           float newDelay = (float)((VRR_VOLT_HALF / (rms - VRR_LIMIT_HIGH)) * PERIOD_TIMER_DELAY) * percentLeft;
           timerDelay = newDelay;
         }
-        timerDelay -= PERIOD_ANALOG_POLL*16;
+        timerDelay -= PERIOD_ANALOG_POLL;
       }
-      else if(timerDelay < PERIOD_ANALOG_POLL*16 && !adjustmentTriggered)
+      else if(timerDelay < PERIOD_ANALOG_POLL && !adjustmentTriggered)
       {
         adjustmentTriggered = true;
         Flash_Write8((uint8_t*)NvCountLowers,_FB(NvCountLowers)+1);
@@ -254,8 +254,6 @@ void CalculateRMSThread(void* pData)
       Analog_Put(ANALOG_CHANNEL_2, VRR_ZERO);
       Analog_Put(ANALOG_CHANNEL_3, VRR_ZERO);
     }
-
-    analogData->sampleDataIndex = 0;
 
     OS_EnableInterrupts();
   }
@@ -281,15 +279,15 @@ void AnalogReadThread(void* pData)
 
     OS_EnableInterrupts();
 
-    if(analogData->sampleDataIndex == VRR_SAMPLE_PERIOD)
+    analogData->sampleData[analogData->sampleDataIndex] = analogInputValue;
+    analogData->sampleDataIndex++;
+
+    if(analogData->sampleDataIndex >= VRR_SAMPLE_PERIOD)
     {
-      (void)OS_SemaphoreSignal(AnalogThreadData[analogData->channelNb].semaphoreRMS);
+      analogData->sampleDataIndex = 0;
     }
-    else
-    {
-      analogData->sampleData[analogData->sampleDataIndex] = analogInputValue;
-      analogData->sampleDataIndex++;
-    }
+
+    (void)OS_SemaphoreSignal(AnalogThreadData[analogData->channelNb].semaphoreRMS);
   }
 }
 
