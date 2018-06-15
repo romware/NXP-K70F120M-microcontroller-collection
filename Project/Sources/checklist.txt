@@ -2,24 +2,24 @@ VRR – Basic Functionality
 
 /2 G A P Voltage sampling.
 Three channels have synchronous sampling.						- Done
-16 samples per cycle at 50 Hz.									- Mostly done, Switch to sliding window
+16 samples per cycle at 50 Hz.									- Done
 Hard real-time constraint met.									- Done
 
 /6 G A P True RMS. 
 Measurement of true RMS for voltage.							- Done
-Speed of calculation.											- Mostly done, check data types and efficiency
-Efficiency of algorithm.										- Mostly done, check data types and efficiency
+Speed of calculation.											- Mostly done, check data types and efficiency (fixed point)
+Efficiency of algorithm.										- Mostly done, check data types and efficiency (fixed point)
 
 /4 G A P Outputs.
 Three channel operation is aggregated 							- Done
 	(raise/lower initiated on any channel).
 Alarm signal.													- Done
-Non-volatile storage of number of raise/lower events.			- Mostly done. Check threads are ok for writing to flash
+Non-volatile storage of number of raise/lower events.			- Mostly Done. Move flash to sperate threads
 
 /6 G A P Timing. 
-Definite.														- In progress with counter
-Inverse.
-Accuracy.
+Definite.														- Done
+Inverse.														- In progress
+Accuracy.														- Mostly Done. Needs testing
 
 /2 G A P Settings / interrogation.
 Tower protocol expanded to achieve Basic Functionality.			- Done

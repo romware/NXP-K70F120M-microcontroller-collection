@@ -47,7 +47,6 @@
 #include "PE_Types.h"
 #include "PIT.h"
 #include "FTM.h"
-#include "RTC.h"
 
 // Analog functions
 #include "analog.h"
@@ -85,19 +84,17 @@ const int16_t VRR_LIMIT_LOW       =    6553;    // VRR_VOLT * 2
 const int16_t VRR_LIMIT_HIGH      =    9830;    // VRR_VOLT * 3 TDO: clean up doxygen and naming conventions
 const int16_t VRR_OUTPUT_5V       =   16384;    // VRR_VOLT * 5
 
-uint8_t Timing_Mode = 1;
+uint8_t Timing_Mode = 2; //TODO:change
 
 volatile uint8_t* NvCountRaises;                /*!< Number of raises pointer to flash */
 volatile uint8_t* NvCountLowers;                /*!< Number of lowers pointer to flash */
 
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Tower Init thread. */
-OS_THREAD_STACK(RTCThreadStack, THREAD_STACK_SIZE);               /*!< The stack for the RTC thread. */
 OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);        /*!< The stack for the FTM thread. */
 OS_THREAD_STACK(PITThreadStack, THREAD_STACK_SIZE);               /*!< The stack for the PIT thread. */
 OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);            /*!< The stack for the Packet thread. */
 
-static uint32_t AnalogThreadStacks[NB_ANALOG_CHANNELS][THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));
 static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS][THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));
 
 typedef enum
@@ -118,7 +115,6 @@ typedef enum
  */
 typedef struct AnalogThreadData
 {
-  OS_ECB* semaphoreRead;
   OS_ECB* semaphoreRMS;
   uint8_t channelNb;
   int16_t sampleData[VRR_SAMPLE_PERIOD];
@@ -131,19 +127,16 @@ typedef struct AnalogThreadData
 static TAnalogThreadData AnalogThreadData[NB_ANALOG_CHANNELS] =
 {
   {
-    .semaphoreRead = NULL,
     .semaphoreRMS = NULL,
     .sampleDataIndex = 0,
     .channelNb = ANALOG_CHANNEL_1
   },
   {
-    .semaphoreRead = NULL,
     .semaphoreRMS = NULL,
     .sampleDataIndex = 0,
     .channelNb = ANALOG_CHANNEL_2
   },
   {
-    .semaphoreRead = NULL,
     .semaphoreRMS = NULL,
     .sampleDataIndex = 0,
     .channelNb = ANALOG_CHANNEL_3
@@ -151,6 +144,22 @@ static TAnalogThreadData AnalogThreadData[NB_ANALOG_CHANNELS] =
 };
 
 static OS_ECB* LEDOffSemaphore;                          /*!< LED off semaphore for FTM */
+
+
+
+/*! @brief Calculates RMS of given values
+ *
+ *  @return float - RMS value
+ */
+float CalculateRMS(const int16_t data[], const uint8_t length)
+{
+  int64_t sum = 0;
+  for(uint8_t i = 0; i < length; i++)
+  {
+    sum += (data[i])*(data[i]);
+  }
+  return sqrt( (float)sum / (float)length );
+}
 
 /*! @brief Calculates the RMS value on an ADC channel.
  *
@@ -160,10 +169,11 @@ void CalculateRMSThread(void* pData)
   // Make the code easier to read by giving a name to the typecast'ed pointer
   #define analogData ((TAnalogThreadData*)pData)
 
-  uint64_t originalDelay;
   uint64_t timerDelay;
   bool alarmTriggered = false;
   bool adjustmentTriggered = false;
+
+  static float prevRMS;
 
   timerDelay = PERIOD_TIMER_DELAY;
 
@@ -171,14 +181,7 @@ void CalculateRMSThread(void* pData)
   {
     (void)OS_SemaphoreWait(analogData->semaphoreRMS, 0);
 
-    int64_t sum = 0;
-
-    for(uint8_t i = 0; i < VRR_SAMPLE_PERIOD; i++)
-    {
-      sum += (analogData->sampleData[i])*(analogData->sampleData[i]);
-    }
-
-    float rms = sqrt((float)sum/(float)VRR_SAMPLE_PERIOD);
+    float rms = CalculateRMS(analogData->sampleData, VRR_SAMPLE_PERIOD);
 
     OS_DisableInterrupts();
 
@@ -190,21 +193,17 @@ void CalculateRMSThread(void* pData)
         Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
 
         timerDelay = PERIOD_TIMER_DELAY;
-        if(Timing_Mode == TIMING_INVERSE)
-        {
-          timerDelay *= (VRR_VOLT_HALF / (VRR_LIMIT_LOW - rms));
-          originalDelay = timerDelay;
-        }
       }
       else if(timerDelay >= PERIOD_ANALOG_POLL)
       {
-        if(Timing_Mode == TIMING_INVERSE)
+        timerDelay -= PERIOD_ANALOG_POLL;
+
+        if(Timing_Mode == TIMING_INVERSE && rms != prevRMS)
         {
-          float percentLeft = (float)(originalDelay - timerDelay) / (float)originalDelay;
-          float newDelay = (float)((VRR_VOLT_HALF / (VRR_LIMIT_LOW - rms)) * PERIOD_TIMER_DELAY) * percentLeft;
+          float percentLeft = (float)(PERIOD_TIMER_DELAY - timerDelay) / (float)PERIOD_TIMER_DELAY;
+          float newDelay = (float)((float)(VRR_VOLT_HALF / (float)(VRR_LIMIT_LOW - rms)) * (float)PERIOD_TIMER_DELAY) * percentLeft;
           timerDelay = newDelay;
         }
-        timerDelay -= PERIOD_ANALOG_POLL;
       }
       else if(timerDelay < PERIOD_ANALOG_POLL && !adjustmentTriggered)
       {
@@ -222,21 +221,18 @@ void CalculateRMSThread(void* pData)
         Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
 
         timerDelay = PERIOD_TIMER_DELAY;
-        if(Timing_Mode == TIMING_INVERSE)
-        {
-          timerDelay *= (VRR_VOLT_HALF / (rms - VRR_LIMIT_HIGH));
-          originalDelay = timerDelay;
-        }
       }
       else if(timerDelay >= PERIOD_ANALOG_POLL)
       {
-        if(Timing_Mode == TIMING_INVERSE)
+        timerDelay -= PERIOD_ANALOG_POLL;
+
+        if(Timing_Mode == TIMING_INVERSE && rms != prevRMS)
         {
-          float percentLeft = (float)(originalDelay - timerDelay) / (float)originalDelay;
-          float newDelay = (float)((VRR_VOLT_HALF / (rms - VRR_LIMIT_HIGH)) * PERIOD_TIMER_DELAY) * percentLeft;
+          float percentLeft = (float)(PERIOD_TIMER_DELAY - timerDelay) / (float)PERIOD_TIMER_DELAY;
+          float newDelay = (float)(((float)VRR_VOLT_HALF / (float)(rms - VRR_LIMIT_HIGH)) * (float)PERIOD_TIMER_DELAY) * percentLeft;
           timerDelay = newDelay;
         }
-        timerDelay -= PERIOD_ANALOG_POLL;
+
       }
       else if(timerDelay < PERIOD_ANALOG_POLL && !adjustmentTriggered)
       {
@@ -256,38 +252,8 @@ void CalculateRMSThread(void* pData)
     }
 
     OS_EnableInterrupts();
-  }
-}
 
-/*! @brief Samples a value on an ADC channel and sends it to the corresponding DAC channel.
- *
- */
-void AnalogReadThread(void* pData)
-{
-  // Make the code easier to read by giving a name to the typecast'ed pointer
-  #define analogData ((TAnalogThreadData*)pData)
-
-  for (;;)
-  {
-    int16_t analogInputValue;
-
-    (void)OS_SemaphoreWait(analogData->semaphoreRead, 0);
-
-    OS_DisableInterrupts();
-
-    Analog_Get(analogData->channelNb, &analogInputValue);
-
-    OS_EnableInterrupts();
-
-    analogData->sampleData[analogData->sampleDataIndex] = analogInputValue;
-    analogData->sampleDataIndex++;
-
-    if(analogData->sampleDataIndex >= VRR_SAMPLE_PERIOD)
-    {
-      analogData->sampleDataIndex = 0;
-    }
-
-    (void)OS_SemaphoreSignal(AnalogThreadData[analogData->channelNb].semaphoreRMS);
+    prevRMS = rms;
   }
 }
 
@@ -297,9 +263,28 @@ void AnalogReadThread(void* pData)
  */
 void PITCallback(void* arg)
 {
-  // Signal the analog channels to take a sample
-  for (uint8_t analogNb = ANALOG_CHANNEL_1; analogNb < NB_ANALOG_CHANNELS; analogNb++)
-    (void)OS_SemaphoreSignal(AnalogThreadData[analogNb].semaphoreRead);
+  static uint8_t channel;
+
+  int16_t analogInputValue;
+
+  TAnalogThreadData* channelData = &AnalogThreadData[channel];
+
+  Analog_Get(channelData->channelNb, &analogInputValue);
+
+  channelData->sampleData[channelData->sampleDataIndex] = analogInputValue;
+  channelData->sampleDataIndex++;
+  if(channelData->sampleDataIndex >= VRR_SAMPLE_PERIOD)
+  {
+    channelData->sampleDataIndex = 0;
+  }
+
+  (void)OS_SemaphoreSignal(AnalogThreadData[channel].semaphoreRMS);
+
+  channel++;
+  if(channel >= NB_ANALOG_CHANNELS)
+  {
+    channel = 0;
+  }
 }
 
 /*! @brief Sets the tower timing mode or sends the packet to the PC
@@ -534,7 +519,6 @@ static void InitModulesThread(void* pData)
   // Generate the global analog semaphores
   for (uint8_t analogNb = ANALOG_CHANNEL_1; analogNb < NB_ANALOG_CHANNELS; analogNb++)
   {
-    AnalogThreadData[analogNb].semaphoreRead = OS_SemaphoreCreate(0);
     AnalogThreadData[analogNb].semaphoreRMS = OS_SemaphoreCreate(0);
   }
 
@@ -552,7 +536,7 @@ static void InitModulesThread(void* pData)
   }
   
   // Set the PIT with the analog polling period
-  PIT_Set(PERIOD_ANALOG_POLL, true);
+  PIT_Set(PERIOD_ANALOG_POLL * NB_ANALOG_CHANNELS, true);
 
   Analog_Put(ANALOG_CHANNEL_1, VRR_ZERO);
   Analog_Put(ANALOG_CHANNEL_2, VRR_ZERO);
@@ -633,32 +617,26 @@ int main(void)
                           NULL,
                           &InitModulesThreadStack[THREAD_STACK_SIZE - 1],
   		                    0);
-  // Create threads for analog read channels
-  for (uint8_t threadNb = ANALOG_CHANNEL_1; threadNb < NB_ANALOG_CHANNELS; threadNb++)
-  {
-    error = OS_ThreadCreate(AnalogReadThread,
-                            &AnalogThreadData[threadNb],
-                            &AnalogThreadStacks[threadNb][THREAD_STACK_SIZE - 1],
-                            3+threadNb);
-  }
-  // Create threads for analog RMS channels
+
+  // Create threads for analog RMS calculations
   for (uint8_t threadNb = ANALOG_CHANNEL_1; threadNb < NB_ANALOG_CHANNELS; threadNb++)
   {
     error = OS_ThreadCreate(CalculateRMSThread,
                             &AnalogThreadData[threadNb],
                             &RMSThreadStacks[threadNb][THREAD_STACK_SIZE - 1],
-                            6+threadNb);
+                            3+threadNb);
   }
+
   // 9th Highest priority
   error = OS_ThreadCreate(PacketThread,
                           NULL,
                           &PacketThreadStack[THREAD_STACK_SIZE - 1],
-                          9);
+                          6);
   // 10th Highest priority
   error = OS_ThreadCreate(FTMLEDsOffThread,
                           NULL,
                           &FTMLEDsOffThreadStack[THREAD_STACK_SIZE - 1],
-                          10);
+                          7);
 
   // Start multithreading - never returns!
   OS_Start();
