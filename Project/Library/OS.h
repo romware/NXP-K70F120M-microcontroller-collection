@@ -14,7 +14,7 @@
 #include <stdbool.h>
 
 // Arbitrary thread stack size - big enough for stacking of interrupts and OS use.
-#define THREAD_STACK_SIZE 100
+#define THREAD_STACK_SIZE 1024
 
 // ----------------------------------------
 // Application defined OS constants

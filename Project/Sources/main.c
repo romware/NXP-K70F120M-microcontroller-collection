@@ -165,24 +165,32 @@ float CalculateRMS(const int16_t data[], const uint8_t length)
  *
  *  @return
  */
-void CheckRMS(uint64_t* timerDelay, bool* alarmTriggered, bool* adjustmentTriggered, volatile uint8_t* nvCount, int16_t out1, int16_t out2)
+void CheckRMS(uint64_t* timerDelay, uint64_t* timerRate, float deviation, bool* alarm, bool* adjustment, volatile uint8_t* nvCount, int16_t out1, int16_t out2)
 {
-  if(!(*alarmTriggered))
+  if(!(*alarm))
   {
-    *alarmTriggered = true;
-    Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
+    *alarm = true;
     *timerDelay = PERIOD_TIMER_DELAY;
+    *timerRate = PERIOD_ANALOG_POLL;
+    Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
   }
-  else if(*timerDelay >= PERIOD_ANALOG_POLL)
+  else if(*timerDelay >= *timerRate)
   {
-    *timerDelay -= PERIOD_ANALOG_POLL;
+    if(Timing_Mode == TIMING_INVERSE)
+    {
+      *timerRate = (deviation/(float)VRR_VOLT_HALF) * PERIOD_ANALOG_POLL;
+
+
+    }
+
+    *timerDelay -= *timerRate;
   }
-  else if(*timerDelay < PERIOD_ANALOG_POLL && !(*adjustmentTriggered))
+  else if(*timerDelay < *timerRate && !(*adjustment))
   {
-    *adjustmentTriggered = true;
-    Flash_Write8((uint8_t*)nvCount,_FB(nvCount)+1);
+    *adjustment = true;
     Analog_Put(ANALOG_CHANNEL_1, out1);
     Analog_Put(ANALOG_CHANNEL_2, out2);
+    Flash_Write8((uint8_t*)nvCount,_FB(nvCount)+1);
   }
 }
 
@@ -195,9 +203,9 @@ void CalculateRMSThread(void* pData)
   #define analogData ((TAnalogThreadData*)pData)
 
   uint64_t timerDelay;
-  bool alarmTriggered = false;
-  bool adjustmentTriggered = false;
-  timerDelay = PERIOD_TIMER_DELAY;
+  uint64_t timerRate;
+  bool alarm = false;
+  bool adjustment = false;
 
   for (;;)
   {
@@ -209,16 +217,16 @@ void CalculateRMSThread(void* pData)
 
     if(rms < VRR_LIMIT_LOW)
     {
-      CheckRMS(&timerDelay, &alarmTriggered, &adjustmentTriggered, NvCountRaises, VRR_OUTPUT_5V, VRR_ZERO);
+      CheckRMS(&timerDelay, &timerRate, (VRR_LIMIT_LOW-rms), &alarm, &adjustment, NvCountRaises, VRR_OUTPUT_5V, VRR_ZERO);
     }
     else if(rms > VRR_LIMIT_HIGH)
     {
-      CheckRMS(&timerDelay, &alarmTriggered, &adjustmentTriggered, NvCountLowers, VRR_ZERO, VRR_OUTPUT_5V);
+      CheckRMS(&timerDelay, &timerRate, (rms-VRR_LIMIT_HIGH), &alarm, &adjustment, NvCountLowers, VRR_ZERO, VRR_OUTPUT_5V);
     }
-    else if(alarmTriggered)
+    else if(alarm)
     {
-      alarmTriggered = false;
-      adjustmentTriggered = false;
+      alarm = false;
+      adjustment = false;
       Analog_Put(ANALOG_CHANNEL_1, VRR_ZERO);
       Analog_Put(ANALOG_CHANNEL_2, VRR_ZERO);
       Analog_Put(ANALOG_CHANNEL_3, VRR_ZERO);
