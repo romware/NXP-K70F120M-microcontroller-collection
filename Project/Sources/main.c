@@ -116,7 +116,7 @@ volatile uint8_t* NvTimingMd;                   /*!< Timing Mode byte pointer to
 
 static TVoltageData VoltageSamples[NB_ANALOG_CHANNELS];
 static uint16_t RMS[NB_ANALOG_CHANNELS];
-static uint16_t Frequency;
+static float Frequency = 50;
 static uint16_t TimingMode;
 
 
@@ -125,12 +125,14 @@ static OS_ECB* RTCReadSemaphore;                /*!< Read semaphore for RTC */
 static OS_ECB* OutOfRangeSemaphore;             /*!< Out of range semaphore for RMS  */
 static OS_ECB* WithinRangeSemaphore;            /*!< Within range semaphore for RMS  */
 static OS_ECB* NewADCDataSemaphore;             /*!< New ADC data semaphore for ADC Process thread */
+static OS_ECB* FrequencyTrackSemaphore;         /*!< Frequency track semaphore */
 
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Tower Init thread. */
 OS_THREAD_STACK(RTCThreadStack, THREAD_STACK_SIZE);               /*!< The stack for the RTC thread. */
 OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);        /*!< The stack for the FTM thread. */
-OS_THREAD_STACK(ADCDataProcessThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the AccelReadComplete thread. */
+OS_THREAD_STACK(ADCDataProcessThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the ADCDataProcess thread. */
+OS_THREAD_STACK(FrequencyTrackThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the FrequencyTrack thread. */
 OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);            /*!< The stack for the Packet thread. */
 
 /*! @brief Sends the startup packets to the PC
@@ -331,7 +333,7 @@ bool HandleTowerFrequency(void)
     // Disable interrupts to read variable.
     OS_DisableInterrupts();
 
-    frequency.l = Frequency;
+    frequency.l = (uint16_t)(Frequency * (float)10);         //TODO: Check modulo and round to closest.
 
     OS_EnableInterrupts();
 
@@ -468,14 +470,14 @@ void ADCReadCallback(void* arg)  //TODO: Info
   {
     Analog_Get(i, &(VoltageSamples[i].ADC_Data[VoltageSamples[i].LatestData]));
     VoltageSamples[i].LatestData++;
-//    if(VoltageSamples[NB_ANALOG_CHANNELS - 1].LatestData == ADC_BUFFER_SIZE - 1)
-//    {
-//      // Load new PIT period
-//      PIT_Set((uint32_t)((uint64_t)(10000000000 /((uint32_t)(Frequency * 10) * ADC_SAMPLES_PER_CYCLE))), false);
-//    }
+    if(VoltageSamples[NB_ANALOG_CHANNELS - 1].LatestData == ADC_BUFFER_SIZE)
+    {
+       OS_SemaphoreSignal(FrequencyTrackSemaphore);
+    }
     if(VoltageSamples[i].LatestData == ADC_BUFFER_SIZE)
     {
       VoltageSamples[i].LatestData = 0;
+      // OS_SemaphoreSignal(FrequencyTrackSemaphore);
     }
   }
   OS_SemaphoreSignal(NewADCDataSemaphore);
@@ -574,6 +576,7 @@ static void InitModulesThread(void* pData)
   LEDOffSemaphore = OS_SemaphoreCreate(0);
   NewADCDataSemaphore = OS_SemaphoreCreate(0);
   RTCReadSemaphore = OS_SemaphoreCreate(0);
+  FrequencyTrackSemaphore = OS_SemaphoreCreate(0);
 
   // Initializes the main tower components and sets the default or stored values
   if(TowerInit())
@@ -652,9 +655,93 @@ static void RTCThread(void* pData)
   }
 }
 
+static void FrequencyTrackThread(void* pData)
+{
+  TVoltageData localSamples;
+  float risingCrossings[10];
+  uint8_t crossingCount;
+  uint16_t m;   // Gradient (units voltage/sample period. This should always be positive)
+  int16_t b;    // y-intercept crossing
+  float lastCrossing;
+  float period;
+  float frequency;
+  uint16_t rms;
+
+  for (;;)
+  {
+    // Wait for FrequencyTrack semaphore
+    OS_SemaphoreWait(FrequencyTrackSemaphore,0);
+
+    // Get a local copy of phase A RMS
+    OS_DisableInterrupts();
+    rms = RMS[0];
+    OS_DisableInterrupts();
+
+    // Check if RMS is in the frequency reading range
+    if(rms > RMS_FREQUENCY_MIN)
+    {
+      // Get a local copy that cannot be modified by another tread
+      OS_DisableInterrupts();
+      for(uint8_t i = 0; i < ADC_BUFFER_SIZE; i++)
+      {
+        localSamples.ADC_Data[i] = VoltageSamples[0].ADC_Data[i];
+      }
+      OS_EnableInterrupts();
+
+      // Reset array element counter
+      crossingCount = 0;
+
+      // Find rising crossings from sample data and store interpolated result in array (units are in sample periods)
+      for(uint8_t i = 0; i < ADC_BUFFER_SIZE - 1; i++)
+      {
+        if((localSamples.ADC_Data[i + 1] > 0) && (localSamples.ADC_Data[i] <= 0))
+        {
+          m = (uint16_t)(localSamples.ADC_Data[i + 1]) - (localSamples.ADC_Data[i]);
+          b = localSamples.ADC_Data[i];
+          risingCrossings[crossingCount] = (float)(i + (((float)-b) / ((float)m)));
+          crossingCount ++;
+        }
+      }
+
+      // If we have a buffer size equal to the number of samples per cycle, we could get only one crossing and need to reference last cycles crossing
+      if(crossingCount == 1)
+      {
+        // Calculate the period
+        period = (float)(((float)ADC_SAMPLES_PER_CYCLE + risingCrossings[crossingCount -1]) - lastCrossing);
+
+        // Update the last crossing
+        lastCrossing = risingCrossings[crossingCount - 1] -((crossingCount -1) * ((float)ADC_SAMPLES_PER_CYCLE));
+      }
+
+      // If we have a larger buffer, or if it is equal but the frequency has increased we could get more than 1 rising crossing from the sample
+      else if(crossingCount > 1)
+      {
+        period = ((risingCrossings[crossingCount - 1]) - risingCrossings[0]) / (float)(crossingCount - 1);
+
+        // Update the last crossing
+        lastCrossing = risingCrossings[crossingCount - 1] -((crossingCount -1) * ((float)ADC_SAMPLES_PER_CYCLE));
+      }
+
+      // If we have a buffer size equal to the number of samples per cycle, we could get no crossings if the frequency has dropped.
+      else if(crossingCount == 0)
+      {
+        //Update the last crossing as a negative number so it can be used normally next time around. Do not update period in this round.
+        lastCrossing -= (float)ADC_SAMPLES_PER_CYCLE;
+      }
+
+      // From the period (in number of sample periods) and the sample period, work out the frequency.
+      frequency = (50 * (float)ADC_SAMPLES_PER_CYCLE) / period;
+      OS_DisableInterrupts();
+      Frequency = frequency;
+      OS_DisableInterrupts();
+    }
+
+  }
+}
+
 uint16_t GetRMS(const TVoltageData Data, const uint8_t DataSize)
 {
-  float sum = 0;      //TODO: use different data type??
+  float sum = 0;      //TODO: use different data type?? keep the sum of the squares.
   for (uint8_t i = 0; i < DataSize; i ++)
   {
     sum += (Data.ADC_Data[i]) * (Data.ADC_Data[i]);
@@ -870,39 +957,39 @@ static void ADCDataProcessThread(void* pData)
       adjusting = false;
     }
 
-    count ++;
-    if(count == ADC_BUFFER_SIZE)
-    {
-      count = 0;
-
-      // Get frequency if VRMS > 1.5 V
-      if(RMS[0] > RMS_FREQUENCY_MIN)
-      {
-        frequency = GetFrequency(VoltageSamples[0], ADC_BUFFER_SIZE, (uint32_t)(frequency * 10));   //TODO: Protect from interrupts
-      }
-
-      // Limit lowest frequency
-      if(frequency < 47.5)
-      {
-        frequency = 47.5;
-      }
-
-      // Limit highest frequency
-      else if(frequency > 52.5)
-      {
-        frequency = 52.5;
-      }
-
-      // Update global frequency variable, disabling interrupts to restrict access during operation.
-      OS_DisableInterrupts();
-
-      Frequency = (uint16_t)(frequency * 10);           //TODO: Does this typecast always round down??
-
-      OS_EnableInterrupts();
-
-      // Load new PIT period
-      PIT_Set((uint32_t)((uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE))), false);
-    }
+//    count ++;
+//    if(count == ADC_BUFFER_SIZE)
+//    {
+//      count = 0;
+//
+//      // Get frequency if VRMS > 1.5 V
+//      if(RMS[0] > RMS_FREQUENCY_MIN)
+//      {
+//        frequency = GetFrequency(VoltageSamples[0], ADC_BUFFER_SIZE, (uint32_t)(frequency * 10));   //TODO: Protect from interrupts
+//      }
+//
+//      // Limit lowest frequency
+//      if(frequency < 47.5)
+//      {
+//        frequency = 47.5;
+//      }
+//
+//      // Limit highest frequency
+//      else if(frequency > 52.5)
+//      {
+//        frequency = 52.5;
+//      }
+//
+//      // Update global frequency variable, disabling interrupts to restrict access during operation.
+//      OS_DisableInterrupts();
+//
+//      Frequency = (uint16_t)(frequency * 10);           //TODO: Does this typecast always round down??
+//
+//      OS_EnableInterrupts();
+//
+//      // Load new PIT period
+//      PIT_Set((uint32_t)((uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE))), false);
+//    }
   }
 }
 
@@ -945,17 +1032,22 @@ int main(void)
 			  NULL,
                           &InitModulesThreadStack[THREAD_STACK_SIZE - 1],
   		                    0);
-  // 7thd Highest priority
+  // 5th Highest priority
   error = OS_ThreadCreate(ADCDataProcessThread,
                           NULL,
                           &ADCDataProcessThreadStack[THREAD_STACK_SIZE - 1],
                           7);
+  // 6th Highest priority
+  error = OS_ThreadCreate(FrequencyTrackThread,
+                          NULL,
+                          &FrequencyTrackThreadStack[THREAD_STACK_SIZE - 1],
+                          6);
 
   // 9th Highest priority
   error = OS_ThreadCreate(PacketThread,
 			  NULL,
                           &PacketThreadStack[THREAD_STACK_SIZE - 1],
-                          5);
+                          9);
   // 29th Highest priority
   error = OS_ThreadCreate(FTMLEDsOffThread,
                           NULL,
