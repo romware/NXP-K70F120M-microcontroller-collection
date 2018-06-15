@@ -64,7 +64,7 @@
 #define VRR_SAMPLE_PERIOD 16
 
 const uint64_t PERIOD_TIMER_DELAY = 5000000000; /*!< Period of the Analog timer delay (5 seconds) 5,000,000,000 */
-const uint32_t PERIOD_ANALOG_POLL = 1250000;    /*!< Period of the Analog polling (1 second) 1,000,000,000 / (f) 50,000 / cycles (16) */
+const uint32_t PERIOD_ANALOG_POLL =    1250000; /*!< Period of the Analog polling = 1s (1b) / f (50k) / cycles (16) */
 
 const uint8_t COMMAND_TIMING      =    0x10;    /*!< The serial command byte for tower timing */
 const uint8_t COMMAND_RAISES      =    0x11;    /*!< The serial command byte for tower raises */
@@ -84,7 +84,7 @@ const int16_t VRR_LIMIT_LOW       =    6553;    // VRR_VOLT * 2
 const int16_t VRR_LIMIT_HIGH      =    9830;    // VRR_VOLT * 3 TDO: clean up doxygen and naming conventions
 const int16_t VRR_OUTPUT_5V       =   16384;    // VRR_VOLT * 5
 
-uint8_t Timing_Mode = 2; //TODO:change
+uint8_t Timing_Mode = 1; //TODO:change
 
 volatile uint8_t* NvCountRaises;                /*!< Number of raises pointer to flash */
 volatile uint8_t* NvCountLowers;                /*!< Number of lowers pointer to flash */
@@ -147,7 +147,7 @@ static OS_ECB* LEDOffSemaphore;                          /*!< LED off semaphore 
 
 
 
-/*! @brief Calculates RMS of given values
+/*! @brief Calculates RMS of given values TODO:params
  *
  *  @return float - RMS value
  */
@@ -161,6 +161,31 @@ float CalculateRMS(const int16_t data[], const uint8_t length)
   return sqrt( (float)sum / (float)length );
 }
 
+/*! @brief  TODO:brief + params
+ *
+ *  @return
+ */
+void CheckRMS(uint64_t* timerDelay, bool* alarmTriggered, bool* adjustmentTriggered, volatile uint8_t* nvCount, int16_t out1, int16_t out2)
+{
+  if(!(*alarmTriggered))
+  {
+    *alarmTriggered = true;
+    Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
+    *timerDelay = PERIOD_TIMER_DELAY;
+  }
+  else if(*timerDelay >= PERIOD_ANALOG_POLL)
+  {
+    *timerDelay -= PERIOD_ANALOG_POLL;
+  }
+  else if(*timerDelay < PERIOD_ANALOG_POLL && !(*adjustmentTriggered))
+  {
+    *adjustmentTriggered = true;
+    Flash_Write8((uint8_t*)nvCount,_FB(nvCount)+1);
+    Analog_Put(ANALOG_CHANNEL_1, out1);
+    Analog_Put(ANALOG_CHANNEL_2, out2);
+  }
+}
+
 /*! @brief Calculates the RMS value on an ADC channel.
  *
  */
@@ -172,9 +197,6 @@ void CalculateRMSThread(void* pData)
   uint64_t timerDelay;
   bool alarmTriggered = false;
   bool adjustmentTriggered = false;
-
-  static float prevRMS;
-
   timerDelay = PERIOD_TIMER_DELAY;
 
   for (;;)
@@ -187,60 +209,11 @@ void CalculateRMSThread(void* pData)
 
     if(rms < VRR_LIMIT_LOW)
     {
-      if(!alarmTriggered)
-      {
-        alarmTriggered = true;
-        Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
-
-        timerDelay = PERIOD_TIMER_DELAY;
-      }
-      else if(timerDelay >= PERIOD_ANALOG_POLL)
-      {
-        timerDelay -= PERIOD_ANALOG_POLL;
-
-        if(Timing_Mode == TIMING_INVERSE && rms != prevRMS)
-        {
-          float percentLeft = (float)(PERIOD_TIMER_DELAY - timerDelay) / (float)PERIOD_TIMER_DELAY;
-          float newDelay = (float)((float)(VRR_VOLT_HALF / (float)(VRR_LIMIT_LOW - rms)) * (float)PERIOD_TIMER_DELAY) * percentLeft;
-          timerDelay = newDelay;
-        }
-      }
-      else if(timerDelay < PERIOD_ANALOG_POLL && !adjustmentTriggered)
-      {
-        adjustmentTriggered = true;
-        Flash_Write8((uint8_t*)NvCountRaises,_FB(NvCountRaises)+1);
-        Analog_Put(ANALOG_CHANNEL_1, VRR_OUTPUT_5V);
-        Analog_Put(ANALOG_CHANNEL_2, VRR_ZERO);
-      }
+      CheckRMS(&timerDelay, &alarmTriggered, &adjustmentTriggered, NvCountRaises, VRR_OUTPUT_5V, VRR_ZERO);
     }
     else if(rms > VRR_LIMIT_HIGH)
     {
-      if(!alarmTriggered)
-      {
-        alarmTriggered = true;
-        Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
-
-        timerDelay = PERIOD_TIMER_DELAY;
-      }
-      else if(timerDelay >= PERIOD_ANALOG_POLL)
-      {
-        timerDelay -= PERIOD_ANALOG_POLL;
-
-        if(Timing_Mode == TIMING_INVERSE && rms != prevRMS)
-        {
-          float percentLeft = (float)(PERIOD_TIMER_DELAY - timerDelay) / (float)PERIOD_TIMER_DELAY;
-          float newDelay = (float)(((float)VRR_VOLT_HALF / (float)(rms - VRR_LIMIT_HIGH)) * (float)PERIOD_TIMER_DELAY) * percentLeft;
-          timerDelay = newDelay;
-        }
-
-      }
-      else if(timerDelay < PERIOD_ANALOG_POLL && !adjustmentTriggered)
-      {
-        adjustmentTriggered = true;
-        Flash_Write8((uint8_t*)NvCountLowers,_FB(NvCountLowers)+1);
-        Analog_Put(ANALOG_CHANNEL_1, VRR_ZERO);
-        Analog_Put(ANALOG_CHANNEL_2, VRR_OUTPUT_5V);
-      }
+      CheckRMS(&timerDelay, &alarmTriggered, &adjustmentTriggered, NvCountLowers, VRR_ZERO, VRR_OUTPUT_5V);
     }
     else if(alarmTriggered)
     {
@@ -252,8 +225,6 @@ void CalculateRMSThread(void* pData)
     }
 
     OS_EnableInterrupts();
-
-    prevRMS = rms;
   }
 }
 
@@ -536,7 +507,7 @@ static void InitModulesThread(void* pData)
   }
   
   // Set the PIT with the analog polling period
-  PIT_Set(PERIOD_ANALOG_POLL * NB_ANALOG_CHANNELS, true);
+  PIT_Set(PERIOD_ANALOG_POLL / NB_ANALOG_CHANNELS, true);
 
   Analog_Put(ANALOG_CHANNEL_1, VRR_ZERO);
   Analog_Put(ANALOG_CHANNEL_2, VRR_ZERO);
