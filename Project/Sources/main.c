@@ -54,7 +54,7 @@
 #include "analog.h"
 #include "math.h"
 
-#define BAUD_RATE 14400                        /*!< UART2 Baud Rate */
+#define BAUD_RATE 115200                        /*!< UART2 Baud Rate */
 
 #define ADC_SAMPLES_PER_CYCLE 16                /*!< ADC samples per cycle */
 
@@ -82,6 +82,29 @@ typedef enum
   TIMING_DEFINITE,
   TIMING_INVERSE
 }TTimingMode;
+/*! @brief Data structure used to pass Analog configuration to a user thread
+ *
+ */
+typedef struct AnalogThreadData
+{
+  OS_ECB* semaphore;
+  uint8_t channelNb;
+} TAnalogThreadData;
+
+/*! @brief Analog thread configuration data
+ *
+ */
+static TAnalogThreadData AnalogThreadData[NB_ANALOG_CHANNELS] =
+{
+  {
+    .semaphore = NULL,
+    .channelNb = 0
+  },
+  {
+    .semaphore = NULL,
+    .channelNb = 1
+  }
+};
 
 const uint32_t PERIOD_I2C_POLL    = 1000000000; /*!< Period of the I2C polling in polling mode */
 
@@ -99,6 +122,12 @@ const uint8_t COMMAND_LOWERS      = 0x12;       /*!< The serial command byte for
 const uint8_t COMMAND_FREQUENCY   = 0x17;       /*!< The serial command byte for tower frequency */
 const uint8_t COMMAND_VOLTAGE     = 0x18;       /*!< The serial command byte for tower voltage */
 const uint8_t COMMAND_SPECTRUM    = 0x19;       /*!< The serial command byte for tower spectrum */
+
+// ----------------------------------------
+// Thread priorities
+// 0 = highest priority
+// ----------------------------------------
+const uint8_t ANALOG_THREAD_PRIORITIES[NB_ANALOG_CHANNELS] = {7, 8, 9};
 
 const uint8_t PARAM_GET           = 1;          /*!< Get bit of packet parameter 1 */
 const uint8_t PARAM_SET           = 2;          /*!< Set bit of packet parameter 1 */
@@ -118,6 +147,8 @@ static TVoltageData VoltageSamples[NB_ANALOG_CHANNELS];
 static uint16_t RMS[NB_ANALOG_CHANNELS];
 static float Frequency = 50;
 static uint16_t TimingMode;
+static uint32_t SamplePeriod;
+static uint32_t NewSamplePeriod;
 
 
 static OS_ECB* LEDOffSemaphore;                 /*!< LED off semaphore for FTM */
@@ -134,6 +165,7 @@ OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);        /*!< The stack
 OS_THREAD_STACK(ADCDataProcessThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the ADCDataProcess thread. */
 OS_THREAD_STACK(FrequencyTrackThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the FrequencyTrack thread. */
 OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);            /*!< The stack for the Packet thread. */
+static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS][THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));
 
 /*! @brief Sends the startup packets to the PC
  *
@@ -466,21 +498,65 @@ void ReceivedPacket(void)
 
 void ADCReadCallback(void* arg)  //TODO: Info
 {
-  for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
-  {
-    Analog_Get(i, &(VoltageSamples[i].ADC_Data[VoltageSamples[i].LatestData]));
-    VoltageSamples[i].LatestData++;
-    if(VoltageSamples[NB_ANALOG_CHANNELS - 1].LatestData == ADC_BUFFER_SIZE)
-    {
-       OS_SemaphoreSignal(FrequencyTrackSemaphore);
-    }
-    if(VoltageSamples[i].LatestData == ADC_BUFFER_SIZE)
-    {
-      VoltageSamples[i].LatestData = 0;
-      // OS_SemaphoreSignal(FrequencyTrackSemaphore);
-    }
+  static uint8_t phase = 0;
+
+  switch (phase){
+    case 0:
+      Analog_Get(phase, &(VoltageSamples[phase].ADC_Data[VoltageSamples[phase].LatestData]));
+      VoltageSamples[phase].LatestData++;
+      if(VoltageSamples[phase].LatestData == ADC_BUFFER_SIZE)
+      {
+        VoltageSamples[phase].LatestData = 0;
+        OS_SemaphoreSignal(FrequencyTrackSemaphore);
+      }
+      OS_SemaphoreSignal(AnalogThreadData[phase].semaphore);
+      phase ++;
+      break;
+    case 1:
+      Analog_Get(phase, &(VoltageSamples[phase].ADC_Data[VoltageSamples[phase].LatestData]));
+      VoltageSamples[phase].LatestData++;
+      if(VoltageSamples[phase].LatestData == ADC_BUFFER_SIZE)
+      {
+        VoltageSamples[phase].LatestData = 0;
+      }
+      OS_SemaphoreSignal(AnalogThreadData[phase].semaphore);
+      phase ++;
+      break;
+    case 2:
+      Analog_Get(phase, &(VoltageSamples[phase].ADC_Data[VoltageSamples[phase].LatestData]));
+      VoltageSamples[phase].LatestData++;
+      if(VoltageSamples[phase].LatestData == ADC_BUFFER_SIZE)
+      {
+        VoltageSamples[phase].LatestData = 0;
+      }
+      OS_SemaphoreSignal(AnalogThreadData[phase].semaphore);
+      phase = 0;
+      break;
   }
-  OS_SemaphoreSignal(NewADCDataSemaphore);
+
+
+
+
+
+
+
+
+
+//  for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
+//  {
+//    Analog_Get(i, &(VoltageSamples[i].ADC_Data[VoltageSamples[i].LatestData]));
+//    VoltageSamples[i].LatestData++;
+//    if(VoltageSamples[NB_ANALOG_CHANNELS - 1].LatestData == ADC_BUFFER_SIZE)
+//    {
+//       OS_SemaphoreSignal(FrequencyTrackSemaphore);
+//    }
+//    if(VoltageSamples[i].LatestData == ADC_BUFFER_SIZE)
+//    {
+//      VoltageSamples[i].LatestData = 0;
+//      // OS_SemaphoreSignal(FrequencyTrackSemaphore);
+//    }
+//  }
+//  OS_SemaphoreSignal(NewADCDataSemaphore);
 
 }
 
@@ -574,9 +650,13 @@ static void InitModulesThread(void* pData)
 {
   // Create semaphores for threads
   LEDOffSemaphore = OS_SemaphoreCreate(0);
-  NewADCDataSemaphore = OS_SemaphoreCreate(0);
+  //NewADCDataSemaphore = OS_SemaphoreCreate(0);
   RTCReadSemaphore = OS_SemaphoreCreate(0);
   FrequencyTrackSemaphore = OS_SemaphoreCreate(0);
+  for (uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
+  {
+    AnalogThreadData[i].semaphore = OS_SemaphoreCreate(0);
+  }
 
   // Initializes the main tower components and sets the default or stored values
   if(TowerInit())
@@ -588,7 +668,12 @@ static void InitModulesThread(void* pData)
   // Send startup packets to PC
   HandleTowerStartup();
 
-  PIT_Set((uint32_t)1000000000/(ADC_DEFAULT_FREQUENCY * ADC_SAMPLES_PER_CYCLE), false);
+  SamplePeriod = (uint32_t)(1000000000/(ADC_DEFAULT_FREQUENCY * ADC_SAMPLES_PER_CYCLE) / 20) * 20;    //TODO: Round to how pit does. 1000000000/modclk
+
+
+
+
+  PIT_Set(SamplePeriod / NB_ANALOG_CHANNELS, false);
   PIT_Enable(true);
   // We only do this once - therefore delete this thread
   OS_ThreadDelete(OS_PRIORITY_SELF);
@@ -664,6 +749,7 @@ static void FrequencyTrackThread(void* pData)
   int16_t b;    // y-intercept crossing
   float lastCrossing;
   float period;
+  uint32_t newSamplePeriod;
   float frequency;
   uint16_t rms;
 
@@ -729,6 +815,13 @@ static void FrequencyTrackThread(void* pData)
         lastCrossing -= (float)ADC_SAMPLES_PER_CYCLE;
       }
 
+      // Find the period in nanoseconds
+      newSamplePeriod = (uint32_t)(((uint32_t)(((float)(period * SamplePeriod) / (float)ADC_SAMPLES_PER_CYCLE)) / 20) * 20);
+
+      OS_DisableInterrupts();
+      NewSamplePeriod = newSamplePeriod;
+      OS_DisableInterrupts();
+
       // From the period (in number of sample periods) and the sample period, work out the frequency.
       frequency = (50 * (float)ADC_SAMPLES_PER_CYCLE) / period;
       OS_DisableInterrupts();
@@ -759,172 +852,163 @@ float GetAverage(const TVoltageData Data, const uint8_t DataSize)
   return sum / DataSize;
 }
 
-float GetFrequency(const TVoltageData Data,  const uint8_t DataSize,  const uint32_t FreqTimesTen)
+//float GetFrequency(const TVoltageData Data,  const uint8_t DataSize,  const uint32_t FreqTimesTen)
+//{
+//  // Array to store calculated crossings.
+//  float crossings[8];
+//  float mean;
+//  uint8_t count = 0;
+//  uint8_t arrayCrossing;      // To store array crossing to be used to find zero crossings
+//
+//  if(Data.LatestData == 0)
+//  {
+//    arrayCrossing = (DataSize - 1);
+//  }
+//  else
+//  {
+//    arrayCrossing = (Data.LatestData - 1);
+//  }
+//
+//  //float average = GetAverage(Data, DataSize);
+//
+//  // Find crossings from LatestData to element 0 of array
+//  for(uint8_t i = arrayCrossing; i > 0; i --)
+//  {
+//    // Check for crossing
+//    if((((float)Data.ADC_Data[i] >= 0) && ((float)Data.ADC_Data[i - 1] < 0))
+//       || (((float)Data.ADC_Data[i] <= 0) && ((float)Data.ADC_Data[i - 1] >= 0)))
+//    {
+//      // Calculate accurate crossing and store in array
+//      crossings[count] = (float)((i - 1) + (float)((- (float)Data.ADC_Data[i - 1])
+//          / ((float)Data.ADC_Data[i] - (float)Data.ADC_Data[i - 1])));
+//      count ++;
+//      //i -= 10;
+//    }
+//  }
+//
+//  // Check for crossing between ends of array
+//  if(1/*Data.LatestData*/)
+//  {
+//    if((((float)Data.ADC_Data[0] >= 0) && ((float)Data.ADC_Data[DataSize - 1] < 0))
+//        || (((float)Data.ADC_Data[0] <= 0) && ((float)Data.ADC_Data[DataSize - 1] >= 0)))
+//    {
+//      // Calculate accurate crossing and store in array
+//      crossings[count] = (float)((float)(((float)Data.ADC_Data[DataSize - 1])
+//          / ((float)Data.ADC_Data[0] - (float)Data.ADC_Data[DataSize - 1])));
+//      count ++;
+//    }
+//  }
+//
+//
+//  for(uint8_t i = DataSize - 1; i > arrayCrossing + 1; i --)
+//  {
+//    // Check for crossing
+//    if((((float)Data.ADC_Data[i] >= 0) && ((float)Data.ADC_Data[i - 1] < 0))
+//       || (((float)Data.ADC_Data[i] <= 0) && ((float)Data.ADC_Data[i - 1] >= 0)))
+//    {
+//      // Calculate accurate crossing and store in array
+//      crossings[count] = (float)(((i - 1) + (float)((- (float)Data.ADC_Data[i - 1])
+//          / ((float)Data.ADC_Data[i] - (float)Data.ADC_Data[i - 1])))- ((float)DataSize - 1));
+//      count ++;
+//      //i += 10;
+//    }
+//  }
+//
+//  mean = (float)((crossings[0] - crossings[count - 1]) / (count - 1));
+//
+//  // Calculate the new sample period in nanoseconds
+//
+//
+////  // Return value as frequency
+////  return (float)((((float)FreqTimesTen * (float)ADC_SAMPLES_PER_CYCLE) / ((float)2 * mean)) / 10);
+//}
+
+
+/*! @brief Samples a value on an ADC channel and sends it to the corresponding DAC channel.
+ *
+ */
+void RMSThread(void* pData)
 {
-  // Array to store calculated crossings.
-  float crossings[8];
-  float mean;
-  uint8_t count = 0;
-  uint8_t arrayCrossing;      // To store array crossing to be used to find zero crossings
+  // Make the code easier to read by giving a name to the typecast'ed pointer
+  #define analogData ((TAnalogThreadData*)pData)
 
-  if(Data.LatestData == 0)
-  {
-    arrayCrossing = (DataSize - 1);
-  }
-  else
-  {
-    arrayCrossing = (Data.LatestData - 1);
-  }
-
-  //float average = GetAverage(Data, DataSize);
-
-  // Find crossings from LatestData to element 0 of array
-  for(uint8_t i = arrayCrossing; i > 0; i --)
-  {
-    // Check for crossing
-    if((((float)Data.ADC_Data[i] >= 0) && ((float)Data.ADC_Data[i - 1] < 0))
-       || (((float)Data.ADC_Data[i] <= 0) && ((float)Data.ADC_Data[i - 1] >= 0)))
-    {
-      // Calculate accurate crossing and store in array
-      crossings[count] = (float)((i - 1) + (float)((- (float)Data.ADC_Data[i - 1])
-          / ((float)Data.ADC_Data[i] - (float)Data.ADC_Data[i - 1])));
-      count ++;
-      //i -= 10;
-    }
-  }
-
-  // Check for crossing between ends of array
-  if(1/*Data.LatestData*/)
-  {
-    if((((float)Data.ADC_Data[0] >= 0) && ((float)Data.ADC_Data[DataSize - 1] < 0))
-        || (((float)Data.ADC_Data[0] <= 0) && ((float)Data.ADC_Data[DataSize - 1] >= 0)))
-    {
-      // Calculate accurate crossing and store in array
-      crossings[count] = (float)((float)(((float)Data.ADC_Data[DataSize - 1])
-          / ((float)Data.ADC_Data[0] - (float)Data.ADC_Data[DataSize - 1])));
-      count ++;
-    }
-  }
-
-
-  for(uint8_t i = DataSize - 1; i > arrayCrossing + 1; i --)
-  {
-    // Check for crossing
-    if((((float)Data.ADC_Data[i] >= 0) && ((float)Data.ADC_Data[i - 1] < 0))
-       || (((float)Data.ADC_Data[i] <= 0) && ((float)Data.ADC_Data[i - 1] >= 0)))
-    {
-      // Calculate accurate crossing and store in array
-      crossings[count] = (float)(((i - 1) + (float)((- (float)Data.ADC_Data[i - 1])
-          / ((float)Data.ADC_Data[i] - (float)Data.ADC_Data[i - 1])))- ((float)DataSize - 1));
-      count ++;
-      //i += 10;
-    }
-  }
-
-  mean = (float)((crossings[0] - crossings[count - 1]) / (count - 1));
-
-  // Return value as frequency
-  return (float)((((float)FreqTimesTen * (float)ADC_SAMPLES_PER_CYCLE) / ((float)2 * mean)) / 10);
-}
-
-static void ADCDataProcessThread(void* pData)
-{
-  float frequency = 50;
+  uint16_t rms;
+  bool alarm;
+  bool alarmSet;
+  bool overVoltage;
+  bool underVoltage;
+  bool adjusting;
+  uint16_t deltaVoltage;
   int64_t OutOfRangeTimer = 5000000000;
   uint32_t minTimeCheck;
-  uint16_t rms;
-  uint8_t count = 0;
-  bool voltageHigh[NB_ANALOG_CHANNELS];
-  bool voltageLow[NB_ANALOG_CHANNELS];
-  bool alarm;
-  bool adjusting = false;
-  float deltaVoltage;
-  float test;
-  float test1;
 
   for (;;)
   {
-    // Wait for New ADC Data Semaphore
-    OS_SemaphoreWait(NewADCDataSemaphore,0);
+    // Wait for channel semaphore
+    (void)OS_SemaphoreWait(analogData->semaphore, 0);
 
-    // Clear alarm flag
-    alarm = false;
+    rms = GetRMS(VoltageSamples[analogData->channelNb], ADC_BUFFER_SIZE);
 
+    // Update global RMS variable, disabling interrupts to restrict access during operation.
+    OS_DisableInterrupts();
 
-    // Calculate RMS for all channels
-    for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
+    RMS[analogData->channelNb] = rms;
+
+    OS_EnableInterrupts();
+
+    // Check if data is in limits
+    if(rms > RMS_UPPER_LIMIT)
     {
-      rms = GetRMS(VoltageSamples[i], ADC_BUFFER_SIZE);
-
-      // Update global RMS variable, disabling interrupts to restrict access during operation.
-      OS_DisableInterrupts();
-
-      RMS[i] = rms;
-
-      OS_EnableInterrupts();
-
-      if(rms > RMS_UPPER_LIMIT)
-      {
-        voltageHigh[i] = true;
-        alarm = true;
-      }
-      else if(rms < RMS_LOWER_LIMIT)
-      {
-        voltageLow[i] = true;
-        alarm = true;
-      }
-      else
-      {
-        voltageHigh[i] = false;
-        voltageLow[i] = false;
-      }
+      alarm = true;
+      overVoltage = true;
+    }
+    else if(rms < RMS_LOWER_LIMIT)
+    {
+      alarm = true;
+      underVoltage = true;
     }
 
-    if(alarm && !adjusting)
+    // Set alarm if it is not set
+    if(alarm && !alarmSet)
     {
       OS_DisableInterrupts();
       Analog_Put(3, DAC_5V_OUT);
       OS_EnableInterrupts();
+      alarmSet = true;
+    }
 
+    if(alarm && !adjusting)
+    {
       if(TimingMode == TIMING_DEFINITE)
       {
-        OutOfRangeTimer -= (uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE));
-        // Keep track of actual time
-        minTimeCheck += (10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE));
-      }
+        OutOfRangeTimer -= (uint64_t)SamplePeriod;
 
-      if(TimingMode == TIMING_INVERSE) /*inverse mode*/
+        // Keep track of actual time
+        minTimeCheck += SamplePeriod;
+      }
+      else if(TimingMode == TIMING_INVERSE)
       {
-        //Find first out of voltage channel. TODO: what to do for independent channels??
-        for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
+        if(overVoltage)
         {
-          if(voltageHigh[i])
-          {
-            deltaVoltage = ((float)RMS[i] - (float)RMS_UPPER_LIMIT);
-            break;
-          }
-          else if(voltageLow[i])
-          {
-            deltaVoltage = ((float)RMS_LOWER_LIMIT - (float)RMS[i]);
-            break;
-          }
+          deltaVoltage = rms - RMS_UPPER_LIMIT;
+        }
+        else if(underVoltage)
+        {
+          deltaVoltage = RMS_LOWER_LIMIT - rms;
         }
 
+        // Decrement counter
+        OutOfRangeTimer -= (uint64_t)SamplePeriod;
+
         // Keep track of actual time
-        minTimeCheck += (10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE));
-
-        // Count down relative amount.
-        // Note: unusual type casting in order to round time the same way PIT did, but then use floats before going back to uint.
-
-        OutOfRangeTimer -= (int32_t)((deltaVoltage / (float) 1638) * (float)(((uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE)))));
-
+        minTimeCheck += SamplePeriod;
       }
 
       // Check if raise or lower signals should be set
       if(OutOfRangeTimer <= 0 && !adjusting && minTimeCheck >= 1000000000)
       {
         // Set Lower signal if voltage high
-        if(voltageHigh[0] || voltageHigh[1] || voltageHigh[2])
+        if(overVoltage)
         {
           OS_DisableInterrupts();
           Analog_Put(2, DAC_5V_OUT);
@@ -933,29 +1017,171 @@ static void ADCDataProcessThread(void* pData)
         }
 
         // Set raise signal if voltage low
-        else if(voltageLow[0] || voltageLow[1] || voltageLow[2])
+        else if(underVoltage)
         {
           OS_DisableInterrupts();
           Analog_Put(1, DAC_5V_OUT);
           OS_EnableInterrupts();
           adjusting = true;
         }
-
-        // Set to avoid underflow overflow
-        OutOfRangeTimer = 0;
-        //minTimeCheck = 1000000000;
       }
     }
+
+    // Check if raise / lower should be decremented   //TODO: check for other channel alarms
     else if(!alarm)
     {
       OS_DisableInterrupts();
       Analog_Put(1, DAC_0V_OUT);
+      OS_EnableInterrupts();
+      OS_DisableInterrupts();
       Analog_Put(2, DAC_0V_OUT);
+      OS_EnableInterrupts();
+      OS_DisableInterrupts();
       Analog_Put(3, DAC_0V_OUT);
       OS_EnableInterrupts();
       OutOfRangeTimer = 5000000000;
       adjusting = false;
+      alarmSet = false;
     }
+
+    // Reset variables
+    alarm = false;
+    overVoltage = false;
+    underVoltage = false;
+  }
+}
+
+//static void ADCDataProcessThread(void* pData)
+//{
+//  float frequency = 50;
+//  int64_t OutOfRangeTimer = 5000000000;
+//  uint32_t minTimeCheck;
+//  uint16_t rms;
+//  uint8_t count = 0;
+//  bool voltageHigh[NB_ANALOG_CHANNELS];
+//  bool voltageLow[NB_ANALOG_CHANNELS];
+//  bool alarm;
+//  bool adjusting = false;
+//  float deltaVoltage;
+//  float test;
+//  float test1;
+//
+//  for (;;)
+//  {
+//    // Wait for New ADC Data Semaphore
+//    OS_SemaphoreWait(NewADCDataSemaphore,0);
+//
+//    // Clear alarm flag
+//    alarm = false;
+//
+//
+//
+//
+//    // Calculate RMS for all channels
+//    for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
+//    {
+//      rms = GetRMS(VoltageSamples[i], ADC_BUFFER_SIZE);
+//
+//      // Update global RMS variable, disabling interrupts to restrict access during operation.
+//      OS_DisableInterrupts();
+//
+//      RMS[i] = rms;
+//
+//      OS_EnableInterrupts();
+//
+//      if(rms > RMS_UPPER_LIMIT)
+//      {
+//        voltageHigh[i] = true;
+//        alarm = true;
+//      }
+//      else if(rms < RMS_LOWER_LIMIT)
+//      {
+//        voltageLow[i] = true;
+//        alarm = true;
+//      }
+//      else
+//      {
+//        voltageHigh[i] = false;
+//        voltageLow[i] = false;
+//      }
+//    }
+//
+//    if(alarm && !adjusting)
+//    {
+//      OS_DisableInterrupts();
+//      Analog_Put(3, DAC_5V_OUT);
+//      OS_EnableInterrupts();
+//
+//      if(TimingMode == TIMING_DEFINITE)
+//      {
+//        OutOfRangeTimer -= (uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE));
+//        // Keep track of actual time
+//        minTimeCheck += (10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE));
+//      }
+//
+//      if(TimingMode == TIMING_INVERSE) /*inverse mode*/
+//      {
+//        //Find first out of voltage channel. TODO: what to do for independent channels??
+//        for(uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
+//        {
+//          if(voltageHigh[i])
+//          {
+//            deltaVoltage = ((float)RMS[i] - (float)RMS_UPPER_LIMIT);
+//            break;
+//          }
+//          else if(voltageLow[i])
+//          {
+//            deltaVoltage = ((float)RMS_LOWER_LIMIT - (float)RMS[i]);
+//            break;
+//          }
+//        }
+//
+//        // Keep track of actual time
+//        minTimeCheck += (10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE));
+//
+//        // Count down relative amount.
+//        // Note: unusual type casting in order to round time the same way PIT did, but then use floats before going back to uint.
+//
+//        OutOfRangeTimer -= (int32_t)((deltaVoltage / (float) 1638) * (float)(((uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE)))));
+//
+//      }
+//
+//      // Check if raise or lower signals should be set
+//      if(OutOfRangeTimer <= 0 && !adjusting && minTimeCheck >= 1000000000)
+//      {
+//        // Set Lower signal if voltage high
+//        if(voltageHigh[0] || voltageHigh[1] || voltageHigh[2])
+//        {
+//          OS_DisableInterrupts();
+//          Analog_Put(2, DAC_5V_OUT);
+//          OS_EnableInterrupts();
+//          adjusting = true;
+//        }
+//
+//        // Set raise signal if voltage low
+//        else if(voltageLow[0] || voltageLow[1] || voltageLow[2])
+//        {
+//          OS_DisableInterrupts();
+//          Analog_Put(1, DAC_5V_OUT);
+//          OS_EnableInterrupts();
+//          adjusting = true;
+//        }
+//
+//        // Set to avoid underflow overflow
+//        OutOfRangeTimer = 0;
+//        //minTimeCheck = 1000000000;
+//      }
+//    }
+//    else if(!alarm)
+//    {
+//      OS_DisableInterrupts();
+//      Analog_Put(1, DAC_0V_OUT);
+//      Analog_Put(2, DAC_0V_OUT);
+//      Analog_Put(3, DAC_0V_OUT);
+//      OS_EnableInterrupts();
+//      OutOfRangeTimer = 5000000000;
+//      adjusting = false;
+//    }
 
 //    count ++;
 //    if(count == ADC_BUFFER_SIZE)
@@ -990,8 +1216,8 @@ static void ADCDataProcessThread(void* pData)
 //      // Load new PIT period
 //      PIT_Set((uint32_t)((uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE))), false);
 //    }
-  }
-}
+//  }
+//}
 
 
 /*! @brief Turns the Blue LED off after the timer is complete
@@ -1032,22 +1258,25 @@ int main(void)
 			  NULL,
                           &InitModulesThreadStack[THREAD_STACK_SIZE - 1],
   		                    0);
-  // 5th Highest priority
-  error = OS_ThreadCreate(ADCDataProcessThread,
-                          NULL,
-                          &ADCDataProcessThreadStack[THREAD_STACK_SIZE - 1],
-                          7);
+  // Create threads for analog loopback channels
+  for (uint8_t threadNb = 0; threadNb < NB_ANALOG_CHANNELS; threadNb++)
+  {
+    error = OS_ThreadCreate(RMSThread,
+                            &AnalogThreadData[threadNb],
+                            &RMSThreadStacks[threadNb][THREAD_STACK_SIZE - 1],
+                            ANALOG_THREAD_PRIORITIES[threadNb]);
+  }
   // 6th Highest priority
   error = OS_ThreadCreate(FrequencyTrackThread,
                           NULL,
                           &FrequencyTrackThreadStack[THREAD_STACK_SIZE - 1],
                           6);
 
-  // 9th Highest priority
+  // 10th Highest priority
   error = OS_ThreadCreate(PacketThread,
 			  NULL,
                           &PacketThreadStack[THREAD_STACK_SIZE - 1],
-                          9);
+                          10);
   // 29th Highest priority
   error = OS_ThreadCreate(FTMLEDsOffThread,
                           NULL,
