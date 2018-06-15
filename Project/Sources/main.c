@@ -157,6 +157,9 @@ static OS_ECB* OutOfRangeSemaphore;             /*!< Out of range semaphore for 
 static OS_ECB* WithinRangeSemaphore;            /*!< Within range semaphore for RMS  */
 static OS_ECB* NewADCDataSemaphore;             /*!< New ADC data semaphore for ADC Process thread */
 static OS_ECB* FrequencyTrackSemaphore;         /*!< Frequency track semaphore */
+static OS_ECB* LogRaisesSemaphore;              /*!< Log Raises semaphore */
+static OS_ECB* LogLowersSemaphore;              /*!< Log Lowers semaphore */
+static OS_ECB* FlashAccessMutex;                /*!< Flash Access Mutex */
 
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Tower Init thread. */
@@ -165,6 +168,8 @@ OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);        /*!< The stack
 OS_THREAD_STACK(ADCDataProcessThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the ADCDataProcess thread. */
 OS_THREAD_STACK(FrequencyTrackThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the FrequencyTrack thread. */
 OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);            /*!< The stack for the Packet thread. */
+OS_THREAD_STACK(LogRaisesThreadStack, THREAD_STACK_SIZE);         /*!< The stack for the Log Raises thread. */
+OS_THREAD_STACK(LogLowersThreadStack, THREAD_STACK_SIZE);         /*!< The stack for the Log Lowers thread. */
 static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS][THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));
 
 /*! @brief Sends the startup packets to the PC
@@ -625,9 +630,11 @@ static void InitModulesThread(void* pData)
 {
   // Create semaphores for threads
   LEDOffSemaphore = OS_SemaphoreCreate(0);
-  //NewADCDataSemaphore = OS_SemaphoreCreate(0);
   RTCReadSemaphore = OS_SemaphoreCreate(0);
   FrequencyTrackSemaphore = OS_SemaphoreCreate(0);
+  LogRaisesSemaphore = OS_SemaphoreCreate(0);
+  LogLowersSemaphore = OS_SemaphoreCreate(0);
+  FlashAccessMutex = OS_SemaphoreCreate(1);
   for (uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
   {
     AnalogThreadData[i].semaphore = OS_SemaphoreCreate(0);
@@ -712,6 +719,47 @@ static void RTCThread(void* pData)
 
     // Send time to PC
     Packet_Put(COMMAND_TIME, hours, minutes, seconds);
+  }
+}
+static void LogRaisesThread(void* pData)
+{
+  uint8_t events;
+  for (;;)
+  {
+    // Wait for Log Raise semaphore
+    OS_SemaphoreWait(LogRaisesSemaphore,0);
+
+    // Gain access to flash
+    OS_SemaphoreWait(FlashAccessMutex, 0);
+
+    events = _FB(NvNbRaises);
+    events ++;
+    Flash_Write8((uint8_t*)NvNbRaises, events);
+
+    // Release access to flash
+    OS_SemaphoreSignal(FlashAccessMutex);
+
+  }
+}
+
+static void LogLowersThread(void* pData)
+{
+  uint8_t events;
+  for (;;)
+  {
+    // Wait for Log Raise semaphore
+    OS_SemaphoreWait(LogLowersSemaphore,0);
+
+    // Gain access to flash
+    OS_SemaphoreWait(FlashAccessMutex, 0);
+
+    events = _FB(NvNbLowers);
+    events ++;
+    Flash_Write8((uint8_t*)NvNbLowers, events);
+
+    // Release access to flash
+    OS_SemaphoreSignal(FlashAccessMutex);
+
   }
 }
 
@@ -919,6 +967,7 @@ void RMSThread(void* pData)
           Analog_Put(2, DAC_5V_OUT);
           OS_EnableInterrupts();
           adjusting = true;
+          OS_SemaphoreSignal(LogLowersSemaphore);
         }
 
         // Set raise signal if voltage low
@@ -928,6 +977,7 @@ void RMSThread(void* pData)
           Analog_Put(1, DAC_5V_OUT);
           OS_EnableInterrupts();
           adjusting = true;
+          OS_SemaphoreSignal(LogRaisesSemaphore);
         }
       }
     }
@@ -1016,6 +1066,16 @@ int main(void)
 			  NULL,
                           &PacketThreadStack[THREAD_STACK_SIZE - 1],
                           10);
+  // 17th Highest priority
+  error = OS_ThreadCreate(LogRaisesThread,
+        NULL,
+                          &LogRaisesThreadStack[THREAD_STACK_SIZE - 1],
+                          17);
+  // 18th Highest priority
+  error = OS_ThreadCreate(LogLowersThread,
+        NULL,
+                          &LogLowersThreadStack[THREAD_STACK_SIZE - 1],
+                          18);
   // 29th Highest priority
   error = OS_ThreadCreate(FTMLEDsOffThread,
                           NULL,
