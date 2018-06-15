@@ -40,19 +40,13 @@ uint8_t DummyRead;                                          /*!< The dummy read 
  */
 static void RxUARTThread(void* pData)
 {
-  uint8_t localDummyRead;     //TODO: Maybe get rid of this.
   for (;;)
   {
     // Wait for received data
     OS_SemaphoreWait(RxUARTSemaphore,0);
 
     // Put the value in UART2 Data Register (UART2_D) in the RxFIFO
-    OS_DisableInterrupts();
-    localDummyRead = DummyRead;
-    OS_EnableInterrupts();
-
-    FIFO_Put(&RxFIFO, localDummyRead);
-
+    FIFO_Put(&RxFIFO, DummyRead);
   }
 }
 

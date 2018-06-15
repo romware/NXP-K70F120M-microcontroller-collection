@@ -54,7 +54,7 @@
 #include "analog.h"
 #include "math.h"
 
-#define BAUD_RATE 115200                        /*!< UART2 Baud Rate */
+#define BAUD_RATE 14400                        /*!< UART2 Baud Rate */
 
 #define ADC_SAMPLES_PER_CYCLE 16                /*!< ADC samples per cycle */
 
@@ -468,6 +468,11 @@ void ADCReadCallback(void* arg)  //TODO: Info
   {
     Analog_Get(i, &(VoltageSamples[i].ADC_Data[VoltageSamples[i].LatestData]));
     VoltageSamples[i].LatestData++;
+//    if(VoltageSamples[NB_ANALOG_CHANNELS - 1].LatestData == ADC_BUFFER_SIZE - 1)
+//    {
+//      // Load new PIT period
+//      PIT_Set((uint32_t)((uint64_t)(10000000000 /((uint32_t)(Frequency * 10) * ADC_SAMPLES_PER_CYCLE))), false);
+//    }
     if(VoltageSamples[i].LatestData == ADC_BUFFER_SIZE)
     {
       VoltageSamples[i].LatestData = 0;
@@ -797,6 +802,8 @@ static void ADCDataProcessThread(void* pData)
       if(TimingMode == TIMING_DEFINITE)
       {
         OutOfRangeTimer -= (uint64_t)(10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE));
+        // Keep track of actual time
+        minTimeCheck += (10000000000 /((uint32_t)(frequency * 10) * ADC_SAMPLES_PER_CYCLE));
       }
 
       if(TimingMode == TIMING_INVERSE) /*inverse mode*/
@@ -948,7 +955,7 @@ int main(void)
   error = OS_ThreadCreate(PacketThread,
 			  NULL,
                           &PacketThreadStack[THREAD_STACK_SIZE - 1],
-                          9);
+                          5);
   // 29th Highest priority
   error = OS_ThreadCreate(FTMLEDsOffThread,
                           NULL,
