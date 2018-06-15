@@ -92,10 +92,16 @@ volatile uint8_t* NvCountLowers;                /*!< Number of lowers pointer to
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Tower Init thread. */
 OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);        /*!< The stack for the FTM thread. */
-OS_THREAD_STACK(PITThreadStack, THREAD_STACK_SIZE);               /*!< The stack for the PIT thread. */
 OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);            /*!< The stack for the Packet thread. */
+OS_THREAD_STACK(RaisesThreadStack, THREAD_STACK_SIZE);            /*!< The stack for the Flash Raises thread. */
+OS_THREAD_STACK(LowersThreadStack, THREAD_STACK_SIZE);            /*!< The stack for the Flash Lowers thread. */
 
 static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS][THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));
+
+static OS_ECB* LEDOffSemaphore;                          /*!< LED off semaphore for FTM */
+static OS_ECB* RaisesSemaphore;                          /*!< Raises semaphore for Flash */
+static OS_ECB* LowersSemaphore;                          /*!< Lowers semaphore for Flash */
+static OS_ECB* FlashMutex;                               /*!< Mutex semaphore for Flash */
 
 typedef enum
 {
@@ -143,10 +149,6 @@ static TAnalogThreadData AnalogThreadData[NB_ANALOG_CHANNELS] =
   }
 };
 
-static OS_ECB* LEDOffSemaphore;                          /*!< LED off semaphore for FTM */
-
-
-
 /*! @brief Calculates RMS of given values TODO:params
  *
  *  @return float - RMS value
@@ -165,32 +167,34 @@ float CalculateRMS(const int16_t data[], const uint8_t length)
  *
  *  @return
  */
-void CheckRMS(uint64_t* timerDelay, uint64_t* timerRate, float deviation, bool* alarm, bool* adjustment, volatile uint8_t* nvCount, int16_t out1, int16_t out2)
+void CheckRMS(uint64_t* timerDelay, uint64_t* timerRate, float deviation, bool* alarm, bool* adjustment, OS_ECB* semaphore, int16_t out1, int16_t out2)
 {
   if(!(*alarm))
   {
     *alarm = true;
     *timerDelay = PERIOD_TIMER_DELAY;
     *timerRate = PERIOD_ANALOG_POLL;
+    OS_DisableInterrupts();
     Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
+    OS_EnableInterrupts();
   }
   else if(*timerDelay >= *timerRate)
   {
     if(Timing_Mode == TIMING_INVERSE)
     {
       *timerRate = (deviation/(float)VRR_VOLT_HALF) * PERIOD_ANALOG_POLL;
-
-
     }
-
     *timerDelay -= *timerRate;
   }
   else if(*timerDelay < *timerRate && !(*adjustment))
   {
     *adjustment = true;
+    OS_DisableInterrupts();
     Analog_Put(ANALOG_CHANNEL_1, out1);
     Analog_Put(ANALOG_CHANNEL_2, out2);
-    Flash_Write8((uint8_t*)nvCount,_FB(nvCount)+1);
+    OS_EnableInterrupts();
+
+    OS_SemaphoreSignal(semaphore);
   }
 }
 
@@ -213,26 +217,56 @@ void CalculateRMSThread(void* pData)
 
     float rms = CalculateRMS(analogData->sampleData, VRR_SAMPLE_PERIOD);
 
-    OS_DisableInterrupts();
-
     if(rms < VRR_LIMIT_LOW)
     {
-      CheckRMS(&timerDelay, &timerRate, (VRR_LIMIT_LOW-rms), &alarm, &adjustment, NvCountRaises, VRR_OUTPUT_5V, VRR_ZERO);
+      CheckRMS(&timerDelay, &timerRate, (VRR_LIMIT_LOW-rms), &alarm, &adjustment, RaisesSemaphore, VRR_OUTPUT_5V, VRR_ZERO);
     }
     else if(rms > VRR_LIMIT_HIGH)
     {
-      CheckRMS(&timerDelay, &timerRate, (rms-VRR_LIMIT_HIGH), &alarm, &adjustment, NvCountLowers, VRR_ZERO, VRR_OUTPUT_5V);
+      CheckRMS(&timerDelay, &timerRate, (rms-VRR_LIMIT_HIGH), &alarm, &adjustment, LowersSemaphore, VRR_ZERO, VRR_OUTPUT_5V);
     }
     else if(alarm)
     {
       alarm = false;
       adjustment = false;
+      OS_DisableInterrupts();
       Analog_Put(ANALOG_CHANNEL_1, VRR_ZERO);
       Analog_Put(ANALOG_CHANNEL_2, VRR_ZERO);
       Analog_Put(ANALOG_CHANNEL_3, VRR_ZERO);
+      OS_EnableInterrupts();
     }
+  }
+}
 
-    OS_EnableInterrupts();
+/*! @brief Increments the raises count and writes to Flash.
+ *
+ */
+void RaisesThread(void* pData)
+{
+  for (;;)
+  {
+    (void)OS_SemaphoreWait(RaisesSemaphore, 0);
+    (void)OS_SemaphoreWait(FlashMutex, 0);
+
+    Flash_Write8((uint8_t*)NvCountRaises,_FB(NvCountRaises)+1);
+
+    (void)OS_SemaphoreSignal(FlashMutex);
+  }
+}
+
+/*! @brief Increments the lowers count and writes to Flash.
+ *
+ */
+void LowersThread(void* pData)
+{
+  for (;;)
+  {
+    (void)OS_SemaphoreWait(LowersSemaphore, 0);
+    (void)OS_SemaphoreWait(FlashMutex, 0);
+
+    Flash_Write8((uint8_t*)NvCountLowers,_FB(NvCountLowers)+1);
+
+    (void)OS_SemaphoreSignal(FlashMutex);
   }
 }
 
@@ -454,7 +488,7 @@ bool TowerInit(void)
   // Success status of writing default values to Flash and FTM
   bool success = false;
 
-  if (Flash_Init() &&  LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init())
+  if (Flash_Init() && LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init())
   {
     success = true;
 
@@ -492,6 +526,8 @@ bool TowerInit(void)
  */
 static void InitModulesThread(void* pData)
 {
+  OS_DisableInterrupts();
+
   // Analog
   (void)Analog_Init(CPU_BUS_CLK_HZ);
 
@@ -501,11 +537,11 @@ static void InitModulesThread(void* pData)
     AnalogThreadData[analogNb].semaphoreRMS = OS_SemaphoreCreate(0);
   }
 
-  // Initialize the Periodic Interrupt Timer with the PIT Callback Function
-  PIT_Init(CPU_BUS_CLK_HZ, PITCallback, NULL);
-
   // Create semaphores for threads
   LEDOffSemaphore = OS_SemaphoreCreate(0);
+  RaisesSemaphore = OS_SemaphoreCreate(0);
+  LowersSemaphore = OS_SemaphoreCreate(0);
+  FlashMutex = OS_SemaphoreCreate(1);
 
   // Initializes the main tower components and sets the default or stored values
   if(TowerInit())
@@ -514,12 +550,17 @@ static void InitModulesThread(void* pData)
     LEDs_On(LED_ORANGE);
   }
   
+  // Initialize the Periodic Interrupt Timer with the PIT Callback Function
+  PIT_Init(CPU_BUS_CLK_HZ, PITCallback, NULL);
+
   // Set the PIT with the analog polling period
   PIT_Set(PERIOD_ANALOG_POLL / NB_ANALOG_CHANNELS, true);
 
   Analog_Put(ANALOG_CHANNEL_1, VRR_ZERO);
   Analog_Put(ANALOG_CHANNEL_2, VRR_ZERO);
   Analog_Put(ANALOG_CHANNEL_3, VRR_ZERO);
+
+  OS_EnableInterrupts();
 
   // We only do this once - therefore delete this thread
   OS_ThreadDelete(OS_PRIORITY_SELF);
@@ -596,7 +637,6 @@ int main(void)
                           NULL,
                           &InitModulesThreadStack[THREAD_STACK_SIZE - 1],
   		                    0);
-
   // Create threads for analog RMS calculations
   for (uint8_t threadNb = ANALOG_CHANNEL_1; threadNb < NB_ANALOG_CHANNELS; threadNb++)
   {
@@ -605,17 +645,26 @@ int main(void)
                             &RMSThreadStacks[threadNb][THREAD_STACK_SIZE - 1],
                             3+threadNb);
   }
-
-  // 9th Highest priority
+  // 6th Highest priority
   error = OS_ThreadCreate(PacketThread,
                           NULL,
                           &PacketThreadStack[THREAD_STACK_SIZE - 1],
                           6);
-  // 10th Highest priority
+  // 7th Highest priority
   error = OS_ThreadCreate(FTMLEDsOffThread,
                           NULL,
                           &FTMLEDsOffThreadStack[THREAD_STACK_SIZE - 1],
                           7);
+  // 8th Highest priority
+  error = OS_ThreadCreate(RaisesThread,
+                          NULL,
+                          &RaisesThreadStack[THREAD_STACK_SIZE - 1],
+                          8);
+  // 9th Highest priority
+  error = OS_ThreadCreate(LowersThread,
+                          NULL,
+                          &LowersThreadStack[THREAD_STACK_SIZE - 1],
+                          9);
 
   // Start multithreading - never returns!
   OS_Start();

@@ -18,8 +18,8 @@ Non-volatile storage of number of raise/lower events.			- Mostly Done. Move flas
 
 /6 G A P Timing. 
 Definite.														- Done
-Inverse.														- In progress
-Accuracy.														- Mostly Done. Needs testing
+Inverse.														- Done
+Accuracy.														- Mostly Done. Check 1s minimum and efficiency
 
 /2 G A P Settings / interrogation.
 Tower protocol expanded to achieve Basic Functionality.			- Done
