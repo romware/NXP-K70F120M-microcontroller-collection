@@ -91,11 +91,11 @@ bool UART_Init(const uint32_t baudRate, const uint32_t moduleClk)
                           NULL,
                           &RxUARTThreadStack[THREAD_STACK_SIZE - 1],
                           1);
-  // 2nd Highest priority
+  // 3rd Highest priority
   error = OS_ThreadCreate(TxUARTThread,
                           NULL,
                           &TxUARTThreadStack[THREAD_STACK_SIZE - 1],
-                          2);
+                          3);
 
   // Enable UART2 clock
   SIM_SCGC4 |= SIM_SCGC4_UART2_MASK;

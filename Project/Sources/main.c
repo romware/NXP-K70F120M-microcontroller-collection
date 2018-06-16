@@ -145,7 +145,7 @@ volatile uint8_t* NvTimingMd;                   /*!< Timing Mode byte pointer to
 
 static TVoltageData VoltageSamples[NB_ANALOG_CHANNELS];
 static uint16_t RMS[NB_ANALOG_CHANNELS];
-static float Frequency = 50;
+static float Frequency;
 static uint16_t TimingMode;
 static uint32_t SamplePeriod;
 static uint32_t NewSamplePeriod;
@@ -160,7 +160,8 @@ static OS_ECB* RTCReadSemaphore;                /*!< Read semaphore for RTC */
 static OS_ECB* OutOfRangeSemaphore;             /*!< Out of range semaphore for RMS  */
 static OS_ECB* WithinRangeSemaphore;            /*!< Within range semaphore for RMS  */
 static OS_ECB* NewADCDataSemaphore;             /*!< New ADC data semaphore for ADC Process thread */
-static OS_ECB* FrequencyCalculateSemaphore;     /*!< Frequency track semaphore */
+static OS_ECB* FrequencyCalculateSemaphore;     /*!< Frequency Calculate semaphore */
+static OS_ECB* FrequencyTrackSemaphore;         /*!< Frequency track semaphore */
 static OS_ECB* LogRaisesSemaphore;              /*!< Log Raises semaphore */
 static OS_ECB* LogLowersSemaphore;              /*!< Log Lowers semaphore */
 static OS_ECB* FlashAccessMutex;                /*!< Flash Access Mutex */
@@ -170,7 +171,8 @@ OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);       /*!< The stack
 OS_THREAD_STACK(RTCThreadStack, THREAD_STACK_SIZE);               /*!< The stack for the RTC thread. */
 OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);        /*!< The stack for the FTM thread. */
 OS_THREAD_STACK(ADCDataProcessThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the ADCDataProcess thread. */
-OS_THREAD_STACK(FrequencyCalculateThreadStack, THREAD_STACK_SIZE);/*!< The stack for the FrequencyTrack thread. */
+OS_THREAD_STACK(FrequencyCalculateThreadStack, THREAD_STACK_SIZE);/*!< The stack for the FrequencyCalculate thread. */
+OS_THREAD_STACK(FrequencyTrackThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the FrequencyTrack thread. */
 OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);            /*!< The stack for the Packet thread. */
 OS_THREAD_STACK(LogRaisesThreadStack, THREAD_STACK_SIZE);         /*!< The stack for the Log Raises thread. */
 OS_THREAD_STACK(LogLowersThreadStack, THREAD_STACK_SIZE);         /*!< The stack for the Log Lowers thread. */
@@ -513,10 +515,14 @@ void ADCReadCallback(void* arg)  //TODO: Info
     case 0:
       Analog_Get(phase, &(VoltageSamples[phase].ADC_Data[VoltageSamples[phase].LatestData]));
       VoltageSamples[phase].LatestData++;
+      if(VoltageSamples[phase].LatestData == ADC_BUFFER_SIZE -1)
+      {
+        OS_SemaphoreSignal(FrequencyTrackSemaphore);
+      }
       if(VoltageSamples[phase].LatestData == ADC_BUFFER_SIZE)
       {
         VoltageSamples[phase].LatestData = 0;
-        OS_SemaphoreSignal(FrequencyCalculateSemaphore);
+        //OS_SemaphoreSignal(FrequencyCalculateSemaphore);
       }
       OS_SemaphoreSignal(AnalogThreadData[phase].semaphore);
       phase ++;
@@ -636,6 +642,7 @@ static void InitModulesThread(void* pData)
   LEDOffSemaphore = OS_SemaphoreCreate(0);
   RTCReadSemaphore = OS_SemaphoreCreate(0);
   FrequencyCalculateSemaphore = OS_SemaphoreCreate(0);
+  FrequencyTrackSemaphore = OS_SemaphoreCreate(0);
   LogRaisesSemaphore = OS_SemaphoreCreate(0);
   LogLowersSemaphore = OS_SemaphoreCreate(0);
   FlashAccessMutex = OS_SemaphoreCreate(1);
@@ -655,9 +662,8 @@ static void InitModulesThread(void* pData)
   HandleTowerStartup();
 
   SamplePeriod = (uint32_t)(1000000000/(ADC_DEFAULT_FREQUENCY * ADC_SAMPLES_PER_CYCLE) / 20) * 20;    //TODO: Round to how pit does. 1000000000/modclk
-
-
-
+  NewSamplePeriod = SamplePeriod;
+  Frequency = ADC_DEFAULT_FREQUENCY;
 
   PIT_Set(SamplePeriod / NB_ANALOG_CHANNELS, false);    //TODO: Check how this division plays out
   PIT_Enable(true);
@@ -767,6 +773,21 @@ static void LogLowersThread(void* pData)
   }
 }
 
+static void FrequencyTrackThread(void* pData)
+{
+  uint8_t events;
+  for (;;)
+  {
+    // Wait for Frequency Track semaphore
+    OS_SemaphoreWait(FrequencyTrackSemaphore,0);
+
+    // Set New PIT sample period
+    OS_DisableInterrupts();
+    PIT_Set((uint32_t)(NewSamplePeriod / NB_ANALOG_CHANNELS), false);
+    OS_EnableInterrupts();
+  }
+}
+
 static void FrequencyCalculateThread(void* pData)
 {
   TVoltageData localSamples;
@@ -785,7 +806,7 @@ static void FrequencyCalculateThread(void* pData)
     // Wait for FrequencyTrack semaphore
     OS_SemaphoreWait(FrequencyCalculateSemaphore,0);
 
-    // Get a local copy of phase A RMS
+    // Get a local copy of phase A RMS,
     OS_DisableInterrupts();
     rms = RMS[0];
     OS_DisableInterrupts();
@@ -845,13 +866,15 @@ static void FrequencyCalculateThread(void* pData)
       // Find the period in nanoseconds
       newSamplePeriod = (uint32_t)(((uint32_t)(((float)(period * SamplePeriod) / (float)ADC_SAMPLES_PER_CYCLE)) / 20) * 20);
 
+      // Update sample periods (for use by Frequency track thread and this thread)
       OS_DisableInterrupts();
+      SamplePeriod = NewSamplePeriod;
       NewSamplePeriod = newSamplePeriod;
       OS_DisableInterrupts();
 
       // From the period (in number of sample periods) and the sample period, work out the frequency.
-      frequency = (50 * (float)ADC_SAMPLES_PER_CYCLE) / period;
       OS_DisableInterrupts();
+      frequency = (Frequency * (float)ADC_SAMPLES_PER_CYCLE) / period;
       Frequency = frequency;
       OS_DisableInterrupts();
     }
@@ -1121,7 +1144,7 @@ int main(void)
 			  NULL,
                           &InitModulesThreadStack[THREAD_STACK_SIZE - 1],
   		                    0);
-  // Create threads for analog loopback channels
+  // Create threads for RMS channels
   for (uint8_t threadNb = 0; threadNb < NB_ANALOG_CHANNELS; threadNb++)
   {
     error = OS_ThreadCreate(RMSThread,
@@ -1134,6 +1157,11 @@ int main(void)
                           NULL,
                           &FrequencyCalculateThreadStack[THREAD_STACK_SIZE - 1],
                           6);
+  // 2nd Highest priority
+  error = OS_ThreadCreate(FrequencyTrackThread,
+                          NULL,
+                          &FrequencyTrackThreadStack[THREAD_STACK_SIZE - 1],
+                          2);
 
   // 10th Highest priority
   error = OS_ThreadCreate(PacketThread,
