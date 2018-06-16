@@ -160,7 +160,7 @@ static OS_ECB* RTCReadSemaphore;                /*!< Read semaphore for RTC */
 static OS_ECB* OutOfRangeSemaphore;             /*!< Out of range semaphore for RMS  */
 static OS_ECB* WithinRangeSemaphore;            /*!< Within range semaphore for RMS  */
 static OS_ECB* NewADCDataSemaphore;             /*!< New ADC data semaphore for ADC Process thread */
-static OS_ECB* FrequencyTrackSemaphore;         /*!< Frequency track semaphore */
+static OS_ECB* FrequencyCalculateSemaphore;     /*!< Frequency track semaphore */
 static OS_ECB* LogRaisesSemaphore;              /*!< Log Raises semaphore */
 static OS_ECB* LogLowersSemaphore;              /*!< Log Lowers semaphore */
 static OS_ECB* FlashAccessMutex;                /*!< Flash Access Mutex */
@@ -170,7 +170,7 @@ OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);       /*!< The stack
 OS_THREAD_STACK(RTCThreadStack, THREAD_STACK_SIZE);               /*!< The stack for the RTC thread. */
 OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);        /*!< The stack for the FTM thread. */
 OS_THREAD_STACK(ADCDataProcessThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the ADCDataProcess thread. */
-OS_THREAD_STACK(FrequencyTrackThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the FrequencyTrack thread. */
+OS_THREAD_STACK(FrequencyCalculateThreadStack, THREAD_STACK_SIZE);/*!< The stack for the FrequencyTrack thread. */
 OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);            /*!< The stack for the Packet thread. */
 OS_THREAD_STACK(LogRaisesThreadStack, THREAD_STACK_SIZE);         /*!< The stack for the Log Raises thread. */
 OS_THREAD_STACK(LogLowersThreadStack, THREAD_STACK_SIZE);         /*!< The stack for the Log Lowers thread. */
@@ -516,7 +516,7 @@ void ADCReadCallback(void* arg)  //TODO: Info
       if(VoltageSamples[phase].LatestData == ADC_BUFFER_SIZE)
       {
         VoltageSamples[phase].LatestData = 0;
-        OS_SemaphoreSignal(FrequencyTrackSemaphore);
+        OS_SemaphoreSignal(FrequencyCalculateSemaphore);
       }
       OS_SemaphoreSignal(AnalogThreadData[phase].semaphore);
       phase ++;
@@ -635,7 +635,7 @@ static void InitModulesThread(void* pData)
   // Create semaphores for threads
   LEDOffSemaphore = OS_SemaphoreCreate(0);
   RTCReadSemaphore = OS_SemaphoreCreate(0);
-  FrequencyTrackSemaphore = OS_SemaphoreCreate(0);
+  FrequencyCalculateSemaphore = OS_SemaphoreCreate(0);
   LogRaisesSemaphore = OS_SemaphoreCreate(0);
   LogLowersSemaphore = OS_SemaphoreCreate(0);
   FlashAccessMutex = OS_SemaphoreCreate(1);
@@ -767,7 +767,7 @@ static void LogLowersThread(void* pData)
   }
 }
 
-static void FrequencyTrackThread(void* pData)
+static void FrequencyCalculateThread(void* pData)
 {
   TVoltageData localSamples;
   uint32_t newSamplePeriod;
@@ -783,7 +783,7 @@ static void FrequencyTrackThread(void* pData)
   for (;;)
   {
     // Wait for FrequencyTrack semaphore
-    OS_SemaphoreWait(FrequencyTrackSemaphore,0);
+    OS_SemaphoreWait(FrequencyCalculateSemaphore,0);
 
     // Get a local copy of phase A RMS
     OS_DisableInterrupts();
@@ -1130,9 +1130,9 @@ int main(void)
                             ANALOG_THREAD_PRIORITIES[threadNb]);
   }
   // 6th Highest priority
-  error = OS_ThreadCreate(FrequencyTrackThread,
+  error = OS_ThreadCreate(FrequencyCalculateThread,
                           NULL,
-                          &FrequencyTrackThreadStack[THREAD_STACK_SIZE - 1],
+                          &FrequencyCalculateThreadStack[THREAD_STACK_SIZE - 1],
                           6);
 
   // 10th Highest priority
