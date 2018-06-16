@@ -375,10 +375,14 @@ bool HandleTowerFrequency(void)
   {
     // Disable interrupts to read variable.
     OS_DisableInterrupts();
-
-    frequency.l = (uint16_t)(Frequency * (float)10);         //TODO: Check modulo and round to closest.
-
+    float localFrequency = Frequency;
     OS_EnableInterrupts();
+
+    // Round to the nearest 0.1Hz
+    float roundedFrequencyBy10 = roundf((localFrequency * (float)10));
+
+    // Type-cast  as a uint16 to be sent to PC.
+    frequency.l = (uint16_t)roundedFrequencyBy10;
 
     // Send frequency to PC
     return Packet_Put(COMMAND_FREQUENCY, frequency.s.Hi, frequency.s.Lo, 0);
