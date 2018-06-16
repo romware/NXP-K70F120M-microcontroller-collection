@@ -515,14 +515,10 @@ void ADCReadCallback(void* arg)  //TODO: Info
     case 0:
       Analog_Get(phase, &(VoltageSamples[phase].ADC_Data[VoltageSamples[phase].LatestData]));
       VoltageSamples[phase].LatestData++;
-      if(VoltageSamples[phase].LatestData == ADC_BUFFER_SIZE -1)
-      {
-        OS_SemaphoreSignal(FrequencyTrackSemaphore);
-      }
       if(VoltageSamples[phase].LatestData == ADC_BUFFER_SIZE)
       {
         VoltageSamples[phase].LatestData = 0;
-        //OS_SemaphoreSignal(FrequencyCalculateSemaphore);
+        OS_SemaphoreSignal(FrequencyCalculateSemaphore);
       }
       OS_SemaphoreSignal(AnalogThreadData[phase].semaphore);
       phase ++;
@@ -540,6 +536,10 @@ void ADCReadCallback(void* arg)  //TODO: Info
     case 2:
       Analog_Get(phase, &(VoltageSamples[phase].ADC_Data[VoltageSamples[phase].LatestData]));
       VoltageSamples[phase].LatestData++;
+      if(VoltageSamples[phase].LatestData == ADC_BUFFER_SIZE - 1)
+      {
+        OS_SemaphoreSignal(FrequencyTrackSemaphore);
+      }
       if(VoltageSamples[phase].LatestData == ADC_BUFFER_SIZE)
       {
         VoltageSamples[phase].LatestData = 0;
@@ -834,6 +834,7 @@ static void FrequencyCalculateThread(void* pData)
           b = localSamples.ADC_Data[i];
           risingCrossings[crossingCount] = (float)(i + (((float)-b) / ((float)m)));
           crossingCount ++;
+          //i += (ADC_SAMPLES_PER_CYCLE / 2);
         }
       }
 
@@ -866,19 +867,20 @@ static void FrequencyCalculateThread(void* pData)
       // Find the period in nanoseconds
       newSamplePeriod = (uint32_t)(((uint32_t)(((float)(period * SamplePeriod) / (float)ADC_SAMPLES_PER_CYCLE)) / 20) * 20);
 
+
+      // From the period (in number of sample periods) and the sample period, work out the frequency.
+      OS_DisableInterrupts();
+      //frequency = (Frequency * (float)ADC_SAMPLES_PER_CYCLE) / period;
+      frequency = (float)1000000000 / (period * SamplePeriod);
+      Frequency = frequency;
+      OS_DisableInterrupts();
+
       // Update sample periods (for use by Frequency track thread and this thread)
       OS_DisableInterrupts();
       SamplePeriod = NewSamplePeriod;
       NewSamplePeriod = newSamplePeriod;
       OS_DisableInterrupts();
-
-      // From the period (in number of sample periods) and the sample period, work out the frequency.
-      OS_DisableInterrupts();
-      frequency = (Frequency * (float)ADC_SAMPLES_PER_CYCLE) / period;
-      Frequency = frequency;
-      OS_DisableInterrupts();
     }
-
   }
 }
 
