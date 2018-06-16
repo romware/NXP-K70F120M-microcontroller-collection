@@ -149,6 +149,8 @@ static float Frequency = 50;
 static uint16_t TimingMode;
 static uint32_t SamplePeriod;
 static uint32_t NewSamplePeriod;
+static bool Alarm[NB_ANALOG_CHANNELS];
+static bool Adjusting[NB_ANALOG_CHANNELS];
 
 
 static OS_ECB* LEDOffSemaphore;                 /*!< LED off semaphore for FTM */
@@ -325,7 +327,7 @@ bool HandleTowerRaises(void)
   if(Packet_Parameter1 == 0 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Sends the number of raises
-    return Packet_Put(COMMAND_RAISES,_FB(NvNbRaises), 0, 0);            //TODO:Check with Jack if he thinks this should be in param 1
+    return Packet_Put(COMMAND_RAISES,_FB(NvNbRaises), 0, 0);
   }
   else if(Packet_Parameter1 == 1 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
@@ -345,7 +347,7 @@ bool HandleTowerLowers(void)
   if(Packet_Parameter1 == 0 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Sends the number of lowers
-    return Packet_Put(COMMAND_RAISES,_FB(NvNbLowers), 0, 0);            //TODO:Check with Jack if he thinks this should be in param 1
+    return Packet_Put(COMMAND_LOWERS,_FB(NvNbLowers), 0, 0);
   }
   else if(Packet_Parameter1 == 1 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
@@ -655,7 +657,7 @@ static void InitModulesThread(void* pData)
 
 
 
-  PIT_Set(SamplePeriod / NB_ANALOG_CHANNELS, false);
+  PIT_Set(SamplePeriod / NB_ANALOG_CHANNELS, false);    //TODO: Check how this division plays out
   PIT_Enable(true);
   // We only do this once - therefore delete this thread
   OS_ThreadDelete(OS_PRIORITY_SELF);
@@ -875,6 +877,15 @@ float GetAverage(const TVoltageData Data, const uint8_t DataSize)
   return sum / DataSize;
 }
 
+bool CheckOutputsOff(const bool  Outputs[], const uint8_t NbOutputs)
+{
+  bool set = false;
+  for (uint8_t i = 0; i < NbOutputs; i++)
+  {
+    set |= Outputs[i];
+  }
+  return !set;
+}
 
 
 /*! @brief Samples a value on an ADC channel and sends it to the corresponding DAC channel.
@@ -925,7 +936,11 @@ void RMSThread(void* pData)
     if(alarm && !alarmSet)
     {
       OS_DisableInterrupts();
-      Analog_Put(3, DAC_5V_OUT);
+      if(CheckOutputsOff(Alarm, (uint8_t)NB_ANALOG_CHANNELS))
+      {
+        Analog_Put(3, DAC_5V_OUT);
+        Alarm[analogData->channelNb] = true;
+      }
       OS_EnableInterrupts();
       alarmSet = true;
     }
@@ -960,40 +975,66 @@ void RMSThread(void* pData)
       // Check if raise or lower signals should be set
       if(OutOfRangeTimer <= 0 && !adjusting && minTimeCheck >= 1000000000)
       {
-        // Set Lower signal if voltage high
+        // Set lower signal and store count in Nv if voltage high and not already set by another channel.
         if(overVoltage)
         {
           OS_DisableInterrupts();
-          Analog_Put(2, DAC_5V_OUT);
+          if(CheckOutputsOff(Adjusting, (uint8_t)NB_ANALOG_CHANNELS))
+          {
+            Analog_Put(2, DAC_5V_OUT);
+            Adjusting[analogData->channelNb] = true;
+            OS_SemaphoreSignal(LogLowersSemaphore);
+          }
           OS_EnableInterrupts();
           adjusting = true;
-          OS_SemaphoreSignal(LogLowersSemaphore);
         }
 
-        // Set raise signal if voltage low
+        // Set raise signal and store count in Nv if voltage low and not already set by another channel.
         else if(underVoltage)
         {
           OS_DisableInterrupts();
-          Analog_Put(1, DAC_5V_OUT);
+          if(CheckOutputsOff(Adjusting, (uint8_t)NB_ANALOG_CHANNELS))
+          {
+            Analog_Put(1, DAC_5V_OUT);
+            Adjusting[analogData->channelNb] = true;
+            OS_SemaphoreSignal(LogRaisesSemaphore);
+          }
           OS_EnableInterrupts();
           adjusting = true;
-          OS_SemaphoreSignal(LogRaisesSemaphore);
         }
       }
     }
 
-    // Check if raise / lower should be decremented   //TODO: check for other channel alarms
+    // Check if raise / lower should be decremented
     else if(!alarm)
     {
+      bool switchOffAdjusting;
+
       OS_DisableInterrupts();
-      Analog_Put(1, DAC_0V_OUT);
+      Alarm[analogData->channelNb] = false;
+      if(CheckOutputsOff(Alarm, (uint8_t)NB_ANALOG_CHANNELS))
+      {
+        Analog_Put(3, DAC_0V_OUT);
+      }
       OS_EnableInterrupts();
+
       OS_DisableInterrupts();
-      Analog_Put(2, DAC_0V_OUT);
-      OS_EnableInterrupts();
-      OS_DisableInterrupts();
-      Analog_Put(3, DAC_0V_OUT);
-      OS_EnableInterrupts();
+      Adjusting[analogData->channelNb] = false;
+      if(CheckOutputsOff(Adjusting, (uint8_t)NB_ANALOG_CHANNELS))
+      {
+        switchOffAdjusting = true;
+      }
+
+      if(switchOffAdjusting)
+      {
+        OS_DisableInterrupts();
+        Analog_Put(1, DAC_0V_OUT);
+        OS_EnableInterrupts();
+
+        OS_DisableInterrupts();
+        Analog_Put(2, DAC_0V_OUT);
+        OS_EnableInterrupts();
+      }
       OutOfRangeTimer = 5000000000;
       adjusting = false;
       alarmSet = false;
