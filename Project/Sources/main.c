@@ -58,7 +58,7 @@
 
 #define ADC_SAMPLES_PER_CYCLE 16                /*!< ADC samples per cycle */
 
-#define ADC_BUFFER_SIZE 64
+#define ADC_BUFFER_SIZE 64                     // Note: Must be an integral number of ADC_SAMPLES_PER_CYCLE
 
 #define NB_ANALOG_CHANNELS 3
 
@@ -864,13 +864,15 @@ static void FrequencyCalculateThread(void* pData)
         lastCrossing -= (float)ADC_SAMPLES_PER_CYCLE;
       }
 
-      // Find the period in nanoseconds
-      newSamplePeriod = (uint32_t)(((uint32_t)(((float)(period * SamplePeriod) / (float)ADC_SAMPLES_PER_CYCLE)) / 20) * 20);
+      // Find the period in nanoseconds.
+      // Truncate the same way PIT does to ensure no difference to actual sample rate (including when pit samples faster for several channels)
+      uint32_t nanoSecondPerTick = 1000000000 / CPU_BUS_CLK_HZ;
+      newSamplePeriod = (uint32_t)(((((uint32_t)(((float)(period * SamplePeriod) / (float)ADC_SAMPLES_PER_CYCLE))
+                         / NB_ANALOG_CHANNELS)/ nanoSecondPerTick) * nanoSecondPerTick) * NB_ANALOG_CHANNELS);
 
 
       // From the period (in number of sample periods) and the sample period, work out the frequency.
       OS_DisableInterrupts();
-      //frequency = (Frequency * (float)ADC_SAMPLES_PER_CYCLE) / period;
       frequency = (float)1000000000 / (period * SamplePeriod);
       Frequency = frequency;
       OS_DisableInterrupts();
