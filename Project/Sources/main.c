@@ -151,6 +151,8 @@ static uint32_t SamplePeriod;
 static uint32_t NewSamplePeriod;
 static bool Alarm[NB_ANALOG_CHANNELS];
 static bool Adjusting[NB_ANALOG_CHANNELS];
+static uint64_t LastSumOfSquares[NB_ANALOG_CHANNELS];
+static int16_t OldestData[NB_ANALOG_CHANNELS];
 
 
 static OS_ECB* LEDOffSemaphore;                 /*!< LED off semaphore for FTM */
@@ -768,15 +770,15 @@ static void LogLowersThread(void* pData)
 static void FrequencyTrackThread(void* pData)
 {
   TVoltageData localSamples;
-  float risingCrossings[10];
-  uint8_t crossingCount;
+  uint32_t newSamplePeriod;
   uint16_t m;   // Gradient (units voltage/sample period. This should always be positive)
   int16_t b;    // y-intercept crossing
-  float lastCrossing;
-  float period;
-  uint32_t newSamplePeriod;
-  float frequency;
   uint16_t rms;
+  uint8_t crossingCount;
+  float risingCrossings[10];
+  float lastCrossing;
+  float frequency;
+  float period;
 
   for (;;)
   {
@@ -857,6 +859,34 @@ static void FrequencyTrackThread(void* pData)
   }
 }
 
+uint16_t UpdateRMSFast(int16_t *RemovedData, uint64_t *PreviousSumOfSquares, const TVoltageData Data, uint8_t DataSize)
+{
+  // Update the sum of squares, removing old data and adding new data.
+  int32_t newestData;
+  if(Data.LatestData == 0)
+  {
+    newestData = Data.ADC_Data[DataSize - 1];
+  }
+  else
+  {
+    newestData = Data.ADC_Data[Data.LatestData - 1];
+  }
+
+  int64_t newSumOfSquares = (uint64_t)(*PreviousSumOfSquares - ((int64_t)(*RemovedData) * (int64_t)(*RemovedData))) + (newestData * newestData);
+
+  if(newSumOfSquares <= 0)
+  {
+    newSumOfSquares = 0;
+  }
+
+  // Update the removed data and sum of squares for next time
+  *RemovedData = Data.ADC_Data[Data.LatestData];    // Note: Latest data is where the latest data WILL be put.
+  *PreviousSumOfSquares = newSumOfSquares;
+
+  return (uint16_t)sqrtf((float)newSumOfSquares / (float)DataSize);
+}
+
+
 uint16_t GetRMS(const TVoltageData Data, const uint8_t DataSize)
 {
   float sum = 0;      //TODO: use different data type?? keep the sum of the squares.
@@ -897,6 +927,7 @@ void RMSThread(void* pData)
   #define analogData ((TAnalogThreadData*)pData)
 
   uint16_t rms;
+  uint16_t rmsTest;
   bool alarm;
   bool alarmSet;
   bool overVoltage;
@@ -912,6 +943,8 @@ void RMSThread(void* pData)
     (void)OS_SemaphoreWait(analogData->semaphore, 0);
 
     rms = GetRMS(VoltageSamples[analogData->channelNb], ADC_BUFFER_SIZE);
+
+    //rms = UpdateRMSFast(&(OldestData[analogData->channelNb]), &(LastSumOfSquares[analogData->channelNb]), VoltageSamples[analogData->channelNb], ADC_BUFFER_SIZE);
 
     // Update global RMS variable, disabling interrupts to restrict access during operation.
     OS_DisableInterrupts();
