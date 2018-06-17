@@ -992,8 +992,8 @@ float FastSqrt(float square, float lastRoot, float accuracy)
  *  @param lastRMS The last RMS value of the data
  *  @return uint16_t - The RMS value
  */
-uint16_t UpdateRMSFast(int16_t* pRemoveData, int64_t* pPreviousSumOfSquares, const int16_t latestData,
-                       const int16_t oldestData, uint8_t dataSize, uint16_t lastRMS) //TODO: use const?
+uint16_t UpdateRMSFast(int16_t* const pRemoveData, int64_t* const pPreviousSumOfSquares, const int16_t latestData,
+                       const int16_t oldestData, const uint8_t dataSize, const uint16_t lastRMS)
 {
   int32_t newestData;
 
@@ -1013,14 +1013,20 @@ uint16_t UpdateRMSFast(int16_t* pRemoveData, int64_t* pPreviousSumOfSquares, con
     newSumOfSquares = ((*pRemoveData) * (*pRemoveData));
   }
 
-  // Update the removed data and sum of squares for next time. Note: Latest data is where the latest data WILL be put.
+  // Update the removed data and sum of squares for next time.
   *pRemoveData = oldestData;
   *pPreviousSumOfSquares = newSumOfSquares;
 
+  // Return the calculated RMS
   return (uint16_t)FastSqrt((float)newSumOfSquares / (float)dataSize, (float) lastRMS, (float)1);
 }
 
-
+/*! @brief Calculate the RMS from scratch
+ *
+ *  @param data The struct containing the array of data to use
+ *  @param dataSize The number of data samples in the array
+ *  @return uint16_t - The RMS value
+ */
 uint16_t GetRMS(const TVoltageData data, const uint8_t dataSize)
 {
   float sum = 0;
@@ -1031,6 +1037,12 @@ uint16_t GetRMS(const TVoltageData data, const uint8_t dataSize)
   return (uint16_t)sqrtf(sum / dataSize);
 }
 
+/*! @brief Calculate the average of a set of data
+ *
+ *  @param data The struct containing the array of data to use
+ *  @param dataSize The number of data samples in the array
+ *  @return float - The average value
+ */
 float GetAverage(const TVoltageData Data, const uint8_t dataSize)
 {
   float sum = 0;
@@ -1041,6 +1053,12 @@ float GetAverage(const TVoltageData Data, const uint8_t dataSize)
   return sum / dataSize;
 }
 
+/*! @brief Checks that no other analog thread has an output set
+ *
+ *  @param outputs[] The array of flags
+ *  @param nboutputs The number of flags in the array
+ *  @return bool - TRUE if all flags are false
+ */
 bool CheckOutputsOff(const bool  outputs[], const uint8_t nbOutputs)
 {
   bool set = false;
@@ -1052,10 +1070,12 @@ bool CheckOutputsOff(const bool  outputs[], const uint8_t nbOutputs)
 }
 
 
-/*! @brief Samples a value on an ADC channel and sends it to the corresponding DAC channel.
+/*! @brief Gets the RMS, checks limits and handles alarms and raise/lower timing
  *
+ *  @param pData The pointer to the analog thread data
+ *  @note Assumes that semaphores have been created.
  */
-void RMSThread(void* pData)
+void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumerated type for DAC channel numbers
 {
   // Make the code easier to read by giving a name to the typecast'ed pointer
   #define analogData ((TAnalogThreadData*)pData)

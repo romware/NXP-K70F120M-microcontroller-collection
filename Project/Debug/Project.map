@@ -1533,7 +1533,7 @@ LOAD c:/freescale/kds_3.0.0/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv7e-
                 0x00000599       0x22 c:/freescale/kds_3.0.0/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv7e-m/fpu/crtn.o
 OUTPUT(Project.elf elf32-littlearm)
 
-.debug_info     0x00000000     0x82a3
+.debug_info     0x00000000     0x82b2
  .debug_info    0x00000000      0x20b ./Sources/FIFO.o
  .debug_info    0x0000020b      0x797 ./Sources/FTM.o
  .debug_info    0x000009a2      0x960 ./Sources/Flash.o
@@ -1543,14 +1543,14 @@ OUTPUT(Project.elf elf32-littlearm)
  .debug_info    0x0000265d      0x632 ./Sources/RTC.o
  .debug_info    0x00002c8f      0xa80 ./Sources/UART.o
  .debug_info    0x0000370f      0x9af ./Sources/accel.o
- .debug_info    0x000040be     0x119c ./Sources/main.o
- .debug_info    0x0000525a      0x2ff ./Sources/packet.o
- .debug_info    0x00005559      0x3b0 ./Project_Settings/Startup_Code/startup.o
- .debug_info    0x00005909      0xc82 ./Generated_Code/Cpu.o
- .debug_info    0x0000658b      0x14c ./Generated_Code/Vectors.o
- .debug_info    0x000066d7      0xd02 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
- .debug_info    0x000073d9      0x46a D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
- .debug_info    0x00007843      0xa60 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
+ .debug_info    0x000040be     0x11ab ./Sources/main.o
+ .debug_info    0x00005269      0x2ff ./Sources/packet.o
+ .debug_info    0x00005568      0x3b0 ./Project_Settings/Startup_Code/startup.o
+ .debug_info    0x00005918      0xc82 ./Generated_Code/Cpu.o
+ .debug_info    0x0000659a      0x14c ./Generated_Code/Vectors.o
+ .debug_info    0x000066e6      0xd02 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
+ .debug_info    0x000073e8      0x46a D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
+ .debug_info    0x00007852      0xa60 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
 
 .debug_abbrev   0x00000000     0x1c79
  .debug_abbrev  0x00000000       0xce ./Sources/FIFO.o
@@ -1675,7 +1675,7 @@ OUTPUT(Project.elf elf32-littlearm)
  .debug_macro   0x0001a8ff       0x10 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
  .debug_macro   0x0001a90f       0x68 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
 
-.debug_line     0x00000000     0x3a29
+.debug_line     0x00000000     0x3a27
  .debug_line    0x00000000      0x2c5 ./Sources/FIFO.o
  .debug_line    0x000002c5      0x307 ./Sources/FTM.o
  .debug_line    0x000005cc      0x390 ./Sources/Flash.o
@@ -1685,14 +1685,14 @@ OUTPUT(Project.elf elf32-littlearm)
  .debug_line    0x000012ac      0x2ea ./Sources/RTC.o
  .debug_line    0x00001596      0x341 ./Sources/UART.o
  .debug_line    0x000018d7      0x329 ./Sources/accel.o
- .debug_line    0x00001c00      0x8cc ./Sources/main.o
- .debug_line    0x000024cc      0x2de ./Sources/packet.o
- .debug_line    0x000027aa      0x3d4 ./Project_Settings/Startup_Code/startup.o
- .debug_line    0x00002b7e      0x27b ./Generated_Code/Cpu.o
- .debug_line    0x00002df9      0x2c7 ./Generated_Code/Vectors.o
- .debug_line    0x000030c0      0x496 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
- .debug_line    0x00003556      0x200 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
- .debug_line    0x00003756      0x2d3 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
+ .debug_line    0x00001c00      0x8ca ./Sources/main.o
+ .debug_line    0x000024ca      0x2de ./Sources/packet.o
+ .debug_line    0x000027a8      0x3d4 ./Project_Settings/Startup_Code/startup.o
+ .debug_line    0x00002b7c      0x27b ./Generated_Code/Cpu.o
+ .debug_line    0x00002df7      0x2c7 ./Generated_Code/Vectors.o
+ .debug_line    0x000030be      0x496 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
+ .debug_line    0x00003554      0x200 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
+ .debug_line    0x00003754      0x2d3 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
 
 .debug_str      0x00000000    0x90478
  .debug_str     0x00000000    0x8a680 ./Sources/FIFO.o
