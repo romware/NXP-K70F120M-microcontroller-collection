@@ -103,6 +103,10 @@ static TAnalogThreadData AnalogThreadData[NB_ANALOG_CHANNELS] =
   {
     .semaphore = NULL,
     .channelNb = 1
+  },
+  {
+    .semaphore = NULL,
+    .channelNb = 2
   }
 };
 
@@ -151,7 +155,7 @@ static uint32_t SamplePeriod;
 static uint32_t NewSamplePeriod;
 static bool Alarm[NB_ANALOG_CHANNELS];
 static bool Adjusting[NB_ANALOG_CHANNELS];
-static uint64_t LastSumOfSquares[NB_ANALOG_CHANNELS];
+static int64_t LastSumOfSquares[NB_ANALOG_CHANNELS];
 static int16_t OldestData[NB_ANALOG_CHANNELS];
 
 
@@ -747,8 +751,11 @@ static void LogRaisesThread(void* pData)
     OS_SemaphoreWait(FlashAccessMutex, 0);
 
     events = _FB(NvNbRaises);
-    events ++;
-    Flash_Write8((uint8_t*)NvNbRaises, events);
+    if(events != 255)
+    {
+      events ++;
+      Flash_Write8((uint8_t*)NvNbRaises, events);
+    }
 
     // Release access to flash
     OS_SemaphoreSignal(FlashAccessMutex);
@@ -768,9 +775,11 @@ static void LogLowersThread(void* pData)
     OS_SemaphoreWait(FlashAccessMutex, 0);
 
     events = _FB(NvNbLowers);
-    events ++;
-    Flash_Write8((uint8_t*)NvNbLowers, events);
-
+    if(events != 255)
+    {
+      events ++;
+      Flash_Write8((uint8_t*)NvNbLowers, events);
+    }
     // Release access to flash
     OS_SemaphoreSignal(FlashAccessMutex);
 
@@ -796,8 +805,6 @@ static void FrequencyCalculateThread(void* pData)
 {
   TVoltageData localSamples;
   uint32_t newSamplePeriod;
-  uint16_t m;   // Gradient (units voltage/sample period. This should always be positive)
-  int16_t b;    // y-intercept crossing
   uint16_t rms;
   uint8_t crossingCount;
   float risingCrossings[10];
@@ -834,11 +841,10 @@ static void FrequencyCalculateThread(void* pData)
       {
         if((localSamples.ADC_Data[i + 1] > 0) && (localSamples.ADC_Data[i] <= 0))
         {
-          m = (uint16_t)(localSamples.ADC_Data[i + 1]) - (localSamples.ADC_Data[i]);
-          b = localSamples.ADC_Data[i];
+          uint16_t m = (uint16_t)(localSamples.ADC_Data[i + 1]) - (localSamples.ADC_Data[i]);
+          int16_t b = localSamples.ADC_Data[i];
           risingCrossings[crossingCount] = (float)(i + (((float)-b) / ((float)m)));
           crossingCount ++;
-          //i += (ADC_SAMPLES_PER_CYCLE / 2);
         }
       }
 
@@ -890,7 +896,7 @@ static void FrequencyCalculateThread(void* pData)
   }
 }
 
-uint16_t UpdateRMSFast(int16_t *RemovedData, uint64_t *PreviousSumOfSquares, const TVoltageData Data, uint8_t DataSize)
+uint16_t UpdateRMSFast(int16_t* RemoveData, int64_t* PreviousSumOfSquares, const TVoltageData Data, uint8_t DataSize)
 {
   // Update the sum of squares, removing old data and adding new data.
   int32_t newestData;
@@ -903,17 +909,21 @@ uint16_t UpdateRMSFast(int16_t *RemovedData, uint64_t *PreviousSumOfSquares, con
     newestData = Data.ADC_Data[Data.LatestData - 1];
   }
 
-  int64_t newSumOfSquares = (uint64_t)(*PreviousSumOfSquares - ((int64_t)(*RemovedData) * (int64_t)(*RemovedData))) + (newestData * newestData);
+  int64_t newSumOfSquares = *PreviousSumOfSquares;
 
-  if(newSumOfSquares <= 0)
+  newSumOfSquares += (newestData * newestData);
+
+  newSumOfSquares -= (int64_t)((int32_t)(*RemoveData) * (int32_t)(*RemoveData));
+
+  // Ensure the new sum is positive
+  if(newSumOfSquares < 0)
   {
-    newSumOfSquares = 0;
+    newSumOfSquares = ((*RemoveData) * (*RemoveData));
   }
 
-  // Update the removed data and sum of squares for next time
-  *RemovedData = Data.ADC_Data[Data.LatestData];    // Note: Latest data is where the latest data WILL be put.
+  // Update the removed data and sum of squares for next time. Note: Latest data is where the latest data WILL be put.
+  *RemoveData = Data.ADC_Data[Data.LatestData];
   *PreviousSumOfSquares = newSumOfSquares;
-
   return (uint16_t)sqrtf((float)newSumOfSquares / (float)DataSize);
 }
 
@@ -973,9 +983,27 @@ void RMSThread(void* pData)
     // Wait for channel semaphore
     (void)OS_SemaphoreWait(analogData->semaphore, 0);
 
-    rms = GetRMS(VoltageSamples[analogData->channelNb], ADC_BUFFER_SIZE);
+    OS_EnableInterrupts();  //TODO: remove probably. Maybe pass just the new value for getrmsfast
 
-    //rms = UpdateRMSFast(&(OldestData[analogData->channelNb]), &(LastSumOfSquares[analogData->channelNb]), VoltageSamples[analogData->channelNb], ADC_BUFFER_SIZE);
+    //Analog_Put(0, DAC_5V_OUT);
+
+   // rms = GetRMS(VoltageSamples[analogData->channelNb], ADC_BUFFER_SIZE);
+
+    //Analog_Put(0, DAC_0V_OUT);
+
+    //Analog_Put(0, 8200);
+
+    rms = UpdateRMSFast(&(OldestData[analogData->channelNb]), &(LastSumOfSquares[analogData->channelNb]),
+                            VoltageSamples[analogData->channelNb], ADC_BUFFER_SIZE);
+
+    //Analog_Put(0, DAC_0V_OUT);
+
+    //LastSumOfSquares;
+//    if(rms != rmsTest)
+//    {
+//       rmsTest = rms;
+//    }
+    OS_DisableInterrupts();
 
     // Update global RMS variable, disabling interrupts to restrict access during operation.
     OS_DisableInterrupts();
