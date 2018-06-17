@@ -68,22 +68,64 @@ bool Flash_Init(void);
 bool Flash_AllocateVar(volatile void** variable, const uint8_t size);
 
 
-///*! @brief Erases the entire Flash sector.
-// *
-// *  @return bool - TRUE if the Flash "data" sector was erased successfully.
-// *  @note Assumes Flash has been initialized.
-// */
+/*! @brief Erases the entire Flash sector.
+ *
+ *  @return bool - TRUE if the Flash "data" sector was erased successfully.
+ *  @note Assumes Flash has been initialized.
+ */
 bool Flash_Erase(void);
 
+
+/*! @brief Writes to flash with mutex access for use in an RTOS.
+ *
+ *  @param address The address of the data.
+ *  @param data The data to be written. Cast as 32 bit but will write 16 and 8.
+ *  @param dataSize The size in bits of the data to be written.
+ *  @return bool - TRUE if the Flash "data"  was written successfully.
+ *  @note Assumes Flash has been initialized.
+ */
 bool Flash_Write(volatile void * const address, const uint32_t data, uint8_t dataSize);
 
+
+/*! @brief Read one byte from flash with mutex access for use in RTOS.
+ *
+ *  @param flashAddress The pointer to the data to read.
+ *  @return uint8_t - The data at the given address
+ *  @note Assumes Flash has been initialized.
+ */
 uint8_t _FB(volatile uint8_t* flashAddress);
 
+
+/*! @brief Read one half word from flash with mutex access for use in RTOS.
+ *
+ *  @param flashAddress The pointer to the data to read.
+ *  @return uint16_t - The data at the given address
+ *  @note Assumes Flash has been initialized.
+ */
 uint16_t _FH(volatile uint16_t* flashAddress);
 
+
+/*! @brief Read one word from flash with mutex access for use in RTOS.
+ *
+ *  @param flashAddress The pointer to the data to read.
+ *  @return uint32_t - The data at the given address
+ *  @note Assumes Flash has been initialized.
+ */
 uint32_t _FW(volatile uint32_t* flashAddress);
 
+
+/*! @brief Read one phrase from flash with mutex access for use in RTOS.
+ *
+ *  @param flashAddress The pointer to the data to read.
+ *  @return uint64_t - The data at the given address
+ *  @note Assumes Flash has been initialized.
+ */
 uint64_t _FP(volatile uint64_t* flashAddress);
 
+
+/*! @brief Interrupt service routine for the Flash.
+ *
+ *  @note Assumes flash has been initialized and a RTOS is being used.
+ */
 void __attribute__ ((interrupt)) Flash_ISR(void);
 #endif

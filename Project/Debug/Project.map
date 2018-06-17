@@ -1537,24 +1537,24 @@ LOAD c:/freescale/kds_3.0.0/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv7e-
                 0x000005cd       0x22 c:/freescale/kds_3.0.0/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv7e-m/fpu/crtn.o
 OUTPUT(Project.elf elf32-littlearm)
 
-.debug_info     0x00000000     0x825b
+.debug_info     0x00000000     0x825a
  .debug_info    0x00000000      0x20b ./Sources/FIFO.o
  .debug_info    0x0000020b      0x797 ./Sources/FTM.o
- .debug_info    0x000009a2      0x961 ./Sources/Flash.o
- .debug_info    0x00001303      0x8fb ./Sources/I2C.o
- .debug_info    0x00001bfe      0x490 ./Sources/LEDs.o
- .debug_info    0x0000208e      0x5d0 ./Sources/PIT.o
- .debug_info    0x0000265e      0x632 ./Sources/RTC.o
- .debug_info    0x00002c90      0xa80 ./Sources/UART.o
- .debug_info    0x00003710      0x9af ./Sources/accel.o
- .debug_info    0x000040bf     0x1153 ./Sources/main.o
- .debug_info    0x00005212      0x2ff ./Sources/packet.o
- .debug_info    0x00005511      0x3b0 ./Project_Settings/Startup_Code/startup.o
- .debug_info    0x000058c1      0xc82 ./Generated_Code/Cpu.o
- .debug_info    0x00006543      0x14c ./Generated_Code/Vectors.o
- .debug_info    0x0000668f      0xd02 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
- .debug_info    0x00007391      0x46a D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
- .debug_info    0x000077fb      0xa60 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
+ .debug_info    0x000009a2      0x960 ./Sources/Flash.o
+ .debug_info    0x00001302      0x8fb ./Sources/I2C.o
+ .debug_info    0x00001bfd      0x490 ./Sources/LEDs.o
+ .debug_info    0x0000208d      0x5d0 ./Sources/PIT.o
+ .debug_info    0x0000265d      0x632 ./Sources/RTC.o
+ .debug_info    0x00002c8f      0xa80 ./Sources/UART.o
+ .debug_info    0x0000370f      0x9af ./Sources/accel.o
+ .debug_info    0x000040be     0x1153 ./Sources/main.o
+ .debug_info    0x00005211      0x2ff ./Sources/packet.o
+ .debug_info    0x00005510      0x3b0 ./Project_Settings/Startup_Code/startup.o
+ .debug_info    0x000058c0      0xc82 ./Generated_Code/Cpu.o
+ .debug_info    0x00006542      0x14c ./Generated_Code/Vectors.o
+ .debug_info    0x0000668e      0xd02 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
+ .debug_info    0x00007390      0x46a D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
+ .debug_info    0x000077fa      0xa60 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
 
 .debug_abbrev   0x00000000     0x1c79
  .debug_abbrev  0x00000000       0xce ./Sources/FIFO.o

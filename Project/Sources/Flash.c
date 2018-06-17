@@ -170,8 +170,8 @@ static bool Write8(volatile uint8_t* const address, const uint8_t data)
 /*! @brief Writes TFCCOB to flash and waits for it to complete
  *
  *  @param commonCommandObject The address of the TFCCOB.
- *  @return bool - TRUE if TFCCOB was written to Flash successfully
- *  @note Assumes Flash has been initialized.
+ *  @return bool - TRUE if TFCCOB was written to Flash successfully.
+ *  @note Assumes Flash has been initialized and is used in a RTOS.
  */
 static bool LaunchCommand(TFCCOB* commonCommandObject)
 {
@@ -199,9 +199,6 @@ static bool LaunchCommand(TFCCOB* commonCommandObject)
 
   // Enable interrupts from CCIF
   FTFE_FCNFG |= FTFE_FCNFG_CCIE_MASK;
-
-  // Wait for write to finish
-  //while(!(FTFE_FSTAT & FTFE_FSTAT_CCIF_MASK)){}
   
   // Wait for semaphore to continue
   OS_SemaphoreWait(CCIFSemaphore, 0);
@@ -352,6 +349,14 @@ static bool EraseSector(const uint32_t address)
 }
 
 
+/*! @brief Writes to flash with mutex access for use in an RTOS.
+ *
+ *  @param address The address of the data.
+ *  @param data The data to be written. Cast as 32 bit but will write 16 and 8.
+ *  @param dataSize The size in bits of the data to be written.
+ *  @return bool - TRUE if the Flash "data"  was written successfully.
+ *  @note Assumes Flash has been initialized.
+ */
 bool Flash_Write(volatile void * const address, const uint32_t data, uint8_t dataSize)
 {
   bool success = false;
@@ -375,6 +380,13 @@ bool Flash_Write(volatile void * const address, const uint32_t data, uint8_t dat
   return success;
 }
 
+
+/*! @brief Read one byte from flash with mutex access for use in RTOS.
+ *
+ *  @param flashAddress The pointer to the data to read.
+ *  @return uint8_t - The data at the given address
+ *  @note Assumes Flash has been initialized.
+ */
 uint8_t _FB(volatile uint8_t* flashAddress)
 {
   // Gain access
@@ -388,6 +400,13 @@ uint8_t _FB(volatile uint8_t* flashAddress)
   return byte;
 }
 
+
+/*! @brief Read one half word from flash with mutex access for use in RTOS.
+ *
+ *  @param flashAddress The pointer to the data to read.
+ *  @return uint16_t - The data at the given address
+ *  @note Assumes Flash has been initialized.
+ */
 uint16_t _FH(volatile uint16_t* flashAddress)
 {
   // Gain access
@@ -402,6 +421,13 @@ uint16_t _FH(volatile uint16_t* flashAddress)
 
 }
 
+
+/*! @brief Read one word from flash with mutex access for use in RTOS.
+ *
+ *  @param flashAddress The pointer to the data to read.
+ *  @return uint32_t - The data at the given address
+ *  @note Assumes Flash has been initialized.
+ */
 uint32_t _FW(volatile uint32_t* flashAddress)
 {
   // Gain access
@@ -415,6 +441,13 @@ uint32_t _FW(volatile uint32_t* flashAddress)
   return word;
 }
 
+
+/*! @brief Read one phrase from flash with mutex access for use in RTOS.
+ *
+ *  @param flashAddress The pointer to the data to read.
+ *  @return uint64_t - The data at the given address
+ *  @note Assumes Flash has been initialized.
+ */
 uint64_t _FP(volatile uint64_t* flashAddress)
 {
   // Gain access
@@ -428,6 +461,11 @@ uint64_t _FP(volatile uint64_t* flashAddress)
   return phrase;
 }
 
+
+/*! @brief Interrupt service routine for the Flash.
+ *
+ *  @note Assumes flash has been initialized and a RTOS is being used.
+ */
 void __attribute__ ((interrupt)) Flash_ISR(void)
 {
   OS_ISREnter();
