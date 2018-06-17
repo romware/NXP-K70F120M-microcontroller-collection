@@ -896,7 +896,29 @@ static void FrequencyCalculateThread(void* pData)
   }
 }
 
-uint16_t UpdateRMSFast(int16_t* RemoveData, int64_t* PreviousSumOfSquares, const TVoltageData Data, uint8_t DataSize)
+float FastSqrt(float square, float lastSquare, float accuracy)
+{
+  float error;
+  float last;
+  float root = lastSquare;
+  if(root <= 0)
+  {
+    root = 1;
+  }
+  if(root <= 0)
+  {
+    return 0;
+  }
+  do
+  {
+    last = root;
+    root = (root + (square / root)) / 2;
+    error = root - last;
+  }while(error > accuracy || error <-accuracy);
+  return root;
+}
+
+uint16_t UpdateRMSFast(int16_t* RemoveData, int64_t* PreviousSumOfSquares, const TVoltageData Data, uint8_t DataSize, uint16_t lastRMS)
 {
   // Update the sum of squares, removing old data and adding new data.
   int32_t newestData;
@@ -924,7 +946,9 @@ uint16_t UpdateRMSFast(int16_t* RemoveData, int64_t* PreviousSumOfSquares, const
   // Update the removed data and sum of squares for next time. Note: Latest data is where the latest data WILL be put.
   *RemoveData = Data.ADC_Data[Data.LatestData];
   *PreviousSumOfSquares = newSumOfSquares;
-  return (uint16_t)sqrtf((float)newSumOfSquares / (float)DataSize);
+
+  return (uint16_t)FastSqrt((float)newSumOfSquares / (float)DataSize, (float) lastRMS, (float)1);
+  //return (uint16_t)sqrtf((float)newSumOfSquares / (float)DataSize);
 }
 
 
@@ -983,9 +1007,9 @@ void RMSThread(void* pData)
     // Wait for channel semaphore
     (void)OS_SemaphoreWait(analogData->semaphore, 0);
 
-    OS_EnableInterrupts();  //TODO: remove probably. Maybe pass just the new value for getrmsfast
+    //OS_EnableInterrupts();  //TODO: remove probably. Maybe pass just the new value for getrmsfast
 
-    //Analog_Put(0, DAC_5V_OUT);
+    // Analog_Put(0, DAC_5V_OUT);
 
    // rms = GetRMS(VoltageSamples[analogData->channelNb], ADC_BUFFER_SIZE);
 
@@ -994,7 +1018,7 @@ void RMSThread(void* pData)
     //Analog_Put(0, 8200);
 
     rms = UpdateRMSFast(&(OldestData[analogData->channelNb]), &(LastSumOfSquares[analogData->channelNb]),
-                            VoltageSamples[analogData->channelNb], ADC_BUFFER_SIZE);
+                            VoltageSamples[analogData->channelNb], ADC_BUFFER_SIZE, RMS[analogData->channelNb]);
 
     //Analog_Put(0, DAC_0V_OUT);
 
