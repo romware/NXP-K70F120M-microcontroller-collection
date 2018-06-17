@@ -35,11 +35,6 @@ typedef struct
   uint8_t dataByte7;           /*!< The TFCCOB data byte 7 */
 } TFCCOB;
 
-// FLASH data access
-#define _FB(flashAddress)  *(uint8_t  volatile *)(flashAddress)
-#define _FH(flashAddress)  *(uint16_t volatile *)(flashAddress)
-#define _FW(flashAddress)  *(uint32_t volatile *)(flashAddress)
-#define _FP(flashAddress)  *(uint64_t volatile *)(flashAddress)
 
 // Address of the start of the Flash block we are using for data storage
 #define FLASH_DATA_START 0x00080000LU
@@ -102,5 +97,13 @@ bool Flash_AllocateVar(volatile void** variable, const uint8_t size);
 bool Flash_Erase(void);
 
 bool Flash_Write(volatile void * const address, const uint32_t data, uint8_t dataSize);
+
+uint8_t _FB(uint32_t* flashaddress);
+
+uint16_t _FH(uint32_t* flashaddress);
+
+uint32_t _FW(uint32_t* flashaddress);
+
+uint64_t _FP(uint32_t* flashaddress);
 
 #endif
