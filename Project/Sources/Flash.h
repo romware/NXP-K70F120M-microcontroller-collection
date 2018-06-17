@@ -85,4 +85,5 @@ uint32_t _FW(volatile uint32_t* flashAddress);
 
 uint64_t _FP(volatile uint64_t* flashAddress);
 
+void __attribute__ ((interrupt)) Flash_ISR(void);
 #endif

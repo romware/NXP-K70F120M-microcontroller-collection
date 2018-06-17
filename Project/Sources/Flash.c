@@ -18,7 +18,7 @@
 #include "Flash.h"
 #include "OS.h"
 
-
+OS_ECB* CCIFSemaphore;                /*!< The CCIF semaphore for Flash */
 OS_ECB* FlashAccessMutex;             /*!< The Flash access Mutex */
 
 /*! @brief Writes TFCCOB to flash and waits for it to complete
@@ -197,9 +197,15 @@ static bool LaunchCommand(TFCCOB* commonCommandObject)
   //Write 1 to clear CCIF
   FTFE_FSTAT = FTFE_FSTAT_CCIF_MASK;
 
+  // Enable interrupts from CCIF
+  FTFE_FCNFG |= FTFE_FCNFG_CCIE_MASK;
+
   // Wait for write to finish
-  while(!(FTFE_FSTAT & FTFE_FSTAT_CCIF_MASK)){}
+  //while(!(FTFE_FSTAT & FTFE_FSTAT_CCIF_MASK)){}
   
+  // Wait for semaphore to continue
+  OS_SemaphoreWait(CCIFSemaphore, 0);
+
   return true;
 }
 /*! @brief Enables the Flash module.
@@ -210,6 +216,18 @@ bool Flash_Init(void)
 {
   // Initialize the Flash
   FlashAccessMutex = OS_SemaphoreCreate(1);
+  CCIFSemaphore = OS_SemaphoreCreate(0);
+
+  // Address     | Vector | IRQ  | NVIC non-IPR register | NVIC IPR register | Source module | Source description
+  // 0x0000_0104 | 34     | 18   | 0                     | 4                 | Flash memory  | Command complete
+  // IRQ modulo 32 = 18
+
+  // Clear any pending interrupts from CCIF (bit 18 of register 0 (IRQ18))
+  NVICICPR0 |= (1 << 18);
+
+  // Enable interrupt source for CCIF in NVIC (bit 18 of register 0 (IRQ18))
+  NVICISER0 |= (1 << 18);
+
   return true;
 }
 
@@ -410,6 +428,18 @@ uint64_t _FP(volatile uint64_t* flashAddress)
   return phrase;
 }
 
+void __attribute__ ((interrupt)) Flash_ISR(void)
+{
+  OS_ISREnter();
+
+  // Disable interrupts from CCIF
+  FTFE_FCNFG &= ~FTFE_FCNFG_CCIE_MASK;
+
+  // Signal Semaphore
+  OS_SemaphoreSignal(CCIFSemaphore);
+
+  OS_ISRExit();
+}
 
 /* END Flash */
 /*!

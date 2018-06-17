@@ -11,7 +11,8 @@ Generated_Code/Vectors.o: ../Generated_Code/Vectors.c \
  D:/Embedded\ Software\ US/es18aut13/Project/Sources/RTC.h \
  D:/Embedded\ Software\ US/es18aut13/Project/Sources/FTM.h \
  D:/Embedded\ Software\ US/es18aut13/Project/Sources/I2C.h \
- D:/Embedded\ Software\ US/es18aut13/Project/Sources/accel.h
+ D:/Embedded\ Software\ US/es18aut13/Project/Sources/accel.h \
+ D:/Embedded\ Software\ US/es18aut13/Project/Sources/Flash.h
 
 ../Generated_Code/Cpu.h:
 
@@ -42,3 +43,5 @@ D:/Embedded\ Software\ US/es18aut13/Project/Sources/FTM.h:
 D:/Embedded\ Software\ US/es18aut13/Project/Sources/I2C.h:
 
 D:/Embedded\ Software\ US/es18aut13/Project/Sources/accel.h:
+
+D:/Embedded\ Software\ US/es18aut13/Project/Sources/Flash.h:

@@ -62,6 +62,7 @@
 #include "FTM.h"
 #include "I2C.h"
 #include "accel.h"
+#include "Flash.h"
 
 void __attribute__ ((interrupt)) LPTimer_ISR(void);
 
@@ -115,7 +116,7 @@ void __attribute__ ((interrupt)) LPTimer_ISR(void);
     (tIsrFunc)&Cpu_Interrupt,          /* 0x1F  0x0000007C   -   ivINT_DMA15_DMA31              unused by PE */
     (tIsrFunc)&Cpu_Interrupt,          /* 0x20  0x00000080   -   ivINT_DMA_Error                unused by PE */
     (tIsrFunc)&Cpu_Interrupt,          /* 0x21  0x00000084   -   ivINT_MCM                      unused by PE */
-    (tIsrFunc)&Cpu_Interrupt,          /* 0x22  0x00000088   -   ivINT_FTFE                     unused by PE */
+    (tIsrFunc)&Flash_ISR,              /* 0x22  0x00000088   -   ivINT_FTFE                     unused by PE */
     (tIsrFunc)&Cpu_Interrupt,          /* 0x23  0x0000008C   -   ivINT_Read_Collision           unused by PE */
     (tIsrFunc)&Cpu_Interrupt,          /* 0x24  0x00000090   -   ivINT_LVD_LVW                  unused by PE */
     (tIsrFunc)&Cpu_Interrupt,          /* 0x25  0x00000094   -   ivINT_LLW                      unused by PE */
