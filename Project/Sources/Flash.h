@@ -66,39 +66,41 @@ bool Flash_Init(void);
  *  @note Assumes Flash has been initialized.
  */
 bool Flash_AllocateVar(volatile void** variable, const uint8_t size);
-
-/*! @brief Writes a 32-bit number to Flash.
- *
- *  @param address The address of the data.
- *  @param data The 32-bit data to write.
- *  @return bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 4-byte boundary or if there is a programming error.
- *  @note Assumes Flash has been initialized.
- */
-bool Flash_Write32(volatile uint32_t* const address, const uint32_t data);
- 
-/*! @brief Writes a 16-bit number to Flash.
- *
- *  @param address The address of the data.
- *  @param data The 16-bit data to write.
- *  @return bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 2-byte boundary or if there is a programming error.
- *  @note Assumes Flash has been initialized.
- */
-bool Flash_Write16(volatile uint16_t* const address, const uint16_t data);
-
-/*! @brief Writes an 8-bit number to Flash.
- *
- *  @param address The address of the data.
- *  @param data The 8-bit data to write.
- *  @return bool - TRUE if Flash was written successfully, FALSE if there is a programming error.
- *  @note Assumes Flash has been initialized.
- */
-bool Flash_Write8(volatile uint8_t* const address, const uint8_t data);
-
-/*! @brief Erases the entire Flash sector.
- *
- *  @return bool - TRUE if the Flash "data" sector was erased successfully.
- *  @note Assumes Flash has been initialized.
- */
+//
+///*! @brief Writes a 32-bit number to Flash.
+// *
+// *  @param address The address of the data.
+// *  @param data The 32-bit data to write.
+// *  @return bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 4-byte boundary or if there is a programming error.
+// *  @note Assumes Flash has been initialized.
+// */
+//bool Flash_Write32(volatile uint32_t* const address, const uint32_t data);
+//
+///*! @brief Writes a 16-bit number to Flash.
+// *
+// *  @param address The address of the data.
+// *  @param data The 16-bit data to write.
+// *  @return bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 2-byte boundary or if there is a programming error.
+// *  @note Assumes Flash has been initialized.
+// */
+//bool Flash_Write16(volatile uint16_t* const address, const uint16_t data);
+//
+///*! @brief Writes an 8-bit number to Flash.
+// *
+// *  @param address The address of the data.
+// *  @param data The 8-bit data to write.
+// *  @return bool - TRUE if Flash was written successfully, FALSE if there is a programming error.
+// *  @note Assumes Flash has been initialized.
+// */
+//bool Flash_Write8(volatile uint8_t* const address, const uint8_t data);
+//
+///*! @brief Erases the entire Flash sector.
+// *
+// *  @return bool - TRUE if the Flash "data" sector was erased successfully.
+// *  @note Assumes Flash has been initialized.
+// */
 bool Flash_Erase(void);
+
+bool Flash_Write(volatile void * const address, const uint32_t data, uint8_t dataSize);
 
 #endif

@@ -221,7 +221,7 @@ bool HandleTowerNumber(void)
   else if(Packet_Parameter1 == PARAM_SET)
   {
     // Sets the tower number
-    return Flash_Write16((uint16_t*)NvTowerNb,(uint16_t)Packet_Parameter23);
+    return Flash_Write((uint16_t*)NvTowerNb,(uint16_t)Packet_Parameter23, (uint8_t)16);
   }
   return false;
 }
@@ -242,7 +242,7 @@ bool HandleTowerProgramByte(void)
   {
     // Program byte to Flash
     volatile uint8_t* nvAddress = (uint8_t*)(FLASH_DATA_START + Packet_Parameter1);
-    return Flash_Write8( (uint8_t*)nvAddress, Packet_Parameter3 );
+    return Flash_Write( (uint8_t*)nvAddress, Packet_Parameter3, (uint8_t)8);
   }
   return false;
 }
@@ -277,7 +277,7 @@ bool HandleTowerMode(void)
   else if (Packet_Parameter1 == PARAM_SET)
   {
     // Sets the tower mode
-    return Flash_Write16((uint16_t*)NvTowerMd,(uint16_t)Packet_Parameter23);
+    return Flash_Write((uint16_t*)NvTowerMd,(uint16_t)Packet_Parameter23, (uint8_t)16);
   }
   return false;
 }
@@ -314,7 +314,7 @@ bool HandleTowerTimingMode(void)
   else if((Packet_Parameter1 == TIMING_DEFINITE || Packet_Parameter1 == TIMING_INVERSE) && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Set Timing Mode
-    if (Flash_Write8((uint8_t*)NvTimingMd,(uint8_t)Packet_Parameter1))
+    if (Flash_Write((uint8_t*)NvTimingMd,(uint8_t)Packet_Parameter1, (uint8_t)8))
     {
       OS_DisableInterrupts();
       TimingMode = _FB(NvTimingMd);
@@ -340,7 +340,7 @@ bool HandleTowerRaises(void)
   else if(Packet_Parameter1 == 1 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Resets the number of raises
-    return Flash_Write8((uint8_t*)NvNbRaises,(uint8_t)0);
+    return Flash_Write((uint8_t*)NvNbRaises,(uint8_t)0, (uint8_t)8);
   }
   return false;
 }
@@ -360,7 +360,7 @@ bool HandleTowerLowers(void)
   else if(Packet_Parameter1 == 1 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Resets the number of lowers
-    return Flash_Write8((uint8_t*)NvNbLowers,(uint8_t)0);
+    return Flash_Write((uint8_t*)NvNbLowers,(uint8_t)0, (uint8_t)8);
   }
   return false;
 }
@@ -583,7 +583,7 @@ bool TowerInit(void)
       if(_FH(NvTowerNb) == 0xFFFF)
       {
         // Sets the tower number to the default number
-        if(!Flash_Write16((uint16_t*)NvTowerNb,(uint16_t)3756))
+        if(!Flash_Write((uint16_t*)NvTowerNb,(uint16_t)3756, (uint8_t)16))
         {
           success = false;
         }
@@ -593,7 +593,7 @@ bool TowerInit(void)
       if(_FH(NvTowerMd) == 0xFFFF)
       {
         // Sets the tower mode to the default mode
-        if(!Flash_Write16((uint16_t*)NvTowerMd,(uint16_t)1))
+        if(!Flash_Write((uint16_t*)NvTowerMd,(uint16_t)1, (uint8_t)16))
         {
           success = false;
         }
@@ -603,7 +603,7 @@ bool TowerInit(void)
       if((_FB(NvTimingMd) != TIMING_DEFINITE) && (_FB(NvTimingMd) != TIMING_INVERSE))
       {
         // Sets the timing mode to the default mode
-        if(!Flash_Write8((uint8_t*)NvTimingMd, (uint8_t)TIMING_DEFINITE))
+        if(!Flash_Write((uint8_t*)NvTimingMd, (uint8_t)TIMING_DEFINITE, (uint8_t)8))
         {
           success = false;
         }
@@ -619,7 +619,7 @@ bool TowerInit(void)
       if(_FB(NvNbRaises) == 0xFF)
       {
         // Sets the number of raises to 0
-        if(!Flash_Write8((uint8_t*)NvNbRaises,(uint8_t)0))
+        if(!Flash_Write((uint8_t*)NvNbRaises,(uint8_t)0, (uint8_t)8))
         {
           success = false;
         }
@@ -629,7 +629,7 @@ bool TowerInit(void)
       if(_FB(NvNbLowers) == 0xFF)
       {
         // Sets the number of raises to 0
-        if(!Flash_Write8((uint8_t*)NvNbLowers,(uint8_t)0))
+        if(!Flash_Write((uint8_t*)NvNbLowers,(uint8_t)0, (uint8_t)8))
         {
           success = false;
         }
@@ -754,7 +754,7 @@ static void LogRaisesThread(void* pData)
     if(events != 255)
     {
       events ++;
-      Flash_Write8((uint8_t*)NvNbRaises, events);
+      Flash_Write((uint8_t*)NvNbRaises, events, (uint8_t)8);
     }
 
     // Release access to flash
@@ -778,7 +778,7 @@ static void LogLowersThread(void* pData)
     if(events != 255)
     {
       events ++;
-      Flash_Write8((uint8_t*)NvNbLowers, events);
+      Flash_Write((uint8_t*)NvNbLowers, events, (uint8_t)8);
     }
     // Release access to flash
     OS_SemaphoreSignal(FlashAccessMutex);

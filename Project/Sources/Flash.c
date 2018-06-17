@@ -23,7 +23,7 @@
  *  @return bool - TRUE if TFCCOB was written to Flash successfully
  *  @note Assumes Flash has been initialized.
  */
-static bool LaunchCommand(TFCCOB* commonCommandObject);
+static bool launchCommand(TFCCOB* commonCommandObject);
 
 /*! @brief Encodes an address and phrase into the TFCCOB structure
  *
@@ -32,7 +32,7 @@ static bool LaunchCommand(TFCCOB* commonCommandObject);
  *  @return bool - TRUE if TFCCOB was encoded successfully
  *  @note Assumes Flash has been initialized.
  */
-static bool WritePhrase(const uint32_t address, const uint64union_t phrase);
+static bool writePhrase(const uint32_t address, const uint64union_t phrase);
 
 /*! @brief Erases a sector of Flash memory
  *
@@ -40,7 +40,7 @@ static bool WritePhrase(const uint32_t address, const uint64union_t phrase);
  *  @return bool - TRUE if the sector was erased successfully
  *  @note Assumes Flash has been initialized.
  */
-static bool EraseSector(const uint32_t address);
+static bool eraseSector(const uint32_t address);
 
 /*! @brief Enables the Flash module.
  *
@@ -104,7 +104,7 @@ bool Flash_AllocateVar(volatile void** variable, const uint8_t size)
  *  @return bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 4-byte boundary or if there is a programming error.
  *  @note Assumes Flash has been initialized.
  */
-bool Flash_Write32(volatile uint32_t* const address, const uint32_t data)
+bool write32(volatile uint32_t* const address, const uint32_t data)
 {
   // The phrase to parse
   uint64union_t phrase; 
@@ -122,7 +122,7 @@ bool Flash_Write32(volatile uint32_t* const address, const uint32_t data)
     phrase.s.Hi = _FW(address32 + sizeof(data));
     
     // Write the phrase to the second half of the 8 byte Flash memory
-    return WritePhrase( (address32), phrase ); 
+    return writePhrase( (address32), phrase );
   }
   else
   {
@@ -133,7 +133,7 @@ bool Flash_Write32(volatile uint32_t* const address, const uint32_t data)
     phrase.s.Hi = data; 
     
     // Write the phrase to the first half of the 8 byte Flash memory
-    return WritePhrase( (address32 - sizeof(data)), phrase );
+    return writePhrase( (address32 - sizeof(data)), phrase );
   }
 }
 
@@ -144,7 +144,7 @@ bool Flash_Write32(volatile uint32_t* const address, const uint32_t data)
  *  @return bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 2-byte boundary or if there is a programming error.
  *  @note Assumes Flash has been initialized.
  */
-bool Flash_Write16(volatile uint16_t* const address, const uint16_t data)
+bool write16(volatile uint16_t* const address, const uint16_t data)
 {
   // The word to parse
   uint32union_t word; 
@@ -162,7 +162,7 @@ bool Flash_Write16(volatile uint16_t* const address, const uint16_t data)
     word.s.Hi = _FH(address32 + sizeof(data));
     
     // Write the word to the second quarter or fourth quarter of the 8 byte Flash memory
-    return Flash_Write32( (uint32_t volatile *)(address32), word.l ); 
+    return write32( (uint32_t volatile *)(address32), word.l );
   }
   else
   {
@@ -173,7 +173,7 @@ bool Flash_Write16(volatile uint16_t* const address, const uint16_t data)
     word.s.Hi = data;
     
     // Write the word to the first quarter or thirst quarter of the 8 byte Flash memory
-    return Flash_Write32( (uint32_t volatile *)(address32 - sizeof(data)), word.l );
+    return write32( (uint32_t volatile *)(address32 - sizeof(data)), word.l );
   }
 }
 
@@ -184,7 +184,7 @@ bool Flash_Write16(volatile uint16_t* const address, const uint16_t data)
  *  @return bool - TRUE if Flash was written successfully, FALSE if there is a programming error.
  *  @note Assumes Flash has been initialized.
  */
-bool Flash_Write8(volatile uint8_t* const address, const uint8_t data)
+bool write8(volatile uint8_t* const address, const uint8_t data)
 {
   // The half word to parse
   uint16union_t halfWord;
@@ -202,7 +202,7 @@ bool Flash_Write8(volatile uint8_t* const address, const uint8_t data)
     halfWord.s.Hi = _FB(address32 + sizeof(data));
     
     // Write the half word to the second, fourth, sixth or eighth section of the 8 byte Flash memory
-    return Flash_Write16( (uint16_t volatile *)(address32), halfWord.l );
+    return write16( (uint16_t volatile *)(address32), halfWord.l );
   }
   else
   {
@@ -213,7 +213,7 @@ bool Flash_Write8(volatile uint8_t* const address, const uint8_t data)
     halfWord.s.Hi = data; 
     
     // Write the half word to the first, third, fifth or seventh section of the 8 byte Flash memory
-    return Flash_Write16( (uint16_t volatile *)(address32 - sizeof(data)), halfWord.l );
+    return write16( (uint16_t volatile *)(address32 - sizeof(data)), halfWord.l );
   }
 }
 
@@ -225,7 +225,7 @@ bool Flash_Write8(volatile uint8_t* const address, const uint8_t data)
 bool Flash_Erase(void)
 {
   // Erase the Flash sector with the Flash Data Start address
-  return EraseSector(FLASH_DATA_START);
+  return eraseSector(FLASH_DATA_START);
 }
 
 /*! @brief Writes TFCCOB to flash and waits for it to complete
@@ -234,7 +234,7 @@ bool Flash_Erase(void)
  *  @return bool - TRUE if TFCCOB was written to Flash successfully
  *  @note Assumes Flash has been initialized.
  */
-static bool LaunchCommand(TFCCOB* commonCommandObject)
+static bool launchCommand(TFCCOB* commonCommandObject)
 {
   // Write 1 to clear ACCERR and FPVIOL flags
   FTFE_FSTAT = FTFE_FSTAT_ACCERR_MASK | FTFE_FSTAT_FPVIOL_MASK;
@@ -271,7 +271,7 @@ static bool LaunchCommand(TFCCOB* commonCommandObject)
  *  @return bool - TRUE if TFCCOB was encoded successfully
  *  @note Assumes Flash has been initialized.
  */
-static bool WritePhrase(const uint32_t address, const uint64union_t phrase)
+static bool writePhrase(const uint32_t address, const uint64union_t phrase)
 {
   // Erase Flash before writing
   if(Flash_Erase())
@@ -299,7 +299,7 @@ static bool WritePhrase(const uint32_t address, const uint64union_t phrase)
     commonCommandObject.dataByte7 = ( (phrase.l >>  0) );
 
     // Run the command to program the phrase
-    return LaunchCommand(&commonCommandObject);
+    return launchCommand(&commonCommandObject);
   }
   return false;
 }
@@ -310,7 +310,7 @@ static bool WritePhrase(const uint32_t address, const uint64union_t phrase)
  *  @return bool - TRUE if the sector was erased successfully
  *  @note Assumes Flash has been initialized.
  */
-static bool EraseSector(const uint32_t address)
+static bool eraseSector(const uint32_t address)
 {
   // Initialize a local TFCCOB structure
   TFCCOB commonCommandObject;
@@ -324,8 +324,41 @@ static bool EraseSector(const uint32_t address)
   commonCommandObject.flashAddress07to00 = ( address );
   
   // Run the command to erase the flash sector
-  return LaunchCommand(&commonCommandObject);
+  return launchCommand(&commonCommandObject);
 }
+
+
+bool Flash_Write(volatile void * const address, const uint32_t data, uint8_t dataSize)
+{
+
+  // Gain access to flash
+
+  switch(dataSize){
+    case 8:
+      return write8(address, data);
+      break;
+    case 16:
+      return write16(address, data);
+      break;
+    case 32:
+      return write32(address, data);
+      break;
+    default:
+      return false;
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
+
 
 /* END Flash */
 /*!
