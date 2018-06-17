@@ -918,66 +918,65 @@ float FastSqrt(float square, float lastSquare, float accuracy)
   return root;
 }
 
-uint16_t UpdateRMSFast(int16_t* RemoveData, int64_t* PreviousSumOfSquares, const TVoltageData Data, uint8_t DataSize, uint16_t lastRMS)
+uint16_t UpdateRMSFast(int16_t* removeData, int64_t* previousSumOfSquares, const TVoltageData data, uint8_t dataSize, uint16_t lastRMS)
 {
   // Update the sum of squares, removing old data and adding new data.
   int32_t newestData;
-  if(Data.LatestData == 0)
+  if(data.LatestData == 0)
   {
-    newestData = Data.ADC_Data[DataSize - 1];
+    newestData = data.ADC_Data[dataSize - 1];
   }
   else
   {
-    newestData = Data.ADC_Data[Data.LatestData - 1];
+    newestData = data.ADC_Data[data.LatestData - 1];
   }
 
-  int64_t newSumOfSquares = *PreviousSumOfSquares;
+  int64_t newSumOfSquares = *previousSumOfSquares;
 
   newSumOfSquares += (newestData * newestData);
 
-  newSumOfSquares -= (int64_t)((int32_t)(*RemoveData) * (int32_t)(*RemoveData));
+  newSumOfSquares -= (int64_t)((int32_t)(*removeData) * (int32_t)(*removeData));
 
   // Ensure the new sum is positive
   if(newSumOfSquares < 0)
   {
-    newSumOfSquares = ((*RemoveData) * (*RemoveData));
+    newSumOfSquares = ((*removeData) * (*removeData));
   }
 
   // Update the removed data and sum of squares for next time. Note: Latest data is where the latest data WILL be put.
-  *RemoveData = Data.ADC_Data[Data.LatestData];
-  *PreviousSumOfSquares = newSumOfSquares;
+  *removeData = data.ADC_Data[data.LatestData];
+  *previousSumOfSquares = newSumOfSquares;
 
-  return (uint16_t)FastSqrt((float)newSumOfSquares / (float)DataSize, (float) lastRMS, (float)1);
-  //return (uint16_t)sqrtf((float)newSumOfSquares / (float)DataSize);
+  return (uint16_t)FastSqrt((float)newSumOfSquares / (float)dataSize, (float) lastRMS, (float)1);
 }
 
 
-uint16_t GetRMS(const TVoltageData Data, const uint8_t DataSize)
+uint16_t GetRMS(const TVoltageData data, const uint8_t dataSize)
 {
   float sum = 0;      //TODO: use different data type?? keep the sum of the squares.
-  for (uint8_t i = 0; i < DataSize; i ++)
+  for (uint8_t i = 0; i < dataSize; i ++)
   {
-    sum += (Data.ADC_Data[i]) * (Data.ADC_Data[i]);
+    sum += (data.ADC_Data[i]) * (data.ADC_Data[i]);
   }
-  return (uint16_t)sqrtf(sum / DataSize);
+  return (uint16_t)sqrtf(sum / dataSize);
 }
 
-float GetAverage(const TVoltageData Data, const uint8_t DataSize)
+float GetAverage(const TVoltageData Data, const uint8_t dataSize)
 {
   float sum = 0;
-  for(uint8_t i = 0; i < DataSize; i ++)
+  for(uint8_t i = 0; i < dataSize; i ++)
   {
     sum += Data.ADC_Data[i];
   }
-  return sum / DataSize;
+  return sum / dataSize;
 }
 
-bool CheckOutputsOff(const bool  Outputs[], const uint8_t NbOutputs)
+bool CheckOutputsOff(const bool  outputs[], const uint8_t nbOutputs)
 {
   bool set = false;
-  for (uint8_t i = 0; i < NbOutputs; i++)
+  for (uint8_t i = 0; i < nbOutputs; i++)
   {
-    set |= Outputs[i];
+    set |= outputs[i];
   }
   return !set;
 }
@@ -1007,26 +1006,9 @@ void RMSThread(void* pData)
     // Wait for channel semaphore
     (void)OS_SemaphoreWait(analogData->semaphore, 0);
 
-    //OS_EnableInterrupts();  //TODO: remove probably. Maybe pass just the new value for getrmsfast
-
-    // Analog_Put(0, DAC_5V_OUT);
-
-   // rms = GetRMS(VoltageSamples[analogData->channelNb], ADC_BUFFER_SIZE);
-
-    //Analog_Put(0, DAC_0V_OUT);
-
-    //Analog_Put(0, 8200);
-
     rms = UpdateRMSFast(&(OldestData[analogData->channelNb]), &(LastSumOfSquares[analogData->channelNb]),
                             VoltageSamples[analogData->channelNb], ADC_BUFFER_SIZE, RMS[analogData->channelNb]);
 
-    //Analog_Put(0, DAC_0V_OUT);
-
-    //LastSumOfSquares;
-//    if(rms != rmsTest)
-//    {
-//       rmsTest = rms;
-//    }
     OS_DisableInterrupts();
 
     // Update global RMS variable, disabling interrupts to restrict access during operation.
