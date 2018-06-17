@@ -144,16 +144,16 @@ volatile uint8_t* NvNbRaises;                                         /*!< Raise
 volatile uint8_t* NvNbLowers;                                         /*!< Lower count byte pointer to flash */
 volatile uint8_t* NvTimingMd;                                         /*!< Timing Mode byte pointer to flash */
 
-static TVoltageData VoltageSamples[NB_ANALOG_CHANNELS];               /*!<  */
-static uint16_t RMS[NB_ANALOG_CHANNELS];                              /*!<  */
-static uint16_t TimingMode;                                           /*!<  */
-static uint32_t SamplePeriod;                                         /*!<  */
-static uint32_t NewSamplePeriod;                                      /*!<  */
-static int64_t LastSumOfSquares[NB_ANALOG_CHANNELS];                  /*!<  */
-static int16_t OldestData[NB_ANALOG_CHANNELS];                        /*!<  */
-static bool Alarm[NB_ANALOG_CHANNELS];                                /*!<  */
-static bool Adjusting[NB_ANALOG_CHANNELS];                            /*!<  */
-static float Frequency;                                               /*!<  */
+static TVoltageData VoltageSamples[NB_ANALOG_CHANNELS];               /*!< The array of structs for voltage samples */
+static uint16_t RMS[NB_ANALOG_CHANNELS];                              /*!< The RMS of each analog channel */
+static uint16_t TimingMode;                                           /*!< The timing mode for the VRR*/
+static uint32_t SamplePeriod;                                         /*!< The current sample period of the VRR*/
+static uint32_t NewSamplePeriod;                                      /*!< The period to be loaded into the PIT next */
+static int64_t LastSumOfSquares[NB_ANALOG_CHANNELS];                  /*!< The array of the last sum of squares for fast RMS calculation */
+static int16_t OldestData[NB_ANALOG_CHANNELS];                        /*!< The array of the oldest ADC sample to be removed from sum of squares */
+static bool Alarm[NB_ANALOG_CHANNELS];                                /*!< The array of alarm flags indicating individual thread alarm states */
+static bool Adjusting[NB_ANALOG_CHANNELS];                            /*!< The array of adjusting flags indicating individual thread adjusting states */
+static float Frequency;                                               /*!< The frequency of phase A */
 
 // Semaphores for use by RTOS
 static OS_ECB* LEDOffSemaphore;                                       /*!< LED off semaphore for FTM */
@@ -392,7 +392,7 @@ bool HandleTowerFrequency(void)
   return false;
 }
 
-/*! @brief Sends the frequency to the PC
+/*! @brief Sends the voltage (RMS) of a given channel to the PC
  *
  *  @return bool - TRUE if packet sent
  */
@@ -671,13 +671,15 @@ bool TowerInit(void)
 static void InitModulesThread(void* pData)
 {
   // Create semaphores for threads
-  LEDOffSemaphore = OS_SemaphoreCreate(0);
-  RTCReadSemaphore = OS_SemaphoreCreate(0);
+  LEDOffSemaphore             = OS_SemaphoreCreate(0);
+  RTCReadSemaphore            = OS_SemaphoreCreate(0);
   FrequencyCalculateSemaphore = OS_SemaphoreCreate(0);
-  FrequencyTrackSemaphore = OS_SemaphoreCreate(0);
-  LogRaisesSemaphore = OS_SemaphoreCreate(0);
-  LogLowersSemaphore = OS_SemaphoreCreate(0);
-  FlashAccessMutex = OS_SemaphoreCreate(1);
+  FrequencyTrackSemaphore     = OS_SemaphoreCreate(0);
+  LogRaisesSemaphore          = OS_SemaphoreCreate(0);
+  LogLowersSemaphore          = OS_SemaphoreCreate(0);
+  FlashAccessMutex            = OS_SemaphoreCreate(1);
+
+  // Create semaphore for RMS channels
   for (uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
   {
     AnalogThreadData[i].semaphore = OS_SemaphoreCreate(0);
@@ -693,12 +695,19 @@ static void InitModulesThread(void* pData)
   // Send startup packets to PC
   HandleTowerStartup();
 
+  // Calculate the resolution of the PIT
   uint32_t nanoSecondPerTick = 1000000000 / CPU_BUS_CLK_HZ;
+
+  // Calculate the initial sample period (in nano-seconds), ensuring this value is truncated the same way PIT
+  // will so we keep accuracy in this value for use by other functions
   SamplePeriod = (uint32_t)(((1000000000/(ADC_DEFAULT_FREQUENCY * ADC_SAMPLES_PER_CYCLE))
                                / NB_ANALOG_CHANNELS/ nanoSecondPerTick) * nanoSecondPerTick) * NB_ANALOG_CHANNELS;
+
+  // Set the new sampler period and frequency
   NewSamplePeriod = SamplePeriod;
   Frequency = ADC_DEFAULT_FREQUENCY;
 
+  // Set and enable the PIT
   PIT_Set(SamplePeriod / NB_ANALOG_CHANNELS, false);
   PIT_Enable(true);
 
@@ -766,6 +775,12 @@ static void RTCThread(void* pData)
     Packet_Put(COMMAND_TIME, hours, minutes, seconds);
   }
 }
+
+/*! @brief Writes a logged VRR raise event to non-volatile memory
+ *
+ *  @param pData is not used but is required by the OS to create a thread.
+ *  @note Assumes that Flash_Init has been called successfully.
+ */
 static void LogRaisesThread(void* pData)
 {
   uint8_t events;
@@ -790,6 +805,11 @@ static void LogRaisesThread(void* pData)
   }
 }
 
+/*! @brief Writes a logged VRR lower event to non-volatile memory
+ *
+ *  @param pData is not used but is required by the OS to create a thread.
+ *  @note Assumes that Flash_Init has been called successfully.
+ */
 static void LogLowersThread(void* pData)
 {
   uint8_t events;
@@ -813,6 +833,11 @@ static void LogLowersThread(void* pData)
   }
 }
 
+/*! @brief Loads a new value into PIT in order to track phase A frequency
+ *
+ *  @param pData is not used but is required by the OS to create a thread.
+ *  @note Assumes that Flash_Init has been called successfully.
+ */
 static void FrequencyTrackThread(void* pData)
 {
   uint8_t events;
@@ -828,6 +853,11 @@ static void FrequencyTrackThread(void* pData)
   }
 }
 
+/*! @brief Calculates the frequency for an analog channel
+ *
+ *  @param pData is not used but is required by the OS to create a thread.
+ *  @note Assumes that Flash_Init has been called successfully.
+ */
 static void FrequencyCalculateThread(void* pData)
 {
   TVoltageData localSamples;
@@ -923,11 +953,18 @@ static void FrequencyCalculateThread(void* pData)
   }
 }
 
-float FastSqrt(float square, float lastSquare, float accuracy)
+/*! @brief Calculates the square root of a float quickly by knowing the previous value of the square
+ *
+ *  @param square The float to find the square root of
+ *  @param lastRoot The root of the last square
+ *  @param accuracy The desired accuracy of the root
+ *  @return float - The square root
+ */
+float FastSqrt(float square, float lastRoot, float accuracy)
 {
   float error;
   float last;
-  float root = lastSquare;
+  float root = lastRoot;
   if(root <= 0)
   {
     root = 1;
@@ -945,34 +982,40 @@ float FastSqrt(float square, float lastSquare, float accuracy)
   return root;
 }
 
-uint16_t UpdateRMSFast(int16_t* removeData, int64_t* previousSumOfSquares, const TVoltageData data, uint8_t dataSize, uint16_t lastRMS)
+/*! @brief Updates the RMS using the previous sum of squares to save time
+ *
+ *  @param pRemoveData The pointer to the data to remove from the sum of squares
+ *  @param pPreviousSumOfSquares The pointer to the previous sum of squares
+ *  @param latestData The latest data sample
+ *  @param oldestData The oldest data sample to be removed next time
+ *  @param dataSize The number of data samples for average of sum of squares
+ *  @param lastRMS The last RMS value of the data
+ *  @return uint16_t - The RMS value
+ */
+uint16_t UpdateRMSFast(int16_t* pRemoveData, int64_t* pPreviousSumOfSquares, const int16_t latestData,
+                       const int16_t oldestData, uint8_t dataSize, uint16_t lastRMS) //TODO: use const?
 {
-  // Update the sum of squares, removing old data and adding new data.
   int32_t newestData;
-  if(data.LatestData == 0)
-  {
-    newestData = data.ADC_Data[dataSize - 1];
-  }
-  else
-  {
-    newestData = data.ADC_Data[data.LatestData - 1];
-  }
 
-  int64_t newSumOfSquares = *previousSumOfSquares;
+  // Cast to int32_t to avoid calculations later
+  newestData = (int32_t)latestData;
+
+  // Update the sum of squares, removing old data and adding new data.
+  int64_t newSumOfSquares = *pPreviousSumOfSquares;
 
   newSumOfSquares += (newestData * newestData);
 
-  newSumOfSquares -= (int64_t)((int32_t)(*removeData) * (int32_t)(*removeData));
+  newSumOfSquares -= (int64_t)((int32_t)(*pRemoveData) * (int32_t)(*pRemoveData));
 
   // Ensure the new sum is positive
   if(newSumOfSquares < 0)
   {
-    newSumOfSquares = ((*removeData) * (*removeData));
+    newSumOfSquares = ((*pRemoveData) * (*pRemoveData));
   }
 
   // Update the removed data and sum of squares for next time. Note: Latest data is where the latest data WILL be put.
-  *removeData = data.ADC_Data[data.LatestData];
-  *previousSumOfSquares = newSumOfSquares;
+  *pRemoveData = oldestData;
+  *pPreviousSumOfSquares = newSumOfSquares;
 
   return (uint16_t)FastSqrt((float)newSumOfSquares / (float)dataSize, (float) lastRMS, (float)1);
 }
@@ -1033,8 +1076,27 @@ void RMSThread(void* pData)
     // Wait for channel semaphore
     (void)OS_SemaphoreWait(analogData->semaphore, 0);
 
+    // Get a local copy of the latest data sample
+    int16_t latestSample;
+    int16_t oldestSample;
+
+    OS_DisableInterrupts();
+
+    if(VoltageSamples[analogData->channelNb].LatestData == 0)
+    {
+      latestSample = VoltageSamples[analogData->channelNb].ADC_Data[ADC_BUFFER_SIZE - 1];
+    }
+    else
+    {
+      latestSample = VoltageSamples[analogData->channelNb].ADC_Data[VoltageSamples[analogData->channelNb].LatestData - 1];
+    }
+    oldestSample = VoltageSamples[analogData->channelNb].ADC_Data[VoltageSamples[analogData->channelNb].LatestData];
+
+    OS_EnableInterrupts();
+
+    // Calculate the new RMS
     rms = UpdateRMSFast(&(OldestData[analogData->channelNb]), &(LastSumOfSquares[analogData->channelNb]),
-                            VoltageSamples[analogData->channelNb], ADC_BUFFER_SIZE, RMS[analogData->channelNb]);
+                            latestSample, oldestSample, ADC_BUFFER_SIZE, RMS[analogData->channelNb]);
 
     OS_DisableInterrupts();
 
