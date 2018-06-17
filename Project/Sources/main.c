@@ -257,7 +257,7 @@ bool HandleTowerReadByte(void)
   if(Packet_Parameter1 >= 0x00 && Packet_Parameter1 <= 0x07 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Send read byte packet
-    return Packet_Put(COMMAND_READBYTE,Packet_Parameter1,0,_FB(FLASH_DATA_START + (uint32_t)Packet_Parameter1));
+    return Packet_Put(COMMAND_READBYTE,Packet_Parameter1,0,_FB((volatile uint8_t*)(FLASH_DATA_START + (uint32_t)Packet_Parameter1)));
   }
   return false;
 }
@@ -580,7 +580,7 @@ bool TowerInit(void)
     && Flash_AllocateVar((volatile void**)&NvNbLowers, sizeof(*NvNbLowers)));
     {
       // Checks if tower number is clear
-      if(_FH(NvTowerNb) == 0xFFFF)
+      if(_FH((volatile uint16_t*)(NvTowerNb)) == 0xFFFF)
       {
         // Sets the tower number to the default number
         if(!Flash_Write((uint16_t*)NvTowerNb,(uint16_t)3756, (uint8_t)16))
@@ -590,7 +590,7 @@ bool TowerInit(void)
       }
 
       // Checks if tower mode is clear
-      if(_FH(NvTowerMd) == 0xFFFF)
+      if(_FH((volatile uint16_t*)(NvTowerMd)) == 0xFFFF)
       {
         // Sets the tower mode to the default mode
         if(!Flash_Write((uint16_t*)NvTowerMd,(uint16_t)1, (uint8_t)16))

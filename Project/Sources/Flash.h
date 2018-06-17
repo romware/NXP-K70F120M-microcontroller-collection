@@ -35,6 +35,11 @@ typedef struct
   uint8_t dataByte7;           /*!< The TFCCOB data byte 7 */
 } TFCCOB;
 
+// FLASH data access
+//#define _FB(flashAddress)  *(uint8_t  volatile *)(flashAddress)
+//#define _FH(flashAddress)  *(uint16_t volatile *)(flashAddress)
+//#define _FW(flashAddress)  *(uint32_t volatile *)(flashAddress)
+//#define _FP(flashAddress)  *(uint64_t volatile *)(flashAddress)
 
 // Address of the start of the Flash block we are using for data storage
 #define FLASH_DATA_START 0x00080000LU
@@ -61,34 +66,8 @@ bool Flash_Init(void);
  *  @note Assumes Flash has been initialized.
  */
 bool Flash_AllocateVar(volatile void** variable, const uint8_t size);
-//
-///*! @brief Writes a 32-bit number to Flash.
-// *
-// *  @param address The address of the data.
-// *  @param data The 32-bit data to write.
-// *  @return bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 4-byte boundary or if there is a programming error.
-// *  @note Assumes Flash has been initialized.
-// */
-//bool Flash_Write32(volatile uint32_t* const address, const uint32_t data);
-//
-///*! @brief Writes a 16-bit number to Flash.
-// *
-// *  @param address The address of the data.
-// *  @param data The 16-bit data to write.
-// *  @return bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 2-byte boundary or if there is a programming error.
-// *  @note Assumes Flash has been initialized.
-// */
-//bool Flash_Write16(volatile uint16_t* const address, const uint16_t data);
-//
-///*! @brief Writes an 8-bit number to Flash.
-// *
-// *  @param address The address of the data.
-// *  @param data The 8-bit data to write.
-// *  @return bool - TRUE if Flash was written successfully, FALSE if there is a programming error.
-// *  @note Assumes Flash has been initialized.
-// */
-//bool Flash_Write8(volatile uint8_t* const address, const uint8_t data);
-//
+
+
 ///*! @brief Erases the entire Flash sector.
 // *
 // *  @return bool - TRUE if the Flash "data" sector was erased successfully.
@@ -98,12 +77,12 @@ bool Flash_Erase(void);
 
 bool Flash_Write(volatile void * const address, const uint32_t data, uint8_t dataSize);
 
-uint8_t _FB(uint32_t* flashaddress);
+uint8_t _FB(volatile uint8_t* flashAddress);
 
-uint16_t _FH(uint32_t* flashaddress);
+uint16_t _FH(volatile uint16_t* flashAddress);
 
-uint32_t _FW(uint32_t* flashaddress);
+uint32_t _FW(volatile uint32_t* flashAddress);
 
-uint64_t _FP(uint32_t* flashaddress);
+uint64_t _FP(volatile uint64_t* flashAddress);
 
 #endif

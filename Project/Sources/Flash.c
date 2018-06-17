@@ -23,7 +23,7 @@
  *  @return bool - TRUE if TFCCOB was written to Flash successfully
  *  @note Assumes Flash has been initialized.
  */
-static bool launchCommand(TFCCOB* commonCommandObject);
+static bool LaunchCommand(TFCCOB* commonCommandObject);
 
 /*! @brief Encodes an address and phrase into the TFCCOB structure
  *
@@ -32,7 +32,7 @@ static bool launchCommand(TFCCOB* commonCommandObject);
  *  @return bool - TRUE if TFCCOB was encoded successfully
  *  @note Assumes Flash has been initialized.
  */
-static bool writePhrase(const uint32_t address, const uint64union_t phrase);
+static bool WritePhrase(const uint32_t address, const uint64union_t phrase);
 
 /*! @brief Erases a sector of Flash memory
  *
@@ -40,8 +40,164 @@ static bool writePhrase(const uint32_t address, const uint64union_t phrase);
  *  @return bool - TRUE if the sector was erased successfully
  *  @note Assumes Flash has been initialized.
  */
-static bool eraseSector(const uint32_t address);
+static bool EraseSector(const uint32_t address);
 
+
+/*! @brief Writes a 32-bit number to Flash.
+ *
+ *  @param address The address of the data.
+ *  @param data The 32-bit data to write.
+ *  @return bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 4-byte boundary or if there is a programming error.
+ *  @note Assumes Flash has been initialized.
+ */
+static bool Write32(volatile uint32_t* const address, const uint32_t data)
+{
+  // The phrase to parse
+  uint64union_t phrase; 
+  
+  // The 32 bit cast of the address
+  uint32_t address32 = (uint32_t)address;
+
+  // Check if address is evenly divisible by 4 to find which bytes to write it to
+  if (address32 % (2*sizeof(data)) == 0)
+  {
+    // The word takes the low end of the phrase
+    phrase.s.Lo = data;
+    
+    // The value of the next 4 bytes takes the high end of the phrase
+    phrase.s.Hi = _FW((volatile uint32_t*)(address32 + sizeof(data)));
+    
+    // Write the phrase to the second half of the 8 byte Flash memory
+    return WritePhrase( (address32), phrase );
+  }
+  else
+  {
+    // The value of the previous 4 bytes takes the low end of the phrase
+    phrase.s.Lo = _FW((volatile uint32_t*)(address32 - sizeof(data)));
+    
+    // The word takes the high end of the phrase
+    phrase.s.Hi = data; 
+    
+    // Write the phrase to the first half of the 8 byte Flash memory
+    return WritePhrase((address32 - sizeof(data)), phrase );
+  }
+}
+
+/*! @brief Writes a 16-bit number to Flash.
+ *
+ *  @param address The address of the data.
+ *  @param data The 16-bit data to write.
+ *  @return bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 2-byte boundary or if there is a programming error.
+ *  @note Assumes Flash has been initialized.
+ */
+static bool Write16(volatile uint16_t* const address, const uint16_t data)
+{
+  // The word to parse
+  uint32union_t word; 
+  
+  // The 32 bit cast of the address
+  uint32_t address32 = (uint32_t)address;
+
+  // Check if address is divisible by 4 to find which bytes to write it to
+  if(address32 % (2*sizeof(data)) == 0)
+  {
+    // The half word takes the low end of the word
+    word.s.Lo = data; 
+    
+    // The value of the next 2 bytes takes the high end of the word
+    word.s.Hi = _FH((volatile uint16_t*)(address32 + sizeof(data)));
+    
+    // Write the word to the second quarter or fourth quarter of the 8 byte Flash memory
+    return Write32( (uint32_t volatile *)(address32), word.l );
+  }
+  else
+  {
+    // The value of the previous 2 bytes takes the low end of the word
+    word.s.Lo = _FH((volatile uint16_t*)(address32 - sizeof(data)));
+    
+    // The half word takes the high end of the word
+    word.s.Hi = data;
+    
+    // Write the word to the first quarter or thirst quarter of the 8 byte Flash memory
+    return Write32( (uint32_t volatile *)(address32 - sizeof(data)), word.l );
+  }
+}
+
+/*! @brief Writes an 8-bit number to Flash.
+ *
+ *  @param address The address of the data.
+ *  @param data The 8-bit data to write.
+ *  @return bool - TRUE if Flash was written successfully, FALSE if there is a programming error.
+ *  @note Assumes Flash has been initialized.
+ */
+static bool Write8(volatile uint8_t* const address, const uint8_t data)
+{
+  // The half word to parse
+  uint16union_t halfWord;
+  
+  // The 32 bit cast of the address
+  uint32_t address32 = (uint32_t)address;
+  
+  // Check if address is divisible by 2 to find which bytes to write it to
+  if(address32 % (2*sizeof(data)) == 0)
+  {
+    // The byte takes the low end of the half word
+    halfWord.s.Lo = data; 
+    
+    // The value of the next byte takes the high end of the half word
+    halfWord.s.Hi = _FB((volatile uint8_t*)(address32 + sizeof(data)));
+    
+    // Write the half word to the second, fourth, sixth or eighth section of the 8 byte Flash memory
+    return Write16( (uint16_t volatile *)(address32), halfWord.l );
+  }
+  else
+  {
+    // The value of the previous byte takes the low end of the half word
+    halfWord.s.Lo = _FB((volatile uint8_t*)(address32 - sizeof(data)));
+    
+    // The byte takes the high end of the half word
+    halfWord.s.Hi = data; 
+    
+    // Write the half word to the first, third, fifth or seventh section of the 8 byte Flash memory
+    return Write16( (uint16_t volatile *)(address32 - sizeof(data)), halfWord.l );
+  }
+}
+
+/*! @brief Writes TFCCOB to flash and waits for it to complete
+ *
+ *  @param commonCommandObject The address of the TFCCOB.
+ *  @return bool - TRUE if TFCCOB was written to Flash successfully
+ *  @note Assumes Flash has been initialized.
+ */
+static bool LaunchCommand(TFCCOB* commonCommandObject)
+{
+  // Write 1 to clear ACCERR and FPVIOL flags
+  FTFE_FSTAT = FTFE_FSTAT_ACCERR_MASK | FTFE_FSTAT_FPVIOL_MASK;
+
+  // Move commonCommandObject to FCCOB
+  FTFE_FCCOB0 = FTFE_FCCOB0_CCOBn(commonCommandObject->FCMD);
+  FTFE_FCCOB1 = FTFE_FCCOB1_CCOBn(commonCommandObject->flashAddress23to16);
+  FTFE_FCCOB2 = FTFE_FCCOB2_CCOBn(commonCommandObject->flashAddress15to08);
+  FTFE_FCCOB3 = FTFE_FCCOB3_CCOBn(commonCommandObject->flashAddress07to00);
+
+  FTFE_FCCOB8 = FTFE_FCCOB8_CCOBn(commonCommandObject->dataByte0);
+  FTFE_FCCOB9 = FTFE_FCCOB9_CCOBn(commonCommandObject->dataByte1);
+  FTFE_FCCOBA = FTFE_FCCOBA_CCOBn(commonCommandObject->dataByte2);
+  FTFE_FCCOBB = FTFE_FCCOBB_CCOBn(commonCommandObject->dataByte3);
+
+  FTFE_FCCOB4 = FTFE_FCCOB4_CCOBn(commonCommandObject->dataByte4);
+  FTFE_FCCOB5 = FTFE_FCCOB5_CCOBn(commonCommandObject->dataByte5);
+  FTFE_FCCOB6 = FTFE_FCCOB6_CCOBn(commonCommandObject->dataByte6);
+  FTFE_FCCOB7 = FTFE_FCCOB7_CCOBn(commonCommandObject->dataByte7);
+
+  //Write 1 to clear CCIF
+  FTFE_FSTAT = FTFE_FSTAT_CCIF_MASK;
+
+  // Wait for write to finish
+  while(!(FTFE_FSTAT & FTFE_FSTAT_CCIF_MASK)){}
+  
+  return true;
+}
 /*! @brief Enables the Flash module.
  *
  *  @return bool - TRUE if the Flash was setup successfully.
@@ -75,146 +231,26 @@ bool Flash_AllocateVar(volatile void** variable, const uint8_t size)
   {
     // Initialize the allocation to be the first address which can store the data
     uint8_t allocation = size * 2 - 1;
-    
+
     // Loop through each of the 8 bytes in Flash until an address is available
     for(uint8_t i = 0; i < 8/size; i++)
     {
       // Mask the allocation with the currently occupied bit mask to see if it is available
       if(!(occupiedBytes & allocation))
       {
-      	// Set the variable value to be the Flash address
+        // Set the variable value to be the Flash address
         *variable = (uint16_t* volatile)((uint32_t)FLASH_DATA_START + i * size);
-        
+
         // Set the occupation bit mask to have the newly allocated address as occupied
         occupiedBytes |= allocation;
         return true;
       }
-      
+
       // If the address is occupied, bit shift to the next location and check again
       allocation = allocation << size;
     }
   }
   return false;
-}
-
-/*! @brief Writes a 32-bit number to Flash.
- *
- *  @param address The address of the data.
- *  @param data The 32-bit data to write.
- *  @return bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 4-byte boundary or if there is a programming error.
- *  @note Assumes Flash has been initialized.
- */
-bool write32(volatile uint32_t* const address, const uint32_t data)
-{
-  // The phrase to parse
-  uint64union_t phrase; 
-  
-  // The 32 bit cast of the address
-  uint32_t address32 = (uint32_t)address;
-
-  // Check if address is evenly divisible by 4 to find which bytes to write it to
-  if (address32 % (2*sizeof(data)) == 0)
-  {
-    // The word takes the low end of the phrase
-    phrase.s.Lo = data;
-    
-    // The value of the next 4 bytes takes the high end of the phrase
-    phrase.s.Hi = _FW((uint32_t*)(address32 + sizeof(data)));
-    
-    // Write the phrase to the second half of the 8 byte Flash memory
-    return writePhrase( (address32), phrase );
-  }
-  else
-  {
-    // The value of the previous 4 bytes takes the low end of the phrase
-    phrase.s.Lo = _FW((uint32_t*)(address32 - sizeof(data)));
-    
-    // The word takes the high end of the phrase
-    phrase.s.Hi = data; 
-    
-    // Write the phrase to the first half of the 8 byte Flash memory
-    return writePhrase( (address32 - sizeof(data)), phrase );
-  }
-}
-
-/*! @brief Writes a 16-bit number to Flash.
- *
- *  @param address The address of the data.
- *  @param data The 16-bit data to write.
- *  @return bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 2-byte boundary or if there is a programming error.
- *  @note Assumes Flash has been initialized.
- */
-bool write16(volatile uint16_t* const address, const uint16_t data)
-{
-  // The word to parse
-  uint32union_t word; 
-  
-  // The 32 bit cast of the address
-  uint32_t address32 = (uint32_t)address;
-
-  // Check if address is divisible by 4 to find which bytes to write it to
-  if(address32 % (2*sizeof(data)) == 0)
-  {
-    // The half word takes the low end of the word
-    word.s.Lo = data; 
-    
-    // The value of the next 2 bytes takes the high end of the word
-    word.s.Hi = _FH((uint32_t*)(address32 + sizeof(data)));
-    
-    // Write the word to the second quarter or fourth quarter of the 8 byte Flash memory
-    return write32( (uint32_t volatile *)(address32), word.l );
-  }
-  else
-  {
-    // The value of the previous 2 bytes takes the low end of the word
-    word.s.Lo = _FH((uint32_t*)(address32 - sizeof(data)));
-    
-    // The half word takes the high end of the word
-    word.s.Hi = data;
-    
-    // Write the word to the first quarter or thirst quarter of the 8 byte Flash memory
-    return write32( (uint32_t volatile *)(address32 - sizeof(data)), word.l );
-  }
-}
-
-/*! @brief Writes an 8-bit number to Flash.
- *
- *  @param address The address of the data.
- *  @param data The 8-bit data to write.
- *  @return bool - TRUE if Flash was written successfully, FALSE if there is a programming error.
- *  @note Assumes Flash has been initialized.
- */
-bool write8(volatile uint8_t* const address, const uint8_t data)
-{
-  // The half word to parse
-  uint16union_t halfWord;
-  
-  // The 32 bit cast of the address
-  uint32_t address32 = (uint32_t)address;
-  
-  // Check if address is divisible by 2 to find which bytes to write it to
-  if(address32 % (2*sizeof(data)) == 0)
-  {
-    // The byte takes the low end of the half word
-    halfWord.s.Lo = data; 
-    
-    // The value of the next byte takes the high end of the half word
-    halfWord.s.Hi = _FB((uint32_t*)(address32 + sizeof(data)));
-    
-    // Write the half word to the second, fourth, sixth or eighth section of the 8 byte Flash memory
-    return write16( (uint16_t volatile *)(address32), halfWord.l );
-  }
-  else
-  {
-    // The value of the previous byte takes the low end of the half word
-    halfWord.s.Lo = _FB((uint32_t*)(address32 - sizeof(data)));
-    
-    // The byte takes the high end of the half word
-    halfWord.s.Hi = data; 
-    
-    // Write the half word to the first, third, fifth or seventh section of the 8 byte Flash memory
-    return write16( (uint16_t volatile *)(address32 - sizeof(data)), halfWord.l );
-  }
 }
 
 /*! @brief Erases the entire Flash sector.
@@ -225,44 +261,9 @@ bool write8(volatile uint8_t* const address, const uint8_t data)
 bool Flash_Erase(void)
 {
   // Erase the Flash sector with the Flash Data Start address
-  return eraseSector(FLASH_DATA_START);
+  return EraseSector(FLASH_DATA_START);
 }
 
-/*! @brief Writes TFCCOB to flash and waits for it to complete
- *
- *  @param commonCommandObject The address of the TFCCOB.
- *  @return bool - TRUE if TFCCOB was written to Flash successfully
- *  @note Assumes Flash has been initialized.
- */
-static bool launchCommand(TFCCOB* commonCommandObject)
-{
-  // Write 1 to clear ACCERR and FPVIOL flags
-  FTFE_FSTAT = FTFE_FSTAT_ACCERR_MASK | FTFE_FSTAT_FPVIOL_MASK;
-
-  // Move commonCommandObject to FCCOB
-  FTFE_FCCOB0 = FTFE_FCCOB0_CCOBn(commonCommandObject->FCMD);
-  FTFE_FCCOB1 = FTFE_FCCOB1_CCOBn(commonCommandObject->flashAddress23to16);
-  FTFE_FCCOB2 = FTFE_FCCOB2_CCOBn(commonCommandObject->flashAddress15to08);
-  FTFE_FCCOB3 = FTFE_FCCOB3_CCOBn(commonCommandObject->flashAddress07to00);
-
-  FTFE_FCCOB8 = FTFE_FCCOB8_CCOBn(commonCommandObject->dataByte0);
-  FTFE_FCCOB9 = FTFE_FCCOB9_CCOBn(commonCommandObject->dataByte1);
-  FTFE_FCCOBA = FTFE_FCCOBA_CCOBn(commonCommandObject->dataByte2);
-  FTFE_FCCOBB = FTFE_FCCOBB_CCOBn(commonCommandObject->dataByte3);
-
-  FTFE_FCCOB4 = FTFE_FCCOB4_CCOBn(commonCommandObject->dataByte4);
-  FTFE_FCCOB5 = FTFE_FCCOB5_CCOBn(commonCommandObject->dataByte5);
-  FTFE_FCCOB6 = FTFE_FCCOB6_CCOBn(commonCommandObject->dataByte6);
-  FTFE_FCCOB7 = FTFE_FCCOB7_CCOBn(commonCommandObject->dataByte7);
-
-  //Write 1 to clear CCIF
-  FTFE_FSTAT = FTFE_FSTAT_CCIF_MASK;
-
-  // Wait for write to finish
-  while(!(FTFE_FSTAT & FTFE_FSTAT_CCIF_MASK)){}
-  
-  return true;
-}
 
 /*! @brief Encodes an address and phrase into the TFCCOB struct
  *
@@ -271,7 +272,7 @@ static bool launchCommand(TFCCOB* commonCommandObject)
  *  @return bool - TRUE if TFCCOB was encoded successfully
  *  @note Assumes Flash has been initialized.
  */
-static bool writePhrase(const uint32_t address, const uint64union_t phrase)
+static bool WritePhrase(const uint32_t address, const uint64union_t phrase)
 {
   // Erase Flash before writing
   if(Flash_Erase())
@@ -299,7 +300,7 @@ static bool writePhrase(const uint32_t address, const uint64union_t phrase)
     commonCommandObject.dataByte7 = ( (phrase.l >>  0) );
 
     // Run the command to program the phrase
-    return launchCommand(&commonCommandObject);
+    return LaunchCommand(&commonCommandObject);
   }
   return false;
 }
@@ -310,7 +311,7 @@ static bool writePhrase(const uint32_t address, const uint64union_t phrase)
  *  @return bool - TRUE if the sector was erased successfully
  *  @note Assumes Flash has been initialized.
  */
-static bool eraseSector(const uint32_t address)
+static bool EraseSector(const uint32_t address)
 {
   // Initialize a local TFCCOB structure
   TFCCOB commonCommandObject;
@@ -324,7 +325,7 @@ static bool eraseSector(const uint32_t address)
   commonCommandObject.flashAddress07to00 = ( address );
   
   // Run the command to erase the flash sector
-  return launchCommand(&commonCommandObject);
+  return LaunchCommand(&commonCommandObject);
 }
 
 
@@ -335,20 +336,20 @@ bool Flash_Write(volatile void * const address, const uint32_t data, uint8_t dat
 
   switch(dataSize){
     case 8:
-      return write8(address, data);
+      return Write8(address, data);
       break;
     case 16:
-      return write16(address, data);
+      return Write16(address, data);
       break;
     case 32:
-      return write32(address, data);
+      return Write32(address, data);
       break;
     default:
       return false;
   }
 }
 
-uint8_t _FB(uint32_t* flashAddress)
+uint8_t _FB(volatile uint8_t* flashAddress)
 {
   // Gain access
 
@@ -359,7 +360,7 @@ uint8_t _FB(uint32_t* flashAddress)
   return byte;
 }
 
-uint16_t _FH(uint32_t* flashAddress)
+uint16_t _FH(volatile uint16_t* flashAddress)
 {
   // Gain access
 
@@ -372,7 +373,7 @@ uint16_t _FH(uint32_t* flashAddress)
 
 }
 
-uint32_t _FW(uint32_t* flashAddress)
+uint32_t _FW(volatile uint32_t* flashAddress)
 {
   // Gain access
 
@@ -384,7 +385,7 @@ uint32_t _FW(uint32_t* flashAddress)
   return word;
 }
 
-uint64_t _FP(uint32_t* flashAddress)
+uint64_t _FP(volatile uint64_t* flashAddress)
 {
   // Gain access
 
@@ -395,14 +396,6 @@ uint64_t _FP(uint32_t* flashAddress)
 
   return phrase;
 }
-
-
-
-
-
-
-
-
 
 
 /* END Flash */

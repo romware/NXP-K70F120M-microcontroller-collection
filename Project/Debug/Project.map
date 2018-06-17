@@ -864,26 +864,23 @@ LOAD c:/freescale/kds_3.0.0/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv7e-
  .text.FTM0_ISR
                 0x00000a34       0x98 ./Sources/FTM.o
                 0x00000a34                FTM0_ISR
+ .text.Write32  0x00000acc       0x64 ./Sources/Flash.o
+ .text.Write16  0x00000b30       0x68 ./Sources/Flash.o
+ .text.Write8   0x00000b98       0x68 ./Sources/Flash.o
+ .text.LaunchCommand
+                0x00000c00       0x98 ./Sources/Flash.o
  .text.Flash_Init
-                0x00000acc       0x10 ./Sources/Flash.o
-                0x00000acc                Flash_Init
+                0x00000c98       0x10 ./Sources/Flash.o
+                0x00000c98                Flash_Init
  .text.Flash_AllocateVar
-                0x00000adc       0x90 ./Sources/Flash.o
-                0x00000adc                Flash_AllocateVar
- .text.write32  0x00000b6c       0x64 ./Sources/Flash.o
-                0x00000b6c                write32
- .text.write16  0x00000bd0       0x68 ./Sources/Flash.o
-                0x00000bd0                write16
- .text.write8   0x00000c38       0x68 ./Sources/Flash.o
-                0x00000c38                write8
+                0x00000ca8       0x90 ./Sources/Flash.o
+                0x00000ca8                Flash_AllocateVar
  .text.Flash_Erase
-                0x00000ca0       0x14 ./Sources/Flash.o
-                0x00000ca0                Flash_Erase
- .text.launchCommand
-                0x00000cb4       0x98 ./Sources/Flash.o
- .text.writePhrase
+                0x00000d38       0x14 ./Sources/Flash.o
+                0x00000d38                Flash_Erase
+ .text.WritePhrase
                 0x00000d4c       0xe8 ./Sources/Flash.o
- .text.eraseSector
+ .text.EraseSector
                 0x00000e34       0x38 ./Sources/Flash.o
  .text.Flash_Write
                 0x00000e6c       0x54 ./Sources/Flash.o
@@ -1285,7 +1282,7 @@ LOAD c:/freescale/kds_3.0.0/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv7e-
  *(.bss*)
  .bss.UserSemaphore
                 0x1fff009c       0x20 ./Sources/FTM.o
- .bss.occupiedBytes.5649
+ .bss.occupiedBytes.5673
                 0x1fff00bc        0x1 ./Sources/Flash.o
  *fill*         0x1fff00bd        0x3 
  .bss.ReadCompleteSemaphore
@@ -1524,43 +1521,43 @@ LOAD c:/freescale/kds_3.0.0/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv7e-
                 0x000005cd       0x22 c:/freescale/kds_3.0.0/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv7e-m/fpu/crtn.o
 OUTPUT(Project.elf elf32-littlearm)
 
-.debug_info     0x00000000     0x8065
+.debug_info     0x00000000     0x806b
  .debug_info    0x00000000      0x20b ./Sources/FIFO.o
  .debug_info    0x0000020b      0x797 ./Sources/FTM.o
- .debug_info    0x000009a2      0x7a8 ./Sources/Flash.o
- .debug_info    0x0000114a      0x8fb ./Sources/I2C.o
- .debug_info    0x00001a45      0x490 ./Sources/LEDs.o
- .debug_info    0x00001ed5      0x5d0 ./Sources/PIT.o
- .debug_info    0x000024a5      0x632 ./Sources/RTC.o
- .debug_info    0x00002ad7      0xa80 ./Sources/UART.o
- .debug_info    0x00003557      0x9af ./Sources/accel.o
- .debug_info    0x00003f06     0x1153 ./Sources/main.o
- .debug_info    0x00005059      0x2ff ./Sources/packet.o
- .debug_info    0x00005358      0x3b0 ./Project_Settings/Startup_Code/startup.o
- .debug_info    0x00005708      0xc82 ./Generated_Code/Cpu.o
- .debug_info    0x0000638a      0x10f ./Generated_Code/Vectors.o
- .debug_info    0x00006499      0xd02 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
- .debug_info    0x0000719b      0x46a D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
- .debug_info    0x00007605      0xa60 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
+ .debug_info    0x000009a2      0x7ae ./Sources/Flash.o
+ .debug_info    0x00001150      0x8fb ./Sources/I2C.o
+ .debug_info    0x00001a4b      0x490 ./Sources/LEDs.o
+ .debug_info    0x00001edb      0x5d0 ./Sources/PIT.o
+ .debug_info    0x000024ab      0x632 ./Sources/RTC.o
+ .debug_info    0x00002add      0xa80 ./Sources/UART.o
+ .debug_info    0x0000355d      0x9af ./Sources/accel.o
+ .debug_info    0x00003f0c     0x1153 ./Sources/main.o
+ .debug_info    0x0000505f      0x2ff ./Sources/packet.o
+ .debug_info    0x0000535e      0x3b0 ./Project_Settings/Startup_Code/startup.o
+ .debug_info    0x0000570e      0xc82 ./Generated_Code/Cpu.o
+ .debug_info    0x00006390      0x10f ./Generated_Code/Vectors.o
+ .debug_info    0x0000649f      0xd02 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
+ .debug_info    0x000071a1      0x46a D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
+ .debug_info    0x0000760b      0xa60 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
 
-.debug_abbrev   0x00000000     0x1c18
+.debug_abbrev   0x00000000     0x1c16
  .debug_abbrev  0x00000000       0xce ./Sources/FIFO.o
  .debug_abbrev  0x000000ce      0x1d2 ./Sources/FTM.o
- .debug_abbrev  0x000002a0      0x204 ./Sources/Flash.o
- .debug_abbrev  0x000004a4      0x1fb ./Sources/I2C.o
- .debug_abbrev  0x0000069f      0x144 ./Sources/LEDs.o
- .debug_abbrev  0x000007e3      0x188 ./Sources/PIT.o
- .debug_abbrev  0x0000096b      0x168 ./Sources/RTC.o
- .debug_abbrev  0x00000ad3      0x232 ./Sources/UART.o
- .debug_abbrev  0x00000d05      0x207 ./Sources/accel.o
- .debug_abbrev  0x00000f0c      0x250 ./Sources/main.o
- .debug_abbrev  0x0000115c       0xec ./Sources/packet.o
- .debug_abbrev  0x00001248      0x189 ./Project_Settings/Startup_Code/startup.o
- .debug_abbrev  0x000013d1      0x185 ./Generated_Code/Cpu.o
- .debug_abbrev  0x00001556       0xa4 ./Generated_Code/Vectors.o
- .debug_abbrev  0x000015fa      0x2f8 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
- .debug_abbrev  0x000018f2      0x151 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
- .debug_abbrev  0x00001a43      0x1d5 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
+ .debug_abbrev  0x000002a0      0x202 ./Sources/Flash.o
+ .debug_abbrev  0x000004a2      0x1fb ./Sources/I2C.o
+ .debug_abbrev  0x0000069d      0x144 ./Sources/LEDs.o
+ .debug_abbrev  0x000007e1      0x188 ./Sources/PIT.o
+ .debug_abbrev  0x00000969      0x168 ./Sources/RTC.o
+ .debug_abbrev  0x00000ad1      0x232 ./Sources/UART.o
+ .debug_abbrev  0x00000d03      0x207 ./Sources/accel.o
+ .debug_abbrev  0x00000f0a      0x250 ./Sources/main.o
+ .debug_abbrev  0x0000115a       0xec ./Sources/packet.o
+ .debug_abbrev  0x00001246      0x189 ./Project_Settings/Startup_Code/startup.o
+ .debug_abbrev  0x000013cf      0x185 ./Generated_Code/Cpu.o
+ .debug_abbrev  0x00001554       0xa4 ./Generated_Code/Vectors.o
+ .debug_abbrev  0x000015f8      0x2f8 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
+ .debug_abbrev  0x000018f0      0x151 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
+ .debug_abbrev  0x00001a41      0x1d5 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
 
 .debug_aranges  0x00000000      0x5b8
  .debug_aranges
