@@ -16,6 +16,10 @@
 #include "MK70F12.h"
 #include "LEDs.h"
 #include "Flash.h"
+#include "OS.h"
+
+
+OS_ECB* FlashAccessMutex;             /*!< The Flash access Mutex */
 
 /*! @brief Writes TFCCOB to flash and waits for it to complete
  *
@@ -65,7 +69,7 @@ static bool Write32(volatile uint32_t* const address, const uint32_t data)
     phrase.s.Lo = data;
     
     // The value of the next 4 bytes takes the high end of the phrase
-    phrase.s.Hi = _FW((volatile uint32_t*)(address32 + sizeof(data)));
+    phrase.s.Hi =  *(uint32_t volatile *)(address32 + sizeof(data));
     
     // Write the phrase to the second half of the 8 byte Flash memory
     return WritePhrase( (address32), phrase );
@@ -73,7 +77,7 @@ static bool Write32(volatile uint32_t* const address, const uint32_t data)
   else
   {
     // The value of the previous 4 bytes takes the low end of the phrase
-    phrase.s.Lo = _FW((volatile uint32_t*)(address32 - sizeof(data)));
+    phrase.s.Lo =  *(uint32_t volatile *)(address32 - sizeof(data));
     
     // The word takes the high end of the phrase
     phrase.s.Hi = data; 
@@ -105,7 +109,7 @@ static bool Write16(volatile uint16_t* const address, const uint16_t data)
     word.s.Lo = data; 
     
     // The value of the next 2 bytes takes the high end of the word
-    word.s.Hi = _FH((volatile uint16_t*)(address32 + sizeof(data)));
+    word.s.Hi =  *(uint16_t volatile *)(address32 + sizeof(data));
     
     // Write the word to the second quarter or fourth quarter of the 8 byte Flash memory
     return Write32( (uint32_t volatile *)(address32), word.l );
@@ -113,7 +117,7 @@ static bool Write16(volatile uint16_t* const address, const uint16_t data)
   else
   {
     // The value of the previous 2 bytes takes the low end of the word
-    word.s.Lo = _FH((volatile uint16_t*)(address32 - sizeof(data)));
+    word.s.Lo =  *(uint16_t volatile *)(address32 - sizeof(data));
     
     // The half word takes the high end of the word
     word.s.Hi = data;
@@ -145,7 +149,7 @@ static bool Write8(volatile uint8_t* const address, const uint8_t data)
     halfWord.s.Lo = data; 
     
     // The value of the next byte takes the high end of the half word
-    halfWord.s.Hi = _FB((volatile uint8_t*)(address32 + sizeof(data)));
+    halfWord.s.Hi =  *(uint8_t volatile *)(address32 + sizeof(data));
     
     // Write the half word to the second, fourth, sixth or eighth section of the 8 byte Flash memory
     return Write16( (uint16_t volatile *)(address32), halfWord.l );
@@ -153,7 +157,7 @@ static bool Write8(volatile uint8_t* const address, const uint8_t data)
   else
   {
     // The value of the previous byte takes the low end of the half word
-    halfWord.s.Lo = _FB((volatile uint8_t*)(address32 - sizeof(data)));
+    halfWord.s.Lo =  *(uint8_t volatile *)(address32 - sizeof(data));
     
     // The byte takes the high end of the half word
     halfWord.s.Hi = data; 
@@ -205,6 +209,7 @@ static bool LaunchCommand(TFCCOB* commonCommandObject)
 bool Flash_Init(void)
 {
   // Initialize the Flash
+  FlashAccessMutex = OS_SemaphoreCreate(1);
   return true;
 }
 
@@ -331,31 +336,36 @@ static bool EraseSector(const uint32_t address)
 
 bool Flash_Write(volatile void * const address, const uint32_t data, uint8_t dataSize)
 {
-
+  bool success = false;
   // Gain access to flash
+  OS_SemaphoreWait(FlashAccessMutex, 0);
 
   switch(dataSize){
     case 8:
-      return Write8(address, data);
+      success = Write8(address, data);
       break;
     case 16:
-      return Write16(address, data);
+      success = Write16(address, data);
       break;
     case 32:
-      return Write32(address, data);
+      success = Write32(address, data);
       break;
-    default:
-      return false;
   }
+  // Release access
+  OS_SemaphoreSignal(FlashAccessMutex);
+
+  return success;
 }
 
 uint8_t _FB(volatile uint8_t* flashAddress)
 {
   // Gain access
+  OS_SemaphoreWait(FlashAccessMutex, 0);
 
   uint8_t byte = *(uint8_t  volatile *)(flashAddress);
 
   // Release access
+  OS_SemaphoreSignal(FlashAccessMutex);
 
   return byte;
 }
@@ -363,11 +373,12 @@ uint8_t _FB(volatile uint8_t* flashAddress)
 uint16_t _FH(volatile uint16_t* flashAddress)
 {
   // Gain access
+  OS_SemaphoreWait(FlashAccessMutex, 0);
 
   uint16_t halfWord = *(uint16_t volatile *)(flashAddress);
 
   // Release access
-
+  OS_SemaphoreSignal(FlashAccessMutex);
 
   return halfWord;
 
@@ -376,11 +387,12 @@ uint16_t _FH(volatile uint16_t* flashAddress)
 uint32_t _FW(volatile uint32_t* flashAddress)
 {
   // Gain access
+  OS_SemaphoreWait(FlashAccessMutex, 0);
 
   uint32_t word = *(uint32_t volatile *)(flashAddress);
 
   // Release access
-
+  OS_SemaphoreSignal(FlashAccessMutex);
 
   return word;
 }
@@ -388,11 +400,12 @@ uint32_t _FW(volatile uint32_t* flashAddress)
 uint64_t _FP(volatile uint64_t* flashAddress)
 {
   // Gain access
+  OS_SemaphoreWait(FlashAccessMutex, 0);
 
   uint64_t phrase = *(uint64_t volatile *)(flashAddress);
 
   // Release access
-
+  OS_SemaphoreSignal(FlashAccessMutex);
 
   return phrase;
 }
