@@ -1,27 +1,27 @@
 /* ###################################################################
 **     Filename    : main.c
-**     Project     : Lab2
+**     Project     : VRR Project
 **     Processor   : MK70FN1M0VMJ12
 **     Version     : Driver 01.01
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2018-04-12, 13:27, # CodeGen: 0
+**     Date/Time   : 2018-06-17, 13:27, # CodeGen: 0
 **     Abstract    :
 **         Main module.
 **         This module contains user's application code.
 **     Settings    :
 **     Contents    :
 **         No public methods
-**     Authors     : 12403756, 12551519
+**     Authors     : 12403756
 **
 ** ###################################################################*/
 /*!
 ** @file main.c
-** @version 2.0
+** @version 1.0
 ** @brief
 **         Main module.
 **         This module contains user's application code.
-** @author 12403756, 12551519
-** @date 2018-04-13
+** @author 12403756
+** @date 2018-06-17
 */         
 /*!
 **  @addtogroup main_module main module documentation
@@ -55,20 +55,15 @@
 #include "math.h"
 
 #define BAUD_RATE 115200                        /*!< UART2 Baud Rate */
-
 #define ADC_SAMPLES_PER_CYCLE 16                /*!< ADC samples per cycle */
-
-#define ADC_BUFFER_SIZE 64                     // Note: Must be an integral number of ADC_SAMPLES_PER_CYCLE
-
-#define NB_ANALOG_CHANNELS 3
-
-#define ADC_DEFAULT_FREQUENCY 50
-
-#define RMS_UPPER_LIMIT    9830
-#define RMS_LOWER_LIMIT    6554
-#define RMS_FREQUENCY_MIN  4915
-#define DAC_5V_OUT         16384
-#define DAC_0V_OUT          0
+#define ADC_BUFFER_SIZE 64                      /*!< ADC buffer size Note: Must be an integral number of ADC_SAMPLES_PER_CYCLE*/
+#define NB_ANALOG_CHANNELS 3                    /*!< Number of analog channels */
+#define ADC_DEFAULT_FREQUENCY 50                /*!< ADC default frequency */
+#define RMS_UPPER_LIMIT    9830                 /*!< VRR RMS upper limit */
+#define RMS_LOWER_LIMIT    6554                 /*!< VRR RMS lower limit */
+#define RMS_FREQUENCY_MIN  4915                 /*!< VRR RMS frequency measure minimum level */
+#define DAC_5V_OUT         16384                /*!< DAC 5 volts out */
+#define DAC_0V_OUT          0                   /*!< DAC 0 volts out */
 
 typedef struct
 {
@@ -82,6 +77,7 @@ typedef enum
   TIMING_DEFINITE,
   TIMING_INVERSE
 }TTimingMode;
+
 /*! @brief Data structure used to pass Analog configuration to a user thread
  *
  */
@@ -110,77 +106,79 @@ static TAnalogThreadData AnalogThreadData[NB_ANALOG_CHANNELS] =
   }
 };
 
-const uint32_t PERIOD_I2C_POLL    = 1000000000; /*!< Period of the I2C polling in polling mode */
 
-const uint8_t COMMAND_STARTUP     = 0x04;       /*!< The serial command byte for tower startup */
-const uint8_t COMMAND_VER         = 0x09;       /*!< The serial command byte for tower version */
-const uint8_t COMMAND_NUM         = 0x0B;       /*!< The serial command byte for tower number */
-const uint8_t COMMAND_PROGRAMBYTE = 0x07;       /*!< The serial command byte for tower program byte */
-const uint8_t COMMAND_READBYTE    = 0x08;       /*!< The serial command byte for tower read byte */
-const uint8_t COMMAND_MODE        = 0x0D;       /*!< The serial command byte for tower mode */
-const uint8_t COMMAND_TIME        = 0x0C;       /*!< The serial command byte for tower time */
-const uint8_t COMMAND_ACCEL       = 0x10;       /*!< The serial command byte for tower accelerometer */
-const uint8_t COMMAND_TIMINGMODE  = 0x10;       /*!< The serial command byte for tower timing mode */
-const uint8_t COMMAND_RAISES      = 0x11;       /*!< The serial command byte for tower raises */
-const uint8_t COMMAND_LOWERS      = 0x12;       /*!< The serial command byte for tower lowers */
-const uint8_t COMMAND_FREQUENCY   = 0x17;       /*!< The serial command byte for tower frequency */
-const uint8_t COMMAND_VOLTAGE     = 0x18;       /*!< The serial command byte for tower voltage */
-const uint8_t COMMAND_SPECTRUM    = 0x19;       /*!< The serial command byte for tower spectrum */
+// Thread priorities for analog threads
+const uint8_t ANALOG_THREAD_PRIORITIES[NB_ANALOG_CHANNELS] = {7,8,9}; /*!< The array of analog thread priorities */
 
-// ----------------------------------------
-// Thread priorities
-// 0 = highest priority
-// ----------------------------------------
-const uint8_t ANALOG_THREAD_PRIORITIES[NB_ANALOG_CHANNELS] = {7, 8, 9};
+// I2C Poll period
+const uint32_t PERIOD_I2C_POLL    = 1000000000;                       /*!< Period of the I2C polling in polling mode */
 
-const uint8_t PARAM_GET           = 1;          /*!< Get bit of packet parameter 1 */
-const uint8_t PARAM_SET           = 2;          /*!< Set bit of packet parameter 1 */
+// PC to Tower Commands
+const uint8_t COMMAND_STARTUP     = 0x04;                             /*!< The serial command byte for tower startup */
+const uint8_t COMMAND_VER         = 0x09;                             /*!< The serial command byte for tower version */
+const uint8_t COMMAND_NUM         = 0x0B;                             /*!< The serial command byte for tower number */
+const uint8_t COMMAND_PROGRAMBYTE = 0x07;                             /*!< The serial command byte for tower program byte */
+const uint8_t COMMAND_READBYTE    = 0x08;                             /*!< The serial command byte for tower read byte */
+const uint8_t COMMAND_MODE        = 0x0D;                             /*!< The serial command byte for tower mode */
+const uint8_t COMMAND_TIME        = 0x0C;                             /*!< The serial command byte for tower time */
+const uint8_t COMMAND_ACCEL       = 0x10;                             /*!< The serial command byte for tower accelerometer */
+const uint8_t COMMAND_TIMINGMODE  = 0x10;                             /*!< The serial command byte for tower timing mode */
+const uint8_t COMMAND_RAISES      = 0x11;                             /*!< The serial command byte for tower raises */
+const uint8_t COMMAND_LOWERS      = 0x12;                             /*!< The serial command byte for tower lowers */
+const uint8_t COMMAND_FREQUENCY   = 0x17;                             /*!< The serial command byte for tower frequency */
+const uint8_t COMMAND_VOLTAGE     = 0x18;                             /*!< The serial command byte for tower voltage */
+const uint8_t COMMAND_SPECTRUM    = 0x19;                             /*!< The serial command byte for tower spectrum */
 
-const uint8_t TOWER_VER_MAJ       = 1;          /*!< Tower major version */
-const uint8_t TOWER_VER_MIN       = 0;          /*!< Tower minor version */
+// Tower packet parameters
+const uint8_t PARAM_GET           = 1;                                /*!< Get bit of packet parameter 1 */
+const uint8_t PARAM_SET           = 2;                                /*!< Set bit of packet parameter 1 */
 
-volatile uint16union_t* NvTowerNb;              /*!< Tower number union pointer to flash */
-volatile uint16union_t* NvTowerMd;              /*!< Tower mode union pointer to flash */
-volatile uint8_t* NvNbRaises;                   /*!< Raise count byte pointer to flash */
-volatile uint8_t* NvNbLowers;                   /*!< Lower count byte pointer to flash */
-volatile uint8_t* NvTimingMd;                   /*!< Timing Mode byte pointer to flash */
+// Tower version numbers
+const uint8_t TOWER_VER_MAJ       = 1;                                /*!< Tower major version */
+const uint8_t TOWER_VER_MIN       = 0;                                /*!< Tower minor version */
 
+// Pointers to non-volatile flash memory
+volatile uint16union_t* NvTowerNb;                                    /*!< Tower number union pointer to flash */
+volatile uint16union_t* NvTowerMd;                                    /*!< Tower mode union pointer to flash */
+volatile uint8_t* NvNbRaises;                                         /*!< Raise count byte pointer to flash */
+volatile uint8_t* NvNbLowers;                                         /*!< Lower count byte pointer to flash */
+volatile uint8_t* NvTimingMd;                                         /*!< Timing Mode byte pointer to flash */
 
+static TVoltageData VoltageSamples[NB_ANALOG_CHANNELS];               /*!<  */
+static uint16_t RMS[NB_ANALOG_CHANNELS];                              /*!<  */
+static uint16_t TimingMode;                                           /*!<  */
+static uint32_t SamplePeriod;                                         /*!<  */
+static uint32_t NewSamplePeriod;                                      /*!<  */
+static int64_t LastSumOfSquares[NB_ANALOG_CHANNELS];                  /*!<  */
+static int16_t OldestData[NB_ANALOG_CHANNELS];                        /*!<  */
+static bool Alarm[NB_ANALOG_CHANNELS];                                /*!<  */
+static bool Adjusting[NB_ANALOG_CHANNELS];                            /*!<  */
+static float Frequency;                                               /*!<  */
 
-static TVoltageData VoltageSamples[NB_ANALOG_CHANNELS];
-static uint16_t RMS[NB_ANALOG_CHANNELS];
-static float Frequency;
-static uint16_t TimingMode;
-static uint32_t SamplePeriod;
-static uint32_t NewSamplePeriod;
-static bool Alarm[NB_ANALOG_CHANNELS];
-static bool Adjusting[NB_ANALOG_CHANNELS];
-static int64_t LastSumOfSquares[NB_ANALOG_CHANNELS];
-static int16_t OldestData[NB_ANALOG_CHANNELS];
-
-
-static OS_ECB* LEDOffSemaphore;                 /*!< LED off semaphore for FTM */
-static OS_ECB* RTCReadSemaphore;                /*!< Read semaphore for RTC */
-static OS_ECB* OutOfRangeSemaphore;             /*!< Out of range semaphore for RMS  */
-static OS_ECB* WithinRangeSemaphore;            /*!< Within range semaphore for RMS  */
-static OS_ECB* NewADCDataSemaphore;             /*!< New ADC data semaphore for ADC Process thread */
-static OS_ECB* FrequencyCalculateSemaphore;     /*!< Frequency Calculate semaphore */
-static OS_ECB* FrequencyTrackSemaphore;         /*!< Frequency track semaphore */
-static OS_ECB* LogRaisesSemaphore;              /*!< Log Raises semaphore */
-static OS_ECB* LogLowersSemaphore;              /*!< Log Lowers semaphore */
-static OS_ECB* FlashAccessMutex;                /*!< Flash Access Mutex */
+// Semaphores for use by RTOS
+static OS_ECB* LEDOffSemaphore;                                       /*!< LED off semaphore for FTM */
+static OS_ECB* RTCReadSemaphore;                                      /*!< Read semaphore for RTC */
+static OS_ECB* OutOfRangeSemaphore;                                   /*!< Out of range semaphore for RMS  */
+static OS_ECB* WithinRangeSemaphore;                                  /*!< Within range semaphore for RMS  */
+static OS_ECB* NewADCDataSemaphore;                                   /*!< New ADC data semaphore for ADC Process thread */
+static OS_ECB* FrequencyCalculateSemaphore;                           /*!< Frequency Calculate semaphore */
+static OS_ECB* FrequencyTrackSemaphore;                               /*!< Frequency track semaphore */
+static OS_ECB* LogRaisesSemaphore;                                    /*!< Log Raises semaphore */
+static OS_ECB* LogLowersSemaphore;                                    /*!< Log Lowers semaphore */
+static OS_ECB* FlashAccessMutex;                                      /*!< Flash Access Mutex */
 
 // Thread stacks
-OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Tower Init thread. */
-OS_THREAD_STACK(RTCThreadStack, THREAD_STACK_SIZE);               /*!< The stack for the RTC thread. */
-OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);        /*!< The stack for the FTM thread. */
-OS_THREAD_STACK(ADCDataProcessThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the ADCDataProcess thread. */
-OS_THREAD_STACK(FrequencyCalculateThreadStack, THREAD_STACK_SIZE);/*!< The stack for the FrequencyCalculate thread. */
-OS_THREAD_STACK(FrequencyTrackThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the FrequencyTrack thread. */
-OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);            /*!< The stack for the Packet thread. */
-OS_THREAD_STACK(LogRaisesThreadStack, THREAD_STACK_SIZE);         /*!< The stack for the Log Raises thread. */
-OS_THREAD_STACK(LogLowersThreadStack, THREAD_STACK_SIZE);         /*!< The stack for the Log Lowers thread. */
-static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS][THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));
+OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);           /*!< The stack for the Tower Init thread. */
+OS_THREAD_STACK(RTCThreadStack, THREAD_STACK_SIZE);                   /*!< The stack for the RTC thread. */
+OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);            /*!< The stack for the FTM thread. */
+OS_THREAD_STACK(ADCDataProcessThreadStack, THREAD_STACK_SIZE);        /*!< The stack for the ADCDataProcess thread. */
+OS_THREAD_STACK(FrequencyCalculateThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the FrequencyCalculate thread. */
+OS_THREAD_STACK(FrequencyTrackThreadStack, THREAD_STACK_SIZE);        /*!< The stack for the FrequencyTrack thread. */
+OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);                /*!< The stack for the Packet thread. */
+OS_THREAD_STACK(LogRaisesThreadStack, THREAD_STACK_SIZE);             /*!< The stack for the Log Raises thread. */
+OS_THREAD_STACK(LogLowersThreadStack, THREAD_STACK_SIZE);             /*!< The stack for the Log Lowers thread. */
+static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS]
+                [THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));  /*!< The thread stack array for RMS threads */
 
 /*! @brief Sends the startup packets to the PC
  *
@@ -515,43 +513,69 @@ void ReceivedPacket(void)
   Packet_Checksum   = 0;
 }
 
-void ADCReadCallback(void* arg)  //TODO: Info
+
+/*! @brief Reads data from the analog channels and signals semaphores for RMS and Frequency treads
+ *
+ *  @return void
+ */
+void ADCReadCallback(void* arg)
 {
+  // Keep track of what phase to read from
   static uint8_t phase = 0;
 
   switch (phase){
     case 0:
+
+      // Read from the ADC and put data in the correct element of the array.
       Analog_Get(phase, &(VoltageSamples[phase].ADC_Data[VoltageSamples[phase].LatestData]));
       VoltageSamples[phase].LatestData++;
+
+      // If we are at the end of the buffer, signal semaphore for FrequencyCalculate thread, also set LatestData to 0.
       if(VoltageSamples[phase].LatestData == ADC_BUFFER_SIZE)
       {
         VoltageSamples[phase].LatestData = 0;
         OS_SemaphoreSignal(FrequencyCalculateSemaphore);
       }
+
+      // Signal semaphore for RMS thread
       OS_SemaphoreSignal(AnalogThreadData[phase].semaphore);
       phase ++;
       break;
     case 1:
+
+      // Read from the ADC and put data in the correct element of the array.
       Analog_Get(phase, &(VoltageSamples[phase].ADC_Data[VoltageSamples[phase].LatestData]));
       VoltageSamples[phase].LatestData++;
+
+      // If we are at the end of the array, set LatestData back to 0.
       if(VoltageSamples[phase].LatestData == ADC_BUFFER_SIZE)
       {
         VoltageSamples[phase].LatestData = 0;
       }
+
+      // Signal semaphore for RMS thread
       OS_SemaphoreSignal(AnalogThreadData[phase].semaphore);
       phase ++;
       break;
     case 2:
+
+      // Read from the ADC and put data in the correct element of the array.
       Analog_Get(phase, &(VoltageSamples[phase].ADC_Data[VoltageSamples[phase].LatestData]));
       VoltageSamples[phase].LatestData++;
+
+      // If we are one element away from the end of the array, signal FrequencyTrack semaphore for thread to load new PIT value.
       if(VoltageSamples[phase].LatestData == ADC_BUFFER_SIZE - 1)
       {
         OS_SemaphoreSignal(FrequencyTrackSemaphore);
       }
+
+      // If we are at the end of the array, set LatestData back to 0.
       if(VoltageSamples[phase].LatestData == ADC_BUFFER_SIZE)
       {
         VoltageSamples[phase].LatestData = 0;
       }
+
+      // Signal semaphore for RMS thread
       OS_SemaphoreSignal(AnalogThreadData[phase].semaphore);
       phase = 0;
       break;
@@ -669,12 +693,15 @@ static void InitModulesThread(void* pData)
   // Send startup packets to PC
   HandleTowerStartup();
 
-  SamplePeriod = (uint32_t)(1000000000/(ADC_DEFAULT_FREQUENCY * ADC_SAMPLES_PER_CYCLE) / 20) * 20;    //TODO: Round to how pit does. 1000000000/modclk
+  uint32_t nanoSecondPerTick = 1000000000 / CPU_BUS_CLK_HZ;
+  SamplePeriod = (uint32_t)(((1000000000/(ADC_DEFAULT_FREQUENCY * ADC_SAMPLES_PER_CYCLE))
+                               / NB_ANALOG_CHANNELS/ nanoSecondPerTick) * nanoSecondPerTick) * NB_ANALOG_CHANNELS;
   NewSamplePeriod = SamplePeriod;
   Frequency = ADC_DEFAULT_FREQUENCY;
 
-  PIT_Set(SamplePeriod / NB_ANALOG_CHANNELS, false);    //TODO: Check how this division plays out
+  PIT_Set(SamplePeriod / NB_ANALOG_CHANNELS, false);
   PIT_Enable(true);
+
   // We only do this once - therefore delete this thread
   OS_ThreadDelete(OS_PRIORITY_SELF);
 }
@@ -953,7 +980,7 @@ uint16_t UpdateRMSFast(int16_t* removeData, int64_t* previousSumOfSquares, const
 
 uint16_t GetRMS(const TVoltageData data, const uint8_t dataSize)
 {
-  float sum = 0;      //TODO: use different data type?? keep the sum of the squares.
+  float sum = 0;
   for (uint8_t i = 0; i < dataSize; i ++)
   {
     sum += (data.ADC_Data[i]) * (data.ADC_Data[i]);

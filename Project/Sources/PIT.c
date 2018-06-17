@@ -19,8 +19,6 @@
 #include "analog.h"
 
 
-#define NB_ANALOG_CHANNELS 3        //TODO: How to share with file properly
-
 static uint32_t ModuleClk;          /*!< Module Clock */
 static void (*UserFunction)(void*); /*!< Callback functions for PIT */
 static void* UserArguments;         /*!< Callback parameters for PIT */
