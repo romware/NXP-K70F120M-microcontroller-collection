@@ -174,6 +174,7 @@ void CheckRMS(uint64_t* timerDelay, uint64_t* timerRate, float deviation, bool* 
     *alarm = true;
     *timerDelay = PERIOD_TIMER_DELAY;
     *timerRate = PERIOD_ANALOG_POLL;
+
     OS_DisableInterrupts();
     Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
     OS_EnableInterrupts();
@@ -189,6 +190,7 @@ void CheckRMS(uint64_t* timerDelay, uint64_t* timerRate, float deviation, bool* 
   else if(*timerDelay < *timerRate && !(*adjustment))
   {
     *adjustment = true;
+
     OS_DisableInterrupts();
     Analog_Put(ANALOG_CHANNEL_1, out1);
     Analog_Put(ANALOG_CHANNEL_2, out2);
@@ -229,6 +231,7 @@ void CalculateRMSThread(void* pData)
     {
       alarm = false;
       adjustment = false;
+
       OS_DisableInterrupts();
       Analog_Put(ANALOG_CHANNEL_1, VRR_ZERO);
       Analog_Put(ANALOG_CHANNEL_2, VRR_ZERO);
@@ -378,20 +381,15 @@ bool HandleTowerFrequency(void)
  */
 bool HandleTowerVoltage(void)
 {
-  // Check half word
+  if(Packet_Parameter1 > ANALOG_CHANNEL_1 && Packet_Parameter1 <= NB_ANALOG_CHANNELS && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    // Calculates the RMS based on received phase
+    OS_DisableInterrupts();
+    int16union_t rms = (int16union_t)CalculateRMS(AnalogThreadData[Packet_Parameter1-1]->sampleData, VRR_SAMPLE_PERIOD);
+    OS_EnableInterrupts();
 
-  // Check if parameters match phase A, B or C
-  if(Packet_Parameter1 == PARAM_PHASE_A)
-  {
-    // Sends the tower voltage packet
-  }
-  else if(Packet_Parameter1 == PARAM_PHASE_B)
-  {
-    // Sends the tower voltage packet
-  }
-  else if(Packet_Parameter1 == PARAM_PHASE_C)
-  {
-    // Sends the tower voltage packet
+    // Sends the RMS voltage packet
+    return Packet_Put(COMMAND_VOLTAGE,Packet_Parameter1,rms.s.Lo,rms.s.Hi);
   }
   return false;
 }

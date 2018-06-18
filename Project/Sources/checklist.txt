@@ -14,7 +14,7 @@ Efficiency of algorithm.										- Mostly done, check data types and efficiency
 Three channel operation is aggregated 							- Done
 	(raise/lower initiated on any channel).
 Alarm signal.													- Done
-Non-volatile storage of number of raise/lower events.			- Mostly Done. Move flash to sperate threads
+Non-volatile storage of number of raise/lower events.			- Done. Check reading from flash protected
 
 /6 G A P Timing. 
 Definite.														- Done
@@ -30,24 +30,24 @@ Tower protocol expanded to achieve Basic Functionality.			- Done
 VRR – Intermediate Functionality
 
 /5 G A P Sample rate. 
-16 samples per cycle 
+16 samples per cycle 											- ...
 	(i.e. frequency measurement to 0.1 Hz and tracking).
 
 /5 G A P RTOS. 
-Multiple threads are used with an RTOS – i.e. 
+Multiple threads are used with an RTOS – i.e.					- Moslty Done
 	one thread for analog, 
 	one thread for PC comms, 
 	one thread for logic, etc.
 
 /2 G A P Settings / interrogation.
-Tower protocol expanded to achieve Intermediate Functionality.
+Tower protocol expanded to achieve Intermediate Functionality.	- Done
 
 /12 SUBTOTAL
 
 
 VRR – Advanced Functionality
 
-/8 G A P Spectrum. 
+/8 G A P Spectrum. 												- ...
 Spectral content of Phase A voltage up to 350 Hz with 50 Hz resolution.
 Magnitude of 50 Hz component calculated.
 Tower protocol expanded to achieve Advanced Functionality.		- Done
