@@ -30,7 +30,7 @@ Tower protocol expanded to achieve Basic Functionality.			- Done
 VRR – Intermediate Functionality
 
 /5 G A P Sample rate. 
-16 samples per cycle 											- ...
+16 samples per cycle 											- In progress
 	(i.e. frequency measurement to 0.1 Hz and tracking).
 
 /5 G A P RTOS. 
@@ -53,3 +53,4 @@ Magnitude of 50 Hz component calculated.
 Tower protocol expanded to achieve Advanced Functionality.		- Done
 
 /8 SUBTOTAL
+
