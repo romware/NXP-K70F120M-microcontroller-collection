@@ -15,7 +15,8 @@ Sources/main.o: ../Sources/main.c ../Sources/types.h \
  ../Sources/packet.h ../Sources/Flash.h ../Sources/PIT.h ../Sources/FTM.h \
  ../Sources/RTC.h ../Sources/accel.h ../Sources/I2C.h ../Sources/median.h \
  D:\Embedded\ Software\ US\es18aut13\Project\Library/analog.h \
- D:/Embedded\ Software\ US/es18aut13/Project/Sources/types.h
+ D:/Embedded\ Software\ US/es18aut13/Project/Sources/types.h \
+ ../Sources/kiss_fft.h ../Sources/kiss_fftr.h
 
 ../Sources/types.h:
 
@@ -68,3 +69,7 @@ D:/Embedded\ Software\ US/es18aut13/Project/Generated_Code/IO_Map.h:
 D:\Embedded\ Software\ US\es18aut13\Project\Library/analog.h:
 
 D:/Embedded\ Software\ US/es18aut13/Project/Sources/types.h:
+
+../Sources/kiss_fft.h:
+
+../Sources/kiss_fftr.h:

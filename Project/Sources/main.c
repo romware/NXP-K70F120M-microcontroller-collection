@@ -53,6 +53,8 @@
 #include "median.h"
 #include "analog.h"
 #include "math.h"
+#include "kiss_fft.h"
+#include "kiss_fftr.h"
 
 #define BAUD_RATE 115200                        /*!< UART2 Baud Rate */
 #define ADC_SAMPLES_PER_CYCLE 16                /*!< ADC samples per cycle */
@@ -166,6 +168,7 @@ static OS_ECB* FrequencyTrackSemaphore;                               /*!< Frequ
 static OS_ECB* LogRaisesSemaphore;                                    /*!< Log Raises semaphore */
 static OS_ECB* LogLowersSemaphore;                                    /*!< Log Lowers semaphore */
 static OS_ECB* FlashAccessMutex;                                      /*!< Flash Access Mutex */
+static OS_ECB* FFTSemaphore;                                          /*!< FFT semaphore semaphore */
 
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);           /*!< The stack for the Tower Init thread. */
@@ -177,6 +180,7 @@ OS_THREAD_STACK(FrequencyTrackThreadStack, THREAD_STACK_SIZE);        /*!< The s
 OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);                /*!< The stack for the Packet thread. */
 OS_THREAD_STACK(LogRaisesThreadStack, THREAD_STACK_SIZE);             /*!< The stack for the Log Raises thread. */
 OS_THREAD_STACK(LogLowersThreadStack, THREAD_STACK_SIZE);             /*!< The stack for the Log Lowers thread. */
+OS_THREAD_STACK(FFTThreadStack, THREAD_STACK_SIZE);                   /*!< The stack for the Log Lowers thread. */
 static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS]
                 [THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));  /*!< The thread stack array for RMS threads */
 
@@ -670,13 +674,14 @@ bool TowerInit(void)
  */
 static void InitModulesThread(void* pData)
 {
-  // Create semaphores for threads
+  // Create semaphores and Mutex semaphores for threads
   LEDOffSemaphore             = OS_SemaphoreCreate(0);
   RTCReadSemaphore            = OS_SemaphoreCreate(0);
   FrequencyCalculateSemaphore = OS_SemaphoreCreate(0);
   FrequencyTrackSemaphore     = OS_SemaphoreCreate(0);
   LogRaisesSemaphore          = OS_SemaphoreCreate(0);
   LogLowersSemaphore          = OS_SemaphoreCreate(0);
+  FFTSemaphore                = OS_SemaphoreCreate(0);
   FlashAccessMutex            = OS_SemaphoreCreate(1);
 
   // Create semaphore for RMS channels
@@ -1274,6 +1279,19 @@ static void FTMLEDsOffThread(void* pData)
   }
 }
 
+static void FFTThread(void* pData)
+{
+  kiss_fft_cpx fftInput[NB_ANALOG_CHANNELS];        /*!< Complex array for input data*/
+  kiss_fft_cpx fftOutput[NB_ANALOG_CHANNELS];       /*!< Complex array for output data */
+
+  for (;;)
+  {
+    // Wait for Frequency Track semaphore
+    OS_SemaphoreWait(FFTSemaphore,0);
+
+
+  }
+}
 
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
 int main(void)
@@ -1313,6 +1331,11 @@ int main(void)
                           NULL,
                           &FrequencyTrackThreadStack[THREAD_STACK_SIZE - 1],
                           2);
+  // 16th Highest priority
+  error = OS_ThreadCreate(FFTThread,
+                          NULL,
+                          &FFTThreadStack[THREAD_STACK_SIZE - 1],
+                          16);
 
   // 10th Highest priority
   error = OS_ThreadCreate(PacketThread,

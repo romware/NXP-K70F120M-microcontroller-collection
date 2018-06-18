@@ -14,6 +14,8 @@ C_SRCS += \
 ../Sources/RTC.c \
 ../Sources/UART.c \
 ../Sources/accel.c \
+../Sources/kiss_fft.c \
+../Sources/kiss_fftr.c \
 ../Sources/main.c \
 ../Sources/main_sample.c \
 ../Sources/median.c \
@@ -30,6 +32,8 @@ OBJS += \
 ./Sources/RTC.o \
 ./Sources/UART.o \
 ./Sources/accel.o \
+./Sources/kiss_fft.o \
+./Sources/kiss_fftr.o \
 ./Sources/main.o \
 ./Sources/main_sample.o \
 ./Sources/median.o \
@@ -46,6 +50,8 @@ C_DEPS += \
 ./Sources/RTC.d \
 ./Sources/UART.d \
 ./Sources/accel.d \
+./Sources/kiss_fft.d \
+./Sources/kiss_fftr.d \
 ./Sources/main.d \
 ./Sources/main_sample.d \
 ./Sources/median.d \
