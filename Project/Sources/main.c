@@ -383,9 +383,12 @@ bool HandleTowerVoltage(void)
 {
   if(Packet_Parameter1 > ANALOG_CHANNEL_1 && Packet_Parameter1 <= NB_ANALOG_CHANNELS && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
+    int16union_t rms;
+    TAnalogThreadData* phase = &AnalogThreadData[Packet_Parameter1-1];
+
     // Calculates the RMS based on received phase
     OS_DisableInterrupts();
-    int16union_t rms = (int16union_t)CalculateRMS(AnalogThreadData[Packet_Parameter1-1]->sampleData, VRR_SAMPLE_PERIOD);
+    rms.l = (int16_t)CalculateRMS(phase->sampleData, VRR_SAMPLE_PERIOD);
     OS_EnableInterrupts();
 
     // Sends the RMS voltage packet
