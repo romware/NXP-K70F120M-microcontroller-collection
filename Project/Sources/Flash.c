@@ -365,10 +365,10 @@ bool Flash_Write(volatile void * const address, const uint32_t data, uint8_t dat
 
   switch(dataSize){
     case 8:
-      success = Write8(address, data);
+      success = Write8(address, (uint8_t)data);
       break;
     case 16:
-      success = Write16(address, data);
+      success = Write16(address, (uint16_t)data);
       break;
     case 32:
       success = Write32(address, data);

@@ -56,6 +56,7 @@
 #include "kiss_fft.h"
 #include "kiss_fftr.h"
 
+
 #define BAUD_RATE 115200                        /*!< UART2 Baud Rate */
 #define ADC_SAMPLES_PER_CYCLE 16                /*!< ADC samples per cycle */
 #define ADC_BUFFER_SIZE 64                      /*!< ADC buffer size Note: Must be an integral number of ADC_SAMPLES_PER_CYCLE*/
@@ -180,7 +181,7 @@ OS_THREAD_STACK(FrequencyTrackThreadStack, THREAD_STACK_SIZE);        /*!< The s
 OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);                /*!< The stack for the Packet thread. */
 OS_THREAD_STACK(LogRaisesThreadStack, THREAD_STACK_SIZE);             /*!< The stack for the Log Raises thread. */
 OS_THREAD_STACK(LogLowersThreadStack, THREAD_STACK_SIZE);             /*!< The stack for the Log Lowers thread. */
-OS_THREAD_STACK(FFTThreadStack, THREAD_STACK_SIZE);                   /*!< The stack for the Log Lowers thread. */
+OS_THREAD_STACK(FFTThreadStack, 2000);                                /*!< The stack for the Log Lowers thread. */
 static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS]
                 [THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));  /*!< The thread stack array for RMS threads */
 
@@ -533,6 +534,12 @@ void ADCReadCallback(void* arg)
       // Read from the ADC and put data in the correct element of the array.
       Analog_Get(phase, &(VoltageSamples[phase].ADC_Data[VoltageSamples[phase].LatestData]));
       VoltageSamples[phase].LatestData++;
+
+      // Signal FFT Semaphore
+      if(VoltageSamples[phase].LatestData == ADC_SAMPLES_PER_CYCLE)
+      {
+        OS_SemaphoreSignal(FFTSemaphore);
+      }
 
       // If we are at the end of the buffer, signal semaphore for FrequencyCalculate thread, also set LatestData to 0.
       if(VoltageSamples[phase].LatestData == ADC_BUFFER_SIZE)
@@ -1178,10 +1185,12 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
         }
 
         // Decrement counter
-        OutOfRangeTimer -= (uint64_t)SamplePeriod;
+        OS_DisableInterrupts();
+        OutOfRangeTimer -= (uint64_t)SamplePeriod;         //TODO remove inverse amount
 
         // Keep track of actual time
         minTimeCheck += SamplePeriod;
+        OS_EnableInterrupts();
       }
 
       // Check if raise or lower signals should be set
@@ -1281,13 +1290,32 @@ static void FTMLEDsOffThread(void* pData)
 
 static void FFTThread(void* pData)
 {
-  kiss_fft_cpx fftInput[NB_ANALOG_CHANNELS];        /*!< Complex array for input data*/
-  kiss_fft_cpx fftOutput[NB_ANALOG_CHANNELS];       /*!< Complex array for output data */
+   kiss_fft_scalar fftInput[16];        /*!< Scalar array for input data*/
+   kiss_fft_cpx fftOutput[9];           /*!< Complex array for output data */
+   kiss_fftr_cfg config;
+
 
   for (;;)
   {
     // Wait for Frequency Track semaphore
     OS_SemaphoreWait(FFTSemaphore,0);
+
+    config = kiss_fftr_alloc(16, 0, NULL, NULL);
+    kiss_fft_cpx* frequencyBins = fftOutput;
+
+    // Load time data into array
+    OS_DisableInterrupts();
+    for(uint8_t i = 0; i < ADC_SAMPLES_PER_CYCLE; i++)
+    {
+      fftInput[i] = VoltageSamples[0].ADC_Data[i];
+    }
+    OS_EnableInterrupts();
+
+    // Run forward FFT
+    kiss_fftr(config, fftInput, frequencyBins);
+    OS_EnableInterrupts();
+    frequencyBins;
+
 
 
   }
