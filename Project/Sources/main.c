@@ -538,7 +538,7 @@ void ADCReadCallback(void* arg)
       // Signal FFT Semaphore
       if(VoltageSamples[phase].LatestData == ADC_SAMPLES_PER_CYCLE)
       {
-        OS_SemaphoreSignal(FFTSemaphore);
+        //OS_SemaphoreSignal(FFTSemaphore);
       }
 
       // If we are at the end of the buffer, signal semaphore for FrequencyCalculate thread, also set LatestData to 0.
@@ -1184,9 +1184,9 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
           deltaVoltage = RMS_LOWER_LIMIT - rms;
         }
 
-        // Decrement counter
+        // Decrement counter by inverse amount (1638 represents 0.5V)
         OS_DisableInterrupts();
-        OutOfRangeTimer -= (uint64_t)SamplePeriod;         //TODO remove inverse amount
+        OutOfRangeTimer -= (uint64_t)(((float)deltaVoltage / (float)1638) * (float)SamplePeriod);         //TODO remove inverse amount
 
         // Keep track of actual time
         minTimeCheck += SamplePeriod;
