@@ -538,7 +538,7 @@ void ADCReadCallback(void* arg)
       // Signal FFT Semaphore
       if(VoltageSamples[phase].LatestData == ADC_SAMPLES_PER_CYCLE)
       {
-        //OS_SemaphoreSignal(FFTSemaphore);
+        OS_SemaphoreSignal(FFTSemaphore);
       }
 
       // If we are at the end of the buffer, signal semaphore for FrequencyCalculate thread, also set LatestData to 0.
@@ -1290,6 +1290,8 @@ static void FTMLEDsOffThread(void* pData)
 
 static void FFTThread(void* pData)
 {
+   uint8_t memory[500];
+   size_t size = 500;
    kiss_fft_scalar fftInput[16];        /*!< Scalar array for input data*/
    kiss_fft_cpx fftOutput[9];           /*!< Complex array for output data */
    kiss_fftr_cfg config;
@@ -1300,7 +1302,7 @@ static void FFTThread(void* pData)
     // Wait for Frequency Track semaphore
     OS_SemaphoreWait(FFTSemaphore,0);
 
-    config = kiss_fftr_alloc(16, 0, NULL, NULL);
+    config = kiss_fftr_alloc(16, 0, memory, &size);
     kiss_fft_cpx* frequencyBins = fftOutput;
 
     // Load time data into array
@@ -1314,7 +1316,7 @@ static void FFTThread(void* pData)
     // Run forward FFT
     kiss_fftr(config, fftInput, frequencyBins);
     OS_EnableInterrupts();
-    frequencyBins;
+    kiss_fft_cpx test = fftOutput[0];
 
 
 
