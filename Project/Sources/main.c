@@ -188,11 +188,18 @@ static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS]
                 [THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));  /*!< The thread stack array for RMS threads */
 
 
+/*! @brief Put FFT data into a global array of frequency bins. Uses Mutex access.
+ *
+ *  @param fftOutput The new data to put in the global array.
+ *  @param size The number of elements in the array
+ *  @return void
+ */
 void FFTProtectedPut(kiss_fft_cpx* fftOutput, uint8_t size)
 {
   // Gain exclusive access to data
   OS_SemaphoreWait(FFTOutputMutex, 0);
 
+  // Copy each element into array
   for(uint8_t i = 0; i < size; i++)
   {
     FFTOutput[i] = fftOutput[i];
@@ -202,6 +209,11 @@ void FFTProtectedPut(kiss_fft_cpx* fftOutput, uint8_t size)
   OS_SemaphoreSignal(FFTOutputMutex);
 }
 
+/*! @brief Gets a harmonic magnitude from a global array off FFT frequency bins. Uses Mutex access.
+ *
+ *  @param The harmonic number
+ *  @return void
+ */
 uint16_t FFTProtectedGet(uint8_t harmonic)
 {
   // Gain exclusive access to data
