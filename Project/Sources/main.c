@@ -157,6 +157,7 @@ static int16_t OldestData[NB_ANALOG_CHANNELS];                        /*!< The a
 static bool Alarm[NB_ANALOG_CHANNELS];                                /*!< The array of alarm flags indicating individual thread alarm states */
 static bool Adjusting[NB_ANALOG_CHANNELS];                            /*!< The array of adjusting flags indicating individual thread adjusting states */
 static float Frequency;                                               /*!< The frequency of phase A */
+kiss_fft_cpx FFTOutput[(ADC_SAMPLES_PER_CYCLE / 2) + 1];              /*!< Complex array for output data */
 
 // Semaphores for use by RTOS
 static OS_ECB* LEDOffSemaphore;                                       /*!< LED off semaphore for FTM */
@@ -170,6 +171,7 @@ static OS_ECB* LogRaisesSemaphore;                                    /*!< Log R
 static OS_ECB* LogLowersSemaphore;                                    /*!< Log Lowers semaphore */
 static OS_ECB* FlashAccessMutex;                                      /*!< Flash Access Mutex */
 static OS_ECB* FFTSemaphore;                                          /*!< FFT semaphore semaphore */
+static OS_ECB* FFTOutputMutex;                                       /*!< FFTOutput Access Mutex */
 
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);           /*!< The stack for the Tower Init thread. */
@@ -184,6 +186,38 @@ OS_THREAD_STACK(LogLowersThreadStack, THREAD_STACK_SIZE);             /*!< The s
 OS_THREAD_STACK(FFTThreadStack, 2000);                                /*!< The stack for the Log Lowers thread. */
 static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS]
                 [THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));  /*!< The thread stack array for RMS threads */
+
+
+void FFTProtectedPut(kiss_fft_cpx* fftOutput, uint8_t size)
+{
+  // Gain exclusive access to data
+  OS_SemaphoreWait(FFTOutputMutex, 0);
+
+  for(uint8_t i = 0; i < size; i++)
+  {
+    FFTOutput[i] = fftOutput[i];
+  }
+
+  // Release exclusive access to data
+  OS_SemaphoreSignal(FFTOutputMutex);
+}
+
+uint16_t FFTProtectedGet(uint8_t harmonic)
+{
+  // Gain exclusive access to data
+  OS_SemaphoreWait(FFTOutputMutex, 0);
+
+  // Gain a local copy then release Mutex. Note: element 0 of the array is the DC component.
+  kiss_fft_cpx localVoltage = FFTOutput[harmonic];
+
+  // Release exclusive access to data
+  OS_SemaphoreSignal(FFTOutputMutex);
+
+  // Get the magnitude by taking the square root of the sum of the real and imaginary components squared. Then divide by nfft / 2.
+  // Note: Time taken by this operation is critical as it is done in a low priority thread, without possession of the Mutex.
+  // Also, this function is only executed on demand from PC.
+  return (uint16_t)(sqrt((localVoltage.r * localVoltage.r) + (localVoltage.i * localVoltage.i)) / (ADC_SAMPLES_PER_CYCLE / 2));
+}
 
 /*! @brief Sends the startup packets to the PC
  *
@@ -422,6 +456,31 @@ bool HandleTowerVoltage(void)
   return false;
 }
 
+/*! @brief Sends the magnitude of a given harmonic to the PC
+ *
+ *  @return bool - TRUE if packet sent
+ */
+bool HandleTowerHarmonic(void)
+{
+  // Local storage of variable as union
+  uint16union_t magnitude;
+
+  // Check if parameters are within limits
+  if(Packet_Parameter1 < 8 &&Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
+  {
+    OS_DisableInterrupts();
+
+    magnitude.l = FFTProtectedGet(Packet_Parameter1);
+
+    OS_EnableInterrupts();
+
+    // Send magnitude to PC
+    return Packet_Put(COMMAND_SPECTRUM, Packet_Parameter1, magnitude.s.Hi, magnitude.s.Lo);
+  }
+  return false;
+}
+
+
 /*! @brief Executes the command depending on what packet has been received
  *
  *  @return void
@@ -492,6 +551,11 @@ void ReceivedPacket(void)
   {
     // Send Voltage to Tower
     success = HandleTowerVoltage();
+  }
+  else if(commandIgnoreAck == COMMAND_SPECTRUM)
+  {
+    // Send Harmonic to Tower
+    success = HandleTowerHarmonic();
   }
 
   // AND the packet command byte with the ACK MASK to check if ACK is requested
@@ -690,6 +754,7 @@ static void InitModulesThread(void* pData)
   LogLowersSemaphore          = OS_SemaphoreCreate(0);
   FFTSemaphore                = OS_SemaphoreCreate(0);
   FlashAccessMutex            = OS_SemaphoreCreate(1);
+  FFTOutputMutex              = OS_SemaphoreCreate(1);
 
   // Create semaphore for RMS channels
   for (uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
@@ -1288,13 +1353,14 @@ static void FTMLEDsOffThread(void* pData)
   }
 }
 
+
+
 static void FFTThread(void* pData)
 {
-   uint8_t memory[500];
-   size_t size = 500;
-   kiss_fft_scalar fftInput[16];        /*!< Scalar array for input data*/
-   kiss_fft_cpx fftOutput[9];           /*!< Complex array for output data */
-   kiss_fftr_cfg config;
+   uint8_t memory[500];                                               /*!< Memory space allocated for kiss_fftr_cfg*/
+   size_t size = 500;                                                 /*!< Size of memory allocated for kiss_fftr_cfg*/
+   kiss_fft_scalar fftInput[ADC_SAMPLES_PER_CYCLE];                   /*!< Scalar array for input data*/
+   kiss_fft_cpx fftOutput[(ADC_SAMPLES_PER_CYCLE / 2) + 1];           /*!< Complex array for output data */
 
 
   for (;;)
@@ -1302,24 +1368,22 @@ static void FFTThread(void* pData)
     // Wait for Frequency Track semaphore
     OS_SemaphoreWait(FFTSemaphore,0);
 
-    config = kiss_fftr_alloc(16, 0, memory, &size);
-    kiss_fft_cpx* frequencyBins = fftOutput;
+    kiss_fftr_cfg config = kiss_fftr_alloc(16, 0, memory, &size);
 
-    // Load time data into array
-    OS_DisableInterrupts();
+    // Load time data into array. Note: interrupts are not disabled as after this threads semaphore is signaled,
+    // it will be a long time (3 * 16 * 1.25 ms for the default sampling rate and buffer size) before the
+    // PIT interrupt will modify any data in this part of the array.
+
     for(uint8_t i = 0; i < ADC_SAMPLES_PER_CYCLE; i++)
     {
       fftInput[i] = VoltageSamples[0].ADC_Data[i];
     }
-    OS_EnableInterrupts();
 
     // Run forward FFT
-    kiss_fftr(config, fftInput, frequencyBins);
-    OS_EnableInterrupts();
-    kiss_fft_cpx test = fftOutput[0];
+    kiss_fftr(config, fftInput, fftOutput);
 
-
-
+    // Update global array
+    FFTProtectedPut(fftOutput, (uint8_t)((ADC_SAMPLES_PER_CYCLE / 2) + 1));
   }
 }
 
