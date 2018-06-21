@@ -53,15 +53,15 @@
 
 #include <math.h>
 
-#define BAUD_RATE 115200                                    /*!< UART2 Baud Rate */
+#define BAUD_RATE 115200                                     /*!< UART2 Baud Rate */
 
-#define ANALOG_CHANNEL_1 0                                  /*!< 1st analog channel */
-#define ANALOG_CHANNEL_2 1                                  /*!< 2nd analog channel */
-#define ANALOG_CHANNEL_3 2                                  /*!< 3rd analog channel */
+#define ANALOG_CHANNEL_1 0                                   /*!< 1st analog channel */
+#define ANALOG_CHANNEL_2 1                                   /*!< 2nd analog channel */
+#define ANALOG_CHANNEL_3 2                                   /*!< 3rd analog channel */
 
-#define NB_ANALOG_CHANNELS 3                                /*!< Number of analog channels */
+#define NB_ANALOG_CHANNELS 3                                 /*!< Number of analog channels */
 
-#define VRR_SAMPLE_SIZE 16                                  /*!< Number of analog samples per cycle */
+#define VRR_SAMPLE_SIZE 16                                   /*!< Number of analog samples per cycle */
 
 const uint64_t PERIOD_TIMER_DELAY  = 5000000000;             /*!< Period of analog timer delay (5 seconds) */
 static uint32_t Period_Analog_Poll =    1250000;             /*!< Period of analog polling (16 samples per cycle, 47.5-52.5 Hz) */
