@@ -1,29 +1,29 @@
 Sources/FIFO.o: ../Sources/FIFO.c ../Sources/FIFO.h ../Sources/types.h \
- C:\Users\12551519\kinetis\Project\Library/OS.h \
- C:/Users/12551519/kinetis/Project/Generated_Code/PE_Types.h \
- C:/Users/12551519/kinetis/Project/Generated_Code/Cpu.h \
- C:/Users/12551519/kinetis/Project/Generated_Code/PE_Types.h \
- C:/Users/12551519/kinetis/Project/Generated_Code/PE_Error.h \
- C:/Users/12551519/kinetis/Project/Generated_Code/PE_Const.h \
- C:/Users/12551519/kinetis/Project/Generated_Code/IO_Map.h \
- C:/Users/12551519/kinetis/Project/Static_Code/IO_Map/MK70F12.h
+ C:\Freescale\KDS_3.0.0\eclipse\es18aut13\Project\Library/OS.h \
+ C:/Freescale/KDS_3.0.0/eclipse/es18aut13/Project/Generated_Code/PE_Types.h \
+ C:/Freescale/KDS_3.0.0/eclipse/es18aut13/Project/Generated_Code/Cpu.h \
+ C:/Freescale/KDS_3.0.0/eclipse/es18aut13/Project/Generated_Code/PE_Types.h \
+ C:/Freescale/KDS_3.0.0/eclipse/es18aut13/Project/Generated_Code/PE_Error.h \
+ C:/Freescale/KDS_3.0.0/eclipse/es18aut13/Project/Generated_Code/PE_Const.h \
+ C:/Freescale/KDS_3.0.0/eclipse/es18aut13/Project/Generated_Code/IO_Map.h \
+ C:/Freescale/KDS_3.0.0/eclipse/es18aut13/Project/Static_Code/IO_Map/MK70F12.h
 
 ../Sources/FIFO.h:
 
 ../Sources/types.h:
 
-C:\Users\12551519\kinetis\Project\Library/OS.h:
+C:\Freescale\KDS_3.0.0\eclipse\es18aut13\Project\Library/OS.h:
 
-C:/Users/12551519/kinetis/Project/Generated_Code/PE_Types.h:
+C:/Freescale/KDS_3.0.0/eclipse/es18aut13/Project/Generated_Code/PE_Types.h:
 
-C:/Users/12551519/kinetis/Project/Generated_Code/Cpu.h:
+C:/Freescale/KDS_3.0.0/eclipse/es18aut13/Project/Generated_Code/Cpu.h:
 
-C:/Users/12551519/kinetis/Project/Generated_Code/PE_Types.h:
+C:/Freescale/KDS_3.0.0/eclipse/es18aut13/Project/Generated_Code/PE_Types.h:
 
-C:/Users/12551519/kinetis/Project/Generated_Code/PE_Error.h:
+C:/Freescale/KDS_3.0.0/eclipse/es18aut13/Project/Generated_Code/PE_Error.h:
 
-C:/Users/12551519/kinetis/Project/Generated_Code/PE_Const.h:
+C:/Freescale/KDS_3.0.0/eclipse/es18aut13/Project/Generated_Code/PE_Const.h:
 
-C:/Users/12551519/kinetis/Project/Generated_Code/IO_Map.h:
+C:/Freescale/KDS_3.0.0/eclipse/es18aut13/Project/Generated_Code/IO_Map.h:
 
-C:/Users/12551519/kinetis/Project/Static_Code/IO_Map/MK70F12.h:
+C:/Freescale/KDS_3.0.0/eclipse/es18aut13/Project/Static_Code/IO_Map/MK70F12.h:

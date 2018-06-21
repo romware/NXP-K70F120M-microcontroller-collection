@@ -91,6 +91,7 @@ static OS_ECB* LEDOffSemaphore;                             /*!< LED off semapho
 static OS_ECB* RaisesSemaphore;                             /*!< Raises semaphore for Flash */
 static OS_ECB* LowersSemaphore;                             /*!< Lowers semaphore for Flash */
 static OS_ECB* FlashMutex;                                  /*!< Mutex semaphore for Flash */
+static OS_ECB* FrequencySemaphore;                          /*!< Frequency semaphore for channel 1*/
 
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE); /*!< The stack for the Tower Init thread. */
@@ -98,9 +99,9 @@ OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);  /*!< The stack for t
 OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the Packet thread. */
 OS_THREAD_STACK(RaisesThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the Flash Raises thread. */
 OS_THREAD_STACK(LowersThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the Flash Lowers thread. */
+OS_THREAD_STACK(FrequencyThreadStack, 2048);   /*!< The stack for the frequency thread. */
 
 static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS][THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));
-static uint32_t FrequencyThreadStacks[NB_ANALOG_CHANNELS][THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));
 
 /*! @brief Timing mode parameters for tower to PC protocol
  *
@@ -127,7 +128,6 @@ typedef enum
 typedef struct AnalogThreadData
 {
   OS_ECB* semaphoreRMS;
-  OS_ECB* semaphoreFrequency;
   uint8_t channelNb;
   int16_t sampleData[VRR_SAMPLE_SIZE];
   int16_t prevSampleData[VRR_SAMPLE_SIZE];
@@ -141,19 +141,16 @@ static TAnalogThreadData AnalogThreadData[NB_ANALOG_CHANNELS] =
 {
   {
     .semaphoreRMS = NULL,
-    .semaphoreFrequency = NULL,
     .sampleDataIndex = 0,
     .channelNb = ANALOG_CHANNEL_1
   },
   {
     .semaphoreRMS = NULL,
-    .semaphoreFrequency = NULL,
     .sampleDataIndex = 0,
     .channelNb = ANALOG_CHANNEL_2
   },
   {
     .semaphoreRMS = NULL,
-    .semaphoreFrequency = NULL,
     .sampleDataIndex = 0,
     .channelNb = ANALOG_CHANNEL_3
   }
@@ -268,16 +265,15 @@ void CalculateRMSThread(void* pData)
  */
 void CalculateFrequencyThread(void* pData)
 {
-  // Make the code easier to read by giving a name to the typecast'ed pointer
-  #define analogData ((TAnalogThreadData*)pData)
-
   for (;;)
   {
-    (void)OS_SemaphoreWait(analogData->semaphoreFrequency, 0);
+    (void)OS_SemaphoreWait(FrequencySemaphore, 0);
 
+    OS_DisableInterrupts();
     bool negCrossingFound = false;
     float negCrossing1 = 0;
     float negCrossing2 = 0;
+    TAnalogThreadData* channelData = &AnalogThreadData[ANALOG_CHANNEL_1];
 
     for(uint8_t i = 0; i < VRR_SAMPLE_SIZE*2 - 1; i++)
     {
@@ -286,20 +282,20 @@ void CalculateFrequencyThread(void* pData)
 
       if(i < 16)
       {
-        leftVal = analogData->prevSampleData[i];
+        leftVal = channelData->prevSampleData[i];
       }
       else
       {
-        leftVal = analogData->sampleData[i];
+        leftVal = channelData->sampleData[i - VRR_SAMPLE_SIZE];
       }
 
       if(i+1 < 16)
       {
-        rightVal = analogData->prevSampleData[i+1];
+        rightVal = channelData->prevSampleData[i+1];
       }
       else
       {
-        rightVal = analogData->sampleData[i+1];
+        rightVal = channelData->sampleData[i+1 - VRR_SAMPLE_SIZE];
       }
 
       if(leftVal >= 0 && 0 > rightVal && negCrossingFound)
@@ -307,12 +303,19 @@ void CalculateFrequencyThread(void* pData)
         // m = rise over run, run = 1 sample
         float m = (rightVal - leftVal);
         // x = -b/m
-        float x = -(leftVal) / m;
-        negCrossing2 = i + x;
+        float x = (float)(-leftVal) / m;
+        negCrossing2 = (float)i + x;
 
-        float distance = negCrossing2 - negCrossing1;
+        float distance = (float)negCrossing2 - (float)negCrossing1;
 
         Frequency = (float)1000000000 / (distance * (float)PERIOD_ANALOG_POLL);
+
+        if(Frequency == 50)
+        {
+          uint8_t i = 0;
+          i = 1;
+
+        }
 
         break;
       }
@@ -323,12 +326,13 @@ void CalculateFrequencyThread(void* pData)
         // m = rise over run, run = 1 sample
         float m = (rightVal - leftVal);
         // x = -b/m
-        float x = -(leftVal) / m;
-        negCrossing1 = i + x;
+        float x = (float)(-leftVal) / m;
+        negCrossing1 = (float)i + x;
       }
     }
 
-    ArrayCopy(analogData->sampleData,analogData->prevSampleData,VRR_SAMPLE_SIZE);
+    ArrayCopy(channelData->sampleData, channelData->prevSampleData, VRR_SAMPLE_SIZE);
+    OS_EnableInterrupts();
   }
 }
 
@@ -370,8 +374,6 @@ void LowersThread(void* pData)
  */
 void PITCallback(void* arg)
 {
-  OS_ISREnter();
-
   static uint8_t channel;
 
   int16_t analogInputValue;
@@ -397,10 +399,8 @@ void PITCallback(void* arg)
 
   if(channel == 0 && channelData->sampleDataIndex == 0)
   {
-    (void)OS_SemaphoreSignal(AnalogThreadData[channel].semaphoreFrequency);
+    (void)OS_SemaphoreSignal(FrequencySemaphore);
   }
-
-  OS_ISRExit();
 }
 
 /*! @brief Sets the tower timing mode or sends the packet to the PC
@@ -471,7 +471,6 @@ bool HandleTowerLowers(void)
 bool HandleTowerFrequency(void)
 {
   int16union_t frequency;
-  TAnalogThreadData* phase = &AnalogThreadData[ANALOG_CHANNEL_1];
 
   OS_DisableInterrupts();
   frequency.l = (int16_t)(Frequency * 10);
@@ -641,15 +640,15 @@ static void InitModulesThread(void* pData)
   // Generate the global analog semaphores
   for (uint8_t analogNb = ANALOG_CHANNEL_1; analogNb < NB_ANALOG_CHANNELS; analogNb++)
   {
-    AnalogThreadData[analogNb].semaphoreRMS       = OS_SemaphoreCreate(0);
-    AnalogThreadData[analogNb].semaphoreFrequency = OS_SemaphoreCreate(0);
+    AnalogThreadData[analogNb].semaphoreRMS = OS_SemaphoreCreate(0);
   }
 
   // Create semaphores for threads
-  LEDOffSemaphore = OS_SemaphoreCreate(0);
-  RaisesSemaphore = OS_SemaphoreCreate(0);
-  LowersSemaphore = OS_SemaphoreCreate(0);
-  FlashMutex      = OS_SemaphoreCreate(1);
+  LEDOffSemaphore    = OS_SemaphoreCreate(0);
+  RaisesSemaphore    = OS_SemaphoreCreate(0);
+  LowersSemaphore    = OS_SemaphoreCreate(0);
+  FlashMutex         = OS_SemaphoreCreate(1);
+  FrequencySemaphore = OS_SemaphoreCreate(0);
 
   // Initializes the main tower components and sets the default or stored values
   if(TowerInit())
@@ -754,34 +753,32 @@ int main(void)
                             &RMSThreadStacks[threadNb][THREAD_STACK_SIZE - 1],
                             3+threadNb);
   }
-  // Create threads for analog Frequency calculations
-  for (uint8_t threadNb = ANALOG_CHANNEL_1; threadNb < NB_ANALOG_CHANNELS; threadNb++)
-  {
-    error = OS_ThreadCreate(CalculateRMSThread,
-                            &AnalogThreadData[threadNb],
-                            &FrequencyThreadStacks[threadNb][THREAD_STACK_SIZE - 1],
-                            6+threadNb);
-  }
-  // 9th Highest priority
+
+  // 6th Highest priority
+  error = OS_ThreadCreate(CalculateFrequencyThread,
+                          NULL,
+                          &FrequencyThreadStack[THREAD_STACK_SIZE - 1],
+                          6);
+  // 7th Highest priority
   error = OS_ThreadCreate(PacketThread,
                           NULL,
                           &PacketThreadStack[THREAD_STACK_SIZE - 1],
-                          9);
-  // 10th Highest priority
+                          7);
+  // 8th Highest priority
   error = OS_ThreadCreate(FTMLEDsOffThread,
                           NULL,
                           &FTMLEDsOffThreadStack[THREAD_STACK_SIZE - 1],
-                          10);
-  // 11th Highest priority
+                          8);
+  // 9th Highest priority
   error = OS_ThreadCreate(RaisesThread,
                           NULL,
                           &RaisesThreadStack[THREAD_STACK_SIZE - 1],
-                          11);
-  // 12th Highest priority
+                          9);
+  // 10th Highest priority
   error = OS_ThreadCreate(LowersThread,
                           NULL,
                           &LowersThreadStack[THREAD_STACK_SIZE - 1],
-                          12);
+                          10);
 
   // Start multithreading - never returns!
   OS_Start();
