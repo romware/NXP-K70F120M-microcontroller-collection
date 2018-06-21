@@ -61,45 +61,45 @@
 
 #define NB_ANALOG_CHANNELS 3                                /*!< Number of analog channels */
 
-#define VRR_SAMPLE_SIZE 16                                /*!< Number of analog samples per cycle */
+#define VRR_SAMPLE_SIZE 16                                  /*!< Number of analog samples per cycle */
 
-const uint64_t PERIOD_TIMER_DELAY = 5000000000;             /*!< Period of analog timer delay (5 seconds) */
-const uint32_t PERIOD_ANALOG_POLL =    1250000;             /*!< Period of analog polling (16 samples per cycle, 50Hz) */
+const uint64_t PERIOD_TIMER_DELAY  = 5000000000;             /*!< Period of analog timer delay (5 seconds) */
+static uint32_t Period_Analog_Poll =    1250000;             /*!< Period of analog polling (16 samples per cycle, 47.5-52.5 Hz) */
 
-const uint8_t COMMAND_TIMING      =       0x10;             /*!< The serial command byte for tower timing */
-const uint8_t COMMAND_RAISES      =       0x11;             /*!< The serial command byte for tower raises */
-const uint8_t COMMAND_LOWERS      =       0x12;             /*!< The serial command byte for tower lowers */
-const uint8_t COMMAND_FREQUENCY   =       0x17;             /*!< The serial command byte for tower frequency */
-const uint8_t COMMAND_VOLTAGE     =       0x18;             /*!< The serial command byte for tower voltage */
-const uint8_t COMMAND_SPECTRUM    =       0x19;             /*!< The serial command byte for tower spectrum */
+const uint8_t COMMAND_TIMING       =       0x10;             /*!< The serial command byte for tower timing */
+const uint8_t COMMAND_RAISES       =       0x11;             /*!< The serial command byte for tower raises */
+const uint8_t COMMAND_LOWERS       =       0x12;             /*!< The serial command byte for tower lowers */
+const uint8_t COMMAND_FREQUENCY    =       0x17;             /*!< The serial command byte for tower frequency */
+const uint8_t COMMAND_VOLTAGE      =       0x18;             /*!< The serial command byte for tower voltage */
+const uint8_t COMMAND_SPECTRUM     =       0x19;             /*!< The serial command byte for tower spectrum */
 
-const int16_t VRR_ZERO            =          0;             /*!< VRR_VOLT x0 */
-const int16_t VRR_VOLT_HALF       =       1638;             /*!< VRR_VOLT x0.5 */
-const int16_t VRR_VOLT            =       3277;             /*!< One volt ((2^15 - 1)/10) */
-const int16_t VRR_LIMIT_LOW       =       6553;             /*!< VRR_VOLT x2 */
-const int16_t VRR_LIMIT_HIGH      =       9830;             /*!< VRR_VOLT x3 */
-const int16_t VRR_OUTPUT_5V       =      16384;             /*!< VRR_VOLT x5 */
+const int16_t VRR_ZERO             =          0;             /*!< VRR_VOLT x0 */
+const int16_t VRR_VOLT_HALF        =       1638;             /*!< VRR_VOLT x0.5 */
+const int16_t VRR_VOLT             =       3277;             /*!< One volt ((2^15 - 1)/10) */
+const int16_t VRR_LIMIT_LOW        =       6553;             /*!< VRR_VOLT x2 */
+const int16_t VRR_LIMIT_HIGH       =       9830;             /*!< VRR_VOLT x3 */
+const int16_t VRR_OUTPUT_5V        =      16384;             /*!< VRR_VOLT x5 */
 
-static uint8_t Timing_Mode        =          1;             /*!< The timing mode of the VRR */
+static uint8_t Timing_Mode         =          1;             /*!< The timing mode of the VRR */
 
-static float Frequency            =          0;             /*!< The frequency of the VRR */
+static float Frequency             =          0;             /*!< The frequency of the VRR */
 
-volatile uint8_t* NvCountRaises;                            /*!< Number of raises pointer to flash */
-volatile uint8_t* NvCountLowers;                            /*!< Number of lowers pointer to flash */
+volatile uint8_t* NvCountRaises;                             /*!< Number of raises pointer to flash */
+volatile uint8_t* NvCountLowers;                             /*!< Number of lowers pointer to flash */
 
-static OS_ECB* LEDOffSemaphore;                             /*!< LED off semaphore for FTM */
-static OS_ECB* RaisesSemaphore;                             /*!< Raises semaphore for Flash */
-static OS_ECB* LowersSemaphore;                             /*!< Lowers semaphore for Flash */
-static OS_ECB* FlashMutex;                                  /*!< Mutex semaphore for Flash */
-static OS_ECB* FrequencySemaphore;                          /*!< Frequency semaphore for channel 1*/
+static OS_ECB* LEDOffSemaphore;                              /*!< LED off semaphore for FTM */
+static OS_ECB* RaisesSemaphore;                              /*!< Raises semaphore for Flash */
+static OS_ECB* LowersSemaphore;                              /*!< Lowers semaphore for Flash */
+static OS_ECB* FlashMutex;                                   /*!< Mutex semaphore for Flash */
+static OS_ECB* FrequencySemaphore;                           /*!< Frequency semaphore for channel 1*/
 
 // Thread stacks
-OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE); /*!< The stack for the Tower Init thread. */
-OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);  /*!< The stack for the FTM thread. */
-OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the Packet thread. */
-OS_THREAD_STACK(RaisesThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the Flash Raises thread. */
-OS_THREAD_STACK(LowersThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the Flash Lowers thread. */
-OS_THREAD_STACK(FrequencyThreadStack, 2048);   /*!< The stack for the frequency thread. */
+OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);  /*!< The stack for the Tower Init thread. */
+OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);   /*!< The stack for the FTM thread. */
+OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Packet thread. */
+OS_THREAD_STACK(RaisesThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Flash Raises thread. */
+OS_THREAD_STACK(LowersThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Flash Lowers thread. */
+OS_THREAD_STACK(FrequencyThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the frequency thread. */
 
 static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS][THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));
 
@@ -192,7 +192,7 @@ void CheckRMS(uint64_t* timerDelay, uint64_t* timerRate, float deviation, bool* 
   {
     *alarm = true;
     *timerDelay = PERIOD_TIMER_DELAY;
-    *timerRate = PERIOD_ANALOG_POLL;
+    *timerRate = Period_Analog_Poll;
 
     OS_DisableInterrupts();
     Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
@@ -202,7 +202,7 @@ void CheckRMS(uint64_t* timerDelay, uint64_t* timerRate, float deviation, bool* 
   {
     if(Timing_Mode == TIMING_INVERSE)
     {
-      *timerRate = (deviation/(float)VRR_VOLT_HALF) * PERIOD_ANALOG_POLL;
+      *timerRate = (deviation/(float)VRR_VOLT_HALF) * Period_Analog_Poll;
     }
     *timerDelay -= *timerRate;
   }
@@ -280,7 +280,7 @@ void CalculateFrequencyThread(void* pData)
       int16_t leftVal;
       int16_t rightVal;
 
-      if(i < 16)
+      if(i < VRR_SAMPLE_SIZE)
       {
         leftVal = channelData->prevSampleData[i];
       }
@@ -289,7 +289,7 @@ void CalculateFrequencyThread(void* pData)
         leftVal = channelData->sampleData[i - VRR_SAMPLE_SIZE];
       }
 
-      if(i+1 < 16)
+      if(i+1 < VRR_SAMPLE_SIZE)
       {
         rightVal = channelData->prevSampleData[i+1];
       }
@@ -308,13 +308,13 @@ void CalculateFrequencyThread(void* pData)
 
         float distance = (float)negCrossing2 - (float)negCrossing1;
 
-        Frequency = (float)1000000000 / (distance * (float)PERIOD_ANALOG_POLL);
+        float frequency = (float)1000000000 / (distance * (float)Period_Analog_Poll);
 
-        if(Frequency == 50)
+        if(Frequency != frequency)
         {
-          uint8_t i = 0;
-          i = 1;
-
+          Frequency = frequency;
+          Period_Analog_Poll = (1000000000 / Frequency) / VRR_SAMPLE_SIZE;
+          PIT_Set(Period_Analog_Poll / NB_ANALOG_CHANNELS, true);
         }
 
         break;
@@ -661,7 +661,7 @@ static void InitModulesThread(void* pData)
   PIT_Init(CPU_BUS_CLK_HZ, PITCallback, NULL);
 
   // Set the PIT with the analog polling period
-  PIT_Set(PERIOD_ANALOG_POLL / NB_ANALOG_CHANNELS, true);
+  PIT_Set(Period_Analog_Poll / NB_ANALOG_CHANNELS, true);
 
   // Put initial zero values to tower output channels
   Analog_Put(ANALOG_CHANNEL_1, VRR_ZERO);
