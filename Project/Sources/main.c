@@ -1172,18 +1172,18 @@ static void FrequencyCalculateThread(void* pData)
   }
 }
 
-/*! @brief Calculates the square root of a float quickly by knowing the previous value of the square. From testing it takes around 10us vs 14 us for math.h sqrt().
+/*! @brief Calculates the square root of a float quickly by knowing the previous value of the square.
  *
- *  @param square The float to find the square root of
+ *  @param square The number to find the square root of
  *  @param lastRoot The root of the last square
  *  @param accuracy The desired accuracy of the root
- *  @return float - The square root
+ *  @return uint16_t - The square root
  */
-float FastSqrt(float square, float lastRoot, float accuracy)
+uint16_t FastSqrt(uint32_t square, uint16_t lastRoot, uint16_t accuracy)
 {
-  float error;
-  float last;
-  float root = lastRoot;
+  int32_t error;
+  uint32_t last;
+  uint32_t root = lastRoot;
   if(root <= 0)
   {
     root = 1;
@@ -1242,7 +1242,7 @@ uint16_t UpdateRMSFast(int16_t* const pRemoveData, int64_t* const pPreviousSumOf
   OS_SemaphoreSignal(mutex);
 
   // Return the calculated RMS
-  return (uint16_t)FastSqrt((float)newSumOfSquares / (float)dataSize, (float) lastRMS, (float)1);
+  return (uint16_t)FastSqrt(newSumOfSquares /dataSize, lastRMS, 1);
 }
 
 
