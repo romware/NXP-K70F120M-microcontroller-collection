@@ -47,6 +47,8 @@
 #include "PE_Types.h"
 #include "PIT.h"
 #include "FTM.h"
+#include "kiss_fft.h"
+#include "kiss_fftr.h"
 
 // Analog functions
 #include "analog.h"
@@ -96,7 +98,7 @@ static OS_ECB* FrequencySemaphore;                           /*!< Frequency sema
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);  /*!< The stack for the Tower Init thread. */
 OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);   /*!< The stack for the FTM thread. */
-OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Packet thread. */
+OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE*4);       /*!< The stack for the Packet thread. TODO:size */
 OS_THREAD_STACK(RaisesThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Flash Raises thread. */
 OS_THREAD_STACK(LowersThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Flash Lowers thread. */
 OS_THREAD_STACK(FrequencyThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the frequency thread. */
@@ -339,20 +341,44 @@ static bool HandleTowerVoltage(void)
   return false;
 }
 
-/*! @brief Sets the tower spectrum
+/*! @brief Sends the tower spectrum packet for a selected harmonic
  *
- *  @return bool - TRUE if spectrum is set
+ *  @return bool - TRUE if spectrum packet is sent
  */
 static bool HandleTowerSpectrum(void)
 {
-  // Check half word
-
   // Check if harmonic number is between 0 and 7
   if(Packet_Parameter1 >= 0 && Packet_Parameter1 <= 7)
   {
-    // Sends the spectrum packet
-  }
+    uint8_t memory[500];
+    size_t length = 500;
+    kiss_fftr_cfg config = kiss_fftr_alloc(VRR_SAMPLE_SIZE, 0, memory, &length);
 
+    TAnalogThreadData* channelData = &AnalogThreadData[ANALOG_CHANNEL_1];
+
+    kiss_fft_scalar timedata[VRR_SAMPLE_SIZE];
+
+    OS_DisableInterrupts();
+    for(uint8_t i = 0; i < VRR_SAMPLE_SIZE; i++)
+    {
+      timedata[i] = channelData->prevSampleData[i];
+    }
+    OS_EnableInterrupts();
+
+    kiss_fft_cpx spectrum[(VRR_SAMPLE_SIZE/2)+1];
+
+    kiss_fftr(config, timedata, spectrum);
+
+    float mag = sqrt(
+        (spectrum[Packet_Parameter1].r*spectrum[Packet_Parameter1].r) +
+        (spectrum[Packet_Parameter1].i*spectrum[Packet_Parameter1].i)
+        ) / (VRR_SAMPLE_SIZE/2);
+
+    uint16union_t magnitude;
+    magnitude.l = mag;
+
+    return Packet_Put(COMMAND_SPECTRUM,Packet_Parameter1,magnitude.s.Lo,magnitude.s.Hi);
+  }
   return false;
 }
 

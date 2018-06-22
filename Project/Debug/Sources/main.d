@@ -12,6 +12,7 @@ Sources/main.o: ../Sources/main.c ../Sources/types.h \
  C:/Users/12551519/Desktop/git/Project/Generated_Code/IO_Map.h \
  ../Sources/LEDs.h ../Sources/UART.h ../Sources/FIFO.h \
  ../Sources/packet.h ../Sources/Flash.h ../Sources/PIT.h ../Sources/FTM.h \
+ ../Sources/kiss_fft.h ../Sources/kiss_fftr.h \
  C:\Users\12551519\Desktop\git\Project\Library/analog.h \
  C:/Users/12551519/Desktop/git/Project/Sources/types.h
 
@@ -54,6 +55,10 @@ C:/Users/12551519/Desktop/git/Project/Generated_Code/IO_Map.h:
 ../Sources/PIT.h:
 
 ../Sources/FTM.h:
+
+../Sources/kiss_fft.h:
+
+../Sources/kiss_fftr.h:
 
 C:\Users\12551519\Desktop\git\Project\Library/analog.h:
 

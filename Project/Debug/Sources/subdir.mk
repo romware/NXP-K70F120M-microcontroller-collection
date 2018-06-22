@@ -11,6 +11,8 @@ C_SRCS += \
 ../Sources/LEDs.c \
 ../Sources/PIT.c \
 ../Sources/UART.c \
+../Sources/kiss_fft.c \
+../Sources/kiss_fftr.c \
 ../Sources/main.c \
 ../Sources/packet.c 
 
@@ -22,6 +24,8 @@ OBJS += \
 ./Sources/LEDs.o \
 ./Sources/PIT.o \
 ./Sources/UART.o \
+./Sources/kiss_fft.o \
+./Sources/kiss_fftr.o \
 ./Sources/main.o \
 ./Sources/packet.o 
 
@@ -33,6 +37,8 @@ C_DEPS += \
 ./Sources/LEDs.d \
 ./Sources/PIT.d \
 ./Sources/UART.d \
+./Sources/kiss_fft.d \
+./Sources/kiss_fftr.d \
 ./Sources/main.d \
 ./Sources/packet.d 
 

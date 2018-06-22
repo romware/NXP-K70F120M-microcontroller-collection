@@ -40,16 +40,16 @@ Multiple threads are used with an RTOS – i.e.					- Done
 	one thread for logic, etc.
 
 /2 G A P Settings / interrogation.
-Tower protocol expanded to achieve Intermediate Functionality.	- Done
+Tower protocol expanded to achieve Intermediate Functionality.	- Done. Check frequency limit if voltage below 1.5V
 
 /12 SUBTOTAL
 
 
 VRR – Advanced Functionality
 
-/8 G A P Spectrum. 												- In progress
+/8 G A P Spectrum. 												- Done
 Spectral content of Phase A voltage up to 350 Hz with 50 Hz resolution.
-Magnitude of 50 Hz component calculated.
+Magnitude of 50 Hz component calculated.						- Done
 Tower protocol expanded to achieve Advanced Functionality.		- Done
 
 /8 SUBTOTAL
