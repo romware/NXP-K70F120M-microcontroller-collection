@@ -171,7 +171,10 @@ static OS_ECB* LogRaisesSemaphore;                                    /*!< Log R
 static OS_ECB* LogLowersSemaphore;                                    /*!< Log Lowers semaphore */
 static OS_ECB* FlashAccessMutex;                                      /*!< Flash Access Mutex */
 static OS_ECB* FFTSemaphore;                                          /*!< FFT semaphore semaphore */
-static OS_ECB* FFTOutputMutex;                                       /*!< FFTOutput Access Mutex */
+static OS_ECB* FFTOutputMutex;                                        /*!< FFTOutput Access Mutex */
+static OS_ECB* AlarmMutex;                                            /*!< Alarm Flag Access Mutex */
+static OS_ECB* AdjustingMutex;                                        /*!< Adjusting Flag Access Mutex */
+static OS_ECB* RMSCalculationDataMutex;                               /*!< RMS Calculation Data Access Mutex */
 
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);           /*!< The stack for the Tower Init thread. */
@@ -187,6 +190,21 @@ OS_THREAD_STACK(FFTThreadStack, 2000);                                /*!< The s
 static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS]
                 [THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));  /*!< The thread stack array for RMS threads */
 
+
+/*! @brief Calls Analog_Put with interrupts disabled.
+ *
+ *  @param channelNb is the number of the analog output channel to send the value to.
+ *  @param value is the value to write to the analog channel.
+ *  @return bool - true if the analog value was output successfully.
+ */
+bool ProtectedAnalogPut(uint8_t const channelNb, int16_t const value)
+{
+  bool success = false;
+  OS_DisableInterrupts();
+  success = Analog_Put(channelNb, value);
+  OS_EnableInterrupts();
+  return success;
+}
 
 /*! @brief Put FFT data into a global array of frequency bins. Uses Mutex access.
  *
@@ -767,6 +785,9 @@ static void InitModulesThread(void* pData)
   FFTSemaphore                = OS_SemaphoreCreate(0);
   FlashAccessMutex            = OS_SemaphoreCreate(1);
   FFTOutputMutex              = OS_SemaphoreCreate(1);
+  AlarmMutex                  = OS_SemaphoreCreate(1);
+  AdjustingMutex              = OS_SemaphoreCreate(1);
+  RMSCalculationDataMutex     = OS_SemaphoreCreate(1);
 
   // Create semaphore for RMS channels
   for (uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
@@ -1082,12 +1103,13 @@ float FastSqrt(float square, float lastRoot, float accuracy)
  *  @return uint16_t - The RMS value
  */
 uint16_t UpdateRMSFast(int16_t* const pRemoveData, int64_t* const pPreviousSumOfSquares, const int16_t latestData,
-                       const int16_t oldestData, const uint8_t dataSize, const uint16_t lastRMS)
+                       const int16_t oldestData, const uint8_t dataSize, const uint16_t lastRMS, OS_ECB* mutex)
 {
-  int32_t newestData;
+  // Gain exlusive access to global variables
+  OS_SemaphoreWait(mutex, 0);
 
   // Cast to int32_t to avoid calculations later
-  newestData = (int32_t)latestData;
+  int32_t newestData = (int32_t)latestData;
 
   // Update the sum of squares, removing old data and adding new data.
   int64_t newSumOfSquares = *pPreviousSumOfSquares;
@@ -1105,6 +1127,9 @@ uint16_t UpdateRMSFast(int16_t* const pRemoveData, int64_t* const pPreviousSumOf
   // Update the removed data and sum of squares for next time.
   *pRemoveData = oldestData;
   *pPreviousSumOfSquares = newSumOfSquares;
+
+  // Release access to global variables
+  OS_SemaphoreSignal(mutex);
 
   // Return the calculated RMS
   return (uint16_t)FastSqrt((float)newSumOfSquares / (float)dataSize, (float) lastRMS, (float)1);
@@ -1146,16 +1171,33 @@ float GetAverage(const TVoltageData Data, const uint8_t dataSize)
  *
  *  @param outputs[] The array of flags
  *  @param nboutputs The number of flags in the array
+ *  @param mutex The mutex to the flag/flag array
  *  @return bool - TRUE if all flags are false
  */
-bool CheckOutputsOff(const bool  outputs[], const uint8_t nbOutputs)
+bool ProtectedCheckFlagsOff(const bool  flags[], const uint8_t nbFlags, OS_ECB* mutex)
 {
+  OS_SemaphoreWait(mutex,0);
   bool set = false;
-  for (uint8_t i = 0; i < nbOutputs; i++)
+  for (uint8_t i = 0; i < nbFlags; i++)
   {
-    set |= outputs[i];
+    set |= flags[i];
   }
+  OS_SemaphoreSignal(mutex);
   return !set;
+}
+
+/*! @brief Updates a flag with mutex access
+ *
+ *  @param flag The flag to be updated
+ *  @param flagValue The new value of the flag
+ *  @param mutex The mutex to the flag/flag array
+ *  @return void
+ */
+void ProtectedFlagUpdate(bool* flag, const bool flagValue, OS_ECB* mutex)
+{
+  OS_SemaphoreWait(mutex,0);
+  *flag = flagValue;
+  OS_SemaphoreSignal(mutex);
 }
 
 
@@ -1189,6 +1231,7 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
     int16_t latestSample;
     int16_t oldestSample;
 
+    // Disable interrupts to get local copy. Cannot use mutex as interrupts update this variable
     OS_DisableInterrupts();
 
     if(VoltageSamples[analogData->channelNb].LatestData == 0)
@@ -1205,7 +1248,7 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
 
     // Calculate the new RMS
     rms = UpdateRMSFast(&(OldestData[analogData->channelNb]), &(LastSumOfSquares[analogData->channelNb]),
-                            latestSample, oldestSample, ADC_BUFFER_SIZE, RMS[analogData->channelNb]);
+                            latestSample, oldestSample, ADC_BUFFER_SIZE, RMS[analogData->channelNb], RMSCalculationDataMutex);
 
     OS_DisableInterrupts();
 
@@ -1231,13 +1274,11 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
     // Set alarm if it is not set
     if(alarm && !alarmSet)
     {
-      OS_DisableInterrupts();
-      if(CheckOutputsOff(Alarm, (uint8_t)NB_ANALOG_CHANNELS))
+      if(ProtectedCheckFlagsOff(Alarm, (uint8_t)NB_ANALOG_CHANNELS, AlarmMutex))
       {
-        Analog_Put(3, DAC_5V_OUT);
-        Alarm[analogData->channelNb] = true;
+        ProtectedAnalogPut(3, DAC_5V_OUT);
+        ProtectedFlagUpdate(&Alarm[analogData->channelNb], true, AlarmMutex);
       }
-      OS_EnableInterrupts();
       alarmSet = true;
     }
 
@@ -1263,7 +1304,7 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
 
         // Decrement counter by inverse amount (1638 represents 0.5V)
         OS_DisableInterrupts();
-        OutOfRangeTimer -= (uint64_t)(((float)deltaVoltage / (float)1638) * (float)SamplePeriod);         //TODO remove inverse amount
+        OutOfRangeTimer -= (uint64_t)(((float)deltaVoltage / (float)1638) * (float)SamplePeriod);         //TODO maybe integer math, mutex access maybe
 
         // Keep track of actual time
         minTimeCheck += SamplePeriod;
@@ -1276,28 +1317,24 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
         // Set lower signal and store count in Nv if voltage high and not already set by another channel.
         if(overVoltage)
         {
-          OS_DisableInterrupts();
-          if(CheckOutputsOff(Adjusting, (uint8_t)NB_ANALOG_CHANNELS))
+          if(ProtectedCheckFlagsOff(Adjusting, (uint8_t)NB_ANALOG_CHANNELS, AdjustingMutex))
           {
-            Analog_Put(2, DAC_5V_OUT);
-            Adjusting[analogData->channelNb] = true;
+            ProtectedAnalogPut(2, DAC_5V_OUT);
+            ProtectedFlagUpdate(&Adjusting[analogData->channelNb], true, AdjustingMutex);
             OS_SemaphoreSignal(LogLowersSemaphore);
           }
-          OS_EnableInterrupts();
           adjusting = true;
         }
 
         // Set raise signal and store count in Nv if voltage low and not already set by another channel.
         else if(underVoltage)
         {
-          OS_DisableInterrupts();
-          if(CheckOutputsOff(Adjusting, (uint8_t)NB_ANALOG_CHANNELS))
+          if(ProtectedCheckFlagsOff(Adjusting, (uint8_t)NB_ANALOG_CHANNELS, AdjustingMutex))
           {
-            Analog_Put(1, DAC_5V_OUT);
-            Adjusting[analogData->channelNb] = true;
+            ProtectedAnalogPut(1, DAC_5V_OUT);
+            ProtectedFlagUpdate(&Adjusting[analogData->channelNb], true, AdjustingMutex);
             OS_SemaphoreSignal(LogRaisesSemaphore);
           }
-          OS_EnableInterrupts();
           adjusting = true;
         }
       }
@@ -1308,30 +1345,23 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
     {
       bool switchOffAdjusting;
 
-      OS_DisableInterrupts();
-      Alarm[analogData->channelNb] = false;
-      if(CheckOutputsOff(Alarm, (uint8_t)NB_ANALOG_CHANNELS))
+      ProtectedFlagUpdate(&Alarm[analogData->channelNb], false, AlarmMutex);
+      if(ProtectedCheckFlagsOff(Alarm, (uint8_t)NB_ANALOG_CHANNELS, AlarmMutex))
       {
-        Analog_Put(3, DAC_0V_OUT);
+        ProtectedAnalogPut(3, DAC_0V_OUT);
       }
-      OS_EnableInterrupts();
 
-      OS_DisableInterrupts();
-      Adjusting[analogData->channelNb] = false;
-      if(CheckOutputsOff(Adjusting, (uint8_t)NB_ANALOG_CHANNELS))
+      ProtectedFlagUpdate(&Adjusting[analogData->channelNb], false, AdjustingMutex);
+      if(ProtectedCheckFlagsOff(Adjusting, (uint8_t)NB_ANALOG_CHANNELS, AdjustingMutex))
       {
         switchOffAdjusting = true;
       }
 
       if(switchOffAdjusting)
       {
-        OS_DisableInterrupts();
-        Analog_Put(1, DAC_0V_OUT);
-        OS_EnableInterrupts();
+        ProtectedAnalogPut(1, DAC_0V_OUT);
+        ProtectedAnalogPut(2, DAC_0V_OUT);
 
-        OS_DisableInterrupts();
-        Analog_Put(2, DAC_0V_OUT);
-        OS_EnableInterrupts();
       }
       OutOfRangeTimer = 5000000000;
       adjusting = false;
@@ -1344,7 +1374,6 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
     underVoltage = false;
   }
 }
-
 
 
 
