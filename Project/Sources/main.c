@@ -257,34 +257,6 @@ void ProtectedUint32Put(uint32_t* pAddress, uint32_t variable, OS_ECB* mutex)
   OS_SemaphoreSignal(mutex);
 }
 
-///*! @brief Reads a float with mutex access
-// *
-// *  @param pVariable The address of the variable.
-// *  @param mutex The mutex semaphore to access the variable
-// *  @return float The variable
-// */
-//float ProtectedFloatGet(float* pVariable, OS_ECB* mutex)
-//{
-//  float localRead;
-//  OS_SemaphoreWait(mutex, 0);
-//  localRead = *pVariable;
-//  OS_SemaphoreSignal(mutex);
-//  return localRead;
-//}
-//
-///*! @brief Puts a float into an address with mutex access
-// *
-// *  @param pAddress The address of the variable.
-// *  @param variable The variable to put in the address
-// *  @param mutex The mutex semaphore to access the variable to be overwritten
-// *  @return void
-// */
-//void ProtectedFloatPut(float* pAddress, float variable, OS_ECB* mutex)
-//{
-//  OS_SemaphoreWait(mutex, 0);
-//  *pAddress = variable;
-//  OS_SemaphoreSignal(mutex);
-//}
 
 /*! @brief Calls Analog_Put with interrupts disabled.
  *
@@ -574,7 +546,7 @@ bool HandleTowerFrequency(void)
     // Get a local copy of Frequency
     uint16_t localFrequency = ProtectedUint16Get(&Frequency, FrequencyMutex);
 
-    // Type-cast  as a uint16 to be sent to PC.
+    // Type-cast as a uint16  and convert to dHz to be sent to PC.
     frequency.l = (uint16_t)(localFrequency / 100);
 
     // Check if we need to round up
@@ -1186,7 +1158,7 @@ static void FrequencyCalculateThread(void* pData)
                          / NB_ANALOG_CHANNELS)/ nanoSecondPerTick) * nanoSecondPerTick) * NB_ANALOG_CHANNELS);
 
 
-      // From the period (in number of sample periods) and the sample period, work out the frequency.
+      // From the period (in number of sample periods) and the sample period, work out the frequency in mHz.
       frequency = (uint16_t)((uint32_t)1000000000 / ((period * (samplePeriod / 1000))));
 
       // Update the Frequency
