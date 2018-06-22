@@ -1106,10 +1106,10 @@ static void FrequencyCalculateThread(void* pData)
   uint32_t samplePeriod;
   uint16_t rms;
   uint8_t crossingCount;
-  float risingCrossings[10];
-  float lastCrossing;
-  float frequency;
-  float period;
+  uint32_t risingCrossings[10];
+  uint32_t lastCrossing;
+  uint32_t frequency;
+  uint32_t period;
 
   for (;;)
   {
@@ -1142,7 +1142,7 @@ static void FrequencyCalculateThread(void* pData)
         {
           uint16_t m = (uint16_t)(localSamples.ADC_Data[i + 1]) - (localSamples.ADC_Data[i]);
           int16_t b = localSamples.ADC_Data[i];
-          risingCrossings[crossingCount] = (float)(i + (((float)-b) / ((float)m)));
+          risingCrossings[crossingCount] = (i * 1000) + ((((-b) * 1000) / m));
           crossingCount ++;
         }
       }
@@ -1151,36 +1151,36 @@ static void FrequencyCalculateThread(void* pData)
       if(crossingCount == 1)
       {
         // Calculate the period
-        period = (float)(((float)ADC_SAMPLES_PER_CYCLE + risingCrossings[crossingCount -1]) - lastCrossing);
+        period = ((ADC_SAMPLES_PER_CYCLE + risingCrossings[crossingCount -1]) - lastCrossing);
 
         // Update the last crossing
-        lastCrossing = risingCrossings[crossingCount - 1] -((crossingCount -1) * ((float)ADC_SAMPLES_PER_CYCLE));
+        lastCrossing = risingCrossings[crossingCount - 1] -((crossingCount -1) * ADC_SAMPLES_PER_CYCLE);
       }
 
       // If we have a larger buffer, or if it is equal but the frequency has increased we could get more than 1 rising crossing from the sample
       else if(crossingCount > 1)
       {
-        period = ((risingCrossings[crossingCount - 1]) - risingCrossings[0]) / (float)(crossingCount - 1);
+        period = ((risingCrossings[crossingCount - 1]) - risingCrossings[0]) / (crossingCount - 1);
 
         // Update the last crossing
-        lastCrossing = risingCrossings[crossingCount - 1] -((crossingCount -1) * ((float)ADC_SAMPLES_PER_CYCLE));
+        lastCrossing = risingCrossings[crossingCount - 1] -((crossingCount -1) * (ADC_SAMPLES_PER_CYCLE));
       }
 
       // If we have a buffer size equal to the number of samples per cycle, we could get no crossings if the frequency has dropped.
       else if(crossingCount == 0)
       {
         //Update the last crossing as a negative number so it can be used normally next time around. Do not update period in this round.
-        lastCrossing -= (float)ADC_SAMPLES_PER_CYCLE;
+        lastCrossing -= ADC_SAMPLES_PER_CYCLE;
       }
 
       // Find the period in nanoseconds.
       // Truncate the same way PIT does to ensure no difference to actual sample rate (including when pit samples faster for several channels)
       uint32_t nanoSecondPerTick = 1000000000 / CPU_BUS_CLK_HZ;
-      newSamplePeriod = (uint32_t)(((((uint32_t)(((float)(period * samplePeriod) / (float)ADC_SAMPLES_PER_CYCLE))
+      newSamplePeriod = (uint32_t)(((((uint32_t)((((uint64_t)period * samplePeriod) /(1000 * ADC_SAMPLES_PER_CYCLE)))
                          / NB_ANALOG_CHANNELS)/ nanoSecondPerTick) * nanoSecondPerTick) * NB_ANALOG_CHANNELS);
 
       // From the period (in number of sample periods) and the sample period, work out the frequency in mHz.
-      frequency = (uint16_t)((uint32_t)1000000000 / ((period * (samplePeriod / 1000))));
+      frequency = (uint16_t)((uint64_t)1000000000000 / ((period * (samplePeriod / 1000))));
 
       // Update the Frequency
       ProtectedUint16Put(&Frequency, (uint16)frequency, FrequencyMutex);
