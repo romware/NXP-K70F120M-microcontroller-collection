@@ -178,6 +178,9 @@ static OS_ECB* AdjustingMutex;                                        /*!< Adjus
 static OS_ECB* RMSCalculationDataMutex;                               /*!< RMS Calculation Data Access Mutex */
 static OS_ECB* SamplePeriodMutex;                                     /*!< Sample Period Access Mutex */
 static OS_ECB* NewSamplePeriodMutex;                                  /*!< New Sample Period Access Mutex */
+static OS_ECB* FrequencyMutex;                                        /*!< Frequency Access Mutex */
+static OS_ECB* RMSMutex;                                              /*!< RMS Access Mutex */
+static OS_ECB* TimingModeMutex;                                       /*!< Timing Mode Access Mutex */
 
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);           /*!< The stack for the Tower Init thread. */
@@ -192,7 +195,6 @@ OS_THREAD_STACK(LogLowersThreadStack, THREAD_STACK_SIZE);             /*!< The s
 OS_THREAD_STACK(FFTThreadStack, 2000);                                /*!< The stack for the Log Lowers thread. */
 static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS]
                 [THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));  /*!< The thread stack array for RMS threads */
-
 
 
 /*! @brief Reads a word with mutex access
@@ -228,7 +230,7 @@ void ProtectedUint16Put(uint16_t* pAddress, uint16_t variable, OS_ECB* mutex)
  *
  *  @param pVariable The address of the variable.
  *  @param mutex The mutex semaphore to access the variable
- *  @return uint16_t The variable
+ *  @return uint32_t The variable
  */
 uint32_t ProtectedUint32Get(uint32* pVariable, OS_ECB* mutex)
 {
@@ -252,6 +254,36 @@ void ProtectedUint32Put(uint32_t* pAddress, uint32_t variable, OS_ECB* mutex)
   *pAddress = variable;
   OS_SemaphoreSignal(mutex);
 }
+
+/*! @brief Reads a float with mutex access
+ *
+ *  @param pVariable The address of the variable.
+ *  @param mutex The mutex semaphore to access the variable
+ *  @return float The variable
+ */
+float ProtectedFloatGet(float* pVariable, OS_ECB* mutex)
+{
+  float localRead;
+  OS_SemaphoreWait(mutex, 0);
+  localRead = *pVariable;
+  OS_SemaphoreSignal(mutex);
+  return localRead;
+}
+
+/*! @brief Puts a float into an address with mutex access
+ *
+ *  @param pAddress The address of the variable.
+ *  @param variable The variable to put in the address
+ *  @param mutex The mutex semaphore to access the variable to be overwritten
+ *  @return void
+ */
+void ProtectedFloatPut(float* pAddress, float variable, OS_ECB* mutex)
+{
+  OS_SemaphoreWait(mutex, 0);
+  *pAddress = variable;
+  OS_SemaphoreSignal(mutex);
+}
+
 /*! @brief Calls Analog_Put with interrupts disabled.
  *
  *  @param channelNb The number of the analog output channel to send the value to.
@@ -478,9 +510,7 @@ bool HandleTowerTimingMode(void)
     // Set Timing Mode
     if (Flash_Write((uint8_t*)NvTimingMd,(uint8_t)Packet_Parameter1, (uint8_t)8))
     {
-      OS_DisableInterrupts();
-      TimingMode = _FB(NvTimingMd);
-      OS_EnableInterrupts();
+      ProtectedUint16Put(&TimingMode, _FB(NvTimingMd), TimingModeMutex);
       return true;
     }
   }
@@ -539,10 +569,8 @@ bool HandleTowerFrequency(void)
   // Check if parameters are within limits
   if(Packet_Parameter1 == 0 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
-    // Disable interrupts to read variable.
-    OS_DisableInterrupts();
-    float localFrequency = Frequency;
-    OS_EnableInterrupts();
+    // Get a local copy of Frequency
+    float localFrequency = ProtectedFloatGet(&Frequency, FrequencyMutex);
 
     // Round to the nearest 0.1Hz
     float roundedFrequencyBy10 = roundf((localFrequency * (float)10));
@@ -885,6 +913,9 @@ static void InitModulesThread(void* pData)
   RMSCalculationDataMutex     = OS_SemaphoreCreate(1);
   SamplePeriodMutex           = OS_SemaphoreCreate(1);
   NewSamplePeriodMutex        = OS_SemaphoreCreate(1);
+  FrequencyMutex              = OS_SemaphoreCreate(1);
+  RMSMutex                    = OS_SemaphoreCreate(1);
+  TimingModeMutex             = OS_SemaphoreCreate(1);
 
 
   // Create semaphore for RMS channels
@@ -1087,16 +1118,14 @@ static void FrequencyCalculateThread(void* pData)
     OS_SemaphoreWait(FrequencyCalculateSemaphore,0);
 
     // Get a local copy of phase A RMS,
-    OS_DisableInterrupts();
-    rms = RMS[0];
-    OS_EnableInterrupts();
+    rms = ProtectedUint16Get(&(RMS[0]), RMSMutex);
 
     samplePeriod = ProtectedUint32Get(&SamplePeriod, SamplePeriodMutex);
 
     // Check if RMS is in the frequency reading range
     if(rms > RMS_FREQUENCY_MIN)
     {
-      // Get a local copy that cannot be modified by another tread
+      // Get a local copy that cannot be modified by and interrupt
       OS_DisableInterrupts();
       for(uint8_t i = 0; i < ADC_BUFFER_SIZE; i++)
       {
@@ -1153,16 +1182,14 @@ static void FrequencyCalculateThread(void* pData)
 
 
       // From the period (in number of sample periods) and the sample period, work out the frequency.
-      OS_DisableInterrupts();
       frequency = (float)1000000000 / (period * samplePeriod);
-      Frequency = frequency;
-      OS_DisableInterrupts();
+
+      // Update the Frequency
+      ProtectedFloatPut(&Frequency, frequency, FrequencyMutex);
 
       // Update sample periods (for use by Frequency track thread and this thread)
-      uint32_t locNewSamplePeriod = ProtectedUint32Get(&NewSamplePeriod, NewSamplePeriodMutex);
-      ProtectedUint32Put(&SamplePeriod, locNewSamplePeriod, SamplePeriodMutex);
-      // SamplePeriod = NewSamplePeriod;
-      // NewSamplePeriod = newSamplePeriod;
+      uint32_t dummyNewSamplePeriod = ProtectedUint32Get(&NewSamplePeriod, NewSamplePeriodMutex);
+      ProtectedUint32Put(&SamplePeriod, dummyNewSamplePeriod, SamplePeriodMutex);
       ProtectedUint32Put(&NewSamplePeriod, newSamplePeriod, NewSamplePeriodMutex);
     }
   }
@@ -1211,7 +1238,7 @@ float FastSqrt(float square, float lastRoot, float accuracy)
 uint16_t UpdateRMSFast(int16_t* const pRemoveData, int64_t* const pPreviousSumOfSquares, const int16_t latestData,
                        const int16_t oldestData, const uint8_t dataSize, const uint16_t lastRMS, OS_ECB* mutex)
 {
-  // Gain exlusive access to global variables
+  // Gain exclusive access to global variables
   OS_SemaphoreWait(mutex, 0);
 
   // Cast to int32_t to avoid calculations later
@@ -1325,14 +1352,8 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
     rms = UpdateRMSFast(&(OldestData[analogData->channelNb]), &(LastSumOfSquares[analogData->channelNb]),
                             latestSample, oldestSample, ADC_BUFFER_SIZE, RMS[analogData->channelNb], RMSCalculationDataMutex);
 
-    OS_DisableInterrupts();
-
-    // Update global RMS variable, disabling interrupts to restrict access during operation.
-    OS_DisableInterrupts();
-
-    RMS[analogData->channelNb] = rms;
-
-    OS_EnableInterrupts();
+    // Update global RMS variable
+    ProtectedUint16Put(&(RMS[analogData->channelNb]), rms, RMSMutex);
 
     // Check if data is in limits
     if(rms > RMS_UPPER_LIMIT)
@@ -1360,14 +1381,14 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
     if(alarm && !adjusting)
     {
       uint32_t samplePeriod = ProtectedUint32Get(&SamplePeriod, SamplePeriodMutex);
-      if(TimingMode == TIMING_DEFINITE)
+      if(ProtectedUint16Get(&TimingMode, TimingModeMutex) == TIMING_DEFINITE)
       {
         OutOfRangeTimer -= samplePeriod;
 
         // Keep track of actual time
         minTimeCheck += samplePeriod;
       }
-      else if(TimingMode == TIMING_INVERSE)
+      else if(ProtectedUint16Get(&TimingMode, TimingModeMutex) == TIMING_INVERSE)
       {
         if(overVoltage)
         {
