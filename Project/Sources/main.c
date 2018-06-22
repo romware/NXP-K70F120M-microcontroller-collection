@@ -98,7 +98,7 @@ static OS_ECB* FrequencySemaphore;                           /*!< Frequency sema
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);  /*!< The stack for the Tower Init thread. */
 OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);   /*!< The stack for the FTM thread. */
-OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE*4);       /*!< The stack for the Packet thread. TODO:size */
+OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Packet thread. TODO:size */
 OS_THREAD_STACK(RaisesThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Flash Raises thread. */
 OS_THREAD_STACK(LowersThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Flash Lowers thread. */
 OS_THREAD_STACK(FrequencyThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the frequency thread. */
