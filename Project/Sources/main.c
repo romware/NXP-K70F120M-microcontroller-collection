@@ -71,12 +71,18 @@
 #define ALARM_TIMER 5000000000                  /*!< Alarm Timer in nanoSeconds */
 #define ALARM_TIMER_MIN 1000000000              /*!< Minimum Alarm Timer in nanoSeconds */
 
+/*! @brief Data structure used to hold ADC voltage samples
+ *
+ */
 typedef struct
 {
   int16_t ADC_Data[ADC_BUFFER_SIZE];
   uint8_t LatestData;
 }TVoltageData;
 
+/*! @brief Data structure for enumerated timing parameters
+ *
+ */
 typedef enum
 {
   TIMING_GET,
@@ -111,7 +117,6 @@ static TAnalogThreadData AnalogThreadData[NB_ANALOG_CHANNELS] =
     .channelNb = 2
   }
 };
-
 
 // Thread priorities for analog threads
 const uint8_t ANALOG_THREAD_PRIORITIES[NB_ANALOG_CHANNELS] = {7,8,9}; /*!< The array of analog thread priorities */
@@ -197,7 +202,6 @@ OS_THREAD_STACK(LogLowersThreadStack, THREAD_STACK_SIZE);             /*!< The s
 OS_THREAD_STACK(FFTThreadStack, 2000);                                /*!< The stack for the Log Lowers thread. */
 static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS]
                 [THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));  /*!< The thread stack array for RMS threads */
-
 
 /*! @brief Calculates the square root of a float quickly by knowing the previous value of the square.
  *
@@ -632,7 +636,6 @@ bool HandleTowerHarmonic(void)
   return false;
 }
 
-
 /*! @brief Executes the command depending on what packet has been received
  *
  *  @return void
@@ -733,7 +736,6 @@ void ReceivedPacket(void)
   Packet_Parameter3 = 0;
   Packet_Checksum   = 0;
 }
-
 
 /*! @brief Reads data from the analog channels and signals semaphores for RMS and Frequency treads
  *
@@ -916,7 +918,6 @@ static void InitModulesThread(void* pData)
   RMSMutex                    = OS_SemaphoreCreate(1);
   TimingModeMutex             = OS_SemaphoreCreate(1);
 
-
   // Create semaphore for RMS channels
   for (uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
   {
@@ -1039,7 +1040,6 @@ static void LogRaisesThread(void* pData)
 
     // Release access to flash
     OS_SemaphoreSignal(FlashAccessMutex);
-
   }
 }
 
@@ -1179,7 +1179,6 @@ static void FrequencyCalculateThread(void* pData)
       newSamplePeriod = (uint32_t)(((((uint32_t)(((float)(period * samplePeriod) / (float)ADC_SAMPLES_PER_CYCLE))
                          / NB_ANALOG_CHANNELS)/ nanoSecondPerTick) * nanoSecondPerTick) * NB_ANALOG_CHANNELS);
 
-
       // From the period (in number of sample periods) and the sample period, work out the frequency in mHz.
       frequency = (uint16_t)((uint32_t)1000000000 / ((period * (samplePeriod / 1000))));
 
@@ -1193,8 +1192,6 @@ static void FrequencyCalculateThread(void* pData)
     }
   }
 }
-
-
 
 /*! @brief Updates the RMS using the previous sum of squares to save time. From testing it take around 64us vs 112us from scratch.
  *
@@ -1238,8 +1235,6 @@ uint16_t UpdateRMSFast(int16_t* const pRemoveData, int64_t* const pPreviousSumOf
   // Return the calculated RMS
   return (uint16_t)FastSqrt(newSumOfSquares /dataSize, lastRMS, 1);
 }
-
-
 
 /*! @brief Gets the RMS, checks limits and handles alarms and raise/lower timing
  *
@@ -1408,8 +1403,6 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
   }
 }
 
-
-
 /*! @brief Turns the Blue LED off after the timer is complete
  *
  *  @param pData is not used but is required by the OS to create a thread.
@@ -1438,7 +1431,6 @@ static void FFTThread(void* pData)
    size_t size = 500;                                                 /*!< Size of memory allocated for kiss_fftr_cfg*/
    kiss_fft_scalar fftInput[ADC_SAMPLES_PER_CYCLE];                   /*!< Scalar array for input data*/
    kiss_fft_cpx fftOutput[(ADC_SAMPLES_PER_CYCLE / 2) + 1];           /*!< Complex array for output data */
-
 
   for (;;)
   {
@@ -1533,8 +1525,6 @@ int main(void)
                           NULL,
                           &RTCThreadStack[THREAD_STACK_SIZE - 1],
                           30);
-
-
 
   // Start multithreading - never returns!
   OS_Start();

@@ -2267,7 +2267,7 @@ LOAD c:/freescale/kds_3.0.0/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv7e-
                 0x00000fe9       0x22 c:/freescale/kds_3.0.0/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv7e-m/fpu/crtn.o
 OUTPUT(Project.elf elf32-littlearm)
 
-.debug_info     0x00000000     0x9a12
+.debug_info     0x00000000     0x9a16
  .debug_info    0x00000000      0x20b ./Sources/FIFO.o
  .debug_info    0x0000020b      0x797 ./Sources/FTM.o
  .debug_info    0x000009a2      0x974 ./Sources/Flash.o
@@ -2279,16 +2279,16 @@ OUTPUT(Project.elf elf32-littlearm)
  .debug_info    0x00003723      0x9af ./Sources/accel.o
  .debug_info    0x000040d2      0x7b1 ./Sources/kiss_fft.o
  .debug_info    0x00004883      0xb8b ./Sources/kiss_fftr.o
- .debug_info    0x0000540e     0x15bb ./Sources/main.o
- .debug_info    0x000069c9      0x2ff ./Sources/packet.o
- .debug_info    0x00006cc8      0x3b0 ./Project_Settings/Startup_Code/startup.o
- .debug_info    0x00007078      0xc82 ./Generated_Code/Cpu.o
- .debug_info    0x00007cfa      0x14c ./Generated_Code/Vectors.o
- .debug_info    0x00007e46      0xd02 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
- .debug_info    0x00008b48      0x46a D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
- .debug_info    0x00008fb2      0xa60 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
+ .debug_info    0x0000540e     0x15bf ./Sources/main.o
+ .debug_info    0x000069cd      0x2ff ./Sources/packet.o
+ .debug_info    0x00006ccc      0x3b0 ./Project_Settings/Startup_Code/startup.o
+ .debug_info    0x0000707c      0xc82 ./Generated_Code/Cpu.o
+ .debug_info    0x00007cfe      0x14c ./Generated_Code/Vectors.o
+ .debug_info    0x00007e4a      0xd02 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
+ .debug_info    0x00008b4c      0x46a D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
+ .debug_info    0x00008fb6      0xa60 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
 
-.debug_abbrev   0x00000000     0x2047
+.debug_abbrev   0x00000000     0x202d
  .debug_abbrev  0x00000000       0xce ./Sources/FIFO.o
  .debug_abbrev  0x000000ce      0x1d2 ./Sources/FTM.o
  .debug_abbrev  0x000002a0      0x23c ./Sources/Flash.o
@@ -2300,14 +2300,14 @@ OUTPUT(Project.elf elf32-littlearm)
  .debug_abbrev  0x00000d3d      0x207 ./Sources/accel.o
  .debug_abbrev  0x00000f44      0x1dd ./Sources/kiss_fft.o
  .debug_abbrev  0x00001121      0x1f3 ./Sources/kiss_fftr.o
- .debug_abbrev  0x00001314      0x268 ./Sources/main.o
- .debug_abbrev  0x0000157c       0xec ./Sources/packet.o
- .debug_abbrev  0x00001668      0x189 ./Project_Settings/Startup_Code/startup.o
- .debug_abbrev  0x000017f1      0x185 ./Generated_Code/Cpu.o
- .debug_abbrev  0x00001976       0xb3 ./Generated_Code/Vectors.o
- .debug_abbrev  0x00001a29      0x2f8 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
- .debug_abbrev  0x00001d21      0x151 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
- .debug_abbrev  0x00001e72      0x1d5 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
+ .debug_abbrev  0x00001314      0x24e ./Sources/main.o
+ .debug_abbrev  0x00001562       0xec ./Sources/packet.o
+ .debug_abbrev  0x0000164e      0x189 ./Project_Settings/Startup_Code/startup.o
+ .debug_abbrev  0x000017d7      0x185 ./Generated_Code/Cpu.o
+ .debug_abbrev  0x0000195c       0xb3 ./Generated_Code/Vectors.o
+ .debug_abbrev  0x00001a0f      0x2f8 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
+ .debug_abbrev  0x00001d07      0x151 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
+ .debug_abbrev  0x00001e58      0x1d5 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
 
 .debug_aranges  0x00000000      0x6a8
  .debug_aranges
