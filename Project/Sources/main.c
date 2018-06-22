@@ -159,7 +159,7 @@ static int64_t LastSumOfSquares[NB_ANALOG_CHANNELS];                  /*!< The a
 static int16_t OldestData[NB_ANALOG_CHANNELS];                        /*!< The array of the oldest ADC sample to be removed from sum of squares */
 static bool Alarm[NB_ANALOG_CHANNELS];                                /*!< The array of alarm flags indicating individual thread alarm states */
 static bool Adjusting[NB_ANALOG_CHANNELS];                            /*!< The array of adjusting flags indicating individual thread adjusting states */
-static float Frequency;                                               /*!< The frequency of phase A */
+static uint16_t Frequency;                                               /*!< The frequency of phase A */
 kiss_fft_cpx FFTOutput[(ADC_SAMPLES_PER_CYCLE / 2) + 1];              /*!< Complex array for output data */
 
 // Semaphores for use by RTOS
@@ -257,34 +257,34 @@ void ProtectedUint32Put(uint32_t* pAddress, uint32_t variable, OS_ECB* mutex)
   OS_SemaphoreSignal(mutex);
 }
 
-/*! @brief Reads a float with mutex access
- *
- *  @param pVariable The address of the variable.
- *  @param mutex The mutex semaphore to access the variable
- *  @return float The variable
- */
-float ProtectedFloatGet(float* pVariable, OS_ECB* mutex)
-{
-  float localRead;
-  OS_SemaphoreWait(mutex, 0);
-  localRead = *pVariable;
-  OS_SemaphoreSignal(mutex);
-  return localRead;
-}
-
-/*! @brief Puts a float into an address with mutex access
- *
- *  @param pAddress The address of the variable.
- *  @param variable The variable to put in the address
- *  @param mutex The mutex semaphore to access the variable to be overwritten
- *  @return void
- */
-void ProtectedFloatPut(float* pAddress, float variable, OS_ECB* mutex)
-{
-  OS_SemaphoreWait(mutex, 0);
-  *pAddress = variable;
-  OS_SemaphoreSignal(mutex);
-}
+///*! @brief Reads a float with mutex access
+// *
+// *  @param pVariable The address of the variable.
+// *  @param mutex The mutex semaphore to access the variable
+// *  @return float The variable
+// */
+//float ProtectedFloatGet(float* pVariable, OS_ECB* mutex)
+//{
+//  float localRead;
+//  OS_SemaphoreWait(mutex, 0);
+//  localRead = *pVariable;
+//  OS_SemaphoreSignal(mutex);
+//  return localRead;
+//}
+//
+///*! @brief Puts a float into an address with mutex access
+// *
+// *  @param pAddress The address of the variable.
+// *  @param variable The variable to put in the address
+// *  @param mutex The mutex semaphore to access the variable to be overwritten
+// *  @return void
+// */
+//void ProtectedFloatPut(float* pAddress, float variable, OS_ECB* mutex)
+//{
+//  OS_SemaphoreWait(mutex, 0);
+//  *pAddress = variable;
+//  OS_SemaphoreSignal(mutex);
+//}
 
 /*! @brief Calls Analog_Put with interrupts disabled.
  *
@@ -572,13 +572,16 @@ bool HandleTowerFrequency(void)
   if(Packet_Parameter1 == 0 && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Get a local copy of Frequency
-    float localFrequency = ProtectedFloatGet(&Frequency, FrequencyMutex);
-
-    // Round to the nearest 0.1Hz
-    float roundedFrequencyBy10 = roundf((localFrequency * (float)10));
+    uint16_t localFrequency = ProtectedUint16Get(&Frequency, FrequencyMutex);
 
     // Type-cast  as a uint16 to be sent to PC.
-    frequency.l = (uint16_t)roundedFrequencyBy10;
+    frequency.l = (uint16_t)(localFrequency / 100);
+
+    // Check if we need to round up
+    if(localFrequency % 100 >= 50)
+    {
+      frequency.l ++;
+    }
 
     // Send frequency to PC
     return Packet_Put(COMMAND_FREQUENCY, frequency.s.Hi, frequency.s.Lo, 0);
@@ -1184,10 +1187,10 @@ static void FrequencyCalculateThread(void* pData)
 
 
       // From the period (in number of sample periods) and the sample period, work out the frequency.
-      frequency = (float)1000000000 / (period * samplePeriod);
+      frequency = (uint16_t)((uint32_t)1000000000 / ((period * (samplePeriod / 1000))));
 
       // Update the Frequency
-      ProtectedFloatPut(&Frequency, frequency, FrequencyMutex);
+      ProtectedUint16Put(&Frequency, (uint16)frequency, FrequencyMutex);
 
       // Update sample periods (for use by Frequency track thread and this thread)
       uint32_t dummyNewSamplePeriod = ProtectedUint32Get(&NewSamplePeriod, NewSamplePeriodMutex);
