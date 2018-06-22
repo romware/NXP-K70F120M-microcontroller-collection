@@ -280,8 +280,18 @@ bool Flash_AllocateVar(volatile void** variable, const uint8_t size)
  */
 bool Flash_Erase(void)
 {
+  bool success = false;
+
+  // Gain access to flash
+  OS_SemaphoreWait(FlashAccessMutex, 0);
+
   // Erase the Flash sector with the Flash Data Start address
-  return EraseSector(FLASH_DATA_START);
+  success = EraseSector(FLASH_DATA_START);
+
+  // Release access
+  OS_SemaphoreSignal(FlashAccessMutex);
+
+  return success;
 }
 
 
@@ -295,7 +305,7 @@ bool Flash_Erase(void)
 static bool WritePhrase(const uint32_t address, const uint64union_t phrase)
 {
   // Erase Flash before writing
-  if(Flash_Erase())
+  if(EraseSector(FLASH_DATA_START))
   {
     // Initialize a local TFCCOB structure
     TFCCOB commonCommandObject;

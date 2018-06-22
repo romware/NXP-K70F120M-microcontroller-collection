@@ -67,6 +67,7 @@
 #define RMS_FREQUENCY_MIN  4915                 /*!< VRR RMS frequency measure minimum level */
 #define DAC_5V_OUT         16384                /*!< DAC 5 volts out */
 #define DAC_0V_OUT          0                   /*!< DAC 0 volts out */
+#define ADC_HALF_VOLT      1638                 /*!< ADC Half Volt */
 
 typedef struct
 {
@@ -175,6 +176,8 @@ static OS_ECB* FFTOutputMutex;                                        /*!< FFTOu
 static OS_ECB* AlarmMutex;                                            /*!< Alarm Flag Access Mutex */
 static OS_ECB* AdjustingMutex;                                        /*!< Adjusting Flag Access Mutex */
 static OS_ECB* RMSCalculationDataMutex;                               /*!< RMS Calculation Data Access Mutex */
+static OS_ECB* SamplePeriodMutex;                                     /*!< Sample Period Access Mutex */
+static OS_ECB* NewSamplePeriodMutex;                                  /*!< New Sample Period Access Mutex */
 
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);           /*!< The stack for the Tower Init thread. */
@@ -191,10 +194,68 @@ static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS]
                 [THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));  /*!< The thread stack array for RMS threads */
 
 
+
+/*! @brief Reads a word with mutex access
+ *
+ *  @param pVariable The address of the variable.
+ *  @param mutex The mutex semaphore to access the variable
+ *  @return uint16_t The variable
+ */
+uint16_t ProtectedUint16Get(uint16* pVariable, OS_ECB* mutex)
+{
+  uint16_t halfword;
+  OS_SemaphoreWait(mutex, 0);
+  halfword = *pVariable;
+  OS_SemaphoreSignal(mutex);
+  return halfword;
+}
+
+/*! @brief Puts a halfword into an address with mutex access
+ *
+ *  @param pAddress The address of the variable.
+ *  @param variable The variable to put in the address
+ *  @param mutex The mutex semaphore to access the variable to be overwritten
+ *  @return void
+ */
+void ProtectedUint16Put(uint16_t* pAddress, uint16_t variable, OS_ECB* mutex)
+{
+  OS_SemaphoreWait(mutex, 0);
+  *pAddress = variable;
+  OS_SemaphoreSignal(mutex);
+}
+
+/*! @brief Reads a word with mutex access
+ *
+ *  @param pVariable The address of the variable.
+ *  @param mutex The mutex semaphore to access the variable
+ *  @return uint16_t The variable
+ */
+uint32_t ProtectedUint32Get(uint32* pVariable, OS_ECB* mutex)
+{
+  uint32_t word;
+  OS_SemaphoreWait(mutex, 0);
+  word = *pVariable;
+  OS_SemaphoreSignal(mutex);
+  return word;
+}
+
+/*! @brief Puts a word into an address with mutex access
+ *
+ *  @param pAddress The address of the variable.
+ *  @param variable The variable to put in the address
+ *  @param mutex The mutex semaphore to access the variable to be overwritten
+ *  @return void
+ */
+void ProtectedUint32Put(uint32_t* pAddress, uint32_t variable, OS_ECB* mutex)
+{
+  OS_SemaphoreWait(mutex, 0);
+  *pAddress = variable;
+  OS_SemaphoreSignal(mutex);
+}
 /*! @brief Calls Analog_Put with interrupts disabled.
  *
- *  @param channelNb is the number of the analog output channel to send the value to.
- *  @param value is the value to write to the analog channel.
+ *  @param channelNb The number of the analog output channel to send the value to.
+ *  @param value The value to write to the analog channel.
  *  @return bool - true if the analog value was output successfully.
  */
 bool ProtectedAnalogPut(uint8_t const channelNb, int16_t const value)
@@ -212,7 +273,7 @@ bool ProtectedAnalogPut(uint8_t const channelNb, int16_t const value)
  *  @param size The number of elements in the array
  *  @return void
  */
-void FFTProtectedPut(kiss_fft_cpx* fftOutput, uint8_t size)
+void ProtectedFFTPut(kiss_fft_cpx* fftOutput, uint8_t size)
 {
   // Gain exclusive access to data
   OS_SemaphoreWait(FFTOutputMutex, 0);
@@ -226,13 +287,13 @@ void FFTProtectedPut(kiss_fft_cpx* fftOutput, uint8_t size)
   // Release exclusive access to data
   OS_SemaphoreSignal(FFTOutputMutex);
 }
-
 /*! @brief Gets a harmonic magnitude from a global array off FFT frequency bins. Uses Mutex access.
  *
  *  @param The harmonic number
  *  @return void
  */
-uint16_t FFTProtectedGet(uint8_t harmonic)
+
+uint16_t ProtectedFFTGet(uint8_t harmonic)
 {
   // Gain exclusive access to data
   OS_SemaphoreWait(FFTOutputMutex, 0);
@@ -248,6 +309,40 @@ uint16_t FFTProtectedGet(uint8_t harmonic)
   // Also, this function is only executed on demand from PC.
   return (uint16_t)(sqrt((localVoltage.r * localVoltage.r) + (localVoltage.i * localVoltage.i)) / (ADC_SAMPLES_PER_CYCLE / 2));
 }
+/*! @brief Checks that no other analog thread has an output set
+ *
+ *  @param outputs[] The array of flags
+ *  @param nboutputs The number of flags in the array
+ *  @param mutex The mutex to the flag/flag array
+ *  @return bool - TRUE if all flags are false
+ */
+
+bool ProtectedCheckFlagsOff(const bool  flags[], const uint8_t nbFlags, OS_ECB* mutex)
+{
+  OS_SemaphoreWait(mutex,0);
+  bool set = false;
+  for (uint8_t i = 0; i < nbFlags; i++)
+  {
+    set |= flags[i];
+  }
+  OS_SemaphoreSignal(mutex);
+  return !set;
+}
+
+/*! @brief Updates a flag with mutex access
+ *
+ *  @param flag The flag to be updated
+ *  @param flagValue The new value of the flag
+ *  @param mutex The mutex to the flag/flag array
+ *  @return void
+ */
+void ProtectedFlagUpdate(bool* flag, const bool flagValue, OS_ECB* mutex)
+{
+  OS_SemaphoreWait(mutex,0);
+  *flag = flagValue;
+  OS_SemaphoreSignal(mutex);
+}
+
 
 /*! @brief Sends the startup packets to the PC
  *
@@ -500,7 +595,7 @@ bool HandleTowerHarmonic(void)
   {
     OS_DisableInterrupts();
 
-    magnitude.l = FFTProtectedGet(Packet_Parameter1);
+    magnitude.l = ProtectedFFTGet(Packet_Parameter1);
 
     OS_EnableInterrupts();
 
@@ -788,6 +883,9 @@ static void InitModulesThread(void* pData)
   AlarmMutex                  = OS_SemaphoreCreate(1);
   AdjustingMutex              = OS_SemaphoreCreate(1);
   RMSCalculationDataMutex     = OS_SemaphoreCreate(1);
+  SamplePeriodMutex           = OS_SemaphoreCreate(1);
+  NewSamplePeriodMutex        = OS_SemaphoreCreate(1);
+
 
   // Create semaphore for RMS channels
   for (uint8_t i = 0; i < NB_ANALOG_CHANNELS; i++)
@@ -951,14 +1049,17 @@ static void LogLowersThread(void* pData)
 static void FrequencyTrackThread(void* pData)
 {
   uint8_t events;
+
   for (;;)
   {
     // Wait for Frequency Track semaphore
     OS_SemaphoreWait(FrequencyTrackSemaphore,0);
 
+    uint32_t newSamplePeriod = ProtectedUint32Get(&NewSamplePeriod, NewSamplePeriodMutex);
+
     // Set New PIT sample period
     OS_DisableInterrupts();
-    PIT_Set((uint32_t)(NewSamplePeriod / NB_ANALOG_CHANNELS), false);
+    PIT_Set((uint32_t)(newSamplePeriod / NB_ANALOG_CHANNELS), false);
     OS_EnableInterrupts();
   }
 }
@@ -972,6 +1073,7 @@ static void FrequencyCalculateThread(void* pData)
 {
   TVoltageData localSamples;
   uint32_t newSamplePeriod;
+  uint32_t samplePeriod;
   uint16_t rms;
   uint8_t crossingCount;
   float risingCrossings[10];
@@ -987,7 +1089,9 @@ static void FrequencyCalculateThread(void* pData)
     // Get a local copy of phase A RMS,
     OS_DisableInterrupts();
     rms = RMS[0];
-    OS_DisableInterrupts();
+    OS_EnableInterrupts();
+
+    samplePeriod = ProtectedUint32Get(&SamplePeriod, SamplePeriodMutex);
 
     // Check if RMS is in the frequency reading range
     if(rms > RMS_FREQUENCY_MIN)
@@ -1044,26 +1148,27 @@ static void FrequencyCalculateThread(void* pData)
       // Find the period in nanoseconds.
       // Truncate the same way PIT does to ensure no difference to actual sample rate (including when pit samples faster for several channels)
       uint32_t nanoSecondPerTick = 1000000000 / CPU_BUS_CLK_HZ;
-      newSamplePeriod = (uint32_t)(((((uint32_t)(((float)(period * SamplePeriod) / (float)ADC_SAMPLES_PER_CYCLE))
+      newSamplePeriod = (uint32_t)(((((uint32_t)(((float)(period * samplePeriod) / (float)ADC_SAMPLES_PER_CYCLE))
                          / NB_ANALOG_CHANNELS)/ nanoSecondPerTick) * nanoSecondPerTick) * NB_ANALOG_CHANNELS);
 
 
       // From the period (in number of sample periods) and the sample period, work out the frequency.
       OS_DisableInterrupts();
-      frequency = (float)1000000000 / (period * SamplePeriod);
+      frequency = (float)1000000000 / (period * samplePeriod);
       Frequency = frequency;
       OS_DisableInterrupts();
 
       // Update sample periods (for use by Frequency track thread and this thread)
-      OS_DisableInterrupts();
-      SamplePeriod = NewSamplePeriod;
-      NewSamplePeriod = newSamplePeriod;
-      OS_DisableInterrupts();
+      uint32_t locNewSamplePeriod = ProtectedUint32Get(&NewSamplePeriod, NewSamplePeriodMutex);
+      ProtectedUint32Put(&SamplePeriod, locNewSamplePeriod, SamplePeriodMutex);
+      // SamplePeriod = NewSamplePeriod;
+      // NewSamplePeriod = newSamplePeriod;
+      ProtectedUint32Put(&NewSamplePeriod, newSamplePeriod, NewSamplePeriodMutex);
     }
   }
 }
 
-/*! @brief Calculates the square root of a float quickly by knowing the previous value of the square
+/*! @brief Calculates the square root of a float quickly by knowing the previous value of the square. From testing it takes around 10us vs 14 us for math.h sqrt().
  *
  *  @param square The float to find the square root of
  *  @param lastRoot The root of the last square
@@ -1092,7 +1197,8 @@ float FastSqrt(float square, float lastRoot, float accuracy)
   return root;
 }
 
-/*! @brief Updates the RMS using the previous sum of squares to save time
+
+/*! @brief Updates the RMS using the previous sum of squares to save time. From testing it take around 64us vs 112us from scratch.
  *
  *  @param pRemoveData The pointer to the data to remove from the sum of squares
  *  @param pPreviousSumOfSquares The pointer to the previous sum of squares
@@ -1135,6 +1241,7 @@ uint16_t UpdateRMSFast(int16_t* const pRemoveData, int64_t* const pPreviousSumOf
   return (uint16_t)FastSqrt((float)newSumOfSquares / (float)dataSize, (float) lastRMS, (float)1);
 }
 
+
 /*! @brief Calculate the RMS from scratch
  *
  *  @param data The struct containing the array of data to use
@@ -1167,38 +1274,6 @@ float GetAverage(const TVoltageData Data, const uint8_t dataSize)
   return sum / dataSize;
 }
 
-/*! @brief Checks that no other analog thread has an output set
- *
- *  @param outputs[] The array of flags
- *  @param nboutputs The number of flags in the array
- *  @param mutex The mutex to the flag/flag array
- *  @return bool - TRUE if all flags are false
- */
-bool ProtectedCheckFlagsOff(const bool  flags[], const uint8_t nbFlags, OS_ECB* mutex)
-{
-  OS_SemaphoreWait(mutex,0);
-  bool set = false;
-  for (uint8_t i = 0; i < nbFlags; i++)
-  {
-    set |= flags[i];
-  }
-  OS_SemaphoreSignal(mutex);
-  return !set;
-}
-
-/*! @brief Updates a flag with mutex access
- *
- *  @param flag The flag to be updated
- *  @param flagValue The new value of the flag
- *  @param mutex The mutex to the flag/flag array
- *  @return void
- */
-void ProtectedFlagUpdate(bool* flag, const bool flagValue, OS_ECB* mutex)
-{
-  OS_SemaphoreWait(mutex,0);
-  *flag = flagValue;
-  OS_SemaphoreSignal(mutex);
-}
 
 
 /*! @brief Gets the RMS, checks limits and handles alarms and raise/lower timing
@@ -1284,12 +1359,13 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
 
     if(alarm && !adjusting)
     {
+      uint32_t samplePeriod = ProtectedUint32Get(&SamplePeriod, SamplePeriodMutex);
       if(TimingMode == TIMING_DEFINITE)
       {
-        OutOfRangeTimer -= (uint64_t)SamplePeriod;
+        OutOfRangeTimer -= samplePeriod;
 
         // Keep track of actual time
-        minTimeCheck += SamplePeriod;
+        minTimeCheck += samplePeriod;
       }
       else if(TimingMode == TIMING_INVERSE)
       {
@@ -1303,12 +1379,10 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
         }
 
         // Decrement counter by inverse amount (1638 represents 0.5V)
-        OS_DisableInterrupts();
-        OutOfRangeTimer -= (uint64_t)(((float)deltaVoltage / (float)1638) * (float)SamplePeriod);         //TODO maybe integer math, mutex access maybe
+        OutOfRangeTimer -= (((uint64_t)deltaVoltage * (uint64_t)samplePeriod) / ADC_HALF_VOLT);
 
         // Keep track of actual time
-        minTimeCheck += SamplePeriod;
-        OS_EnableInterrupts();
+        minTimeCheck += samplePeriod;
       }
 
       // Check if raise or lower signals should be set
@@ -1395,7 +1469,6 @@ static void FTMLEDsOffThread(void* pData)
 }
 
 
-
 static void FFTThread(void* pData)
 {
    uint8_t memory[500];                                               /*!< Memory space allocated for kiss_fftr_cfg*/
@@ -1424,7 +1497,7 @@ static void FFTThread(void* pData)
     kiss_fftr(config, fftInput, fftOutput);
 
     // Update global array
-    FFTProtectedPut(fftOutput, (uint8_t)((ADC_SAMPLES_PER_CYCLE / 2) + 1));
+    ProtectedFFTPut(fftOutput, (uint8_t)((ADC_SAMPLES_PER_CYCLE / 2) + 1));
   }
 }
 
