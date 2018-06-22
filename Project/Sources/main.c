@@ -181,6 +181,22 @@ void ArrayCopy(int16_t array1[], int16_t array2[], const uint8_t length)
   }
 }
 
+/*! @brief Checks if any item in array is true TODO:params + comments
+ *
+ *  @return bool - TRUE if any item is true
+ */
+bool ArrayAnyTrue(const bool data[], const uint8_t length)
+{
+  for(uint8_t i = 0; i < length; i++)
+  {
+    if(data[i])
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 /*! @brief Calculates RMS of given values TODO:params + comments
  *
  *  @return float - RMS value
@@ -199,7 +215,7 @@ uint16_t CalculateRMS(const int16_t data[], const uint8_t length)
  *
  *  @return
  */
-void CheckRMS(uint64_t* timerDelay, uint64_t* timerRate, const uint16_t deviation, bool* alarm, bool* adjustment, OS_ECB* semaphore, const int16_t out1, const int16_t out2)
+void CheckRMS(uint64_t* timerDelay, uint64_t* timerRate, const uint16_t deviation, bool* alarm, bool* adjustment, OS_ECB* semaphore, const int8_t channel)
 {
   if(!(*alarm))
   {
@@ -216,11 +232,10 @@ void CheckRMS(uint64_t* timerDelay, uint64_t* timerRate, const uint16_t deviatio
     }
     *timerDelay -= *timerRate;
   }
-  else if(*timerDelay < *timerRate && !(*adjustment))
+  else if((*timerDelay < *timerRate) && !*adjustment)
   {
     *adjustment = true;
-    ProtectedAnalogPut(ANALOG_CHANNEL_1, out1);
-    ProtectedAnalogPut(ANALOG_CHANNEL_2, out2);
+    ProtectedAnalogPut(channel, VRR_OUTPUT_5V);
     OS_SemaphoreSignal(semaphore);
   }
 }
@@ -538,13 +553,13 @@ static void InitModulesThread(void* pData)
  */
 static void PacketThread(void* pData)
 {
-  TFTMChannel receivedPacketTmr;                   /*!< FTM Channel for received packet timer */
-  receivedPacketTmr.channelNb                      = 0;
-  receivedPacketTmr.delayCount                     = CPU_MCGFF_CLK_HZ_CONFIG_0;
-  receivedPacketTmr.ioType.inputDetection          = TIMER_INPUT_ANY;
-  receivedPacketTmr.ioType.outputAction            = TIMER_OUTPUT_DISCONNECT;
-  receivedPacketTmr.timerFunction                  = TIMER_FUNCTION_OUTPUT_COMPARE;
-  receivedPacketTmr.userSemaphore                  = LEDOffSemaphore;
+  TFTMChannel receivedPacketTmr;          /*!< FTM Channel for received packet timer */
+  receivedPacketTmr.channelNb             = 0;
+  receivedPacketTmr.delayCount            = CPU_MCGFF_CLK_HZ_CONFIG_0;
+  receivedPacketTmr.ioType.inputDetection = TIMER_INPUT_ANY;
+  receivedPacketTmr.ioType.outputAction   = TIMER_OUTPUT_DISCONNECT;
+  receivedPacketTmr.timerFunction         = TIMER_FUNCTION_OUTPUT_COMPARE;
+  receivedPacketTmr.userSemaphore         = LEDOffSemaphore;
 
   // Set FTM Channel for received packet timer
   FTM_Set(&receivedPacketTmr);
@@ -591,10 +606,12 @@ void CalculateRMSThread(void* pData)
   // Make the code easier to read by giving a name to the typecast'ed pointer
   #define analogData ((TAnalogThreadData*)pData)
 
+  static bool allAlarms[NB_ANALOG_CHANNELS];
+  static bool adjustment;
+
   uint64_t timerDelay;
   uint64_t timerRate;
-  bool alarm = false;
-  bool adjustment = false;
+  bool alarm;
 
   for (;;)
   {
@@ -604,15 +621,20 @@ void CalculateRMSThread(void* pData)
 
     if(rms < VRR_LIMIT_LOW)
     {
-      CheckRMS(&timerDelay, &timerRate, (VRR_LIMIT_LOW-rms), &alarm, &adjustment, RaisesSemaphore, VRR_OUTPUT_5V, VRR_ZERO);
+      CheckRMS(&timerDelay, &timerRate, (VRR_LIMIT_LOW-rms), &alarm, &adjustment, RaisesSemaphore, ANALOG_CHANNEL_1);
     }
     else if(rms > VRR_LIMIT_HIGH)
     {
-      CheckRMS(&timerDelay, &timerRate, (rms-VRR_LIMIT_HIGH), &alarm, &adjustment, LowersSemaphore, VRR_ZERO, VRR_OUTPUT_5V);
+      CheckRMS(&timerDelay, &timerRate, (rms-VRR_LIMIT_HIGH), &alarm, &adjustment, LowersSemaphore, ANALOG_CHANNEL_2);
     }
-    else if(alarm)
+    else
     {
       alarm = false;
+    }
+
+    allAlarms[analogData->channelNb] = alarm;
+    if(!ArrayAnyTrue(allAlarms, NB_ANALOG_CHANNELS))
+    {
       adjustment = false;
       ProtectedAnalogPut(ANALOG_CHANNEL_1, VRR_ZERO);
       ProtectedAnalogPut(ANALOG_CHANNEL_2, VRR_ZERO);
@@ -630,7 +652,8 @@ void CalculateFrequencyThread(void* pData)
   {
     (void)OS_SemaphoreWait(FrequencySemaphore, 0);
 
-    OS_DisableInterrupts();
+    OS_DisableInterrupts(); // TODO: remove interrupts disable
+
     bool negCrossingFound = false;
     float negCrossing1 = 0;
     float negCrossing2 = 0;
@@ -693,6 +716,7 @@ void CalculateFrequencyThread(void* pData)
     }
 
     ArrayCopy(channelData->sampleData, channelData->prevSampleData, VRR_SAMPLE_SIZE);
+
     OS_EnableInterrupts();
   }
 }
@@ -740,6 +764,7 @@ int main(void)
                           NULL,
                           &InitModulesThreadStack[THREAD_STACK_SIZE - 1],
   		                    0);
+
   // Create threads for analog RMS calculations
   for (uint8_t threadNb = ANALOG_CHANNEL_1; threadNb < NB_ANALOG_CHANNELS; threadNb++)
   {
