@@ -428,7 +428,6 @@ uint16_t _FH(volatile uint16_t* flashAddress)
   OS_SemaphoreSignal(FlashAccessMutex);
 
   return halfWord;
-
 }
 
 

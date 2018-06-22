@@ -171,6 +171,7 @@ static uint16_t RMS[NB_ANALOG_CHANNELS];                              /*!< The R
 static uint16_t TimingMode;                                           /*!< The timing mode for the VRR*/
 static uint32_t SamplePeriod;                                         /*!< The current sample period of the VRR*/
 static uint32_t NewSamplePeriod;                                      /*!< The period to be loaded into the PIT next */
+static uint32_t LastCrossing;                                         /*!< The last crossing measured. Only accessed by one thread */
 static int64_t LastSumOfSquares[NB_ANALOG_CHANNELS];                  /*!< The array of the last sum of squares for fast RMS calculation */
 static int16_t OldestData[NB_ANALOG_CHANNELS];                        /*!< The array of the oldest ADC sample to be removed from sum of squares */
 static bool Alarm[NB_ANALOG_CHANNELS];                                /*!< The array of alarm flags indicating individual thread alarm states */
@@ -1105,15 +1106,14 @@ static void FrequencyTrackThread(void* pData)
  */
 static void FrequencyCalculateThread(void* pData)
 {
-  TVoltageData localSamples;
-  uint32_t newSamplePeriod;
-  uint32_t samplePeriod;
-  uint16_t rms;
-  uint8_t crossingCount;
-  uint32_t risingCrossings[10];
-  uint32_t lastCrossing;
-  uint32_t frequency;
-  uint32_t period;
+  TVoltageData localSamples;            /*!< The local copy of the voltage samples */
+  uint32_t newSamplePeriod;             /*!< The local copy of the new sample period */
+  uint32_t samplePeriod;                /*!< The local copy of the sample period */
+  uint16_t rms;                         /*!< The local copy of the rms */
+  uint8_t crossingCount;                /*!< The counter for the number of positive going crossings */
+  uint32_t risingCrossings[10];         /*!< The array of found crossings, large enough to fit them all */
+  uint32_t frequency;                   /*!< The local copy of the frequency */
+  uint32_t period;                      /*!< The calculated size of the period */
 
   for (;;)
   {
@@ -1139,14 +1139,21 @@ static void FrequencyCalculateThread(void* pData)
       // Reset array element counter
       crossingCount = 0;
 
-      // Find rising crossings from sample data and store interpolated result in array (units are in sample periods)
+      // Find rising crossings from sample data and store interpolated result in array (units are in sample periods * 1000)
       for(uint8_t i = 0; i < ADC_BUFFER_SIZE - 1; i++)
       {
         if((localSamples.ADC_Data[i + 1] > 0) && (localSamples.ADC_Data[i] <= 0))
         {
+          // Calculate the gradient
           uint16_t m = (uint16_t)(localSamples.ADC_Data[i + 1]) - (localSamples.ADC_Data[i]);
+
+          // Calculate the y-intercept
           int16_t b = localSamples.ADC_Data[i];
+
+          // Interpolate the zero crossing and store in array
           risingCrossings[crossingCount] = (i * 1000) + ((((-b) * 1000) / m));
+
+          // Increment the number of crossings
           crossingCount ++;
         }
       }
@@ -1155,10 +1162,10 @@ static void FrequencyCalculateThread(void* pData)
       if(crossingCount == 1)
       {
         // Calculate the period
-        period = ((ADC_SAMPLES_PER_CYCLE + risingCrossings[crossingCount -1]) - lastCrossing);
+        period = ((ADC_SAMPLES_PER_CYCLE + risingCrossings[crossingCount -1]) - LastCrossing);
 
         // Update the last crossing
-        lastCrossing = risingCrossings[crossingCount - 1] -((crossingCount -1) * ADC_SAMPLES_PER_CYCLE);
+        LastCrossing = risingCrossings[crossingCount - 1] -((crossingCount -1) * ADC_SAMPLES_PER_CYCLE);
       }
 
       // If we have a larger buffer, or if it is equal but the frequency has increased we could get more than 1 rising crossing from the sample
@@ -1167,14 +1174,14 @@ static void FrequencyCalculateThread(void* pData)
         period = ((risingCrossings[crossingCount - 1]) - risingCrossings[0]) / (crossingCount - 1);
 
         // Update the last crossing
-        lastCrossing = risingCrossings[crossingCount - 1] -((crossingCount -1) * (ADC_SAMPLES_PER_CYCLE));
+        LastCrossing = risingCrossings[crossingCount - 1] -((crossingCount -1) * (ADC_SAMPLES_PER_CYCLE));
       }
 
       // If we have a buffer size equal to the number of samples per cycle, we could get no crossings if the frequency has dropped.
       else if(crossingCount == 0)
       {
         //Update the last crossing as a negative number so it can be used normally next time around. Do not update period in this round.
-        lastCrossing -= ADC_SAMPLES_PER_CYCLE;
+        LastCrossing -= ADC_SAMPLES_PER_CYCLE;
       }
 
       // Find the period in nanoseconds.
@@ -1215,9 +1222,7 @@ uint16_t UpdateRMSFast(int16_t* const pRemoveData, int64_t* const pPreviousSumOf
 
   // Update the sum of squares, removing old data and adding new data.
   int64_t newSumOfSquares = *pPreviousSumOfSquares;
-
   newSumOfSquares += (newestData * newestData);
-
   newSumOfSquares -= (int64_t)((int32_t)(*pRemoveData) * (int32_t)(*pRemoveData));
 
   // Ensure the new sum is positive
@@ -1242,21 +1247,20 @@ uint16_t UpdateRMSFast(int16_t* const pRemoveData, int64_t* const pPreviousSumOf
  *  @param pData The pointer to the analog thread data
  *  @note Assumes that semaphores have been created.
  */
-void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumerated type for DAC channel numbers
+void RMSThread(void* pData)
 {
   // Make the code easier to read by giving a name to the typecast'ed pointer
   #define analogData ((TAnalogThreadData*)pData)
 
-  uint16_t rms;
-  uint16_t rmsTest;
-  uint16_t deltaVoltage;
-  uint32_t minTimeCheck;
-  int64_t OutOfRangeTimer = ALARM_TIMER;
-  bool alarm;
-  bool alarmSet;
-  bool overVoltage;
-  bool underVoltage;
-  bool adjusting;
+  uint16_t rms;                              /*!< The local copy of the RMS */
+  uint16_t deltaVoltage;                     /*!< The magnitude the RMS is out of range by */
+  uint32_t minTimeCheck;                     /*!< The minimum alarm time in nano-seconds */
+  int64_t OutOfRangeTimer = ALARM_TIMER;     /*!< The variable to track the alarm time before raise/lower outputs */
+  bool alarm;                                /*!< The flag to indicate out of range */
+  bool alarmSet;                             /*!< The flag to indicate the alarm is set */
+  bool overVoltage;                          /*!< The flag to indicate over voltage */
+  bool underVoltage;                         /*!< The flag to indicate under voltage */
+  bool adjusting;                            /*!< The flag to indicate the VRR is currently adjusting */
 
   for (;;)
   {
@@ -1289,7 +1293,7 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
     // Update global RMS variable
     ProtectedUint16Put(&(RMS[analogData->channelNb]), rms, RMSMutex);
 
-    // Check if data is in limits
+    // Check if data is in limits, set flags accordingly
     if(rms > RMS_UPPER_LIMIT)
     {
       alarm = true;
@@ -1301,7 +1305,7 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
       underVoltage = true;
     }
 
-    // Set alarm if it is not set
+    // Set alarm if it is not set, updating flags
     if(alarm && !alarmSet)
     {
       if(ProtectedCheckFlagsOff(Alarm, (uint8_t)NB_ANALOG_CHANNELS, AlarmMutex))
@@ -1312,9 +1316,13 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
       alarmSet = true;
     }
 
+    // If the alarm has been set and the VRR is not adjusting yet start counting down to raise/lower event
     if(alarm && !adjusting)
     {
+      // Get the last sampling period
       uint32_t samplePeriod = ProtectedUint32Get(&SamplePeriod, SamplePeriodMutex);
+
+      // Check timing mode and decrement amount
       if(ProtectedUint16Get(&TimingMode, TimingModeMutex) == TIMING_DEFINITE)
       {
         OutOfRangeTimer -= samplePeriod;
@@ -1322,6 +1330,7 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
         // Keep track of actual time
         minTimeCheck += samplePeriod;
       }
+      // If inverse timing calculate deltaVoltage
       else if(ProtectedUint16Get(&TimingMode, TimingModeMutex) == TIMING_INVERSE)
       {
         if(overVoltage)
@@ -1333,7 +1342,7 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
           deltaVoltage = RMS_LOWER_LIMIT - rms;
         }
 
-        // Decrement counter by inverse amount (1638 represents 0.5V)
+        // Decrement counter by inverse amount
         OutOfRangeTimer -= (((uint64_t)deltaVoltage * (uint64_t)samplePeriod) / ADC_HALF_VOLT);
 
         // Keep track of actual time
@@ -1346,6 +1355,7 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
         // Set lower signal and store count in Nv if voltage high and not already set by another channel.
         if(overVoltage)
         {
+          // If the VRR is not already adjusting, start adjusting, log event and update flags
           if(ProtectedCheckFlagsOff(Adjusting, (uint8_t)NB_ANALOG_CHANNELS, AdjustingMutex))
           {
             ProtectedAnalogPut(OUTPUT_LOWER, DAC_5V_OUT);
@@ -1358,6 +1368,7 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
         // Set raise signal and store count in Nv if voltage low and not already set by another channel.
         else if(underVoltage)
         {
+          // If the VRR is not already adjusting, start adjusting, log event and update flags
           if(ProtectedCheckFlagsOff(Adjusting, (uint8_t)NB_ANALOG_CHANNELS, AdjustingMutex))
           {
             ProtectedAnalogPut(OUTPUT_RAISE, DAC_5V_OUT);
@@ -1369,28 +1380,32 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
       }
     }
 
-    // Check if raise / lower should be decremented
+    // Check if raise / lower should be switched off
     else if(!alarm)
     {
       bool switchOffAdjusting;
 
+      // Check if all other channel alarm flags are off, update flag and turn off alarm if required
       ProtectedFlagUpdate(&Alarm[analogData->channelNb], false, AlarmMutex);
       if(ProtectedCheckFlagsOff(Alarm, (uint8_t)NB_ANALOG_CHANNELS, AlarmMutex))
       {
         ProtectedAnalogPut(OUTPUT_ALARM, DAC_0V_OUT);
       }
 
+      // Update adjusting flag
       ProtectedFlagUpdate(&Adjusting[analogData->channelNb], false, AdjustingMutex);
       if(ProtectedCheckFlagsOff(Adjusting, (uint8_t)NB_ANALOG_CHANNELS, AdjustingMutex))
       {
         switchOffAdjusting = true;
       }
 
+      // Switch off raise and lower outputs
       if(switchOffAdjusting)
       {
         ProtectedAnalogPut(OUTPUT_RAISE, DAC_0V_OUT);
         ProtectedAnalogPut(OUTPUT_LOWER, DAC_0V_OUT);
       }
+      // Reset variables
       OutOfRangeTimer = ALARM_TIMER;
       adjusting = false;
       alarmSet = false;
@@ -1470,13 +1485,26 @@ int main(void)
   // Initialize the RTOS
   OS_Init(CPU_CORE_CLK_HZ, false);
 
+  /* Create threads. Note: UARTRX holds priority 1 in its module
+   *                       UARTTX holds priority 3 in its module
+   */
 
-  // Highest priority
+  // Highest priority (will delete and make priority 1 the highest the rest correct)
   error = OS_ThreadCreate(InitModulesThread,
 			  NULL,
                           &InitModulesThreadStack[THREAD_STACK_SIZE - 1],
   		                    0);
-  // Create threads for RMS channels
+  // 2nd Highest priority
+  error = OS_ThreadCreate(FrequencyTrackThread,
+                          NULL,
+                          &FrequencyTrackThreadStack[THREAD_STACK_SIZE - 1],
+                          2);
+  // 6th Highest priority
+  error = OS_ThreadCreate(FrequencyCalculateThread,
+                          NULL,
+                          &FrequencyCalculateThreadStack[THREAD_STACK_SIZE - 1],
+                          6);
+  // Create threads for RMS channels (7th -9th highest priority)
   for (uint8_t threadNb = 0; threadNb < NB_ANALOG_CHANNELS; threadNb++)
   {
     error = OS_ThreadCreate(RMSThread,
@@ -1484,27 +1512,16 @@ int main(void)
                             &RMSThreadStacks[threadNb][THREAD_STACK_SIZE - 1],
                             ANALOG_THREAD_PRIORITIES[threadNb]);
   }
-  // 6th Highest priority
-  error = OS_ThreadCreate(FrequencyCalculateThread,
-                          NULL,
-                          &FrequencyCalculateThreadStack[THREAD_STACK_SIZE - 1],
-                          6);
-  // 2nd Highest priority
-  error = OS_ThreadCreate(FrequencyTrackThread,
-                          NULL,
-                          &FrequencyTrackThreadStack[THREAD_STACK_SIZE - 1],
-                          2);
+  // 10th Highest priority
+  error = OS_ThreadCreate(PacketThread,
+        NULL,
+                          &PacketThreadStack[THREAD_STACK_SIZE - 1],
+                          10);
   // 16th Highest priority
   error = OS_ThreadCreate(FFTThread,
                           NULL,
                           &FFTThreadStack[THREAD_STACK_SIZE - 1],
                           16);
-
-  // 10th Highest priority
-  error = OS_ThreadCreate(PacketThread,
-			  NULL,
-                          &PacketThreadStack[THREAD_STACK_SIZE - 1],
-                          10);
   // 17th Highest priority
   error = OS_ThreadCreate(LogRaisesThread,
         NULL,
