@@ -199,6 +199,35 @@ static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS]
                 [THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));  /*!< The thread stack array for RMS threads */
 
 
+/*! @brief Calculates the square root of a float quickly by knowing the previous value of the square.
+ *
+ *  @param square The number to find the square root of
+ *  @param lastRoot The root of the last square
+ *  @param accuracy The desired accuracy of the root
+ *  @return uint16_t - The square root
+ */
+uint16_t FastSqrt(uint32_t square, uint16_t lastRoot, uint16_t accuracy)
+{
+  int32_t error;
+  uint32_t last;
+  uint32_t root = lastRoot;
+  if(root <= 0)
+  {
+    root = 1;
+  }
+  if(root <= 0)
+  {
+    return 0;
+  }
+  do
+  {
+    last = root;
+    root = (root + (square / root)) / 2;
+    error = root - last;
+  }while(error > accuracy || error <-accuracy);
+  return root;
+}
+
 /*! @brief Reads a word with mutex access
  *
  *  @param pVariable The address of the variable.
@@ -310,10 +339,9 @@ uint16_t ProtectedFFTGet(uint8_t harmonic)
   // Release exclusive access to data
   OS_SemaphoreSignal(FFTOutputMutex);
 
-  // Get the magnitude by taking the square root of the sum of the real and imaginary components squared. Then divide by nfft / 2.
-  // Note: Time taken by this operation is critical as it is done in a low priority thread, without possession of the Mutex.
-  // Also, this function is only executed on demand from PC.
-  return (uint16_t)(sqrt((localVoltage.r * localVoltage.r) + (localVoltage.i * localVoltage.i)) / (ADC_SAMPLES_PER_CYCLE / 2));
+  // Get the magnitude by taking the square root of the sum of the real and imaginary components squared, dividing values by nfft / 2 to scale correctly.
+  return (uint16_t)FastSqrt(((uint32_t)(((int32_t)localVoltage.r  / (ADC_SAMPLES_PER_CYCLE / 2)) * ((int32_t)localVoltage.r) / (ADC_SAMPLES_PER_CYCLE / 2))
+         + (((int32_t)localVoltage.i  / (ADC_SAMPLES_PER_CYCLE / 2))* ((int32_t)localVoltage.i / (ADC_SAMPLES_PER_CYCLE / 2)))), 0, 1);
 }
 /*! @brief Checks that no other analog thread has an output set
  *
@@ -573,12 +601,8 @@ bool HandleTowerVoltage(void)
   // Check if parameters are within limits
   if(Packet_Parameter1 > 0 && Packet_Parameter1 <= NB_ANALOG_CHANNELS && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
-    // Disable interrupts to read variable.
-    OS_DisableInterrupts();
-
-    rms.l = RMS[Packet_Parameter1 -1];
-
-    OS_EnableInterrupts();
+    // Get RMS value
+    rms.l = ProtectedUint16Get(&(RMS[Packet_Parameter1 -1]), RMSMutex);
 
     // Send Voltage to PC
     return Packet_Put(COMMAND_VOLTAGE, Packet_Parameter1, rms.s.Hi, rms.s.Lo);
@@ -589,6 +613,7 @@ bool HandleTowerVoltage(void)
 /*! @brief Sends the magnitude of a given harmonic to the PC
  *
  *  @return bool - TRUE if packet sent
+ *  @note Peak magnitude used.
  */
 bool HandleTowerHarmonic(void)
 {
@@ -598,11 +623,8 @@ bool HandleTowerHarmonic(void)
   // Check if parameters are within limits
   if(Packet_Parameter1 < 8 &&Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
-    OS_DisableInterrupts();
-
+    // Get magnitude from complex data
     magnitude.l = ProtectedFFTGet(Packet_Parameter1);
-
-    OS_EnableInterrupts();
 
     // Send magnitude to PC
     return Packet_Put(COMMAND_SPECTRUM, Packet_Parameter1, magnitude.s.Hi, magnitude.s.Lo);
@@ -1172,34 +1194,6 @@ static void FrequencyCalculateThread(void* pData)
   }
 }
 
-/*! @brief Calculates the square root of a float quickly by knowing the previous value of the square.
- *
- *  @param square The number to find the square root of
- *  @param lastRoot The root of the last square
- *  @param accuracy The desired accuracy of the root
- *  @return uint16_t - The square root
- */
-uint16_t FastSqrt(uint32_t square, uint16_t lastRoot, uint16_t accuracy)
-{
-  int32_t error;
-  uint32_t last;
-  uint32_t root = lastRoot;
-  if(root <= 0)
-  {
-    root = 1;
-  }
-  if(root <= 0)
-  {
-    return 0;
-  }
-  do
-  {
-    last = root;
-    root = (root + (square / root)) / 2;
-    error = root - last;
-  }while(error > accuracy || error <-accuracy);
-  return root;
-}
 
 
 /*! @brief Updates the RMS using the previous sum of squares to save time. From testing it take around 64us vs 112us from scratch.
@@ -1245,38 +1239,6 @@ uint16_t UpdateRMSFast(int16_t* const pRemoveData, int64_t* const pPreviousSumOf
   return (uint16_t)FastSqrt(newSumOfSquares /dataSize, lastRMS, 1);
 }
 
-
-/*! @brief Calculate the RMS from scratch
- *
- *  @param data The struct containing the array of data to use
- *  @param dataSize The number of data samples in the array
- *  @return uint16_t - The RMS value
- */
-uint16_t GetRMS(const TVoltageData data, const uint8_t dataSize)
-{
-  float sum = 0;
-  for (uint8_t i = 0; i < dataSize; i ++)
-  {
-    sum += (data.ADC_Data[i]) * (data.ADC_Data[i]);
-  }
-  return (uint16_t)sqrtf(sum / dataSize);
-}
-
-/*! @brief Calculate the average of a set of data
- *
- *  @param data The struct containing the array of data to use
- *  @param dataSize The number of data samples in the array
- *  @return float - The average value
- */
-float GetAverage(const TVoltageData Data, const uint8_t dataSize)
-{
-  float sum = 0;
-  for(uint8_t i = 0; i < dataSize; i ++)
-  {
-    sum += Data.ADC_Data[i];
-  }
-  return sum / dataSize;
-}
 
 
 /*! @brief Gets the RMS, checks limits and handles alarms and raise/lower timing
@@ -1465,7 +1427,11 @@ static void FTMLEDsOffThread(void* pData)
   }
 }
 
-
+/*! @brief Performs a Foward Fast Fourier Transform on the given time data.
+ *
+ *  @param pData is not used but is required by the OS to create a thread.
+ *  @note Uses a real only FFT which saves close to 45% of the time required for a complex FFT
+ */
 static void FFTThread(void* pData)
 {
    uint8_t memory[500];                                               /*!< Memory space allocated for kiss_fftr_cfg*/
