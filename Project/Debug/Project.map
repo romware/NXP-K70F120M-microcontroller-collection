@@ -2438,7 +2438,7 @@ OUTPUT(Project.elf elf32-littlearm)
  .debug_ranges  0x00000520       0x28 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
  .debug_ranges  0x00000548       0x48 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
 
-.debug_macro    0x00000000    0x1b33e
+.debug_macro    0x00000000    0x1b34a
  .debug_macro   0x00000000       0xaf ./Sources/FIFO.o
  .debug_macro   0x000000af       0x22 ./Sources/FIFO.o
  .debug_macro   0x000000d1       0x3c ./Sources/FIFO.o
@@ -2485,24 +2485,24 @@ OUTPUT(Project.elf elf32-littlearm)
  .debug_macro   0x0001a29a       0xee ./Sources/kiss_fft.o
  .debug_macro   0x0001a388       0x71 ./Sources/kiss_fft.o
  .debug_macro   0x0001a3f9      0x1a8 ./Sources/kiss_fftr.o
- .debug_macro   0x0001a5a1      0x2c8 ./Sources/main.o
- .debug_macro   0x0001a869       0x10 ./Sources/main.o
- .debug_macro   0x0001a879       0x3a ./Sources/main.o
- .debug_macro   0x0001a8b3      0x166 ./Sources/main.o
- .debug_macro   0x0001aa19       0x10 ./Sources/main.o
- .debug_macro   0x0001aa29       0xc2 ./Sources/packet.o
- .debug_macro   0x0001aaeb      0x121 ./Project_Settings/Startup_Code/startup.o
- .debug_macro   0x0001ac0c      0x20f ./Project_Settings/Startup_Code/startup.o
- .debug_macro   0x0001ae1b       0x84 ./Generated_Code/Cpu.o
- .debug_macro   0x0001ae9f       0xa0 ./Generated_Code/Cpu.o
- .debug_macro   0x0001af3f       0xf5 ./Generated_Code/Vectors.o
- .debug_macro   0x0001b034       0x36 ./Generated_Code/Vectors.o
- .debug_macro   0x0001b06a       0xa3 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
- .debug_macro   0x0001b10d       0x94 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
- .debug_macro   0x0001b1a1       0x30 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
- .debug_macro   0x0001b1d1       0xf5 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
- .debug_macro   0x0001b2c6       0x10 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
- .debug_macro   0x0001b2d6       0x68 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
+ .debug_macro   0x0001a5a1      0x2d4 ./Sources/main.o
+ .debug_macro   0x0001a875       0x10 ./Sources/main.o
+ .debug_macro   0x0001a885       0x3a ./Sources/main.o
+ .debug_macro   0x0001a8bf      0x166 ./Sources/main.o
+ .debug_macro   0x0001aa25       0x10 ./Sources/main.o
+ .debug_macro   0x0001aa35       0xc2 ./Sources/packet.o
+ .debug_macro   0x0001aaf7      0x121 ./Project_Settings/Startup_Code/startup.o
+ .debug_macro   0x0001ac18      0x20f ./Project_Settings/Startup_Code/startup.o
+ .debug_macro   0x0001ae27       0x84 ./Generated_Code/Cpu.o
+ .debug_macro   0x0001aeab       0xa0 ./Generated_Code/Cpu.o
+ .debug_macro   0x0001af4b       0xf5 ./Generated_Code/Vectors.o
+ .debug_macro   0x0001b040       0x36 ./Generated_Code/Vectors.o
+ .debug_macro   0x0001b076       0xa3 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
+ .debug_macro   0x0001b119       0x94 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
+ .debug_macro   0x0001b1ad       0x30 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
+ .debug_macro   0x0001b1dd       0xf5 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
+ .debug_macro   0x0001b2d2       0x10 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
+ .debug_macro   0x0001b2e2       0x68 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
 
 .debug_line     0x00000000     0x4662
  .debug_line    0x00000000      0x2c5 ./Sources/FIFO.o
@@ -2525,7 +2525,7 @@ OUTPUT(Project.elf elf32-littlearm)
  .debug_line    0x0000418f      0x200 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
  .debug_line    0x0000438f      0x2d3 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
 
-.debug_str      0x00000000    0x91e3c
+.debug_str      0x00000000    0x91e6e
  .debug_str     0x00000000    0x8a66f ./Sources/FIFO.o
                               0x8a7fe (size before relaxing)
  .debug_str     0x0008a66f      0x3b0 ./Sources/FTM.o
@@ -2548,21 +2548,21 @@ OUTPUT(Project.elf elf32-littlearm)
                                0x65de (size before relaxing)
  .debug_str     0x0008fcb6      0x452 ./Sources/kiss_fftr.o
                                0x6938 (size before relaxing)
- .debug_str     0x00090108      0xcd3 ./Sources/main.o
-                              0x8efcb (size before relaxing)
- .debug_str     0x00090ddb       0x4f ./Sources/packet.o
+ .debug_str     0x00090108      0xd05 ./Sources/main.o
+                              0x8effd (size before relaxing)
+ .debug_str     0x00090e0d       0x4f ./Sources/packet.o
                               0x8aa8d (size before relaxing)
- .debug_str     0x00090e2a      0x182 ./Project_Settings/Startup_Code/startup.o
+ .debug_str     0x00090e5c      0x182 ./Project_Settings/Startup_Code/startup.o
                               0x853f0 (size before relaxing)
- .debug_str     0x00090fac      0x1e3 ./Generated_Code/Cpu.o
+ .debug_str     0x00090fde      0x1e3 ./Generated_Code/Cpu.o
                               0x8aa21 (size before relaxing)
- .debug_str     0x0009118f       0x1c ./Generated_Code/Vectors.o
+ .debug_str     0x000911c1       0x1c ./Generated_Code/Vectors.o
                               0x8a854 (size before relaxing)
- .debug_str     0x000911ab      0x39a D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
+ .debug_str     0x000911dd      0x39a D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
                               0x8ad2a (size before relaxing)
- .debug_str     0x00091545      0x55a D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
+ .debug_str     0x00091577      0x55a D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
                                0x3866 (size before relaxing)
- .debug_str     0x00091a9f      0x39d D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
+ .debug_str     0x00091ad1      0x39d D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
                               0x83389 (size before relaxing)
 
 .comment        0x00000000       0x70

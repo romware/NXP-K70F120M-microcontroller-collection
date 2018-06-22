@@ -62,12 +62,14 @@
 #define ADC_BUFFER_SIZE 64                      /*!< ADC buffer size Note: Must be an integral number of ADC_SAMPLES_PER_CYCLE*/
 #define NB_ANALOG_CHANNELS 3                    /*!< Number of analog channels */
 #define ADC_DEFAULT_FREQUENCY 50                /*!< ADC default frequency */
-#define RMS_UPPER_LIMIT    9830                 /*!< VRR RMS upper limit */
-#define RMS_LOWER_LIMIT    6554                 /*!< VRR RMS lower limit */
-#define RMS_FREQUENCY_MIN  4915                 /*!< VRR RMS frequency measure minimum level */
-#define DAC_5V_OUT         16384                /*!< DAC 5 volts out */
-#define DAC_0V_OUT          0                   /*!< DAC 0 volts out */
-#define ADC_HALF_VOLT      1638                 /*!< ADC Half Volt */
+#define RMS_UPPER_LIMIT 9830                    /*!< VRR RMS upper limit */
+#define RMS_LOWER_LIMIT 6554                    /*!< VRR RMS lower limit */
+#define RMS_FREQUENCY_MIN 4915                  /*!< VRR RMS frequency measure minimum level */
+#define DAC_5V_OUT 16384                        /*!< DAC 5 volts out */
+#define DAC_0V_OUT 0                            /*!< DAC 0 volts out */
+#define ADC_HALF_VOLT 1638                      /*!< ADC Half Volt */
+#define ALARM_TIMER 5000000000                  /*!< Alarm Timer in nanoSeconds */
+#define ALARM_TIMER_MIN 1000000000              /*!< Minimum Alarm Timer in nanoSeconds */
 
 typedef struct
 {
@@ -1302,7 +1304,6 @@ float GetAverage(const TVoltageData Data, const uint8_t dataSize)
 }
 
 
-
 /*! @brief Gets the RMS, checks limits and handles alarms and raise/lower timing
  *
  *  @param pData The pointer to the analog thread data
@@ -1321,7 +1322,7 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
   bool underVoltage;
   bool adjusting;
   uint16_t deltaVoltage;
-  int64_t OutOfRangeTimer = 5000000000;
+  int64_t OutOfRangeTimer = ALARM_TIMER;
   uint32_t minTimeCheck;
 
   for (;;)
@@ -1407,7 +1408,7 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
       }
 
       // Check if raise or lower signals should be set
-      if(OutOfRangeTimer <= 0 && !adjusting && minTimeCheck >= 1000000000)
+      if(OutOfRangeTimer <= 0 && !adjusting && minTimeCheck >= ALARM_TIMER_MIN)
       {
         // Set lower signal and store count in Nv if voltage high and not already set by another channel.
         if(overVoltage)
@@ -1458,7 +1459,7 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
         ProtectedAnalogPut(2, DAC_0V_OUT);
 
       }
-      OutOfRangeTimer = 5000000000;
+      OutOfRangeTimer = ALARM_TIMER;
       adjusting = false;
       alarmSet = false;
     }
