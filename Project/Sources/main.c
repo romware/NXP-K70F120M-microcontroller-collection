@@ -934,13 +934,8 @@ static void InitModulesThread(void* pData)
   // Send startup packets to PC
   HandleTowerStartup();
 
-  // Calculate the resolution of the PIT
-  uint32_t nanoSecondPerTick = 1000000000 / CPU_BUS_CLK_HZ;
-
-  // Calculate the initial sample period (in nano-seconds), ensuring this value is truncated the same way PIT
-  // will so we keep accuracy in this value for use by other functions
-  SamplePeriod = (uint32_t)(((1000000000/(ADC_DEFAULT_FREQUENCY * ADC_SAMPLES_PER_CYCLE))
-                               / NB_ANALOG_CHANNELS/ nanoSecondPerTick) * nanoSecondPerTick) * NB_ANALOG_CHANNELS;
+  // Calculate the initial sample period (in nano-seconds)
+  SamplePeriod = (uint32_t)(1000000000/(ADC_DEFAULT_FREQUENCY * ADC_SAMPLES_PER_CYCLE));
 
   // Set the new sampler period and frequency
   NewSamplePeriod = SamplePeriod;
@@ -1174,10 +1169,7 @@ static void FrequencyCalculateThread(void* pData)
       }
 
       // Find the period in nanoseconds.
-      // Truncate the same way PIT does to ensure no difference to actual sample rate (including when pit samples faster for several channels)
-      uint32_t nanoSecondPerTick = 1000000000 / CPU_BUS_CLK_HZ;
-      newSamplePeriod = (uint32_t)(((((uint32_t)((((uint64_t)period * samplePeriod) /(1000 * ADC_SAMPLES_PER_CYCLE)))
-                         / NB_ANALOG_CHANNELS)/ nanoSecondPerTick) * nanoSecondPerTick) * NB_ANALOG_CHANNELS);
+      newSamplePeriod = (uint32_t)(uint32_t)((((uint64_t)period * samplePeriod) /(1000 * ADC_SAMPLES_PER_CYCLE)));
 
       // From the period (in number of sample periods) and the sample period, work out the frequency in mHz.
       frequency = (uint16_t)((uint64_t)1000000000000 / ((period * (samplePeriod / 1000))));
