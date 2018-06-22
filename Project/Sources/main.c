@@ -90,6 +90,17 @@ typedef enum
   TIMING_INVERSE
 }TTimingMode;
 
+/*! @brief Data structure for enumerated output
+ *
+ */
+typedef enum
+{
+  OUTPUT_DEBUG,
+  OUTPUT_RAISE,
+  OUTPUT_LOWER,
+  OUTPUT_ALARM
+}TOutputMode;
+
 /*! @brief Data structure used to pass Analog configuration to a user thread
  *
  */
@@ -203,7 +214,7 @@ OS_THREAD_STACK(FFTThreadStack, 2000);                                /*!< The s
 static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS]
                 [THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));  /*!< The thread stack array for RMS threads */
 
-/*! @brief Calculates the square root of a float quickly by knowing the previous value of the square.
+/*! @brief Calculates the square root of a number quickly by knowing the previous value of the square.
  *
  *  @param square The number to find the square root of
  *  @param lastRoot The root of the last square
@@ -289,7 +300,6 @@ void ProtectedUint32Put(uint32_t* pAddress, uint32_t variable, OS_ECB* mutex)
   *pAddress = variable;
   OS_SemaphoreSignal(mutex);
 }
-
 
 /*! @brief Calls Analog_Put with interrupts disabled.
  *
@@ -1062,7 +1072,6 @@ static void LogLowersThread(void* pData)
     }
     // Release access to flash
     OS_SemaphoreSignal(FlashAccessMutex);
-
   }
 }
 
@@ -1240,14 +1249,14 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
 
   uint16_t rms;
   uint16_t rmsTest;
+  uint16_t deltaVoltage;
+  uint32_t minTimeCheck;
+  int64_t OutOfRangeTimer = ALARM_TIMER;
   bool alarm;
   bool alarmSet;
   bool overVoltage;
   bool underVoltage;
   bool adjusting;
-  uint16_t deltaVoltage;
-  int64_t OutOfRangeTimer = ALARM_TIMER;
-  uint32_t minTimeCheck;
 
   for (;;)
   {
@@ -1297,7 +1306,7 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
     {
       if(ProtectedCheckFlagsOff(Alarm, (uint8_t)NB_ANALOG_CHANNELS, AlarmMutex))
       {
-        ProtectedAnalogPut(3, DAC_5V_OUT);
+        ProtectedAnalogPut(OUTPUT_ALARM, DAC_5V_OUT);
         ProtectedFlagUpdate(&Alarm[analogData->channelNb], true, AlarmMutex);
       }
       alarmSet = true;
@@ -1339,7 +1348,7 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
         {
           if(ProtectedCheckFlagsOff(Adjusting, (uint8_t)NB_ANALOG_CHANNELS, AdjustingMutex))
           {
-            ProtectedAnalogPut(2, DAC_5V_OUT);
+            ProtectedAnalogPut(OUTPUT_LOWER, DAC_5V_OUT);
             ProtectedFlagUpdate(&Adjusting[analogData->channelNb], true, AdjustingMutex);
             OS_SemaphoreSignal(LogLowersSemaphore);
           }
@@ -1351,7 +1360,7 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
         {
           if(ProtectedCheckFlagsOff(Adjusting, (uint8_t)NB_ANALOG_CHANNELS, AdjustingMutex))
           {
-            ProtectedAnalogPut(1, DAC_5V_OUT);
+            ProtectedAnalogPut(OUTPUT_RAISE, DAC_5V_OUT);
             ProtectedFlagUpdate(&Adjusting[analogData->channelNb], true, AdjustingMutex);
             OS_SemaphoreSignal(LogRaisesSemaphore);
           }
@@ -1368,7 +1377,7 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
       ProtectedFlagUpdate(&Alarm[analogData->channelNb], false, AlarmMutex);
       if(ProtectedCheckFlagsOff(Alarm, (uint8_t)NB_ANALOG_CHANNELS, AlarmMutex))
       {
-        ProtectedAnalogPut(3, DAC_0V_OUT);
+        ProtectedAnalogPut(OUTPUT_ALARM, DAC_0V_OUT);
       }
 
       ProtectedFlagUpdate(&Adjusting[analogData->channelNb], false, AdjustingMutex);
@@ -1379,9 +1388,8 @@ void RMSThread(void* pData)  //TODO: commenting from here on. Also create enumer
 
       if(switchOffAdjusting)
       {
-        ProtectedAnalogPut(1, DAC_0V_OUT);
-        ProtectedAnalogPut(2, DAC_0V_OUT);
-
+        ProtectedAnalogPut(OUTPUT_RAISE, DAC_0V_OUT);
+        ProtectedAnalogPut(OUTPUT_LOWER, DAC_0V_OUT);
       }
       OutOfRangeTimer = ALARM_TIMER;
       adjusting = false;
@@ -1412,7 +1420,7 @@ static void FTMLEDsOffThread(void* pData)
   }
 }
 
-/*! @brief Performs a Foward Fast Fourier Transform on the given time data.
+/*! @brief Performs a Forward Fast Fourier Transform on the given time data.
  *
  *  @param pData is not used but is required by the OS to create a thread.
  *  @note Uses a real only FFT which saves close to 45% of the time required for a complex FFT
