@@ -17,6 +17,7 @@ static const uint8_t ERASE_FLASH_SECTOR = 0x09;
 
 // new types
 #include "types.h"
+#include "OS.h"
 
 // TFCCOB struct of containing the Flash command, address and 8 data bytes
 typedef struct
@@ -48,9 +49,10 @@ typedef struct
 
 /*! @brief Enables the Flash module.
  *
+ *  @param flashAccessSemaphore The mutex to protect flash reading and writing.
  *  @return bool - TRUE if the Flash was setup successfully.
  */
-bool Flash_Init(void);
+bool Flash_Init(OS_ECB* flashAccessSemaphore);
  
 /*! @brief Allocates space for a non-volatile variable in the Flash memory.
  *
@@ -67,32 +69,47 @@ bool Flash_Init(void);
  */
 bool Flash_AllocateVar(volatile void** variable, const uint8_t size);
 
-/*! @brief Writes a 32-bit number to Flash.
+/*! @brief Writes to Flash.
  *
  *  @param address The address of the data.
- *  @param data The 32-bit data to write.
+ *  @param data The variable-bit data to write.
+ *  @param size The size of the data to write.
  *  @return bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 4-byte boundary or if there is a programming error.
  *  @note Assumes Flash has been initialized.
  */
-bool Flash_Write32(volatile uint32_t* const address, const uint32_t data);
- 
-/*! @brief Writes a 16-bit number to Flash.
- *
- *  @param address The address of the data.
- *  @param data The 16-bit data to write.
- *  @return bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 2-byte boundary or if there is a programming error.
- *  @note Assumes Flash has been initialized.
- */
-bool Flash_Write16(volatile uint16_t* const address, const uint16_t data);
+bool Flash_Write(volatile uint32_t* const address, const uint32_t data, const uint8_t size);
 
-/*! @brief Writes an 8-bit number to Flash.
+/*! @brief Reads from Flash.
  *
  *  @param address The address of the data.
- *  @param data The 8-bit data to write.
- *  @return bool - TRUE if Flash was written successfully, FALSE if there is a programming error.
+ *  @return uint8_t - The read value of the data.
  *  @note Assumes Flash has been initialized.
  */
-bool Flash_Write8(volatile uint8_t* const address, const uint8_t data);
+uint8_t Flash_Read8(volatile uint8_t* const address);
+
+/*! @brief Reads from Flash.
+ *
+ *  @param address The address of the data.
+ *  @return uint16_t - The read value of the data.
+ *  @note Assumes Flash has been initialized.
+ */
+uint16_t Flash_Read16(volatile uint16_t* const address);
+
+/*! @brief Reads from Flash.
+ *
+ *  @param address The address of the data.
+ *  @return uint32_t - The read value of the data.
+ *  @note Assumes Flash has been initialized.
+ */
+uint32_t Flash_Read32(volatile uint32_t* const address);
+
+/*! @brief Reads from Flash.
+ *
+ *  @param address The address of the data.
+ *  @return uin64_t - The read value of the data.
+ *  @note Assumes Flash has been initialized.
+ */
+uint64_t Flash_Read64(volatile uint64_t* const address);
 
 /*! @brief Erases the entire Flash sector.
  *

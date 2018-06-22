@@ -17,6 +17,8 @@
 #include "LEDs.h"
 #include "Flash.h"
 
+static OS_ECB* FlashAccessSemaphore;  /*!< Mutex to protect reading and writing to Flash */
+
 /*! @brief Writes TFCCOB to flash and waits for it to complete
  *
  *  @param commonCommandObject The address of the TFCCOB.
@@ -42,13 +44,42 @@ static bool WritePhrase(const uint32_t address, const uint64union_t phrase);
  */
 static bool EraseSector(const uint32_t address);
 
+/*! @brief Writes a 32-bit number to Flash.
+ *
+ *  @param address The address of the data.
+ *  @param data The 32-bit data to write.
+ *  @return bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 4-byte boundary or if there is a programming error.
+ *  @note Assumes Flash has been initialized.
+ */
+static bool Write32(volatile uint32_t* const address, const uint32_t data);
+
+/*! @brief Writes a 16-bit number to Flash.
+ *
+ *  @param address The address of the data.
+ *  @param data The 16-bit data to write.
+ *  @return bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 2-byte boundary or if there is a programming error.
+ *  @note Assumes Flash has been initialized.
+ */
+static bool Write16(volatile uint16_t* const address, const uint16_t data);
+
+/*! @brief Writes an 8-bit number to Flash.
+ *
+ *  @param address The address of the data.
+ *  @param data The 8-bit data to write.
+ *  @return bool - TRUE if Flash was written successfully, FALSE if there is a programming error.
+ *  @note Assumes Flash has been initialized.
+ */
+static bool Write8(volatile uint8_t* const address, const uint8_t data);
+
 /*! @brief Enables the Flash module.
  *
+ *  @param flashAccessSemaphore The mutex to protect flash reading and writing.
  *  @return bool - TRUE if the Flash was setup successfully.
  */
-bool Flash_Init(void)
+bool Flash_Init(OS_ECB* flashAccessSemaphore)
 {
   // Initialize the Flash
+  FlashAccessSemaphore = flashAccessSemaphore;
   return true;
 }
 
@@ -75,26 +106,129 @@ bool Flash_AllocateVar(volatile void** variable, const uint8_t size)
   {
     // Initialize the allocation to be the first address which can store the data
     uint8_t allocation = size * 2 - 1;
-    
+
     // Loop through each of the 8 bytes in Flash until an address is available
     for(uint8_t i = 0; i < 8/size; i++)
     {
       // Mask the allocation with the currently occupied bit mask to see if it is available
       if(!(occupiedBytes & allocation))
       {
-      	// Set the variable value to be the Flash address
+        // Set the variable value to be the Flash address
         *variable = (uint16_t* volatile)((uint32_t)FLASH_DATA_START + i * size);
-        
+
         // Set the occupation bit mask to have the newly allocated address as occupied
         occupiedBytes |= allocation;
         return true;
       }
-      
+
       // If the address is occupied, bit shift to the next location and check again
       allocation = allocation << size;
     }
   }
   return false;
+}
+
+/*! @brief Erases the entire Flash sector.
+ *
+ *  @return bool - TRUE if the Flash "data" sector was erased successfully.
+ *  @note Assumes Flash has been initialized.
+ */
+bool Flash_Erase(void)
+{
+  OS_SemaphoreWait(FlashAccessSemaphore,0);
+
+  // Erase the Flash sector with the Flash Data Start address
+  bool success = EraseSector(FLASH_DATA_START);
+
+  OS_SemaphoreSignal(FlashAccessSemaphore);
+  return success;
+}
+
+/*! @brief Writes to Flash. TODO:comments
+ *
+ *  @param address The address of the data.
+ *  @param data The variable-bit data to write.
+ *  @param size The size of the data to write.
+ *  @return bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 4-byte boundary or if there is a programming error.
+ *  @note Assumes Flash has been initialized.
+ */
+bool Flash_Write(volatile uint32_t* const address, const uint32_t data, const uint8_t size)
+{
+  OS_SemaphoreWait(FlashAccessSemaphore,0);
+
+  bool success = false;
+
+  if(size == 32)
+  {
+    success = Write32((uint32_t*)address, (uint32_t)data);
+  }
+  else if(size == 16)
+  {
+    success = Write16((uint16_t*)address, (uint16_t)data);
+  }
+  else if(size == 8)
+  {
+    success = Write8((uint8_t*)address, (uint8_t)data);
+  }
+
+  OS_SemaphoreSignal(FlashAccessSemaphore);
+  return success;
+}
+
+/*! @brief Reads from Flash.
+ *
+ *  @param address The address of the data.
+ *  @return uint8_t - The read value of the data.
+ *  @note Assumes Flash has been initialized.
+ */
+uint8_t Flash_Read8(volatile uint8_t* const address)
+{
+  OS_SemaphoreWait(FlashAccessSemaphore,0);
+  uint8_t data = _FB(address);
+  OS_SemaphoreSignal(FlashAccessSemaphore);
+  return data;
+}
+
+/*! @brief Reads from Flash.
+ *
+ *  @param address The address of the data.
+ *  @return uint16_t - The read value of the data.
+ *  @note Assumes Flash has been initialized.
+ */
+uint16_t Flash_Read16(volatile uint16_t* const address)
+{
+  OS_SemaphoreWait(FlashAccessSemaphore,0);
+  uint16_t data = _FH(address);
+  OS_SemaphoreSignal(FlashAccessSemaphore);
+  return data;
+}
+
+/*! @brief Reads from Flash.
+ *
+ *  @param address The address of the data.
+ *  @return uint32_t - The read value of the data.
+ *  @note Assumes Flash has been initialized.
+ */
+uint32_t Flash_Read32(volatile uint32_t* const address)
+{
+  OS_SemaphoreWait(FlashAccessSemaphore,0);
+  uint32_t data = _FW(address);
+  OS_SemaphoreSignal(FlashAccessSemaphore);
+  return data;
+}
+
+/*! @brief Reads from Flash.
+ *
+ *  @param address The address of the data.
+ *  @return uin64_t - The read value of the data.
+ *  @note Assumes Flash has been initialized.
+ */
+uint64_t Flash_Read64(volatile uint64_t* const address)
+{
+  OS_SemaphoreWait(FlashAccessSemaphore,0);
+  uint64_t data = _FP(address);
+  OS_SemaphoreSignal(FlashAccessSemaphore);
+  return data;
 }
 
 /*! @brief Writes a 32-bit number to Flash.
@@ -104,7 +238,7 @@ bool Flash_AllocateVar(volatile void** variable, const uint8_t size)
  *  @return bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 4-byte boundary or if there is a programming error.
  *  @note Assumes Flash has been initialized.
  */
-bool Flash_Write32(volatile uint32_t* const address, const uint32_t data)
+static bool Write32(volatile uint32_t* const address, const uint32_t data)
 {
   // The phrase to parse
   uint64union_t phrase; 
@@ -144,7 +278,7 @@ bool Flash_Write32(volatile uint32_t* const address, const uint32_t data)
  *  @return bool - TRUE if Flash was written successfully, FALSE if address is not aligned to a 2-byte boundary or if there is a programming error.
  *  @note Assumes Flash has been initialized.
  */
-bool Flash_Write16(volatile uint16_t* const address, const uint16_t data)
+static bool Write16(volatile uint16_t* const address, const uint16_t data)
 {
   // The word to parse
   uint32union_t word; 
@@ -162,7 +296,7 @@ bool Flash_Write16(volatile uint16_t* const address, const uint16_t data)
     word.s.Hi = _FH(address32 + sizeof(data));
     
     // Write the word to the second quarter or fourth quarter of the 8 byte Flash memory
-    return Flash_Write32( (uint32_t volatile *)(address32), word.l ); 
+    return Write32( (uint32_t volatile *)(address32), word.l );
   }
   else
   {
@@ -173,7 +307,7 @@ bool Flash_Write16(volatile uint16_t* const address, const uint16_t data)
     word.s.Hi = data;
     
     // Write the word to the first quarter or thirst quarter of the 8 byte Flash memory
-    return Flash_Write32( (uint32_t volatile *)(address32 - sizeof(data)), word.l );
+    return Write32( (uint32_t volatile *)(address32 - sizeof(data)), word.l );
   }
 }
 
@@ -184,7 +318,7 @@ bool Flash_Write16(volatile uint16_t* const address, const uint16_t data)
  *  @return bool - TRUE if Flash was written successfully, FALSE if there is a programming error.
  *  @note Assumes Flash has been initialized.
  */
-bool Flash_Write8(volatile uint8_t* const address, const uint8_t data)
+static bool Write8(volatile uint8_t* const address, const uint8_t data)
 {
   // The half word to parse
   uint16union_t halfWord;
@@ -202,7 +336,7 @@ bool Flash_Write8(volatile uint8_t* const address, const uint8_t data)
     halfWord.s.Hi = _FB(address32 + sizeof(data));
     
     // Write the half word to the second, fourth, sixth or eighth section of the 8 byte Flash memory
-    return Flash_Write16( (uint16_t volatile *)(address32), halfWord.l );
+    return Write16( (uint16_t volatile *)(address32), halfWord.l );
   }
   else
   {
@@ -213,19 +347,8 @@ bool Flash_Write8(volatile uint8_t* const address, const uint8_t data)
     halfWord.s.Hi = data; 
     
     // Write the half word to the first, third, fifth or seventh section of the 8 byte Flash memory
-    return Flash_Write16( (uint16_t volatile *)(address32 - sizeof(data)), halfWord.l );
+    return Write16( (uint16_t volatile *)(address32 - sizeof(data)), halfWord.l );
   }
-}
-
-/*! @brief Erases the entire Flash sector.
- *
- *  @return bool - TRUE if the Flash "data" sector was erased successfully.
- *  @note Assumes Flash has been initialized.
- */
-bool Flash_Erase(void)
-{
-  // Erase the Flash sector with the Flash Data Start address
-  return EraseSector(FLASH_DATA_START);
 }
 
 /*! @brief Writes TFCCOB to flash and waits for it to complete
@@ -274,7 +397,7 @@ static bool LaunchCommand(TFCCOB* commonCommandObject)
 static bool WritePhrase(const uint32_t address, const uint64union_t phrase)
 {
   // Erase Flash before writing
-  if(Flash_Erase())
+  if(EraseSector(FLASH_DATA_START))
   {
     // Initialize a local TFCCOB structure
     TFCCOB commonCommandObject;

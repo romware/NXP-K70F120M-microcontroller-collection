@@ -90,7 +90,7 @@ volatile uint8_t* NvCountLowers;                             /*!< Number of lowe
 static OS_ECB* LEDOffSemaphore;                              /*!< LED off semaphore for FTM */
 static OS_ECB* RaisesSemaphore;                              /*!< Raises semaphore for Flash */
 static OS_ECB* LowersSemaphore;                              /*!< Lowers semaphore for Flash */
-static OS_ECB* FlashMutex;                                   /*!< Mutex semaphore for Flash */
+static OS_ECB* FlashAccessSemaphore;                         /*!< Mutex semaphore for Flash */
 static OS_ECB* FrequencySemaphore;                           /*!< Frequency semaphore for channel 1*/
 
 // Thread stacks
@@ -156,7 +156,20 @@ static TAnalogThreadData AnalogThreadData[NB_ANALOG_CHANNELS] =
   }
 };
 
-/*! @brief Insert into from one array into another TODO: params
+/*! @brief Sends a value to an analog input channel.
+ *
+ *  @param channelNb is the number of the analog output channel to send the value to.
+ *  @param value is the value to write to the analog channel.
+ *  @return bool - true if the analog value was output successfully.
+ */
+bool ProtectedAnalogPut(uint8_t const channelNb, int16_t const value)
+{
+  OS_DisableInterrupts();
+  Analog_Put(channelNb, value);
+  OS_EnableInterrupts();
+}
+
+/*! @brief Insert into from one array into another TODO: params + comments
  *
  *  @return void
  */
@@ -168,238 +181,47 @@ void ArrayCopy(int16_t array1[], int16_t array2[], const uint8_t length)
   }
 }
 
-/*! @brief Calculates RMS of given values TODO:params
+/*! @brief Calculates RMS of given values TODO:params + comments
  *
  *  @return float - RMS value
  */
-float CalculateRMS(const int16_t data[], const uint8_t length)
+uint16_t CalculateRMS(const int16_t data[], const uint8_t length)
 {
   int64_t sum = 0;
   for(uint8_t i = 0; i < length; i++)
   {
     sum += (data[i])*(data[i]);
   }
-  return sqrt( (float)sum / (float)length );
+  return (uint16_t)sqrt( sum / length );
 }
 
-/*! @brief  TODO:brief + params
+/*! @brief  TODO:brief + params + comments
  *
  *  @return
  */
-void CheckRMS(uint64_t* timerDelay, uint64_t* timerRate, float deviation, bool* alarm, bool* adjustment, OS_ECB* semaphore, int16_t out1, int16_t out2)
+void CheckRMS(uint64_t* timerDelay, uint64_t* timerRate, const uint16_t deviation, bool* alarm, bool* adjustment, OS_ECB* semaphore, const int16_t out1, const int16_t out2)
 {
   if(!(*alarm))
   {
     *alarm = true;
     *timerDelay = PERIOD_TIMER_DELAY;
     *timerRate = Period_Analog_Poll;
-
-    OS_DisableInterrupts();
-    Analog_Put(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
-    OS_EnableInterrupts();
+    ProtectedAnalogPut(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
   }
   else if(*timerDelay >= *timerRate)
   {
     if(Timing_Mode == TIMING_INVERSE)
     {
-      *timerRate = (deviation/(float)VRR_VOLT_HALF) * Period_Analog_Poll;
+      *timerRate = (deviation/(uint16_t)VRR_VOLT_HALF) * Period_Analog_Poll;
     }
     *timerDelay -= *timerRate;
   }
   else if(*timerDelay < *timerRate && !(*adjustment))
   {
     *adjustment = true;
-
-    OS_DisableInterrupts();
-    Analog_Put(ANALOG_CHANNEL_1, out1);
-    Analog_Put(ANALOG_CHANNEL_2, out2);
-    OS_EnableInterrupts();
-
+    ProtectedAnalogPut(ANALOG_CHANNEL_1, out1);
+    ProtectedAnalogPut(ANALOG_CHANNEL_2, out2);
     OS_SemaphoreSignal(semaphore);
-  }
-}
-
-/*! @brief Calculates the RMS value on an ADC channel.
- *
- */
-void CalculateRMSThread(void* pData)
-{
-  // Make the code easier to read by giving a name to the typecast'ed pointer
-  #define analogData ((TAnalogThreadData*)pData)
-
-  uint64_t timerDelay;
-  uint64_t timerRate;
-  bool alarm = false;
-  bool adjustment = false;
-
-  for (;;)
-  {
-    (void)OS_SemaphoreWait(analogData->semaphoreRMS, 0);
-
-    float rms = CalculateRMS(analogData->sampleData, VRR_SAMPLE_SIZE);
-
-    if(rms < VRR_LIMIT_LOW)
-    {
-      CheckRMS(&timerDelay, &timerRate, (VRR_LIMIT_LOW-rms), &alarm, &adjustment, RaisesSemaphore, VRR_OUTPUT_5V, VRR_ZERO);
-    }
-    else if(rms > VRR_LIMIT_HIGH)
-    {
-      CheckRMS(&timerDelay, &timerRate, (rms-VRR_LIMIT_HIGH), &alarm, &adjustment, LowersSemaphore, VRR_ZERO, VRR_OUTPUT_5V);
-    }
-    else if(alarm)
-    {
-      alarm = false;
-      adjustment = false;
-
-      OS_DisableInterrupts();
-      Analog_Put(ANALOG_CHANNEL_1, VRR_ZERO);
-      Analog_Put(ANALOG_CHANNEL_2, VRR_ZERO);
-      Analog_Put(ANALOG_CHANNEL_3, VRR_ZERO);
-      OS_EnableInterrupts();
-    }
-  }
-}
-
-/*! @brief Calculates the Frequency value on an ADC channel.
- *
- */
-void CalculateFrequencyThread(void* pData)
-{
-  for (;;)
-  {
-    (void)OS_SemaphoreWait(FrequencySemaphore, 0);
-
-    OS_DisableInterrupts();
-    bool negCrossingFound = false;
-    float negCrossing1 = 0;
-    float negCrossing2 = 0;
-    TAnalogThreadData* channelData = &AnalogThreadData[ANALOG_CHANNEL_1];
-
-    for(uint8_t i = 0; i < VRR_SAMPLE_SIZE*2 - 1; i++)
-    {
-      int16_t leftVal;
-      int16_t rightVal;
-
-      if(i < VRR_SAMPLE_SIZE)
-      {
-        leftVal = channelData->prevSampleData[i];
-      }
-      else
-      {
-        leftVal = channelData->sampleData[i - VRR_SAMPLE_SIZE];
-      }
-
-      if(i+1 < VRR_SAMPLE_SIZE)
-      {
-        rightVal = channelData->prevSampleData[i+1];
-      }
-      else
-      {
-        rightVal = channelData->sampleData[i+1 - VRR_SAMPLE_SIZE];
-      }
-
-      if(leftVal >= 0 && 0 > rightVal && negCrossingFound)
-      {
-        // m = rise over run, run = 1 sample
-        float m = (rightVal - leftVal);
-        // x = -b/m
-        float x = (float)(-leftVal) / m;
-        negCrossing2 = (float)i + x;
-
-        float distance = (float)negCrossing2 - (float)negCrossing1;
-
-        float frequency = (float)1000000000 / (distance * (float)Period_Analog_Poll);
-
-        if(Frequency != frequency)
-        {
-          Frequency = frequency;
-          Period_Analog_Poll = (1000000000 / Frequency) / VRR_SAMPLE_SIZE;
-          PIT_Set(Period_Analog_Poll / NB_ANALOG_CHANNELS, true);
-        }
-
-        break;
-      }
-      else if(leftVal >= 0 && 0 > rightVal && !negCrossingFound)
-      {
-        negCrossingFound = true;
-
-        // m = rise over run, run = 1 sample
-        float m = (rightVal - leftVal);
-        // x = -b/m
-        float x = (float)(-leftVal) / m;
-        negCrossing1 = (float)i + x;
-      }
-    }
-
-    ArrayCopy(channelData->sampleData, channelData->prevSampleData, VRR_SAMPLE_SIZE);
-    OS_EnableInterrupts();
-  }
-}
-
-/*! @brief Increments the raises count and writes to Flash.
- *
- */
-void RaisesThread(void* pData)
-{
-  for (;;)
-  {
-    (void)OS_SemaphoreWait(RaisesSemaphore, 0);
-    (void)OS_SemaphoreWait(FlashMutex, 0);
-
-    Flash_Write8((uint8_t*)NvCountRaises,_FB(NvCountRaises)+1);
-
-    (void)OS_SemaphoreSignal(FlashMutex);
-  }
-}
-
-/*! @brief Increments the lowers count and writes to Flash.
- *
- */
-void LowersThread(void* pData)
-{
-  for (;;)
-  {
-    (void)OS_SemaphoreWait(LowersSemaphore, 0);
-    (void)OS_SemaphoreWait(FlashMutex, 0);
-
-    Flash_Write8((uint8_t*)NvCountLowers,_FB(NvCountLowers)+1);
-
-    (void)OS_SemaphoreSignal(FlashMutex);
-  }
-}
-
-/*! @brief Reads analog data every time it is called
- *
- *  @return void
- */
-void PITCallback(void* arg)
-{
-  static uint8_t channel;
-
-  int16_t analogInputValue;
-
-  TAnalogThreadData* channelData = &AnalogThreadData[channel];
-
-  Analog_Get(channelData->channelNb, &analogInputValue);
-
-  channelData->sampleData[channelData->sampleDataIndex] = analogInputValue;
-  channelData->sampleDataIndex++;
-  if(channelData->sampleDataIndex >= VRR_SAMPLE_SIZE)
-  {
-    channelData->sampleDataIndex = 0;
-  }
-
-  (void)OS_SemaphoreSignal(AnalogThreadData[channel].semaphoreRMS);
-
-  channel++;
-  if(channel >= NB_ANALOG_CHANNELS)
-  {
-    channel = 0;
-  }
-
-  if(channel == 0 && channelData->sampleDataIndex == 0)
-  {
-    (void)OS_SemaphoreSignal(FrequencySemaphore);
   }
 }
 
@@ -407,7 +229,7 @@ void PITCallback(void* arg)
  *
  *  @return bool - TRUE if packet is sent or timing mode is set
  */
-bool HandleTowerTiming(void)
+static bool HandleTowerTiming(void)
 {
   // Check if parameters match timing GET, DEFINITE or INVERSE parameters
   if(Packet_Parameter1 == TIMING_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
@@ -428,18 +250,18 @@ bool HandleTowerTiming(void)
  *
  *  @return bool - TRUE if packet is sent or number of raises is reset
  */
-bool HandleTowerRaises(void)
+static bool HandleTowerRaises(void)
 {
   // Check if parameters match tower raises GET or RESET parameters
   if(Packet_Parameter1 == DEVIATION_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Sends the number of raises packet
-    return Packet_Put(COMMAND_RAISES,DEVIATION_GET,_FB(NvCountRaises),0);
+    return Packet_Put(COMMAND_RAISES,DEVIATION_GET,Flash_Read8(NvCountRaises),0);
   }
   else if(Packet_Parameter1 == DEVIATION_RESET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Resets the number of raises to flash
-    return Flash_Write8((uint8_t*)NvCountRaises,0);
+    return Flash_Write((uint32_t*)NvCountRaises,0,8);
   }
   return false;
 }
@@ -448,18 +270,18 @@ bool HandleTowerRaises(void)
  *
  *  @return bool - TRUE if packet is sent or number of lowers is reset
  */
-bool HandleTowerLowers(void)
+static bool HandleTowerLowers(void)
 {
   // Check if parameters match tower raises GET or RESET parameters
   if(Packet_Parameter1 == DEVIATION_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Sends the number of raises packet
-    return Packet_Put(COMMAND_LOWERS,DEVIATION_GET,_FB(NvCountLowers),0);
+    return Packet_Put(COMMAND_LOWERS,DEVIATION_GET,Flash_Read8(NvCountLowers),0);
   }
   else if(Packet_Parameter1 == DEVIATION_RESET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Resets the number of lowers to flash
-    return Flash_Write8((uint8_t*)NvCountLowers,0);
+    return Flash_Write((uint32_t*)NvCountLowers,0,8);
   }
   return false;
 }
@@ -468,7 +290,7 @@ bool HandleTowerLowers(void)
  *
  *  @return bool - TRUE if frequency packet is sent
  */
-bool HandleTowerFrequency(void)
+static bool HandleTowerFrequency(void)
 {
   int16union_t frequency;
 
@@ -484,7 +306,7 @@ bool HandleTowerFrequency(void)
  *
  *  @return bool - TRUE if voltage packet is sent
  */
-bool HandleTowerVoltage(void)
+static bool HandleTowerVoltage(void)
 {
   if(Packet_Parameter1 > ANALOG_CHANNEL_1 && Packet_Parameter1 <= NB_ANALOG_CHANNELS && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
@@ -506,7 +328,7 @@ bool HandleTowerVoltage(void)
  *
  *  @return bool - TRUE if spectrum is set
  */
-bool HandleTowerSpectrum(void)
+static bool HandleTowerSpectrum(void)
 {
   // Check half word
 
@@ -585,6 +407,41 @@ void ReceivedPacket(void)
   Packet_Checksum   = 0;
 }
 
+/*! @brief Reads analog data every time it is called
+ *
+ *  @return void
+ */
+void PITCallback(void* arg)
+{
+  static uint8_t channel;
+
+  int16_t analogInputValue;
+
+  TAnalogThreadData* channelData = &AnalogThreadData[channel];
+
+  Analog_Get(channelData->channelNb, &analogInputValue);
+
+  channelData->sampleData[channelData->sampleDataIndex] = analogInputValue;
+  channelData->sampleDataIndex++;
+  if(channelData->sampleDataIndex >= VRR_SAMPLE_SIZE)
+  {
+    channelData->sampleDataIndex = 0;
+  }
+
+  (void)OS_SemaphoreSignal(AnalogThreadData[channel].semaphoreRMS);
+
+  channel++;
+  if(channel >= NB_ANALOG_CHANNELS)
+  {
+    channel = 0;
+  }
+
+  if(channel == 0 && channelData->sampleDataIndex == 0)
+  {
+    (void)OS_SemaphoreSignal(FrequencySemaphore);
+  }
+}
+
 /*! @brief Initializes the main tower components by calling the initialization routines of the supporting software modules.
  *
  *  @return void
@@ -594,7 +451,7 @@ bool TowerInit(void)
   // Success status of writing default values to Flash and FTM
   bool success = false;
 
-  if (Flash_Init() && LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init())
+  if (Flash_Init(FlashAccessSemaphore) && LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init())
   {
     success = true;
 
@@ -603,19 +460,19 @@ bool TowerInit(void)
     && Flash_AllocateVar((volatile void**)&NvCountLowers, sizeof(*NvCountLowers)));
     {
       // Checks if number of raises is clear
-      if(_FB(NvCountRaises) == 0xFF)
+      if(Flash_Read8(NvCountRaises) == 0xFF)
       {
         // Sets the number of raises to the default number
-        if(!Flash_Write8((uint8_t*)NvCountRaises,(uint8_t)0))
+        if(!Flash_Write((uint32_t*)NvCountRaises,(uint8_t)0,8))
         {
           success = false;
         }
       }
       // Checks if number of lowers is clear
-      if(_FB(NvCountLowers) == 0xFF)
+      if(Flash_Read8(NvCountLowers) == 0xFF)
       {
         // Sets the number of lowers to the default number
-        if(!Flash_Write8((uint8_t*)NvCountLowers,(uint8_t)0))
+        if(!Flash_Write((uint32_t*)NvCountLowers,(uint8_t)0,8))
         {
           success = false;
         }
@@ -644,11 +501,11 @@ static void InitModulesThread(void* pData)
   }
 
   // Create semaphores for threads
-  LEDOffSemaphore    = OS_SemaphoreCreate(0);
-  RaisesSemaphore    = OS_SemaphoreCreate(0);
-  LowersSemaphore    = OS_SemaphoreCreate(0);
-  FlashMutex         = OS_SemaphoreCreate(1);
-  FrequencySemaphore = OS_SemaphoreCreate(0);
+  FlashAccessSemaphore = OS_SemaphoreCreate(1);
+  LEDOffSemaphore      = OS_SemaphoreCreate(0);
+  RaisesSemaphore      = OS_SemaphoreCreate(0);
+  LowersSemaphore      = OS_SemaphoreCreate(0);
+  FrequencySemaphore   = OS_SemaphoreCreate(0);
 
   // Initializes the main tower components and sets the default or stored values
   if(TowerInit())
@@ -664,9 +521,9 @@ static void InitModulesThread(void* pData)
   PIT_Set(Period_Analog_Poll / NB_ANALOG_CHANNELS, true);
 
   // Put initial zero values to tower output channels
-  Analog_Put(ANALOG_CHANNEL_1, VRR_ZERO);
-  Analog_Put(ANALOG_CHANNEL_2, VRR_ZERO);
-  Analog_Put(ANALOG_CHANNEL_3, VRR_ZERO);
+  ProtectedAnalogPut(ANALOG_CHANNEL_1, VRR_ZERO);
+  ProtectedAnalogPut(ANALOG_CHANNEL_2, VRR_ZERO);
+  ProtectedAnalogPut(ANALOG_CHANNEL_3, VRR_ZERO);
 
   OS_EnableInterrupts();
 
@@ -723,6 +580,144 @@ static void FTMLEDsOffThread(void* pData)
 
      // Turn off blue LED
      LEDs_Off(LED_BLUE);
+  }
+}
+
+/*! @brief Calculates the RMS value on an ADC channel. TODO:comments
+ *
+ */
+void CalculateRMSThread(void* pData)
+{
+  // Make the code easier to read by giving a name to the typecast'ed pointer
+  #define analogData ((TAnalogThreadData*)pData)
+
+  uint64_t timerDelay;
+  uint64_t timerRate;
+  bool alarm = false;
+  bool adjustment = false;
+
+  for (;;)
+  {
+    (void)OS_SemaphoreWait(analogData->semaphoreRMS, 0);
+
+    uint16_t rms = CalculateRMS(analogData->sampleData, VRR_SAMPLE_SIZE);
+
+    if(rms < VRR_LIMIT_LOW)
+    {
+      CheckRMS(&timerDelay, &timerRate, (VRR_LIMIT_LOW-rms), &alarm, &adjustment, RaisesSemaphore, VRR_OUTPUT_5V, VRR_ZERO);
+    }
+    else if(rms > VRR_LIMIT_HIGH)
+    {
+      CheckRMS(&timerDelay, &timerRate, (rms-VRR_LIMIT_HIGH), &alarm, &adjustment, LowersSemaphore, VRR_ZERO, VRR_OUTPUT_5V);
+    }
+    else if(alarm)
+    {
+      alarm = false;
+      adjustment = false;
+      ProtectedAnalogPut(ANALOG_CHANNEL_1, VRR_ZERO);
+      ProtectedAnalogPut(ANALOG_CHANNEL_2, VRR_ZERO);
+      ProtectedAnalogPut(ANALOG_CHANNEL_3, VRR_ZERO);
+    }
+  }
+}
+
+/*! @brief Calculates the Frequency value on an ADC channel. TODO:comments
+ *
+ */
+void CalculateFrequencyThread(void* pData)
+{
+  for (;;)
+  {
+    (void)OS_SemaphoreWait(FrequencySemaphore, 0);
+
+    OS_DisableInterrupts();
+    bool negCrossingFound = false;
+    float negCrossing1 = 0;
+    float negCrossing2 = 0;
+    TAnalogThreadData* channelData = &AnalogThreadData[ANALOG_CHANNEL_1];
+
+    for(uint8_t i = 0; i < VRR_SAMPLE_SIZE*2 - 1; i++)
+    {
+      int16_t leftVal;
+      int16_t rightVal;
+
+      if(i < VRR_SAMPLE_SIZE)
+      {
+        leftVal = channelData->prevSampleData[i];
+      }
+      else
+      {
+        leftVal = channelData->sampleData[i - VRR_SAMPLE_SIZE];
+      }
+
+      if(i+1 < VRR_SAMPLE_SIZE)
+      {
+        rightVal = channelData->prevSampleData[i+1];
+      }
+      else
+      {
+        rightVal = channelData->sampleData[i+1 - VRR_SAMPLE_SIZE];
+      }
+
+      if(leftVal >= 0 && 0 > rightVal && negCrossingFound)
+      {
+        // m = rise over run, run = 1 sample
+        float m = (rightVal - leftVal);
+        // x = -b/m
+        float x = (float)(-leftVal) / m;
+        negCrossing2 = (float)i + x;
+
+        float distance = negCrossing2 - negCrossing1;
+
+        float frequency = (float)1000000000 / (distance * (float)Period_Analog_Poll);
+
+        if(Frequency != frequency)
+        {
+          Frequency = frequency;
+          Period_Analog_Poll = (1000000000 / Frequency) / VRR_SAMPLE_SIZE;
+          PIT_Set(Period_Analog_Poll / NB_ANALOG_CHANNELS, true);
+        }
+
+        break;
+      }
+      else if(leftVal >= 0 && 0 > rightVal && !negCrossingFound)
+      {
+        negCrossingFound = true;
+
+        // m = rise over run, run = 1 sample
+        float m = (rightVal - leftVal);
+        // x = -b/m
+        float x = (float)(-leftVal) / m;
+        negCrossing1 = (float)i + x;
+      }
+    }
+
+    ArrayCopy(channelData->sampleData, channelData->prevSampleData, VRR_SAMPLE_SIZE);
+    OS_EnableInterrupts();
+  }
+}
+
+/*! @brief Increments the raises count and writes to Flash.
+ *
+ */
+void RaisesThread(void* pData)
+{
+  for (;;)
+  {
+    (void)OS_SemaphoreWait(RaisesSemaphore, 0);
+    Flash_Write((uint32_t*)NvCountRaises,Flash_Read8(NvCountRaises)+1,8);
+  }
+}
+
+/*! @brief Increments the lowers count and writes to Flash.
+ *
+ */
+void LowersThread(void* pData)
+{
+  for (;;)
+  {
+    (void)OS_SemaphoreWait(LowersSemaphore, 0);
+    Flash_Write((uint32_t*)NvCountLowers,Flash_Read8(NvCountLowers)+1,8);
   }
 }
 
