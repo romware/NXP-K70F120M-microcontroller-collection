@@ -1311,8 +1311,8 @@ void RMSThread(void* pData)
       if(ProtectedCheckFlagsOff(Alarm, (uint8_t)NB_ANALOG_CHANNELS, AlarmMutex))
       {
         ProtectedAnalogPut(OUTPUT_ALARM, DAC_5V_OUT);
-        ProtectedFlagUpdate(&Alarm[analogData->channelNb], true, AlarmMutex);
       }
+      ProtectedFlagUpdate(&Alarm[analogData->channelNb], true, AlarmMutex);
       alarmSet = true;
     }
 
@@ -1359,9 +1359,9 @@ void RMSThread(void* pData)
           if(ProtectedCheckFlagsOff(Adjusting, (uint8_t)NB_ANALOG_CHANNELS, AdjustingMutex))
           {
             ProtectedAnalogPut(OUTPUT_LOWER, DAC_5V_OUT);
-            ProtectedFlagUpdate(&Adjusting[analogData->channelNb], true, AdjustingMutex);
             OS_SemaphoreSignal(LogLowersSemaphore);
           }
+          ProtectedFlagUpdate(&Adjusting[analogData->channelNb], true, AdjustingMutex);
           adjusting = true;
         }
 
@@ -1372,9 +1372,9 @@ void RMSThread(void* pData)
           if(ProtectedCheckFlagsOff(Adjusting, (uint8_t)NB_ANALOG_CHANNELS, AdjustingMutex))
           {
             ProtectedAnalogPut(OUTPUT_RAISE, DAC_5V_OUT);
-            ProtectedFlagUpdate(&Adjusting[analogData->channelNb], true, AdjustingMutex);
             OS_SemaphoreSignal(LogRaisesSemaphore);
           }
+          ProtectedFlagUpdate(&Adjusting[analogData->channelNb], true, AdjustingMutex);
           adjusting = true;
         }
       }
@@ -1383,7 +1383,7 @@ void RMSThread(void* pData)
     // Check if raise / lower should be switched off
     else if(!alarm)
     {
-      bool switchOffAdjusting;
+      bool switchOffAdjusting = false;
 
       // Check if all other channel alarm flags are off, update flag and turn off alarm if required
       ProtectedFlagUpdate(&Alarm[analogData->channelNb], false, AlarmMutex);

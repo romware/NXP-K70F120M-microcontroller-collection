@@ -2439,7 +2439,7 @@ OUTPUT(Project.elf elf32-littlearm)
  .debug_macro   0x0001b2d2       0x10 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
  .debug_macro   0x0001b2e2       0x68 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
 
-.debug_line     0x00000000     0x45e3
+.debug_line     0x00000000     0x45e5
  .debug_line    0x00000000      0x2c5 ./Sources/FIFO.o
  .debug_line    0x000002c5      0x307 ./Sources/FTM.o
  .debug_line    0x000005cc      0x394 ./Sources/Flash.o
@@ -2451,14 +2451,14 @@ OUTPUT(Project.elf elf32-littlearm)
  .debug_line    0x000018db      0x329 ./Sources/accel.o
  .debug_line    0x00001c04      0x61b ./Sources/kiss_fft.o
  .debug_line    0x0000221f      0x418 ./Sources/kiss_fftr.o
- .debug_line    0x00002637      0xa4f ./Sources/main.o
- .debug_line    0x00003086      0x2de ./Sources/packet.o
- .debug_line    0x00003364      0x3d4 ./Project_Settings/Startup_Code/startup.o
- .debug_line    0x00003738      0x27b ./Generated_Code/Cpu.o
- .debug_line    0x000039b3      0x2c7 ./Generated_Code/Vectors.o
- .debug_line    0x00003c7a      0x496 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
- .debug_line    0x00004110      0x200 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
- .debug_line    0x00004310      0x2d3 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
+ .debug_line    0x00002637      0xa51 ./Sources/main.o
+ .debug_line    0x00003088      0x2de ./Sources/packet.o
+ .debug_line    0x00003366      0x3d4 ./Project_Settings/Startup_Code/startup.o
+ .debug_line    0x0000373a      0x27b ./Generated_Code/Cpu.o
+ .debug_line    0x000039b5      0x2c7 ./Generated_Code/Vectors.o
+ .debug_line    0x00003c7c      0x496 D:\Embedded Software US\es18aut13\Project\Library\libOS.a(OS.o)
+ .debug_line    0x00004112      0x200 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(analog.o)
+ .debug_line    0x00004312      0x2d3 D:\Embedded Software US\es18aut13\Project\Library\libAnalog.a(SPI.o)
 
 .debug_str      0x00000000    0x91e45
  .debug_str     0x00000000    0x8a66f ./Sources/FIFO.o
