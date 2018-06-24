@@ -589,7 +589,7 @@ bool HandleTowerFrequency(void)
     // Get a local copy of Frequency
     uint16_t localFrequency = ProtectedUint16Get(&Frequency, FrequencyMutex);
 
-    // Type-cast as a uint16  and convert to dHz to be sent to PC.
+    // Type-cast as a uint16  and convert to dHz from Q6.10 to be sent to PC.
     frequency.l = (uint16_t)(localFrequency / 100);
 
     // Check if we need to round up
@@ -1140,18 +1140,18 @@ static void FrequencyCalculateThread(void* pData)
       crossingCount = 0;
 
       // Find rising crossings from sample data and store interpolated result in array (units are in sample periods * 1000)
-      for(uint8_t i = 0; i < ADC_BUFFER_SIZE - 1; i++)
+      for(uint32_t i = 0; i < ADC_BUFFER_SIZE - 1; i++)
       {
         if((localSamples.ADC_Data[i + 1] > 0) && (localSamples.ADC_Data[i] <= 0))
         {
           // Calculate the gradient
-          uint16_t m = (uint16_t)(localSamples.ADC_Data[i + 1]) - (localSamples.ADC_Data[i]);
+          int32_t m = (uint16_t)(localSamples.ADC_Data[i + 1]) - (localSamples.ADC_Data[i]);
 
           // Calculate the y-intercept
-          int16_t b = localSamples.ADC_Data[i];
+          int32_t b = localSamples.ADC_Data[i];
 
-          // Interpolate the zero crossing and store in array
-          risingCrossings[crossingCount] = (i * 1000) + ((((-b) * 1000) / m));
+          // Interpolate the zero crossing and store in array using Q22.10
+          risingCrossings[crossingCount] = (i << 10) + ((((-b) << 10) / m));
 
           // Increment the number of crossings
           crossingCount ++;
@@ -1184,11 +1184,11 @@ static void FrequencyCalculateThread(void* pData)
         LastCrossing -= ADC_SAMPLES_PER_CYCLE;
       }
 
-      // Find the period in nanoseconds.
-      newSamplePeriod = (uint32_t)(uint32_t)((((uint64_t)period * samplePeriod) /(1000 * ADC_SAMPLES_PER_CYCLE)));
+      // Find the period in nanoseconds, converting back from Q22.10
+      newSamplePeriod = (uint32_t)(uint32_t)((((uint64_t)period * samplePeriod) /(ADC_SAMPLES_PER_CYCLE << 10)));
 
-      // From the period (in number of sample periods) and the sample period, work out the frequency in mHz.
-      frequency = (uint16_t)((uint64_t)1000000000000 / ((period * (samplePeriod / 1000))));
+      // From the period (in number of sample periods) and the sample period, work out the frequency in mHz
+      frequency = (uint16_t)((uint64_t)1000000000000 / ((period * (samplePeriod >> 10))));
 
       // Update the Frequency
       ProtectedUint16Put(&Frequency, (uint16)frequency, FrequencyMutex);
