@@ -1476,9 +1476,7 @@ static void FFTThread(void* pData)
     }
 
     // Run forward FFT
-    ProtectedAnalogPut(0, DAC_5V_OUT);
     kiss_fftr(config, fftInput, fftOutput);
-    ProtectedAnalogPut(0, DAC_0V_OUT);
 
     // Update global array
     ProtectedFFTPut(fftOutput, (uint8_t)((ADC_SAMPLES_PER_CYCLE / 2) + 1));
