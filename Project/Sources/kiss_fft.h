@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include "types.h"
+
+#define FIXED_POINT 32
 
 #ifdef __cplusplus
 extern "C" {

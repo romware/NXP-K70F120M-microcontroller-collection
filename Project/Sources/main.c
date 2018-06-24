@@ -12,6 +12,7 @@
 **     Contents    :
 **         No public methods
 **     Authors     : 12403756
+**                 : Mark Borgerding (kiss_fft files)  Copyright (c) 2003-2010. See kiss_fft_guts.h for details.
 **
 ** ###################################################################*/
 /*!
@@ -52,22 +53,21 @@
 #include "I2C.h"
 #include "median.h"
 #include "analog.h"
-#include "math.h"
 #include "kiss_fft.h"
 #include "kiss_fftr.h"
 
 
 #define BAUD_RATE 115200                        /*!< UART2 Baud Rate */
+#define NB_ANALOG_CHANNELS 3                    /*!< Number of analog channels */
 #define ADC_SAMPLES_PER_CYCLE 16                /*!< ADC samples per cycle */
 #define ADC_BUFFER_SIZE 64                      /*!< ADC buffer size Note: Must be an integral number of ADC_SAMPLES_PER_CYCLE*/
-#define NB_ANALOG_CHANNELS 3                    /*!< Number of analog channels */
+#define ADC_HALF_VOLT 1638                      /*!< ADC Half Volt */
 #define ADC_DEFAULT_FREQUENCY 50                /*!< ADC default frequency */
+#define DAC_5V_OUT 16384                        /*!< DAC 5 volts out */
+#define DAC_0V_OUT 0                            /*!< DAC 0 volts out */
 #define RMS_UPPER_LIMIT 9830                    /*!< VRR RMS upper limit */
 #define RMS_LOWER_LIMIT 6554                    /*!< VRR RMS lower limit */
 #define RMS_FREQUENCY_MIN 4915                  /*!< VRR RMS frequency measure minimum level */
-#define DAC_5V_OUT 16384                        /*!< DAC 5 volts out */
-#define DAC_0V_OUT 0                            /*!< DAC 0 volts out */
-#define ADC_HALF_VOLT 1638                      /*!< ADC Half Volt */
 #define ALARM_TIMER 5000000000                  /*!< Alarm Timer in nanoSeconds */
 #define ALARM_TIMER_MIN 1000000000              /*!< Minimum Alarm Timer in nanoSeconds */
 
@@ -395,9 +395,8 @@ uint16_t ProtectedFFTGet(const uint8_t harmonic)
   // Release exclusive access to data
   OS_SemaphoreSignal(FFTOutputMutex);
 
-  // Get the magnitude by taking the square root of the sum of the real and imaginary components squared, dividing values by nfft / 2 first to scale correctly.
-  return (uint16_t)FastSqrt(((uint32_t)(((int32_t)localVoltage.r  / (ADC_SAMPLES_PER_CYCLE / 2)) * ((int32_t)localVoltage.r) / (ADC_SAMPLES_PER_CYCLE / 2))
-         + (((int32_t)localVoltage.i  / (ADC_SAMPLES_PER_CYCLE / 2))* ((int32_t)localVoltage.i / (ADC_SAMPLES_PER_CYCLE / 2)))), 0, 1);
+  // Get the magnitude by taking the square root of the sum of the real and imaginary components squared. Multiply by 2 to scale correctly.
+  return (uint16_t)2 * FastSqrt(((localVoltage.r * localVoltage.r) + (localVoltage.i * localVoltage.i)), 0, 1);
 }
 /*! @brief Checks that no other analog thread has an output set
  *
@@ -1449,7 +1448,9 @@ static void FTMLEDsOffThread(void* pData)
 /*! @brief Performs a Forward Fast Fourier Transform on the given time data.
  *
  *  @param pData is not used but is required by the OS to create a thread.
- *  @note Uses a real only FFT which saves close to 45% of the time required for a complex FFT
+ *  @note Uses a real only FFT which saves close to 45% of the time required for a complex FFT.
+ *  @note Uses fixed point processing which takes around 370us.
+ *  @note Can be changed to use float which takes around 240us with a FPU. Set up for fixed point for versatility with non-FPU micro-controllers.
  */
 static void FFTThread(void* pData)
 {
@@ -1475,7 +1476,9 @@ static void FFTThread(void* pData)
     }
 
     // Run forward FFT
+    ProtectedAnalogPut(0, DAC_5V_OUT);
     kiss_fftr(config, fftInput, fftOutput);
+    ProtectedAnalogPut(0, DAC_0V_OUT);
 
     // Update global array
     ProtectedFFTPut(fftOutput, (uint8_t)((ADC_SAMPLES_PER_CYCLE / 2) + 1));
