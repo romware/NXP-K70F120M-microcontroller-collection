@@ -181,7 +181,6 @@ static kiss_fft_cpx FFTOutput[(ADC_SAMPLES_PER_CYCLE / 2) + 1];       /*!< Compl
 
 // Semaphores for use by RTOS
 static OS_ECB* LEDOffSemaphore;                                       /*!< LED off semaphore for FTM */
-static OS_ECB* RTCReadSemaphore;                                      /*!< Read semaphore for RTC */
 static OS_ECB* OutOfRangeSemaphore;                                   /*!< Out of range semaphore for RMS  */
 static OS_ECB* WithinRangeSemaphore;                                  /*!< Within range semaphore for RMS  */
 static OS_ECB* NewADCDataSemaphore;                                   /*!< New ADC data semaphore for ADC Process thread */
@@ -203,7 +202,6 @@ static OS_ECB* TimingModeMutex;                                       /*!< Timin
 
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);           /*!< The stack for the Tower Init thread. */
-OS_THREAD_STACK(RTCThreadStack, THREAD_STACK_SIZE);                   /*!< The stack for the RTC thread. */
 OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);            /*!< The stack for the FTM thread. */
 OS_THREAD_STACK(ADCDataProcessThreadStack, THREAD_STACK_SIZE);        /*!< The stack for the ADCDataProcess thread. */
 OS_THREAD_STACK(FrequencyCalculateThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the FrequencyCalculate thread. */
@@ -227,18 +225,29 @@ uint16_t FastSqrt(const uint32_t square, const uint16_t lastRoot, const uint16_t
   int32_t error;
   uint32_t last;
   uint32_t root = lastRoot;
-  if(root <= 0)
+
+  // Ensure root is not 0
+  if(root == 0)
   {
     root = 1;
   }
-  if(root <= 0)
+
+  // Ensure square is not 0
+  if(square == 0)
   {
     return 0;
   }
+
+  // Obtain a new estimate for the root
   do
   {
+    // Keep last estimate
     last = root;
+
+    // Estimate new root
     root = (root + (square / root)) / 2;
+
+    // Calculate error and check if within accuracy required
     error = root - last;
   }while(error > accuracy || error <-accuracy);
   return root;
@@ -378,12 +387,12 @@ void ProtectedFFTPut(kiss_fft_cpx* const fftOutput, const uint8_t size)
   // Release exclusive access to data
   OS_SemaphoreSignal(FFTOutputMutex);
 }
+
 /*! @brief Gets a harmonic magnitude from a global array off FFT frequency bins. Uses Mutex access.
  *
  *  @param The harmonic number
  *  @return void
  */
-
 uint16_t ProtectedFFTGet(const uint8_t harmonic)
 {
   // Gain exclusive access to data
@@ -396,8 +405,9 @@ uint16_t ProtectedFFTGet(const uint8_t harmonic)
   OS_SemaphoreSignal(FFTOutputMutex);
 
   // Get the magnitude by taking the square root of the sum of the real and imaginary components squared. Multiply by 2 to scale correctly.
-  return (uint16_t)2 * FastSqrt(((localVoltage.r * localVoltage.r) + (localVoltage.i * localVoltage.i)), 0, 1);
+  return (uint16_t)(2 * FastSqrt(((localVoltage.r * localVoltage.r) + (localVoltage.i * localVoltage.i)), 0, 1));
 }
+
 /*! @brief Checks that no other analog thread has an output set
  *
  *  @param outputs[] The array of flags
@@ -405,7 +415,6 @@ uint16_t ProtectedFFTGet(const uint8_t harmonic)
  *  @param mutex The mutex to the flag/flag array
  *  @return bool - TRUE if all flags are false
  */
-
 bool ProtectedCheckFlagsOff(const bool flags[], const uint8_t nbFlags, OS_ECB* const mutex)
 {
   OS_SemaphoreWait(mutex,0);
@@ -533,21 +542,6 @@ bool HandleTowerMode(void)
   return false;
 }
 
-/*! @brief Sets the Real Time Clock time as requested by PC
- *
- *  @return bool - TRUE if Real Clock Time is set successfully
- */
-bool HandleTowerSetTime(void)
-{
-  // Check if parameters are within tower time limits
-  if(Packet_Parameter1 < 24 && Packet_Parameter2 < 60 && Packet_Parameter3 < 60)
-  {
-    // Sets the Real Time Clock
-    RTC_Set(Packet_Parameter1,Packet_Parameter2,Packet_Parameter3);
-    return true;
-  }
-  return false;
-}
 
 /*! @brief Sets or gets timing mode as requested by PC
  *
@@ -728,11 +722,6 @@ void ReceivedPacket(void)
     // Send tower read byte packet
     success = HandleTowerReadByte();
   }
-  else if(commandIgnoreAck == COMMAND_TIME)
-  {
-    // Set the Real Time Clock time
-    success = HandleTowerSetTime();
-  }
   else if(commandIgnoreAck == COMMAND_TIMINGMODE)
   {
     // Handle timing mode command
@@ -872,7 +861,7 @@ bool TowerInit(void)
   bool success = false;
 
   if (Flash_Init() &&  LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init() &&
-      RTC_Init(RTCReadSemaphore) && Analog_Init(CPU_BUS_CLK_HZ) && PIT_Init(CPU_BUS_CLK_HZ, ADCReadCallback, NULL)/*&& Accel_Init(&accelSetup)*/)
+       Analog_Init(CPU_BUS_CLK_HZ) && PIT_Init(CPU_BUS_CLK_HZ, ADCReadCallback, NULL))
   {
     success = true;
 
@@ -952,7 +941,6 @@ static void InitModulesThread(void* pData)
 {
   // Create semaphores and Mutex semaphores for threads
   LEDOffSemaphore             = OS_SemaphoreCreate(0);
-  RTCReadSemaphore            = OS_SemaphoreCreate(0);
   FrequencyCalculateSemaphore = OS_SemaphoreCreate(0);
   FrequencyTrackSemaphore     = OS_SemaphoreCreate(0);
   LogRaisesSemaphore          = OS_SemaphoreCreate(0);
@@ -988,13 +976,12 @@ static void InitModulesThread(void* pData)
   // Calculate the initial sample period (in nano-seconds)
   SamplePeriod = (uint32_t)(1000000000/(ADC_DEFAULT_FREQUENCY * ADC_SAMPLES_PER_CYCLE));
 
-  // Set the new sampler period and frequency
+  // Set the new sample period and frequency
   NewSamplePeriod = SamplePeriod;
   Frequency = ADC_DEFAULT_FREQUENCY;
 
-  // Set and enable the PIT
-  PIT_Set(SamplePeriod / NB_ANALOG_CHANNELS, false);
-  PIT_Enable(true);
+  // Set the PIT
+  PIT_Set(SamplePeriod / NB_ANALOG_CHANNELS, true);
 
   // We only do this once - therefore delete this thread
   OS_ThreadDelete(OS_PRIORITY_SELF);
@@ -1035,31 +1022,6 @@ static void PacketThread(void* pData)
   }
 }
 
-/*! @brief Sends the time from the real time clock to the PC
- *
- *  @param pData is not used but is required by the OS to create a thread.
- *  @note Assumes that RTC_Init has been called successfully.
- */
-static void RTCThread(void* pData)
-{
-  for (;;)
-  {
-    // Wait for RTCRead semaphore
-    OS_SemaphoreWait(RTCReadSemaphore,0);
-
-    // Toggle the yellow LED
-    LEDs_Toggle(LED_YELLOW);
-
-    // Declare variable for hours, minutes seconds
-    uint8_t hours, minutes, seconds;
-
-    // Get the current time values
-    RTC_Get(&hours, &minutes, &seconds);
-
-    // Send time to PC
-    Packet_Put(COMMAND_TIME, hours, minutes, seconds);
-  }
-}
 
 /*! @brief Writes a logged VRR raise event to non-volatile memory
  *
@@ -1074,18 +1036,13 @@ static void LogRaisesThread(void* pData)
     // Wait for Log Raise semaphore
     OS_SemaphoreWait(LogRaisesSemaphore,0);
 
-    // Gain access to flash
-    OS_SemaphoreWait(FlashAccessMutex, 0);
-
     events = _FB(NvNbRaises);
-    if(events != 255)
+    // Limit to avoid overflow or reset by Flash_Init (takes FF to be clear)
+    if(events != 254)
     {
       events ++;
       Flash_Write((uint8_t*)NvNbRaises, events, (uint8_t)8);
     }
-
-    // Release access to flash
-    OS_SemaphoreSignal(FlashAccessMutex);
   }
 }
 
@@ -1102,17 +1059,13 @@ static void LogLowersThread(void* pData)
     // Wait for Log Raise semaphore
     OS_SemaphoreWait(LogLowersSemaphore,0);
 
-    // Gain access to flash
-    OS_SemaphoreWait(FlashAccessMutex, 0);
-
     events = _FB(NvNbLowers);
-    if(events != 255)
+    // Limit to avoid overflow or reset by Flash_Init (takes FF to be clear)
+    if(events != 254)
     {
       events ++;
       Flash_Write((uint8_t*)NvNbLowers, events, (uint8_t)8);
     }
-    // Release access to flash
-    OS_SemaphoreSignal(FlashAccessMutex);
   }
 }
 
@@ -1242,7 +1195,7 @@ static void FrequencyCalculateThread(void* pData)
     // Set to default 50 Hz if below minimum rms
     else
     {
-      // Update the Frequency
+      // Update the Frequency (in mHz)
       ProtectedUint16Put(&Frequency, (uint16)(ADC_DEFAULT_FREQUENCY * 1000), FrequencyMutex);
 
       // Update Sample period
@@ -1503,7 +1456,7 @@ int main(void)
 
   // Highest priority (will delete and make priority 1 the highest the rest correct)
   error = OS_ThreadCreate(InitModulesThread,
-			  NULL,
+			                    NULL,
                           &InitModulesThreadStack[THREAD_STACK_SIZE - 1],
   		                    0);
   // 2nd Highest priority
@@ -1526,7 +1479,7 @@ int main(void)
   }
   // 10th Highest priority
   error = OS_ThreadCreate(PacketThread,
-        NULL,
+                          NULL,
                           &PacketThreadStack[THREAD_STACK_SIZE - 1],
                           10);
   // 16th Highest priority
@@ -1536,12 +1489,12 @@ int main(void)
                           16);
   // 17th Highest priority
   error = OS_ThreadCreate(LogRaisesThread,
-        NULL,
+                          NULL,
                           &LogRaisesThreadStack[THREAD_STACK_SIZE - 1],
                           17);
   // 18th Highest priority
   error = OS_ThreadCreate(LogLowersThread,
-        NULL,
+                          NULL,
                           &LogLowersThreadStack[THREAD_STACK_SIZE - 1],
                           18);
   // 29th Highest priority
@@ -1549,11 +1502,6 @@ int main(void)
                           NULL,
                           &FTMLEDsOffThreadStack[THREAD_STACK_SIZE - 1],
                           29);
-  // 30th Highest priority
-  error = OS_ThreadCreate(RTCThread,
-                          NULL,
-                          &RTCThreadStack[THREAD_STACK_SIZE - 1],
-                          30);
 
   // Start multithreading - never returns!
   OS_Start();
