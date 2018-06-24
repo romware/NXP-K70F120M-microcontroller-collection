@@ -211,7 +211,7 @@ OS_THREAD_STACK(FrequencyTrackThreadStack, THREAD_STACK_SIZE);        /*!< The s
 OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);                /*!< The stack for the Packet thread. */
 OS_THREAD_STACK(LogRaisesThreadStack, THREAD_STACK_SIZE);             /*!< The stack for the Log Raises thread. */
 OS_THREAD_STACK(LogLowersThreadStack, THREAD_STACK_SIZE);             /*!< The stack for the Log Lowers thread. */
-OS_THREAD_STACK(FFTThreadStack, 2000);                                /*!< The stack for the Log Lowers thread. */
+OS_THREAD_STACK(FFTThreadStack, THREAD_STACK_SIZE);                   /*!< The stack for the Log Lowers thread. */
 static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS]
                 [THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));  /*!< The thread stack array for RMS threads */
 
