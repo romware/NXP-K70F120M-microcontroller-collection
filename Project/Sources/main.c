@@ -88,6 +88,7 @@ static float Frequency             =          0;             /*!< The frequency 
 
 volatile uint8_t* NvCountRaises;                             /*!< Number of raises pointer to flash */
 volatile uint8_t* NvCountLowers;                             /*!< Number of lowers pointer to flash */
+volatile uint8_t* NvTimingMode;                              /*!< Timing Mode Setting pointer to flash */
 
 static OS_ECB* LEDOffSemaphore;                              /*!< LED off semaphore for FTM */
 static OS_ECB* RaisesSemaphore;                              /*!< Raises semaphore for Flash */
@@ -134,6 +135,8 @@ typedef struct AnalogThreadData
   int16_t sampleData[VRR_SAMPLE_SIZE];
   int16_t prevSampleData[VRR_SAMPLE_SIZE];
   uint16_t sampleDataIndex;
+  uint16 currentRMS;
+  uint16 currentRMSSquared;
 } TAnalogThreadData;
 
 /*! @brief Analog thread configuration data
@@ -199,18 +202,57 @@ bool ArrayAnyTrue(const bool data[], const uint8_t length)
   return false;
 }
 
+/*! @brief Calculates the square root of a given value efficiently TODO:params + comments
+ *
+ *  @note Tested speed of Math.h sqrt function - 38us whereas this is 25us. Therefore on average 13us faster
+ *  @return uint16 - Square root value
+ */
+uint32_t QuickSquareRoot(const uint32_t targetSquare, uint32_t prevRoot, uint32_t prevSquare, const uint32_t lowLimit, const uint32_t highLimit)
+{
+  if(!prevRoot || !prevSquare)
+  {
+    prevRoot = (lowLimit + highLimit) / 2;
+    prevSquare = prevRoot * prevRoot;
+  }
+
+  bool increment = false;
+  bool decrement = false;
+
+  while((prevSquare != targetSquare) && !(increment && decrement))
+  {
+    if(prevSquare < targetSquare)
+    {
+      prevRoot++;
+      increment = true;
+    }
+    else
+    {
+      prevRoot--;
+      decrement = true;
+    }
+    prevSquare = prevRoot * prevRoot;
+  }
+
+  return prevRoot;
+}
+
 /*! @brief Calculates RMS of given values TODO:params + comments
  *
- *  @return float - RMS value
+ *  @return uint16_t - RMS value
  */
-uint16_t CalculateRMS(const int16_t data[], const uint8_t length)
+uint16_t CalculateRMS(const int16_t data[], const uint8_t length, const uint16_t prevRoot)
 {
   int64_t sum = 0;
   for(uint8_t i = 0; i < length; i++)
   {
     sum += (data[i])*(data[i]);
   }
-  return (uint16_t)sqrt( sum / length );
+
+  //return (uint16_t)sqrt( sum / length );
+  uint32_t prevSquare = prevRoot*prevRoot;
+  return (uint16_t)QuickSquareRoot((sum/length), prevRoot, prevSquare, VRR_ZERO, VRR_OUTPUT_5V);
+
+
 }
 
 /*! @brief  TODO:brief + params + comments
@@ -258,7 +300,7 @@ static bool HandleTowerTiming(void)
   {
     // Sets the timing mode
     Timing_Mode = Packet_Parameter1;
-    return true;
+    return Flash_Write((uint32_t*)NvTimingMode,Packet_Parameter1,8);
   }
   return false;
 }
@@ -332,7 +374,7 @@ static bool HandleTowerVoltage(void)
 
     // Calculates the RMS based on received phase
     OS_DisableInterrupts();
-    rms.l = (int16_t)CalculateRMS(phase->sampleData, VRR_SAMPLE_SIZE);
+    rms.l = phase->currentRMS;
     OS_EnableInterrupts();
 
     // Sends the RMS voltage packet
@@ -343,6 +385,7 @@ static bool HandleTowerVoltage(void)
 
 /*! @brief Sends the tower spectrum packet for a selected harmonic
  *
+ *  @note Tested speed of Math.h sqrt and float FFT speed - 242us whereas this is 26us. Therefore on average 216us faster
  *  @return bool - TRUE if spectrum packet is sent
  */
 static bool HandleTowerSpectrum(void)
@@ -369,13 +412,18 @@ static bool HandleTowerSpectrum(void)
 
     kiss_fftr(config, timedata, spectrum);
 
-    float mag = sqrt(
-        (spectrum[Packet_Parameter1].r*spectrum[Packet_Parameter1].r) +
-        (spectrum[Packet_Parameter1].i*spectrum[Packet_Parameter1].i)
-        ) / (VRR_SAMPLE_SIZE/2);
+    static uint32_t prevRoots[7];
+    uint32_t prevRoot = prevRoots[Packet_Parameter1];
+    uint32_t prevSquare = prevRoot * prevRoot;
+
+    int64_t real = spectrum[Packet_Parameter1].r / (VRR_SAMPLE_SIZE/2);
+    int64_t imaginary = spectrum[Packet_Parameter1].i / (VRR_SAMPLE_SIZE/2);
+    int64_t targetSquare = (real * real) + (imaginary * imaginary);
+
+    prevRoots[Packet_Parameter1] = QuickSquareRoot(targetSquare,prevRoot,prevSquare,VRR_LIMIT_LOW,VRR_OUTPUT_5V);
 
     uint16union_t magnitude;
-    magnitude.l = mag;
+    magnitude.l = prevRoots[Packet_Parameter1];
 
     return Packet_Put(COMMAND_SPECTRUM,Packet_Parameter1,magnitude.s.Lo,magnitude.s.Hi);
   }
@@ -492,14 +540,28 @@ bool TowerInit(void)
   // Success status of writing default values to Flash and FTM
   bool success = false;
 
-  if (Flash_Init(FlashAccessSemaphore) && LEDs_Init() && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ) && FTM_Init())
+  if(Flash_Init(FlashAccessSemaphore)
+  && LEDs_Init()
+  && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ)
+  && FTM_Init()
+  && PIT_Init(CPU_BUS_CLK_HZ, PITCallback, NULL))
   {
     success = true;
 
-    // Allocates an address in Flash memory to the tower number and tower mode
+    // Allocates addresses in Flash memory
     if(Flash_AllocateVar((volatile void**)&NvCountRaises, sizeof(*NvCountRaises))
-    && Flash_AllocateVar((volatile void**)&NvCountLowers, sizeof(*NvCountLowers)));
+    && Flash_AllocateVar((volatile void**)&NvCountLowers, sizeof(*NvCountLowers))
+    && Flash_AllocateVar((volatile void**)&NvTimingMode, sizeof(*NvTimingMode)));
     {
+      // Checks if timing mode is clear
+      if(Flash_Read8(NvTimingMode) == 0xFF)
+      {
+        // Sets the tower mode to the default number
+        if(!Flash_Write((uint32_t*)NvTimingMode,(uint8_t)TIMING_DEFINITE,8))
+        {
+          success = false;
+        }
+      }
       // Checks if number of raises is clear
       if(Flash_Read8(NvCountRaises) == 0xFF)
       {
@@ -555,9 +617,6 @@ static void InitModulesThread(void* pData)
     LEDs_On(LED_ORANGE);
   }
   
-  // Initialize the Periodic Interrupt Timer with the PIT Callback Function
-  PIT_Init(CPU_BUS_CLK_HZ, PITCallback, NULL);
-
   // Set the PIT with the analog polling period
   PIT_Set(Period_Analog_Poll / NB_ANALOG_CHANNELS, true);
 
@@ -643,7 +702,10 @@ void CalculateRMSThread(void* pData)
   {
     (void)OS_SemaphoreWait(analogData->semaphoreRMS, 0);
 
-    uint16_t rms = CalculateRMS(analogData->sampleData, VRR_SAMPLE_SIZE);
+    uint16_t prevRoot = analogData->currentRMS;
+
+    uint16_t rms = CalculateRMS(analogData->sampleData, VRR_SAMPLE_SIZE, prevRoot);
+    analogData->currentRMS = rms;
 
     if(rms < VRR_LIMIT_LOW)
     {

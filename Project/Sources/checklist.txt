@@ -8,7 +8,7 @@ Hard real-time constraint met.									- Done
 /6 G A P True RMS. 
 Measurement of true RMS for voltage.							- Done
 Speed of calculation.											- Done
-Efficiency of algorithm.										- Moslty Done. Need to change square root function
+Efficiency of algorithm.										- Done
 
 /4 G A P Outputs.
 Three channel operation is aggregated 							- Done
