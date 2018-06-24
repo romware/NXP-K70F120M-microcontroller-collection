@@ -78,13 +78,14 @@ const uint8_t COMMAND_SPECTRUM     =       0x19;             /*!< The serial com
 const int16_t VRR_ZERO             =          0;             /*!< VRR_VOLT x0 */
 const int16_t VRR_VOLT_HALF        =       1638;             /*!< VRR_VOLT x0.5 */
 const int16_t VRR_VOLT             =       3277;             /*!< One volt ((2^15 - 1)/10) */
+const int16_t VRR_LIMIT_FREQUENCY  =       4915;             /*!< VRR_VOLT x1.5 */
 const int16_t VRR_LIMIT_LOW        =       6553;             /*!< VRR_VOLT x2 */
 const int16_t VRR_LIMIT_HIGH       =       9830;             /*!< VRR_VOLT x3 */
 const int16_t VRR_OUTPUT_5V        =      16384;             /*!< VRR_VOLT x5 */
 
 static uint8_t Timing_Mode         =          1;             /*!< The timing mode of the VRR */
 
-static float Frequency             =          0;             /*!< The frequency of the VRR */
+static float Frequency             =         50;             /*!< The frequency of the VRR */
 
 volatile uint8_t* NvCountRaises;                             /*!< Number of raises pointer to flash */
 volatile uint8_t* NvCountLowers;                             /*!< Number of lowers pointer to flash */
@@ -747,65 +748,76 @@ void CalculateFrequencyThread(void* pData)
     float negCrossing2 = 0;
     TAnalogThreadData* channelData = &AnalogThreadData[ANALOG_CHANNEL_1];
 
-    for(uint8_t i = 0; i < VRR_SAMPLE_SIZE*2 - 1; i++)
+    if(channelData->currentRMS > VRR_LIMIT_FREQUENCY)
     {
-      int16_t leftVal;
-      int16_t rightVal;
-
-      if(i < VRR_SAMPLE_SIZE)
+      for(uint8_t i = 0; i < VRR_SAMPLE_SIZE*2 - 1; i++)
       {
-        leftVal = channelData->prevSampleData[i];
-      }
-      else
-      {
-        leftVal = channelData->sampleData[i - VRR_SAMPLE_SIZE];
-      }
+        int16_t leftVal;
+        int16_t rightVal;
 
-      if(i+1 < VRR_SAMPLE_SIZE)
-      {
-        rightVal = channelData->prevSampleData[i+1];
-      }
-      else
-      {
-        rightVal = channelData->sampleData[i+1 - VRR_SAMPLE_SIZE];
-      }
-
-      if(leftVal >= 0 && 0 > rightVal && negCrossingFound)
-      {
-        // m = rise over run, run = 1 sample
-        float m = (rightVal - leftVal);
-        // x = -b/m
-        float x = (float)(-leftVal) / m;
-        negCrossing2 = (float)i + x;
-
-        float distance = negCrossing2 - negCrossing1;
-
-        float frequency = (float)1000000000 / (distance * (float)Period_Analog_Poll);
-
-        if(Frequency != frequency)
+        if(i < VRR_SAMPLE_SIZE)
         {
-          Frequency = frequency;
-          Period_Analog_Poll = (1000000000 / Frequency) / VRR_SAMPLE_SIZE;
-          PIT_Set(Period_Analog_Poll / NB_ANALOG_CHANNELS, true);
+          leftVal = channelData->prevSampleData[i];
+        }
+        else
+        {
+          leftVal = channelData->sampleData[i - VRR_SAMPLE_SIZE];
         }
 
-        break;
-      }
-      else if(leftVal >= 0 && 0 > rightVal && !negCrossingFound)
-      {
-        negCrossingFound = true;
+        if(i+1 < VRR_SAMPLE_SIZE)
+        {
+          rightVal = channelData->prevSampleData[i+1];
+        }
+        else
+        {
+          rightVal = channelData->sampleData[i+1 - VRR_SAMPLE_SIZE];
+        }
 
-        // m = rise over run, run = 1 sample
-        float m = (rightVal - leftVal);
-        // x = -b/m
-        float x = (float)(-leftVal) / m;
-        negCrossing1 = (float)i + x;
+        if(leftVal >= 0 && 0 > rightVal && negCrossingFound)
+        {
+          // m = rise over run, run = 1 sample
+          float m = (rightVal - leftVal);
+          // x = -b/m
+          float x = (float)(-leftVal) / m;
+          negCrossing2 = (float)i + x;
+
+          float distance = negCrossing2 - negCrossing1;
+
+          float frequency = (float)1000000000 / (distance * (float)Period_Analog_Poll);
+
+          if(Frequency != frequency && frequency >= 47.5 && frequency <= 52.5)
+          {
+            Frequency = frequency;
+            Period_Analog_Poll = (1000000000 / Frequency) / VRR_SAMPLE_SIZE;
+            PIT_Set(Period_Analog_Poll / NB_ANALOG_CHANNELS, true);
+          }
+
+          break;
+        }
+        else if(leftVal >= 0 && 0 > rightVal && !negCrossingFound)
+        {
+          negCrossingFound = true;
+
+          // m = rise over run, run = 1 sample
+          float m = (rightVal - leftVal);
+          // x = -b/m
+          float x = (float)(-leftVal) / m;
+          negCrossing1 = (float)i + x;
+        }
       }
+
+      ArrayCopy(channelData->sampleData, channelData->prevSampleData, VRR_SAMPLE_SIZE);
+
+      OS_EnableInterrupts();
     }
-
-    ArrayCopy(channelData->sampleData, channelData->prevSampleData, VRR_SAMPLE_SIZE);
-
-    OS_EnableInterrupts();
+    else
+    {
+      OS_DisableInterrupts();
+      Frequency = 50;
+      Period_Analog_Poll = (1000000000 / Frequency) / VRR_SAMPLE_SIZE;
+      PIT_Set(Period_Analog_Poll / NB_ANALOG_CHANNELS, true);
+      OS_EnableInterrupts();
+    }
   }
 }
 
