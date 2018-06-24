@@ -176,8 +176,8 @@ static int64_t LastSumOfSquares[NB_ANALOG_CHANNELS];                  /*!< The a
 static int16_t OldestData[NB_ANALOG_CHANNELS];                        /*!< The array of the oldest ADC sample to be removed from sum of squares */
 static bool Alarm[NB_ANALOG_CHANNELS];                                /*!< The array of alarm flags indicating individual thread alarm states */
 static bool Adjusting[NB_ANALOG_CHANNELS];                            /*!< The array of adjusting flags indicating individual thread adjusting states */
-static uint16_t Frequency;                                               /*!< The frequency of phase A */
-kiss_fft_cpx FFTOutput[(ADC_SAMPLES_PER_CYCLE / 2) + 1];              /*!< Complex array for output data */
+static uint16_t Frequency;                                            /*!< The frequency of phase A */
+static kiss_fft_cpx FFTOutput[(ADC_SAMPLES_PER_CYCLE / 2) + 1];       /*!< Complex array for output data */
 
 // Semaphores for use by RTOS
 static OS_ECB* LEDOffSemaphore;                                       /*!< LED off semaphore for FTM */
@@ -222,7 +222,7 @@ static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS]
  *  @param accuracy The desired accuracy of the root
  *  @return uint16_t - The square root
  */
-uint16_t FastSqrt(uint32_t square, uint16_t lastRoot, uint16_t accuracy)
+uint16_t FastSqrt(const uint32_t square, const uint16_t lastRoot, const uint16_t accuracy)
 {
   int32_t error;
   uint32_t last;
@@ -244,13 +244,54 @@ uint16_t FastSqrt(uint32_t square, uint16_t lastRoot, uint16_t accuracy)
   return root;
 }
 
+/*! @brief Updates the RMS using the previous sum of squares to save time. From testing it take around 64us vs 112us from scratch.
+ *
+ *  @param pRemoveData The pointer to the data to remove from the sum of squares
+ *  @param pPreviousSumOfSquares The pointer to the previous sum of squares
+ *  @param latestData The latest data sample
+ *  @param oldestData The oldest data sample to be removed next time
+ *  @param dataSize The number of data samples for average of sum of squares
+ *  @param lastRMS The last RMS value of the data
+ *  @return uint16_t - The RMS value
+ */
+uint16_t UpdateRMSFast(int16_t* const pRemoveData, int64_t* const pPreviousSumOfSquares, const int16_t latestData,
+                       const int16_t oldestData, const uint8_t dataSize, const uint16_t lastRMS, OS_ECB* const mutex)
+{
+  // Gain exclusive access to global variables
+  OS_SemaphoreWait(mutex, 0);
+
+  // Cast to int32_t to avoid calculations later
+  int32_t newestData = (int32_t)latestData;
+
+  // Update the sum of squares, removing old data and adding new data.
+  int64_t newSumOfSquares = *pPreviousSumOfSquares;
+  newSumOfSquares += (newestData * newestData);
+  newSumOfSquares -= (int64_t)((int32_t)(*pRemoveData) * (int32_t)(*pRemoveData));
+
+  // Ensure the new sum is positive
+  if(newSumOfSquares < 0)
+  {
+    newSumOfSquares = ((*pRemoveData) * (*pRemoveData));
+  }
+
+  // Update the removed data and sum of squares for next time.
+  *pRemoveData = oldestData;
+  *pPreviousSumOfSquares = newSumOfSquares;
+
+  // Release access to global variables
+  OS_SemaphoreSignal(mutex);
+
+  // Return the calculated RMS
+  return (uint16_t)FastSqrt(newSumOfSquares /dataSize, lastRMS, 1);
+}
+
 /*! @brief Reads a word with mutex access
  *
  *  @param pVariable The address of the variable.
  *  @param mutex The mutex semaphore to access the variable
  *  @return uint16_t The variable
  */
-uint16_t ProtectedUint16Get(uint16* pVariable, OS_ECB* mutex)
+uint16_t ProtectedUint16Get(uint16* const pVariable, OS_ECB* const mutex)
 {
   uint16_t halfword;
   OS_SemaphoreWait(mutex, 0);
@@ -266,7 +307,7 @@ uint16_t ProtectedUint16Get(uint16* pVariable, OS_ECB* mutex)
  *  @param mutex The mutex semaphore to access the variable to be overwritten
  *  @return void
  */
-void ProtectedUint16Put(uint16_t* pAddress, uint16_t variable, OS_ECB* mutex)
+void ProtectedUint16Put(uint16_t* const pAddress, const uint16_t variable, OS_ECB* const mutex)
 {
   OS_SemaphoreWait(mutex, 0);
   *pAddress = variable;
@@ -279,7 +320,7 @@ void ProtectedUint16Put(uint16_t* pAddress, uint16_t variable, OS_ECB* mutex)
  *  @param mutex The mutex semaphore to access the variable
  *  @return uint32_t The variable
  */
-uint32_t ProtectedUint32Get(uint32* pVariable, OS_ECB* mutex)
+uint32_t ProtectedUint32Get(uint32* const pVariable, OS_ECB* const mutex)
 {
   uint32_t word;
   OS_SemaphoreWait(mutex, 0);
@@ -295,7 +336,7 @@ uint32_t ProtectedUint32Get(uint32* pVariable, OS_ECB* mutex)
  *  @param mutex The mutex semaphore to access the variable to be overwritten
  *  @return void
  */
-void ProtectedUint32Put(uint32_t* pAddress, uint32_t variable, OS_ECB* mutex)
+void ProtectedUint32Put(uint32_t* const pAddress, const uint32_t variable, OS_ECB* const mutex)
 {
   OS_SemaphoreWait(mutex, 0);
   *pAddress = variable;
@@ -308,7 +349,7 @@ void ProtectedUint32Put(uint32_t* pAddress, uint32_t variable, OS_ECB* mutex)
  *  @param value The value to write to the analog channel.
  *  @return bool - true if the analog value was output successfully.
  */
-bool ProtectedAnalogPut(uint8_t const channelNb, int16_t const value)
+bool ProtectedAnalogPut(const uint8_t channelNb, const int16_t value)
 {
   bool success = false;
   OS_DisableInterrupts();
@@ -323,7 +364,7 @@ bool ProtectedAnalogPut(uint8_t const channelNb, int16_t const value)
  *  @param size The number of elements in the array
  *  @return void
  */
-void ProtectedFFTPut(kiss_fft_cpx* fftOutput, uint8_t size)
+void ProtectedFFTPut(kiss_fft_cpx* const fftOutput, const uint8_t size)
 {
   // Gain exclusive access to data
   OS_SemaphoreWait(FFTOutputMutex, 0);
@@ -343,7 +384,7 @@ void ProtectedFFTPut(kiss_fft_cpx* fftOutput, uint8_t size)
  *  @return void
  */
 
-uint16_t ProtectedFFTGet(uint8_t harmonic)
+uint16_t ProtectedFFTGet(const uint8_t harmonic)
 {
   // Gain exclusive access to data
   OS_SemaphoreWait(FFTOutputMutex, 0);
@@ -354,7 +395,7 @@ uint16_t ProtectedFFTGet(uint8_t harmonic)
   // Release exclusive access to data
   OS_SemaphoreSignal(FFTOutputMutex);
 
-  // Get the magnitude by taking the square root of the sum of the real and imaginary components squared, dividing values by nfft / 2 to scale correctly.
+  // Get the magnitude by taking the square root of the sum of the real and imaginary components squared, dividing values by nfft / 2 first to scale correctly.
   return (uint16_t)FastSqrt(((uint32_t)(((int32_t)localVoltage.r  / (ADC_SAMPLES_PER_CYCLE / 2)) * ((int32_t)localVoltage.r) / (ADC_SAMPLES_PER_CYCLE / 2))
          + (((int32_t)localVoltage.i  / (ADC_SAMPLES_PER_CYCLE / 2))* ((int32_t)localVoltage.i / (ADC_SAMPLES_PER_CYCLE / 2)))), 0, 1);
 }
@@ -366,7 +407,7 @@ uint16_t ProtectedFFTGet(uint8_t harmonic)
  *  @return bool - TRUE if all flags are false
  */
 
-bool ProtectedCheckFlagsOff(const bool  flags[], const uint8_t nbFlags, OS_ECB* mutex)
+bool ProtectedCheckFlagsOff(const bool flags[], const uint8_t nbFlags, OS_ECB* const mutex)
 {
   OS_SemaphoreWait(mutex,0);
   bool set = false;
@@ -385,7 +426,7 @@ bool ProtectedCheckFlagsOff(const bool  flags[], const uint8_t nbFlags, OS_ECB* 
  *  @param mutex The mutex to the flag/flag array
  *  @return void
  */
-void ProtectedFlagUpdate(bool* flag, const bool flagValue, OS_ECB* mutex)
+void ProtectedFlagUpdate(bool* const flag, const bool flagValue, OS_ECB* const mutex)
 {
   OS_SemaphoreWait(mutex,0);
   *flag = flagValue;
@@ -599,7 +640,7 @@ bool HandleTowerFrequency(void)
     }
 
     // Send frequency to PC
-    return Packet_Put(COMMAND_FREQUENCY, frequency.s.Hi, frequency.s.Lo, 0);
+    return Packet_Put(COMMAND_FREQUENCY, frequency.s.Lo, frequency.s.Hi, 0);
   }
   return false;
 }
@@ -620,7 +661,7 @@ bool HandleTowerVoltage(void)
     rms.l = ProtectedUint16Get(&(RMS[Packet_Parameter1 -1]), RMSMutex);
 
     // Send Voltage to PC
-    return Packet_Put(COMMAND_VOLTAGE, Packet_Parameter1, rms.s.Hi, rms.s.Lo);
+    return Packet_Put(COMMAND_VOLTAGE, Packet_Parameter1, rms.s.Lo, rms.s.Hi);
   }
   return false;
 }
@@ -642,7 +683,7 @@ bool HandleTowerHarmonic(void)
     magnitude.l = ProtectedFFTGet(Packet_Parameter1);
 
     // Send magnitude to PC
-    return Packet_Put(COMMAND_SPECTRUM, Packet_Parameter1, magnitude.s.Hi, magnitude.s.Lo);
+    return Packet_Put(COMMAND_SPECTRUM, Packet_Parameter1, magnitude.s.Lo, magnitude.s.Hi);
   }
   return false;
 }
@@ -1198,49 +1239,19 @@ static void FrequencyCalculateThread(void* pData)
       ProtectedUint32Put(&SamplePeriod, dummyNewSamplePeriod, SamplePeriodMutex);
       ProtectedUint32Put(&NewSamplePeriod, newSamplePeriod, NewSamplePeriodMutex);
     }
+
+    // Set to default 50 Hz if below minimum rms
+    else
+    {
+      // Update the Frequency
+      ProtectedUint16Put(&Frequency, (uint16)(ADC_DEFAULT_FREQUENCY * 1000), FrequencyMutex);
+
+      // Update Sample period
+      ProtectedUint32Put(&NewSamplePeriod, (uint32_t)(1000000000/(ADC_DEFAULT_FREQUENCY * ADC_SAMPLES_PER_CYCLE)), NewSamplePeriodMutex);
+    }
   }
 }
 
-/*! @brief Updates the RMS using the previous sum of squares to save time. From testing it take around 64us vs 112us from scratch.
- *
- *  @param pRemoveData The pointer to the data to remove from the sum of squares
- *  @param pPreviousSumOfSquares The pointer to the previous sum of squares
- *  @param latestData The latest data sample
- *  @param oldestData The oldest data sample to be removed next time
- *  @param dataSize The number of data samples for average of sum of squares
- *  @param lastRMS The last RMS value of the data
- *  @return uint16_t - The RMS value
- */
-uint16_t UpdateRMSFast(int16_t* const pRemoveData, int64_t* const pPreviousSumOfSquares, const int16_t latestData,
-                       const int16_t oldestData, const uint8_t dataSize, const uint16_t lastRMS, OS_ECB* mutex)
-{
-  // Gain exclusive access to global variables
-  OS_SemaphoreWait(mutex, 0);
-
-  // Cast to int32_t to avoid calculations later
-  int32_t newestData = (int32_t)latestData;
-
-  // Update the sum of squares, removing old data and adding new data.
-  int64_t newSumOfSquares = *pPreviousSumOfSquares;
-  newSumOfSquares += (newestData * newestData);
-  newSumOfSquares -= (int64_t)((int32_t)(*pRemoveData) * (int32_t)(*pRemoveData));
-
-  // Ensure the new sum is positive
-  if(newSumOfSquares < 0)
-  {
-    newSumOfSquares = ((*pRemoveData) * (*pRemoveData));
-  }
-
-  // Update the removed data and sum of squares for next time.
-  *pRemoveData = oldestData;
-  *pPreviousSumOfSquares = newSumOfSquares;
-
-  // Release access to global variables
-  OS_SemaphoreSignal(mutex);
-
-  // Return the calculated RMS
-  return (uint16_t)FastSqrt(newSumOfSquares /dataSize, lastRMS, 1);
-}
 
 /*! @brief Gets the RMS, checks limits and handles alarms and raise/lower timing
  *
