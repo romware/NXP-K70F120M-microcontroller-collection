@@ -19,7 +19,7 @@ Non-volatile storage of number of raise/lower events.			- Done
 /6 G A P Timing. 
 Definite.														- Done
 Inverse.														- Done
-Accuracy.														- Mostly Done. Check 1s minimum and efficiency
+Accuracy.														- Done
 
 /2 G A P Settings / interrogation.
 Tower protocol expanded to achieve Basic Functionality.			- Done
@@ -30,7 +30,7 @@ Tower protocol expanded to achieve Basic Functionality.			- Done
 VRR – Intermediate Functionality
 
 /5 G A P Sample rate. 
-16 samples per cycle 											- Moslty Done. Need to optimise float point calculations
+16 samples per cycle 											- Done
 	(i.e. frequency measurement to 0.1 Hz and tracking).
 
 /5 G A P RTOS. 
@@ -40,7 +40,7 @@ Multiple threads are used with an RTOS – i.e.					- Done
 	one thread for logic, etc.
 
 /2 G A P Settings / interrogation.
-Tower protocol expanded to achieve Intermediate Functionality.	- Done. Check frequency limit if voltage below 1.5V
+Tower protocol expanded to achieve Intermediate Functionality.	- Done
 
 /12 SUBTOTAL
 
