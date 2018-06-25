@@ -1,0 +1,54 @@
+\hypertarget{_u_a_r_t_8c}{}\section{C\+:/\+Users/12551519/\+Desktop/es18aut13/\+Project/sources/\+U\+A\+R\+T.c File Reference}
+\label{_u_a_r_t_8c}\index{C\+:/\+Users/12551519/\+Desktop/es18aut13/\+Project/sources/\+U\+A\+R\+T.\+c@{C\+:/\+Users/12551519/\+Desktop/es18aut13/\+Project/sources/\+U\+A\+R\+T.\+c}}
+
+
+I/\+O routines for U\+A\+R\+T communications on the T\+W\+R-\/\+K70\+F120\+M.  
+
+
+{\ttfamily \#include \char`\"{}U\+A\+R\+T.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}F\+I\+F\+O.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}M\+K70\+F12.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}P\+E\+\_\+\+Types.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Cpu.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}O\+S.\+h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{group___u_a_r_t__module_ga2dc6c99815245d0539b23bd5ef9301b1}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Rx\+U\+A\+R\+T\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group___u_a_r_t__module_ga3256718fed574cf8e1a1a2912218e8ac}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Tx\+U\+A\+R\+T\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+bool \hyperlink{group___u_a_r_t__module_gae5760d1a086ec79a33901db253000af9}{U\+A\+R\+T\+\_\+\+Init} (const uint32\+\_\+t baud\+Rate, const uint32\+\_\+t module\+Clk)
+\begin{DoxyCompactList}\small\item\em Sets up the U\+A\+R\+T interface before first use. \end{DoxyCompactList}\item 
+void \hyperlink{group___u_a_r_t__module_ga2825651a32e14bba982ea79dbc505ef7}{U\+A\+R\+T\+\_\+\+In\+Char} (uint8\+\_\+t $\ast$const data\+Ptr)
+\begin{DoxyCompactList}\small\item\em Get a character from the receive F\+I\+F\+O if it is not empty. \end{DoxyCompactList}\item 
+void \hyperlink{group___u_a_r_t__module_ga0bf706acb65883a6fe98326fbb490038}{U\+A\+R\+T\+\_\+\+Out\+Char} (const uint8\+\_\+t data)
+\begin{DoxyCompactList}\small\item\em Put a byte in the transmit F\+I\+F\+O if it is not full. \end{DoxyCompactList}\item 
+void \hyperlink{group___u_a_r_t__module_ga445500277ba0e363873b34cffc015745}{\+\_\+\+\_\+attribute\+\_\+\+\_\+} ((interrupt))
+\begin{DoxyCompactList}\small\item\em Interrupt service routine for the U\+A\+R\+T. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+O\+S\+\_\+\+E\+C\+B $\ast$ \hyperlink{group___u_a_r_t__module_ga4339f0c853f01fbc291b1eb07ea99b0d}{Rx\+U\+A\+R\+T\+Semaphore}
+\item 
+O\+S\+\_\+\+E\+C\+B $\ast$ \hyperlink{group___u_a_r_t__module_ga38ffbfe2005f45b683a4c00b0a578255}{Tx\+U\+A\+R\+T\+Semaphore}
+\item 
+\hyperlink{struct_t_f_i_f_o}{T\+F\+I\+F\+O} \hyperlink{group___u_a_r_t__module_ga57a6bee2e32f83a4a1b52c99299794b8}{Rx\+F\+I\+F\+O}
+\item 
+\hyperlink{struct_t_f_i_f_o}{T\+F\+I\+F\+O} \hyperlink{group___u_a_r_t__module_gabfc40789d380623f1ba598e006927b5e}{Tx\+F\+I\+F\+O}
+\item 
+uint8\+\_\+t \hyperlink{group___u_a_r_t__module_gac7796c8a7e3acba11d9a5c78bab6df3b}{Dummy\+Read}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+I/\+O routines for U\+A\+R\+T communications on the T\+W\+R-\/\+K70\+F120\+M. 
+
+This contains the functions for operating the U\+A\+R\+T (serial port).
+
+\begin{DoxyAuthor}{Author}
+12403756, 12551519 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2018-\/04-\/13 
+\end{DoxyDate}

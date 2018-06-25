@@ -1,0 +1,371 @@
+\hypertarget{group__main__module}{}\section{main module documentation}
+\label{group__main__module}\index{main module documentation@{main module documentation}}
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{struct_analog_thread_data}{Analog\+Thread\+Data}
+\begin{DoxyCompactList}\small\item\em Data structure used to pass Analog configuration to a user thread. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{group__main__module_gad4455691936f92fdd6c37566fc58ba1f}{B\+A\+U\+D\+\_\+\+R\+A\+T\+E}~115200
+\item 
+\hypertarget{group__main__module_ga90b7a8cb7bc3fdbd98014a3e15ee6e9a}{}\#define {\bfseries T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E}~100\label{group__main__module_ga90b7a8cb7bc3fdbd98014a3e15ee6e9a}
+
+\item 
+\hypertarget{group__main__module_ga300da08cc989dc0963caf3a5afc024b8}{}\#define {\bfseries N\+B\+\_\+\+A\+N\+A\+L\+O\+G\+\_\+\+C\+H\+A\+N\+N\+E\+L\+S}~2\label{group__main__module_ga300da08cc989dc0963caf3a5afc024b8}
+
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct \hyperlink{struct_analog_thread_data}{Analog\+Thread\+Data} \hyperlink{group__main__module_gae5f40603a116adc42529ceedda6942c7}{T\+Analog\+Thread\+Data}
+\begin{DoxyCompactList}\small\item\em Data structure used to pass Analog configuration to a user thread. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{group__main__module_gac2875955d67e96abf6cfa8aaad5e9f75}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Init\+Modules\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group__main__module_ga78e32208fd29f8777453fba66cb23512}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (L\+E\+Ds\+Off\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group__main__module_gab4c1c0cd94088cbbb7b7caa74232e2b8}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Packet\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group__main__module_ga05a413cec42e7d893bccc45d54001bb7}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Raises\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group__main__module_ga74d9df5a06cceec1b45c61e69c6d1718}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Lowers\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group__main__module_gaf1afd8f3ce4eedf9ad5254b8750ad1fa}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Frequency\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group__main__module_ga9abdf6124e333220d024a49b5ce39883}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Spectrum\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+void \hyperlink{group__main__module_gaf57dd4c5e7e444cfe5571d411f9548c9}{Received\+Packet} (void)
+\begin{DoxyCompactList}\small\item\em Executes the command depending on what packet has been received. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga5bb615c293d6b116d3c327bd223f2a4a}{Analog\+Sample\+Callback} (void $\ast$arg)
+\begin{DoxyCompactList}\small\item\em Reads analog data from the A\+D\+C on a specific channel. \end{DoxyCompactList}\item 
+bool \hyperlink{group__main__module_gaeda7b585d318b7b1476285b82b6fed11}{Tower\+Init} (void)
+\begin{DoxyCompactList}\small\item\em Initializes the main tower components by calling the initialization routines of the supporting software modules. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga202b6a897d73aca5d3d20cde43ce7a54}{Calculate\+R\+M\+S\+Thread} (void $\ast$p\+Data)
+\begin{DoxyCompactList}\small\item\em Calculates the R\+M\+S value on an A\+D\+C channel. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga39400542b35c71e63af9b23a072c2412}{Calculate\+Frequency\+Thread} (void $\ast$p\+Data)
+\begin{DoxyCompactList}\small\item\em Calculates the Frequency value on an A\+D\+C channel. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga41af216646a8e64f0bc0767a77244c4c}{Calculate\+Spectrum\+Thread} (void $\ast$p\+Data)
+\begin{DoxyCompactList}\small\item\em Calculates the Spectrum on an A\+D\+C channel. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_gad6f4e9bc8436aeebcc4776b05a7173ae}{Raises\+Thread} (void $\ast$p\+Data)
+\begin{DoxyCompactList}\small\item\em Increments the raises count and writes to Flash. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga58206eaf11b86e19e48708e5d3e5cc3f}{Lowers\+Thread} (void $\ast$p\+Data)
+\begin{DoxyCompactList}\small\item\em Increments the lowers count and writes to Flash. \end{DoxyCompactList}\item 
+\hypertarget{group__main__module_ga840291bc02cba5474a4cb46a9b9566fe}{}int {\bfseries main} (void)\label{group__main__module_ga840291bc02cba5474a4cb46a9b9566fe}
+
+\item 
+\hypertarget{group__main__module_gaeac4abe1062c9f3b5d9eb540e300482a}{}void {\bfseries L\+P\+T\+M\+R\+Init} (const uint16\+\_\+t count)\label{group__main__module_gaeac4abe1062c9f3b5d9eb540e300482a}
+
+\item 
+void \hyperlink{group__main__module_gae3cf366e06ba6a7a895b06f7cd6dab35}{\+\_\+\+\_\+attribute\+\_\+\+\_\+} ((interrupt)) L\+P\+Timer\+\_\+\+I\+S\+R(void)
+\begin{DoxyCompactList}\small\item\em Interrupt service routine for the F\+T\+M. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga57d918b99919e3a8dd4e1b736370015a}{Analog\+Loopback\+Thread} (void $\ast$p\+Data)
+\begin{DoxyCompactList}\small\item\em Samples a value on an A\+D\+C channel and sends it to the corresponding D\+A\+C channel. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_gab8928c10e70b1b264be7ff2809bdbafc}{C\+O\+M\+M\+A\+N\+D\+\_\+\+T\+I\+M\+I\+N\+G} = 0x10
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_ga458112a297f29bcedf862af9fee21352}{C\+O\+M\+M\+A\+N\+D\+\_\+\+R\+A\+I\+S\+E\+S} = 0x11
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_ga3950ac4d5a4f4c540f6856a4ad463e14}{C\+O\+M\+M\+A\+N\+D\+\_\+\+L\+O\+W\+E\+R\+S} = 0x12
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_gad03f9b44ebc48c9db63337935fcaf46e}{C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y} = 0x17
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_ga793f5eac55477efb909e878b3021f765}{C\+O\+M\+M\+A\+N\+D\+\_\+\+V\+O\+L\+T\+A\+G\+E} = 0x18
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_gae55bd8263a510b359f8b4ebca3e6a91d}{C\+O\+M\+M\+A\+N\+D\+\_\+\+S\+P\+E\+C\+T\+R\+U\+M} = 0x19
+\item 
+volatile uint8\+\_\+t $\ast$ \hyperlink{group__main__module_ga515a64111062904ebde3d38b51d1d7d2}{Nv\+Count\+Raises}
+\item 
+volatile uint8\+\_\+t $\ast$ \hyperlink{group__main__module_ga5f7c64789a946f4a8d7c20e94b875f30}{Nv\+Count\+Lowers}
+\item 
+volatile uint8\+\_\+t $\ast$ \hyperlink{group__main__module_ga56dcc37aec297d091908aa8c6c90a89e}{Nv\+Timing\+Mode}
+\item 
+\hypertarget{group__main__module_ga8916636821cdde434ff4869a5d9ef1b7}{}const uint8\+\_\+t {\bfseries A\+N\+A\+L\+O\+G\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+P\+R\+I\+O\+R\+I\+T\+I\+E\+S} \mbox{[}N\+B\+\_\+\+A\+N\+A\+L\+O\+G\+\_\+\+C\+H\+A\+N\+N\+E\+L\+S\mbox{]} = \{1, 2\}\label{group__main__module_ga8916636821cdde434ff4869a5d9ef1b7}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{group__main__module_gad4455691936f92fdd6c37566fc58ba1f}{}\index{main module documentation@{main module documentation}!B\+A\+U\+D\+\_\+\+R\+A\+T\+E@{B\+A\+U\+D\+\_\+\+R\+A\+T\+E}}
+\index{B\+A\+U\+D\+\_\+\+R\+A\+T\+E@{B\+A\+U\+D\+\_\+\+R\+A\+T\+E}!main module documentation@{main module documentation}}
+\subsubsection[{B\+A\+U\+D\+\_\+\+R\+A\+T\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define B\+A\+U\+D\+\_\+\+R\+A\+T\+E~115200}\label{group__main__module_gad4455691936f92fdd6c37566fc58ba1f}
+U\+A\+R\+T2 Baud Rate 
+
+\subsection{Typedef Documentation}
+\hypertarget{group__main__module_gae5f40603a116adc42529ceedda6942c7}{}\index{main module documentation@{main module documentation}!T\+Analog\+Thread\+Data@{T\+Analog\+Thread\+Data}}
+\index{T\+Analog\+Thread\+Data@{T\+Analog\+Thread\+Data}!main module documentation@{main module documentation}}
+\subsubsection[{T\+Analog\+Thread\+Data}]{\setlength{\rightskip}{0pt plus 5cm}typedef struct {\bf Analog\+Thread\+Data}  {\bf T\+Analog\+Thread\+Data}}\label{group__main__module_gae5f40603a116adc42529ceedda6942c7}
+
+
+Data structure used to pass Analog configuration to a user thread. 
+
+
+
+\subsection{Function Documentation}
+\hypertarget{group__main__module_gae3cf366e06ba6a7a895b06f7cd6dab35}{}\index{main module documentation@{main module documentation}!\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}!main module documentation@{main module documentation}}
+\subsubsection[{\+\_\+\+\_\+attribute\+\_\+\+\_\+((interrupt)) L\+P\+Timer\+\_\+\+I\+S\+R(void)}]{\setlength{\rightskip}{0pt plus 5cm}void \+\_\+\+\_\+attribute\+\_\+\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{(interrupt)}]{}
+\end{DoxyParamCaption}
+)}\label{group__main__module_gae3cf366e06ba6a7a895b06f7cd6dab35}
+
+
+Interrupt service routine for the F\+T\+M. 
+
+Interrupt service routine for the U\+A\+R\+T.
+
+Interrupt service routine for the P\+I\+T.
+
+If a timer channel was set up as output compare, then the user callback function will be called. \begin{DoxyNote}{Note}
+Assumes the F\+T\+M has been initialized. 
+\end{DoxyNote}
+\hypertarget{group__main__module_ga57d918b99919e3a8dd4e1b736370015a}{}\index{main module documentation@{main module documentation}!Analog\+Loopback\+Thread@{Analog\+Loopback\+Thread}}
+\index{Analog\+Loopback\+Thread@{Analog\+Loopback\+Thread}!main module documentation@{main module documentation}}
+\subsubsection[{Analog\+Loopback\+Thread(void $\ast$p\+Data)}]{\setlength{\rightskip}{0pt plus 5cm}void Analog\+Loopback\+Thread (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{p\+Data}
+\end{DoxyParamCaption}
+)}\label{group__main__module_ga57d918b99919e3a8dd4e1b736370015a}
+
+
+Samples a value on an A\+D\+C channel and sends it to the corresponding D\+A\+C channel. 
+
+\hypertarget{group__main__module_ga5bb615c293d6b116d3c327bd223f2a4a}{}\index{main module documentation@{main module documentation}!Analog\+Sample\+Callback@{Analog\+Sample\+Callback}}
+\index{Analog\+Sample\+Callback@{Analog\+Sample\+Callback}!main module documentation@{main module documentation}}
+\subsubsection[{Analog\+Sample\+Callback(void $\ast$arg)}]{\setlength{\rightskip}{0pt plus 5cm}void Analog\+Sample\+Callback (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{arg}
+\end{DoxyParamCaption}
+)}\label{group__main__module_ga5bb615c293d6b116d3c327bd223f2a4a}
+
+
+Reads analog data from the A\+D\+C on a specific channel. 
+
+\begin{DoxyReturn}{Returns}
+void 
+\end{DoxyReturn}
+\hypertarget{group__main__module_ga39400542b35c71e63af9b23a072c2412}{}\index{main module documentation@{main module documentation}!Calculate\+Frequency\+Thread@{Calculate\+Frequency\+Thread}}
+\index{Calculate\+Frequency\+Thread@{Calculate\+Frequency\+Thread}!main module documentation@{main module documentation}}
+\subsubsection[{Calculate\+Frequency\+Thread(void $\ast$p\+Data)}]{\setlength{\rightskip}{0pt plus 5cm}void Calculate\+Frequency\+Thread (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{p\+Data}
+\end{DoxyParamCaption}
+)}\label{group__main__module_ga39400542b35c71e63af9b23a072c2412}
+
+
+Calculates the Frequency value on an A\+D\+C channel. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Data} & is not used. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Assumes that Analog\+\_\+\+Init has been called successfully. 
+\end{DoxyNote}
+\hypertarget{group__main__module_ga202b6a897d73aca5d3d20cde43ce7a54}{}\index{main module documentation@{main module documentation}!Calculate\+R\+M\+S\+Thread@{Calculate\+R\+M\+S\+Thread}}
+\index{Calculate\+R\+M\+S\+Thread@{Calculate\+R\+M\+S\+Thread}!main module documentation@{main module documentation}}
+\subsubsection[{Calculate\+R\+M\+S\+Thread(void $\ast$p\+Data)}]{\setlength{\rightskip}{0pt plus 5cm}void Calculate\+R\+M\+S\+Thread (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{p\+Data}
+\end{DoxyParamCaption}
+)}\label{group__main__module_ga202b6a897d73aca5d3d20cde43ce7a54}
+
+
+Calculates the R\+M\+S value on an A\+D\+C channel. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Data} & is not used to store the channels data. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Assumes that Analog\+\_\+\+Init has been called successfully. 
+\end{DoxyNote}
+\hypertarget{group__main__module_ga41af216646a8e64f0bc0767a77244c4c}{}\index{main module documentation@{main module documentation}!Calculate\+Spectrum\+Thread@{Calculate\+Spectrum\+Thread}}
+\index{Calculate\+Spectrum\+Thread@{Calculate\+Spectrum\+Thread}!main module documentation@{main module documentation}}
+\subsubsection[{Calculate\+Spectrum\+Thread(void $\ast$p\+Data)}]{\setlength{\rightskip}{0pt plus 5cm}void Calculate\+Spectrum\+Thread (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{p\+Data}
+\end{DoxyParamCaption}
+)}\label{group__main__module_ga41af216646a8e64f0bc0767a77244c4c}
+
+
+Calculates the Spectrum on an A\+D\+C channel. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Data} & is not used. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Assumes that Analog\+\_\+\+Init has been called successfully. 
+\end{DoxyNote}
+\hypertarget{group__main__module_ga58206eaf11b86e19e48708e5d3e5cc3f}{}\index{main module documentation@{main module documentation}!Lowers\+Thread@{Lowers\+Thread}}
+\index{Lowers\+Thread@{Lowers\+Thread}!main module documentation@{main module documentation}}
+\subsubsection[{Lowers\+Thread(void $\ast$p\+Data)}]{\setlength{\rightskip}{0pt plus 5cm}void Lowers\+Thread (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{p\+Data}
+\end{DoxyParamCaption}
+)}\label{group__main__module_ga58206eaf11b86e19e48708e5d3e5cc3f}
+
+
+Increments the lowers count and writes to Flash. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Data} & is not used. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Assumes that Flash\+\_\+\+Init has been called successfully. 
+\end{DoxyNote}
+\hypertarget{group__main__module_gac2875955d67e96abf6cfa8aaad5e9f75}{}\index{main module documentation@{main module documentation}!O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}}
+\index{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}!main module documentation@{main module documentation}}
+\subsubsection[{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K(\+Init\+Modules\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)}]{\setlength{\rightskip}{0pt plus 5cm}O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K (
+\begin{DoxyParamCaption}
+\item[{Init\+Modules\+Thread\+Stack}]{, }
+\item[{T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E}]{}
+\end{DoxyParamCaption}
+)}\label{group__main__module_gac2875955d67e96abf6cfa8aaad5e9f75}
+The stack for the Initial thread.
+
+The stack for the L\+E\+D Init thread. \hypertarget{group__main__module_ga78e32208fd29f8777453fba66cb23512}{}\index{main module documentation@{main module documentation}!O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}}
+\index{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}!main module documentation@{main module documentation}}
+\subsubsection[{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K(\+L\+E\+Ds\+Off\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)}]{\setlength{\rightskip}{0pt plus 5cm}O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K (
+\begin{DoxyParamCaption}
+\item[{L\+E\+Ds\+Off\+Thread\+Stack}]{, }
+\item[{T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E}]{}
+\end{DoxyParamCaption}
+)}\label{group__main__module_ga78e32208fd29f8777453fba66cb23512}
+The stack for the F\+T\+M L\+E\+D thread. \hypertarget{group__main__module_gab4c1c0cd94088cbbb7b7caa74232e2b8}{}\index{main module documentation@{main module documentation}!O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}}
+\index{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}!main module documentation@{main module documentation}}
+\subsubsection[{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K(\+Packet\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)}]{\setlength{\rightskip}{0pt plus 5cm}O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K (
+\begin{DoxyParamCaption}
+\item[{Packet\+Thread\+Stack}]{, }
+\item[{T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E}]{}
+\end{DoxyParamCaption}
+)}\label{group__main__module_gab4c1c0cd94088cbbb7b7caa74232e2b8}
+The stack for the Packet thread. \hypertarget{group__main__module_ga05a413cec42e7d893bccc45d54001bb7}{}\index{main module documentation@{main module documentation}!O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}}
+\index{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}!main module documentation@{main module documentation}}
+\subsubsection[{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K(\+Raises\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)}]{\setlength{\rightskip}{0pt plus 5cm}O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K (
+\begin{DoxyParamCaption}
+\item[{Raises\+Thread\+Stack}]{, }
+\item[{T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E}]{}
+\end{DoxyParamCaption}
+)}\label{group__main__module_ga05a413cec42e7d893bccc45d54001bb7}
+The stack for the Flash Raises thread. \hypertarget{group__main__module_ga74d9df5a06cceec1b45c61e69c6d1718}{}\index{main module documentation@{main module documentation}!O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}}
+\index{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}!main module documentation@{main module documentation}}
+\subsubsection[{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K(\+Lowers\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)}]{\setlength{\rightskip}{0pt plus 5cm}O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K (
+\begin{DoxyParamCaption}
+\item[{Lowers\+Thread\+Stack}]{, }
+\item[{T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E}]{}
+\end{DoxyParamCaption}
+)}\label{group__main__module_ga74d9df5a06cceec1b45c61e69c6d1718}
+The stack for the Flash Lowers thread. \hypertarget{group__main__module_gaf1afd8f3ce4eedf9ad5254b8750ad1fa}{}\index{main module documentation@{main module documentation}!O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}}
+\index{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}!main module documentation@{main module documentation}}
+\subsubsection[{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K(\+Frequency\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)}]{\setlength{\rightskip}{0pt plus 5cm}O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K (
+\begin{DoxyParamCaption}
+\item[{Frequency\+Thread\+Stack}]{, }
+\item[{T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E}]{}
+\end{DoxyParamCaption}
+)}\label{group__main__module_gaf1afd8f3ce4eedf9ad5254b8750ad1fa}
+The stack for the Frequency thread. \hypertarget{group__main__module_ga9abdf6124e333220d024a49b5ce39883}{}\index{main module documentation@{main module documentation}!O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}}
+\index{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}!main module documentation@{main module documentation}}
+\subsubsection[{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K(\+Spectrum\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)}]{\setlength{\rightskip}{0pt plus 5cm}O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K (
+\begin{DoxyParamCaption}
+\item[{Spectrum\+Thread\+Stack}]{, }
+\item[{T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E}]{}
+\end{DoxyParamCaption}
+)}\label{group__main__module_ga9abdf6124e333220d024a49b5ce39883}
+The stack for the Spectrum thread. \hypertarget{group__main__module_gad6f4e9bc8436aeebcc4776b05a7173ae}{}\index{main module documentation@{main module documentation}!Raises\+Thread@{Raises\+Thread}}
+\index{Raises\+Thread@{Raises\+Thread}!main module documentation@{main module documentation}}
+\subsubsection[{Raises\+Thread(void $\ast$p\+Data)}]{\setlength{\rightskip}{0pt plus 5cm}void Raises\+Thread (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{p\+Data}
+\end{DoxyParamCaption}
+)}\label{group__main__module_gad6f4e9bc8436aeebcc4776b05a7173ae}
+
+
+Increments the raises count and writes to Flash. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Data} & is not used. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Assumes that Flash\+\_\+\+Init has been called successfully. 
+\end{DoxyNote}
+\hypertarget{group__main__module_gaf57dd4c5e7e444cfe5571d411f9548c9}{}\index{main module documentation@{main module documentation}!Received\+Packet@{Received\+Packet}}
+\index{Received\+Packet@{Received\+Packet}!main module documentation@{main module documentation}}
+\subsubsection[{Received\+Packet(void)}]{\setlength{\rightskip}{0pt plus 5cm}void Received\+Packet (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{group__main__module_gaf57dd4c5e7e444cfe5571d411f9548c9}
+
+
+Executes the command depending on what packet has been received. 
+
+\begin{DoxyReturn}{Returns}
+void 
+\end{DoxyReturn}
+$<$ The success status of the received packet
+
+$<$ The command byte ignoring the A\+C\+K mask
+
+$<$ The command byte with the A\+C\+K mask \hypertarget{group__main__module_gaeda7b585d318b7b1476285b82b6fed11}{}\index{main module documentation@{main module documentation}!Tower\+Init@{Tower\+Init}}
+\index{Tower\+Init@{Tower\+Init}!main module documentation@{main module documentation}}
+\subsubsection[{Tower\+Init(void)}]{\setlength{\rightskip}{0pt plus 5cm}bool Tower\+Init (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{group__main__module_gaeda7b585d318b7b1476285b82b6fed11}
+
+
+Initializes the main tower components by calling the initialization routines of the supporting software modules. 
+
+\begin{DoxyReturn}{Returns}
+void 
+\end{DoxyReturn}
+
+
+\subsection{Variable Documentation}
+\hypertarget{group__main__module_gad03f9b44ebc48c9db63337935fcaf46e}{}\index{main module documentation@{main module documentation}!C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y@{C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y}}
+\index{C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y@{C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y}!main module documentation@{main module documentation}}
+\subsubsection[{C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y}]{\setlength{\rightskip}{0pt plus 5cm}const uint8\+\_\+t C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y = 0x17}\label{group__main__module_gad03f9b44ebc48c9db63337935fcaf46e}
+The serial command byte for tower frequency \hypertarget{group__main__module_ga3950ac4d5a4f4c540f6856a4ad463e14}{}\index{main module documentation@{main module documentation}!C\+O\+M\+M\+A\+N\+D\+\_\+\+L\+O\+W\+E\+R\+S@{C\+O\+M\+M\+A\+N\+D\+\_\+\+L\+O\+W\+E\+R\+S}}
+\index{C\+O\+M\+M\+A\+N\+D\+\_\+\+L\+O\+W\+E\+R\+S@{C\+O\+M\+M\+A\+N\+D\+\_\+\+L\+O\+W\+E\+R\+S}!main module documentation@{main module documentation}}
+\subsubsection[{C\+O\+M\+M\+A\+N\+D\+\_\+\+L\+O\+W\+E\+R\+S}]{\setlength{\rightskip}{0pt plus 5cm}const uint8\+\_\+t C\+O\+M\+M\+A\+N\+D\+\_\+\+L\+O\+W\+E\+R\+S = 0x12}\label{group__main__module_ga3950ac4d5a4f4c540f6856a4ad463e14}
+The serial command byte for tower lowers \hypertarget{group__main__module_ga458112a297f29bcedf862af9fee21352}{}\index{main module documentation@{main module documentation}!C\+O\+M\+M\+A\+N\+D\+\_\+\+R\+A\+I\+S\+E\+S@{C\+O\+M\+M\+A\+N\+D\+\_\+\+R\+A\+I\+S\+E\+S}}
+\index{C\+O\+M\+M\+A\+N\+D\+\_\+\+R\+A\+I\+S\+E\+S@{C\+O\+M\+M\+A\+N\+D\+\_\+\+R\+A\+I\+S\+E\+S}!main module documentation@{main module documentation}}
+\subsubsection[{C\+O\+M\+M\+A\+N\+D\+\_\+\+R\+A\+I\+S\+E\+S}]{\setlength{\rightskip}{0pt plus 5cm}const uint8\+\_\+t C\+O\+M\+M\+A\+N\+D\+\_\+\+R\+A\+I\+S\+E\+S = 0x11}\label{group__main__module_ga458112a297f29bcedf862af9fee21352}
+The serial command byte for tower raises \hypertarget{group__main__module_gae55bd8263a510b359f8b4ebca3e6a91d}{}\index{main module documentation@{main module documentation}!C\+O\+M\+M\+A\+N\+D\+\_\+\+S\+P\+E\+C\+T\+R\+U\+M@{C\+O\+M\+M\+A\+N\+D\+\_\+\+S\+P\+E\+C\+T\+R\+U\+M}}
+\index{C\+O\+M\+M\+A\+N\+D\+\_\+\+S\+P\+E\+C\+T\+R\+U\+M@{C\+O\+M\+M\+A\+N\+D\+\_\+\+S\+P\+E\+C\+T\+R\+U\+M}!main module documentation@{main module documentation}}
+\subsubsection[{C\+O\+M\+M\+A\+N\+D\+\_\+\+S\+P\+E\+C\+T\+R\+U\+M}]{\setlength{\rightskip}{0pt plus 5cm}const uint8\+\_\+t C\+O\+M\+M\+A\+N\+D\+\_\+\+S\+P\+E\+C\+T\+R\+U\+M = 0x19}\label{group__main__module_gae55bd8263a510b359f8b4ebca3e6a91d}
+The serial command byte for tower spectrum \hypertarget{group__main__module_gab8928c10e70b1b264be7ff2809bdbafc}{}\index{main module documentation@{main module documentation}!C\+O\+M\+M\+A\+N\+D\+\_\+\+T\+I\+M\+I\+N\+G@{C\+O\+M\+M\+A\+N\+D\+\_\+\+T\+I\+M\+I\+N\+G}}
+\index{C\+O\+M\+M\+A\+N\+D\+\_\+\+T\+I\+M\+I\+N\+G@{C\+O\+M\+M\+A\+N\+D\+\_\+\+T\+I\+M\+I\+N\+G}!main module documentation@{main module documentation}}
+\subsubsection[{C\+O\+M\+M\+A\+N\+D\+\_\+\+T\+I\+M\+I\+N\+G}]{\setlength{\rightskip}{0pt plus 5cm}const uint8\+\_\+t C\+O\+M\+M\+A\+N\+D\+\_\+\+T\+I\+M\+I\+N\+G = 0x10}\label{group__main__module_gab8928c10e70b1b264be7ff2809bdbafc}
+The serial command byte for tower timing \hypertarget{group__main__module_ga793f5eac55477efb909e878b3021f765}{}\index{main module documentation@{main module documentation}!C\+O\+M\+M\+A\+N\+D\+\_\+\+V\+O\+L\+T\+A\+G\+E@{C\+O\+M\+M\+A\+N\+D\+\_\+\+V\+O\+L\+T\+A\+G\+E}}
+\index{C\+O\+M\+M\+A\+N\+D\+\_\+\+V\+O\+L\+T\+A\+G\+E@{C\+O\+M\+M\+A\+N\+D\+\_\+\+V\+O\+L\+T\+A\+G\+E}!main module documentation@{main module documentation}}
+\subsubsection[{C\+O\+M\+M\+A\+N\+D\+\_\+\+V\+O\+L\+T\+A\+G\+E}]{\setlength{\rightskip}{0pt plus 5cm}const uint8\+\_\+t C\+O\+M\+M\+A\+N\+D\+\_\+\+V\+O\+L\+T\+A\+G\+E = 0x18}\label{group__main__module_ga793f5eac55477efb909e878b3021f765}
+The serial command byte for tower voltage \hypertarget{group__main__module_ga5f7c64789a946f4a8d7c20e94b875f30}{}\index{main module documentation@{main module documentation}!Nv\+Count\+Lowers@{Nv\+Count\+Lowers}}
+\index{Nv\+Count\+Lowers@{Nv\+Count\+Lowers}!main module documentation@{main module documentation}}
+\subsubsection[{Nv\+Count\+Lowers}]{\setlength{\rightskip}{0pt plus 5cm}volatile uint8\+\_\+t$\ast$ Nv\+Count\+Lowers}\label{group__main__module_ga5f7c64789a946f4a8d7c20e94b875f30}
+Number of lowers pointer to flash \hypertarget{group__main__module_ga515a64111062904ebde3d38b51d1d7d2}{}\index{main module documentation@{main module documentation}!Nv\+Count\+Raises@{Nv\+Count\+Raises}}
+\index{Nv\+Count\+Raises@{Nv\+Count\+Raises}!main module documentation@{main module documentation}}
+\subsubsection[{Nv\+Count\+Raises}]{\setlength{\rightskip}{0pt plus 5cm}volatile uint8\+\_\+t$\ast$ Nv\+Count\+Raises}\label{group__main__module_ga515a64111062904ebde3d38b51d1d7d2}
+Number of raises pointer to flash \hypertarget{group__main__module_ga56dcc37aec297d091908aa8c6c90a89e}{}\index{main module documentation@{main module documentation}!Nv\+Timing\+Mode@{Nv\+Timing\+Mode}}
+\index{Nv\+Timing\+Mode@{Nv\+Timing\+Mode}!main module documentation@{main module documentation}}
+\subsubsection[{Nv\+Timing\+Mode}]{\setlength{\rightskip}{0pt plus 5cm}volatile uint8\+\_\+t$\ast$ Nv\+Timing\+Mode}\label{group__main__module_ga56dcc37aec297d091908aa8c6c90a89e}
+Timing Mode Setting pointer to flash 

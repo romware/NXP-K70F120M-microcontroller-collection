@@ -146,7 +146,7 @@ void VRR_SetFrequency(OS_ECB* frequencyAccess, uint32_t * frequencyPtr, const ui
  *
  *  @param sampleData is the sample data taken from the ADC.
  *  @param rms is value of the calculated RMS on the selected channel.
- *  @param preiodAnalogSample is the period at which the ADC is sampling.
+ *  @param periodAnalogSample is the period at which the ADC is sampling.
  *  @return uint32_t - The frequency
  */
 uint32_t VRR_CalculateFrequency(const int16_t sampleData[], const uint16_t rms, const uint32_t periodAnalogSample);

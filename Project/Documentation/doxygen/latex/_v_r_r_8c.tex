@@ -1,0 +1,70 @@
+\hypertarget{_v_r_r_8c}{}\section{C\+:/\+Users/12551519/\+Desktop/es18aut13/\+Project/sources/\+V\+R\+R.c File Reference}
+\label{_v_r_r_8c}\index{C\+:/\+Users/12551519/\+Desktop/es18aut13/\+Project/sources/\+V\+R\+R.\+c@{C\+:/\+Users/12551519/\+Desktop/es18aut13/\+Project/sources/\+V\+R\+R.\+c}}
+
+
+Routines for voltage regulating relay.  
+
+
+{\ttfamily \#include \char`\"{}types.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}M\+K70\+F12.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}analog.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}V\+R\+R.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}O\+S.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}P\+I\+T.\+h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{group___v_r_r__module_ga756bc6b6907a4561fe65c47e79fcac7a}{V\+R\+R\+\_\+\+Init} (void)
+\begin{DoxyCompactList}\small\item\em Sets up the V\+R\+R before first use. \end{DoxyCompactList}\item 
+bool \hyperlink{group___v_r_r__module_ga93027d44790f5625dc76fe8546c9692b}{V\+R\+R\+\_\+\+Protected\+Analog\+Put} (uint8\+\_\+t const channel\+Nb, int16\+\_\+t const value)
+\begin{DoxyCompactList}\small\item\em Sends a value to an analog input channel. \end{DoxyCompactList}\item 
+void \hyperlink{group___v_r_r__module_ga8522aea3405b3832f6d4b685f98abef8}{V\+R\+R\+\_\+\+Array\+Copy} (int16\+\_\+t array1\mbox{[}$\,$\mbox{]}, int16\+\_\+t array2\mbox{[}$\,$\mbox{]}, const uint8\+\_\+t length)
+\begin{DoxyCompactList}\small\item\em Insert samples from one array into another. \end{DoxyCompactList}\item 
+bool \hyperlink{group___v_r_r__module_ga77bce40d62678d121ab09cb771c49493}{V\+R\+R\+\_\+\+Array\+Any\+True} (const bool data\mbox{[}$\,$\mbox{]}, const uint8\+\_\+t length)
+\begin{DoxyCompactList}\small\item\em Checks if any alarm in an array is true. \end{DoxyCompactList}\item 
+uint32\+\_\+t \hyperlink{group___v_r_r__module_ga71340103bb9bb352a49355047d8ca2fe}{V\+R\+R\+\_\+\+Quick\+Square\+Root} (const uint32\+\_\+t target\+Square, uint32\+\_\+t prev\+Root, uint32\+\_\+t prev\+Square, const uint32\+\_\+t low\+Limit, const uint32\+\_\+t high\+Limit)
+\begin{DoxyCompactList}\small\item\em Calculates the square root of a given value efficiently using previous roots. \end{DoxyCompactList}\item 
+uint16\+\_\+t \hyperlink{group___v_r_r__module_ga133f79b2a87bb1e8c5ec256642b2e0d5}{V\+R\+R\+\_\+\+Calculate\+R\+M\+S} (const int16\+\_\+t data\mbox{[}$\,$\mbox{]}, const uint8\+\_\+t length, const uint16\+\_\+t prev\+Root)
+\begin{DoxyCompactList}\small\item\em Calculates R\+M\+S of given values. \end{DoxyCompactList}\item 
+void \hyperlink{group___v_r_r__module_ga19d2f6b20d6ec746b143317ea8add0db}{V\+R\+R\+\_\+\+Check\+Alarm} (int64\+\_\+t $\ast$timer\+Delay, int64\+\_\+t $\ast$min\+Delay, int64\+\_\+t $\ast$timer\+Rate, const uint32\+\_\+t default\+Rate, const uint8\+\_\+t mode, const uint16\+\_\+t deviation, bool $\ast$alarm, bool $\ast$adjustment, O\+S\+\_\+\+E\+C\+B $\ast$semaphore, const int8\+\_\+t channel)
+\begin{DoxyCompactList}\small\item\em Triggers the alarm, adjustment and timer when the R\+M\+S is out of bounds. \end{DoxyCompactList}\item 
+void \hyperlink{group___v_r_r__module_ga86c619fba042609fa87246ef742e466e}{V\+R\+R\+\_\+\+Set\+Frequency} (O\+S\+\_\+\+E\+C\+B $\ast$frequency\+Access, uint32\+\_\+t $\ast$frequency\+Ptr, const uint32\+\_\+t frequency, const uint16\+\_\+t rms, uint32\+\_\+t $\ast$period\+Analog\+Sample\+Ptr)
+\begin{DoxyCompactList}\small\item\em Sets the frequency to a new value. \end{DoxyCompactList}\item 
+uint32\+\_\+t \hyperlink{group___v_r_r__module_ga62b2158646147efadf49c870f3245c0d}{V\+R\+R\+\_\+\+Calculate\+Frequency} (const int16\+\_\+t sample\+Data\mbox{[}$\,$\mbox{]}, const uint16\+\_\+t rms, const uint32\+\_\+t period\+Analog\+Sample)
+\begin{DoxyCompactList}\small\item\em Calculates the frequency from sample data. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const uint64\+\_\+t \hyperlink{group___v_r_r__module_gadc0a5545fe71ae0a54e9790b83f3cc35}{V\+R\+R\+\_\+\+P\+E\+R\+I\+O\+D\+\_\+\+T\+I\+M\+E\+R\+\_\+\+D\+E\+L\+A\+Y} = 5000000000
+\item 
+const uint64\+\_\+t \hyperlink{group___v_r_r__module_ga6dcb39a1c723e97c190362e56504ce0f}{V\+R\+R\+\_\+\+P\+E\+R\+I\+O\+D\+\_\+\+M\+I\+N\+\_\+\+D\+E\+L\+A\+Y} = 1000000000
+\item 
+const uint32\+\_\+t \hyperlink{group___v_r_r__module_ga9cff33455fa636577df049d46c6a732c}{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+D\+E\+F\+A\+U\+L\+T} = 500
+\item 
+const int16\+\_\+t \hyperlink{group___v_r_r__module_gad55bb968f6baf24de7bc84da9af56299}{V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+Z\+E\+R\+O} = 0
+\item 
+const int16\+\_\+t \hyperlink{group___v_r_r__module_gab6986e66860b0f542175fa87d09b9b0c}{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+H\+A\+L\+F} = 1638
+\item 
+const int16\+\_\+t \hyperlink{group___v_r_r__module_gad3aaefa339469ae93a965e64c9e19695}{V\+R\+R\+\_\+\+V\+O\+L\+T} = 3277
+\item 
+const int16\+\_\+t \hyperlink{group___v_r_r__module_ga9475d7ceaf1b4b9d63d458bc8df3c5e0}{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y} = 4915
+\item 
+const int16\+\_\+t \hyperlink{group___v_r_r__module_ga18eb3dafde58338caa5182fc2c2e9d82}{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W} = 6553
+\item 
+const int16\+\_\+t \hyperlink{group___v_r_r__module_gaf47e40bfdb9ee19a02d47d30cfca0237}{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H} = 9830
+\item 
+const int16\+\_\+t \hyperlink{group___v_r_r__module_gadc76104466768c55588f9dfa0d80d851}{V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+F\+I\+V\+E} = 16384
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Routines for voltage regulating relay. 
+
+This contains the functions needed for accessing the V\+R\+R.
+
+\begin{DoxyAuthor}{Author}
+12551519 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2018-\/06-\/13 
+\end{DoxyDate}

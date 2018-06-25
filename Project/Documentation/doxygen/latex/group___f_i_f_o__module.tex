@@ -1,0 +1,86 @@
+\hypertarget{group___f_i_f_o__module}{}\section{F\+I\+F\+O module documentation}
+\label{group___f_i_f_o__module}\index{F\+I\+F\+O module documentation@{F\+I\+F\+O module documentation}}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{group___f_i_f_o__module_gad9207f49ab9ed061b6dca6063112ca60}{F\+I\+F\+O\+\_\+\+Init} (\hyperlink{struct_t_f_i_f_o}{T\+F\+I\+F\+O} $\ast$const F\+I\+F\+O)
+\begin{DoxyCompactList}\small\item\em Initialize the F\+I\+F\+O before first use. \end{DoxyCompactList}\item 
+void \hyperlink{group___f_i_f_o__module_gaee681f1a1e1fd5672ed23dca0929433a}{F\+I\+F\+O\+\_\+\+Put} (\hyperlink{struct_t_f_i_f_o}{T\+F\+I\+F\+O} $\ast$const F\+I\+F\+O, const uint8\+\_\+t data)
+\begin{DoxyCompactList}\small\item\em Put one character into the F\+I\+F\+O. \end{DoxyCompactList}\item 
+void \hyperlink{group___f_i_f_o__module_gabb3392ae9e1170a724586695ab0e5808}{F\+I\+F\+O\+\_\+\+Get} (\hyperlink{struct_t_f_i_f_o}{T\+F\+I\+F\+O} $\ast$const F\+I\+F\+O, uint8\+\_\+t $\ast$const data\+Ptr)
+\begin{DoxyCompactList}\small\item\em Get one character from the F\+I\+F\+O. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Function Documentation}
+\hypertarget{group___f_i_f_o__module_gabb3392ae9e1170a724586695ab0e5808}{}\index{F\+I\+F\+O module documentation@{F\+I\+F\+O module documentation}!F\+I\+F\+O\+\_\+\+Get@{F\+I\+F\+O\+\_\+\+Get}}
+\index{F\+I\+F\+O\+\_\+\+Get@{F\+I\+F\+O\+\_\+\+Get}!F\+I\+F\+O module documentation@{F\+I\+F\+O module documentation}}
+\subsubsection[{F\+I\+F\+O\+\_\+\+Get(\+T\+F\+I\+F\+O $\ast$const F\+I\+F\+O, uint8\+\_\+t $\ast$const data\+Ptr)}]{\setlength{\rightskip}{0pt plus 5cm}void F\+I\+F\+O\+\_\+\+Get (
+\begin{DoxyParamCaption}
+\item[{{\bf T\+F\+I\+F\+O} $\ast$const}]{F\+I\+F\+O, }
+\item[{uint8\+\_\+t $\ast$const}]{data\+Ptr}
+\end{DoxyParamCaption}
+)}\label{group___f_i_f_o__module_gabb3392ae9e1170a724586695ab0e5808}
+
+
+Get one character from the F\+I\+F\+O. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em F\+I\+F\+O} & A pointer to a F\+I\+F\+O struct with data to be retrieved. \\
+\hline
+{\em data\+Ptr} & A pointer to a memory location to place the retrieved byte. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Assumes that F\+I\+F\+O\+\_\+\+Init has been called. 
+\end{DoxyNote}
+\hypertarget{group___f_i_f_o__module_gad9207f49ab9ed061b6dca6063112ca60}{}\index{F\+I\+F\+O module documentation@{F\+I\+F\+O module documentation}!F\+I\+F\+O\+\_\+\+Init@{F\+I\+F\+O\+\_\+\+Init}}
+\index{F\+I\+F\+O\+\_\+\+Init@{F\+I\+F\+O\+\_\+\+Init}!F\+I\+F\+O module documentation@{F\+I\+F\+O module documentation}}
+\subsubsection[{F\+I\+F\+O\+\_\+\+Init(\+T\+F\+I\+F\+O $\ast$const F\+I\+F\+O)}]{\setlength{\rightskip}{0pt plus 5cm}void F\+I\+F\+O\+\_\+\+Init (
+\begin{DoxyParamCaption}
+\item[{{\bf T\+F\+I\+F\+O} $\ast$const}]{F\+I\+F\+O}
+\end{DoxyParamCaption}
+)}\label{group___f_i_f_o__module_gad9207f49ab9ed061b6dca6063112ca60}
+
+
+Initialize the F\+I\+F\+O before first use. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em F\+I\+F\+O} & A pointer to the F\+I\+F\+O that needs initializing. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void 
+\end{DoxyReturn}
+\hypertarget{group___f_i_f_o__module_gaee681f1a1e1fd5672ed23dca0929433a}{}\index{F\+I\+F\+O module documentation@{F\+I\+F\+O module documentation}!F\+I\+F\+O\+\_\+\+Put@{F\+I\+F\+O\+\_\+\+Put}}
+\index{F\+I\+F\+O\+\_\+\+Put@{F\+I\+F\+O\+\_\+\+Put}!F\+I\+F\+O module documentation@{F\+I\+F\+O module documentation}}
+\subsubsection[{F\+I\+F\+O\+\_\+\+Put(\+T\+F\+I\+F\+O $\ast$const F\+I\+F\+O, const uint8\+\_\+t data)}]{\setlength{\rightskip}{0pt plus 5cm}void F\+I\+F\+O\+\_\+\+Put (
+\begin{DoxyParamCaption}
+\item[{{\bf T\+F\+I\+F\+O} $\ast$const}]{F\+I\+F\+O, }
+\item[{const uint8\+\_\+t}]{data}
+\end{DoxyParamCaption}
+)}\label{group___f_i_f_o__module_gaee681f1a1e1fd5672ed23dca0929433a}
+
+
+Put one character into the F\+I\+F\+O. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em F\+I\+F\+O} & A pointer to a F\+I\+F\+O struct where data is to be stored. \\
+\hline
+{\em data} & A byte of data to store in the F\+I\+F\+O buffer. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Assumes that F\+I\+F\+O\+\_\+\+Init has been called. 
+\end{DoxyNote}

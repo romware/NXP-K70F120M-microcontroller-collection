@@ -1,0 +1,206 @@
+\hypertarget{group___flash__module}{}\section{Flash module documentation}
+\label{group___flash__module}\index{Flash module documentation@{Flash module documentation}}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{group___flash__module_gab6bef2c581b902a2bca7a0d04409ad30}{Flash\+\_\+\+Init} (O\+S\+\_\+\+E\+C\+B $\ast$flash\+Access\+Semaphore)
+\begin{DoxyCompactList}\small\item\em Enables the Flash module. \end{DoxyCompactList}\item 
+bool \hyperlink{group___flash__module_ga50871aff0f5af1e092aea3ed2545cf72}{Flash\+\_\+\+Allocate\+Var} (volatile void $\ast$$\ast$variable, const uint8\+\_\+t size)
+\begin{DoxyCompactList}\small\item\em Allocates space for a non-\/volatile variable in the Flash memory. \end{DoxyCompactList}\item 
+bool \hyperlink{group___flash__module_ga06868787ccef73e69bd236d3b93b68f3}{Flash\+\_\+\+Erase} (void)
+\begin{DoxyCompactList}\small\item\em Erases the entire Flash sector. \end{DoxyCompactList}\item 
+bool \hyperlink{group___flash__module_gab920a95573638276676b5a9417e282fd}{Flash\+\_\+\+Write} (volatile uint32\+\_\+t $\ast$const address, const uint32\+\_\+t data, const uint8\+\_\+t size)
+\begin{DoxyCompactList}\small\item\em Writes to Flash. T\+O\+D\+O\+:comments. \end{DoxyCompactList}\item 
+uint8\+\_\+t \hyperlink{group___flash__module_ga10da7ee9a2d8d8bc4bc6fc698c9197ac}{Flash\+\_\+\+Read8} (volatile uint8\+\_\+t $\ast$const address)
+\begin{DoxyCompactList}\small\item\em Reads from Flash. \end{DoxyCompactList}\item 
+uint16\+\_\+t \hyperlink{group___flash__module_gab00365afc70a3e21ea3987c3c5e97132}{Flash\+\_\+\+Read16} (volatile uint16\+\_\+t $\ast$const address)
+\begin{DoxyCompactList}\small\item\em Reads from Flash. \end{DoxyCompactList}\item 
+uint32\+\_\+t \hyperlink{group___flash__module_gad7c248518fd800ac3af6b4cf52843e82}{Flash\+\_\+\+Read32} (volatile uint32\+\_\+t $\ast$const address)
+\begin{DoxyCompactList}\small\item\em Reads from Flash. \end{DoxyCompactList}\item 
+uint64\+\_\+t \hyperlink{group___flash__module_ga4a5eef3ce2a12cc3b20450882ec6e904}{Flash\+\_\+\+Read64} (volatile uint64\+\_\+t $\ast$const address)
+\begin{DoxyCompactList}\small\item\em Reads from Flash. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Function Documentation}
+\hypertarget{group___flash__module_ga50871aff0f5af1e092aea3ed2545cf72}{}\index{Flash module documentation@{Flash module documentation}!Flash\+\_\+\+Allocate\+Var@{Flash\+\_\+\+Allocate\+Var}}
+\index{Flash\+\_\+\+Allocate\+Var@{Flash\+\_\+\+Allocate\+Var}!Flash module documentation@{Flash module documentation}}
+\subsubsection[{Flash\+\_\+\+Allocate\+Var(volatile void $\ast$$\ast$variable, const uint8\+\_\+t size)}]{\setlength{\rightskip}{0pt plus 5cm}bool Flash\+\_\+\+Allocate\+Var (
+\begin{DoxyParamCaption}
+\item[{volatile void $\ast$$\ast$}]{variable, }
+\item[{const uint8\+\_\+t}]{size}
+\end{DoxyParamCaption}
+)}\label{group___flash__module_ga50871aff0f5af1e092aea3ed2545cf72}
+
+
+Allocates space for a non-\/volatile variable in the Flash memory. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em variable} & is the address of a pointer to a variable that is to be allocated space in Flash memory. The pointer will be allocated to a relevant address\+: If the variable is a byte, then any address. If the variable is a half-\/word, then an even address. If the variable is a word, then an address divisible by 4. This allows the resulting variable to be used with the relevant Flash\+\_\+\+Write function which assumes a certain memory address. e.\+g. a 16-\/bit variable will be on an even address \\
+\hline
+{\em size} & The size, in bytes, of the variable that is to be allocated space in the Flash memory. Valid values are 1, 2 and 4. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bool -\/ T\+R\+U\+E if the variable was allocated space in the Flash memory. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Assumes Flash has been initialized. 
+\end{DoxyNote}
+\hypertarget{group___flash__module_ga06868787ccef73e69bd236d3b93b68f3}{}\index{Flash module documentation@{Flash module documentation}!Flash\+\_\+\+Erase@{Flash\+\_\+\+Erase}}
+\index{Flash\+\_\+\+Erase@{Flash\+\_\+\+Erase}!Flash module documentation@{Flash module documentation}}
+\subsubsection[{Flash\+\_\+\+Erase(void)}]{\setlength{\rightskip}{0pt plus 5cm}bool Flash\+\_\+\+Erase (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{group___flash__module_ga06868787ccef73e69bd236d3b93b68f3}
+
+
+Erases the entire Flash sector. 
+
+\begin{DoxyReturn}{Returns}
+bool -\/ T\+R\+U\+E if the Flash \char`\"{}data\char`\"{} sector was erased successfully. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Assumes Flash has been initialized. 
+\end{DoxyNote}
+\hypertarget{group___flash__module_gab6bef2c581b902a2bca7a0d04409ad30}{}\index{Flash module documentation@{Flash module documentation}!Flash\+\_\+\+Init@{Flash\+\_\+\+Init}}
+\index{Flash\+\_\+\+Init@{Flash\+\_\+\+Init}!Flash module documentation@{Flash module documentation}}
+\subsubsection[{Flash\+\_\+\+Init(\+O\+S\+\_\+\+E\+C\+B $\ast$flash\+Access\+Semaphore)}]{\setlength{\rightskip}{0pt plus 5cm}bool Flash\+\_\+\+Init (
+\begin{DoxyParamCaption}
+\item[{O\+S\+\_\+\+E\+C\+B $\ast$}]{flash\+Access\+Semaphore}
+\end{DoxyParamCaption}
+)}\label{group___flash__module_gab6bef2c581b902a2bca7a0d04409ad30}
+
+
+Enables the Flash module. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em flash\+Access\+Semaphore} & The mutex to protect flash reading and writing. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bool -\/ T\+R\+U\+E if the Flash was setup successfully. 
+\end{DoxyReturn}
+\hypertarget{group___flash__module_gab00365afc70a3e21ea3987c3c5e97132}{}\index{Flash module documentation@{Flash module documentation}!Flash\+\_\+\+Read16@{Flash\+\_\+\+Read16}}
+\index{Flash\+\_\+\+Read16@{Flash\+\_\+\+Read16}!Flash module documentation@{Flash module documentation}}
+\subsubsection[{Flash\+\_\+\+Read16(volatile uint16\+\_\+t $\ast$const address)}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t Flash\+\_\+\+Read16 (
+\begin{DoxyParamCaption}
+\item[{volatile uint16\+\_\+t $\ast$const}]{address}
+\end{DoxyParamCaption}
+)}\label{group___flash__module_gab00365afc70a3e21ea3987c3c5e97132}
+
+
+Reads from Flash. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em address} & The address of the data. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+uint16\+\_\+t -\/ The read value of the data. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Assumes Flash has been initialized. 
+\end{DoxyNote}
+\hypertarget{group___flash__module_gad7c248518fd800ac3af6b4cf52843e82}{}\index{Flash module documentation@{Flash module documentation}!Flash\+\_\+\+Read32@{Flash\+\_\+\+Read32}}
+\index{Flash\+\_\+\+Read32@{Flash\+\_\+\+Read32}!Flash module documentation@{Flash module documentation}}
+\subsubsection[{Flash\+\_\+\+Read32(volatile uint32\+\_\+t $\ast$const address)}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t Flash\+\_\+\+Read32 (
+\begin{DoxyParamCaption}
+\item[{volatile uint32\+\_\+t $\ast$const}]{address}
+\end{DoxyParamCaption}
+)}\label{group___flash__module_gad7c248518fd800ac3af6b4cf52843e82}
+
+
+Reads from Flash. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em address} & The address of the data. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+uint32\+\_\+t -\/ The read value of the data. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Assumes Flash has been initialized. 
+\end{DoxyNote}
+\hypertarget{group___flash__module_ga4a5eef3ce2a12cc3b20450882ec6e904}{}\index{Flash module documentation@{Flash module documentation}!Flash\+\_\+\+Read64@{Flash\+\_\+\+Read64}}
+\index{Flash\+\_\+\+Read64@{Flash\+\_\+\+Read64}!Flash module documentation@{Flash module documentation}}
+\subsubsection[{Flash\+\_\+\+Read64(volatile uint64\+\_\+t $\ast$const address)}]{\setlength{\rightskip}{0pt plus 5cm}uint64\+\_\+t Flash\+\_\+\+Read64 (
+\begin{DoxyParamCaption}
+\item[{volatile uint64\+\_\+t $\ast$const}]{address}
+\end{DoxyParamCaption}
+)}\label{group___flash__module_ga4a5eef3ce2a12cc3b20450882ec6e904}
+
+
+Reads from Flash. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em address} & The address of the data. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+uin64\+\_\+t -\/ The read value of the data. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Assumes Flash has been initialized. 
+\end{DoxyNote}
+\hypertarget{group___flash__module_ga10da7ee9a2d8d8bc4bc6fc698c9197ac}{}\index{Flash module documentation@{Flash module documentation}!Flash\+\_\+\+Read8@{Flash\+\_\+\+Read8}}
+\index{Flash\+\_\+\+Read8@{Flash\+\_\+\+Read8}!Flash module documentation@{Flash module documentation}}
+\subsubsection[{Flash\+\_\+\+Read8(volatile uint8\+\_\+t $\ast$const address)}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Flash\+\_\+\+Read8 (
+\begin{DoxyParamCaption}
+\item[{volatile uint8\+\_\+t $\ast$const}]{address}
+\end{DoxyParamCaption}
+)}\label{group___flash__module_ga10da7ee9a2d8d8bc4bc6fc698c9197ac}
+
+
+Reads from Flash. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em address} & The address of the data. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+uint8\+\_\+t -\/ The read value of the data. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Assumes Flash has been initialized. 
+\end{DoxyNote}
+\hypertarget{group___flash__module_gab920a95573638276676b5a9417e282fd}{}\index{Flash module documentation@{Flash module documentation}!Flash\+\_\+\+Write@{Flash\+\_\+\+Write}}
+\index{Flash\+\_\+\+Write@{Flash\+\_\+\+Write}!Flash module documentation@{Flash module documentation}}
+\subsubsection[{Flash\+\_\+\+Write(volatile uint32\+\_\+t $\ast$const address, const uint32\+\_\+t data, const uint8\+\_\+t size)}]{\setlength{\rightskip}{0pt plus 5cm}bool Flash\+\_\+\+Write (
+\begin{DoxyParamCaption}
+\item[{volatile uint32\+\_\+t $\ast$const}]{address, }
+\item[{const uint32\+\_\+t}]{data, }
+\item[{const uint8\+\_\+t}]{size}
+\end{DoxyParamCaption}
+)}\label{group___flash__module_gab920a95573638276676b5a9417e282fd}
+
+
+Writes to Flash. T\+O\+D\+O\+:comments. 
+
+Writes to Flash.
+
+
+\begin{DoxyParams}{Parameters}
+{\em address} & The address of the data. \\
+\hline
+{\em data} & The variable-\/bit data to write. \\
+\hline
+{\em size} & The size of the data to write. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bool -\/ T\+R\+U\+E if Flash was written successfully, F\+A\+L\+S\+E if address is not aligned to a 4-\/byte boundary or if there is a programming error. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Assumes Flash has been initialized. 
+\end{DoxyNote}
