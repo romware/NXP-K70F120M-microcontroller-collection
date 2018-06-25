@@ -1,6 +1,6 @@
 /* ###################################################################
 **     Filename    : main.c
-**     Project     : Lab2
+**     Project     : VRR
 **     Processor   : MK70FN1M0VMJ12
 **     Version     : Driver 01.01
 **     Compiler    : GNU C Compiler
@@ -11,7 +11,7 @@
 **     Settings    :
 **     Contents    :
 **         No public methods
-**     Authors     : 12403756, 12551519
+**     Authors     : 12551519
 **
 ** ###################################################################*/
 /*!
@@ -38,15 +38,15 @@
 #include "PE_Error.h"
 #include "PE_Const.h"
 #include "IO_Map.h"
-#include "LEDs.h"
 #include "MK70F12.h"
+#include "LEDs.h"
 #include "UART.h"
 #include "FIFO.h"
 #include "packet.h"
 #include "Flash.h"
-#include "PE_Types.h"
 #include "PIT.h"
 #include "FTM.h"
+#include "VRR.h"
 #include "kiss_fft.h"
 #include "kiss_fftr.h"
 
@@ -57,31 +57,12 @@
 
 #define BAUD_RATE 115200                                     /*!< UART2 Baud Rate */
 
-#define ANALOG_CHANNEL_1 0                                   /*!< 1st analog channel */
-#define ANALOG_CHANNEL_2 1                                   /*!< 2nd analog channel */
-#define ANALOG_CHANNEL_3 2                                   /*!< 3rd analog channel */
-
-#define NB_ANALOG_CHANNELS 3                                 /*!< Number of analog channels */
-
-#define ANALOG_SAMPLE_SIZE 16                                   /*!< Number of analog samples per cycle */
-
-const uint64_t PERIOD_TIMER_DELAY  = 5000000000;             /*!< Period of analog timer delay (5 seconds) */
-const uint64_t PERIOD_MIN_DELAY    = 1000000000;             /*!< Period of analog timer delay minium (1 second) */
-
 const uint8_t COMMAND_TIMING       =       0x10;             /*!< The serial command byte for tower timing */
 const uint8_t COMMAND_RAISES       =       0x11;             /*!< The serial command byte for tower raises */
 const uint8_t COMMAND_LOWERS       =       0x12;             /*!< The serial command byte for tower lowers */
 const uint8_t COMMAND_FREQUENCY    =       0x17;             /*!< The serial command byte for tower frequency */
 const uint8_t COMMAND_VOLTAGE      =       0x18;             /*!< The serial command byte for tower voltage */
 const uint8_t COMMAND_SPECTRUM     =       0x19;             /*!< The serial command byte for tower spectrum */
-
-const int16_t VRR_ZERO             =          0;             /*!< VRR_VOLT x0 */
-const int16_t VRR_VOLT_HALF        =       1638;             /*!< VRR_VOLT x0.5 */
-const int16_t VRR_VOLT             =       3277;             /*!< One volt ((2^15 - 1)/10) */
-const int16_t VRR_LIMIT_FREQUENCY  =       4915;             /*!< VRR_VOLT x1.5 */
-const int16_t VRR_LIMIT_LOW        =       6553;             /*!< VRR_VOLT x2 */
-const int16_t VRR_LIMIT_HIGH       =       9830;             /*!< VRR_VOLT x3 */
-const int16_t VRR_OUTPUT_5V        =      16384;             /*!< VRR_VOLT x5 */
 
 static uint32_t PeriodAnalogPoll   =    1250000;             /*!< Period of analog polling (16 samples per cycle, 50 Hz default) */
 static uint32_t Frequency          =        500;             /*!< The frequency of the VRR */
@@ -94,51 +75,23 @@ volatile uint8_t* NvTimingMode;                              /*!< Timing Mode Se
 static OS_ECB* LEDOffSemaphore;                              /*!< LED off semaphore for FTM */
 static OS_ECB* RaisesSemaphore;                              /*!< Raises semaphore for Flash */
 static OS_ECB* LowersSemaphore;                              /*!< Lowers semaphore for Flash */
+static OS_ECB* FrequencySemaphore;                           /*!< Frequency semaphore for VRR */
+static OS_ECB* FFTSemaphore;                                 /*!< FFT semaphore for VRR */
+
 static OS_ECB* FlashAccessSemaphore;                         /*!< Mutex semaphore for Flash */
-static OS_ECB* FrequencySemaphore;                           /*!< Frequency semaphore for channel 1*/
+static OS_ECB* RMSAccessSemaphore;                           /*!< Mutex semaphore for RMS */
+static OS_ECB* FrequencyAccessSemaphore;                     /*!< Mutex semaphore for Frequency */
 
 // Thread stacks
-OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);  /*!< The stack for the Tower Init thread. */
-OS_THREAD_STACK(FTMLEDsOffThreadStack, THREAD_STACK_SIZE);   /*!< The stack for the FTM thread. */
-OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Packet thread. TODO:size */
+OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);  /*!< The stack for the Initial thread. */
+OS_THREAD_STACK(LEDsOffThreadStack, THREAD_STACK_SIZE);      /*!< The stack for the FTM LED thread. */
+OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Packet thread. */
 OS_THREAD_STACK(RaisesThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Flash Raises thread. */
 OS_THREAD_STACK(LowersThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Flash Lowers thread. */
-OS_THREAD_STACK(FrequencyThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the frequency thread. */
+OS_THREAD_STACK(FrequencyThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the Frequency thread. */
+OS_THREAD_STACK(FFTThreadStack, THREAD_STACK_SIZE);          /*!< The stack for the FFT thread. */
 
 static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS][THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));
-
-/*! @brief Timing mode parameters for tower to PC protocol
- *
- */
-typedef enum
-{
-  TIMING_GET,
-  TIMING_DEFINITE,
-  TIMING_INVERSE
-} TTimingMode;
-
-/*! @brief Deviation parameters for tower to PC protocol
- *
- */
-typedef enum
-{
-  DEVIATION_GET,
-  DEVIATION_RESET
-} TDeviation;
-
-/*! @brief Data structure used to pass Analog configuration to a user thread
- *
- */
-typedef struct AnalogThreadData
-{
-  OS_ECB* semaphoreRMS;
-  uint8_t channelNb;
-  int16_t sampleData[ANALOG_SAMPLE_SIZE];
-  int16_t prevSampleData[ANALOG_SAMPLE_SIZE];
-  uint16_t sampleDataIndex;
-  uint16 currentRMS;
-  uint16 currentRMSSquared;
-} TAnalogThreadData;
 
 /*! @brief Analog thread configuration data
  *
@@ -161,131 +114,6 @@ static TAnalogThreadData AnalogThreadData[NB_ANALOG_CHANNELS] =
     .channelNb = ANALOG_CHANNEL_3
   }
 };
-
-/*! @brief Sends a value to an analog input channel.
- *
- *  @param channelNb is the number of the analog output channel to send the value to.
- *  @param value is the value to write to the analog channel.
- *  @return bool - true if the analog value was output successfully.
- */
-bool ProtectedAnalogPut(uint8_t const channelNb, int16_t const value)
-{
-  OS_DisableInterrupts();
-  Analog_Put(channelNb, value);
-  OS_EnableInterrupts();
-}
-
-/*! @brief Insert into from one array into another TODO: params + comments
- *
- *  @return void
- */
-void ArrayCopy(int16_t array1[], int16_t array2[], const uint8_t length)
-{
-  for(uint8_t i = 0; i < length; i++)
-  {
-    array2[i] = array1[i];
-  }
-}
-
-/*! @brief Checks if any item in array is true TODO:params + comments
- *
- *  @return bool - TRUE if any item is true
- */
-bool ArrayAnyTrue(const bool data[], const uint8_t length)
-{
-  for(uint8_t i = 0; i < length; i++)
-  {
-    if(data[i])
-    {
-      return true;
-    }
-  }
-  return false;
-}
-
-/*! @brief Calculates the square root of a given value efficiently TODO:params + comments
- *
- *  @note Tested speed of Math.h sqrt function - 38us whereas this is 25us. Therefore on average 13us faster
- *  @return uint16 - Square root value
- */
-uint32_t QuickSquareRoot(const uint32_t targetSquare, uint32_t prevRoot, uint32_t prevSquare, const uint32_t lowLimit, const uint32_t highLimit)
-{
-  if(!prevRoot || !prevSquare)
-  {
-    prevRoot = (lowLimit + highLimit) / 2;
-    prevSquare = prevRoot * prevRoot;
-  }
-
-  bool increment = false;
-  bool decrement = false;
-
-  while((prevSquare != targetSquare) && !(increment && decrement))
-  {
-    if(prevSquare < targetSquare)
-    {
-      prevRoot++;
-      increment = true;
-    }
-    else
-    {
-      prevRoot--;
-      decrement = true;
-    }
-    prevSquare = prevRoot * prevRoot;
-  }
-
-  return prevRoot;
-}
-
-/*! @brief Calculates RMS of given values TODO:params + comments
- *
- *  @return uint16_t - RMS value
- */
-uint16_t CalculateRMS(const int16_t data[], const uint8_t length, const uint16_t prevRoot)
-{
-  int64_t sum = 0;
-  for(uint8_t i = 0; i < length; i++)
-  {
-    sum += (data[i])*(data[i]);
-  }
-
-  //return (uint16_t)sqrt( sum / length );
-  uint32_t prevSquare = prevRoot*prevRoot;
-  return (uint16_t)QuickSquareRoot((sum/length), prevRoot, prevSquare, VRR_ZERO, VRR_OUTPUT_5V);
-
-
-}
-
-/*! @brief  TODO:brief + params + comments
- *
- *  @return
- */
-void CheckRMS(int64_t* timerDelay, int64_t* minDelay, int64_t* timerRate, const uint16_t deviation, bool* alarm, bool* adjustment, OS_ECB* semaphore, const int8_t channel)
-{
-  if(!(*alarm))
-  {
-    *alarm = true;
-    *timerDelay = PERIOD_TIMER_DELAY;
-    *minDelay = PERIOD_MIN_DELAY;
-    *timerRate = PeriodAnalogPoll;
-    ProtectedAnalogPut(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
-  }
-  else if(*timerDelay >= *timerRate || *minDelay >= *timerRate)
-  {
-    if(TimingMode == TIMING_INVERSE)
-    {
-      *timerRate = (deviation/(uint16_t)VRR_VOLT_HALF) * PeriodAnalogPoll;
-    }
-    *timerDelay -= *timerRate;
-    *minDelay -= PeriodAnalogPoll;
-  }
-  else if(!*adjustment)
-  {
-    *adjustment = true;
-    ProtectedAnalogPut(channel, VRR_OUTPUT_5V);
-    OS_SemaphoreSignal(semaphore);
-  }
-}
 
 /*! @brief Sets the tower timing mode or sends the packet to the PC
  *
@@ -356,9 +184,9 @@ static bool HandleTowerFrequency(void)
 {
   int16union_t frequency;
 
-  OS_DisableInterrupts();
+  (void)OS_SemaphoreWait(FrequencyAccessSemaphore, 0);
   frequency.l = (int16_t)Frequency;
-  OS_EnableInterrupts();
+  (void)OS_SemaphoreSignal(FrequencyAccessSemaphore);
 
   // Sends the frequency packet
   return Packet_Put(COMMAND_FREQUENCY,frequency.s.Lo,frequency.s.Hi,0);
@@ -376,9 +204,9 @@ static bool HandleTowerVoltage(void)
     TAnalogThreadData* phase = &AnalogThreadData[Packet_Parameter1-1];
 
     // Calculates the RMS based on received phase
-    OS_DisableInterrupts();
+    (void)OS_SemaphoreWait(RMSAccessSemaphore, 0);
     rms.l = phase->currentRMS;
-    OS_EnableInterrupts();
+    (void)OS_SemaphoreSignal(RMSAccessSemaphore);
 
     // Sends the RMS voltage packet
     return Packet_Put(COMMAND_VOLTAGE,Packet_Parameter1,rms.s.Lo,rms.s.Hi);
@@ -423,7 +251,7 @@ static bool HandleTowerSpectrum(void)
     int64_t imaginary = spectrum[Packet_Parameter1].i / (ANALOG_SAMPLE_SIZE/2);
     int64_t targetSquare = (real * real) + (imaginary * imaginary);
 
-    prevRoots[Packet_Parameter1] = QuickSquareRoot(targetSquare,prevRoot,prevSquare,VRR_LIMIT_LOW,VRR_OUTPUT_5V);
+    prevRoots[Packet_Parameter1] = VRR_QuickSquareRoot(targetSquare,prevRoot,prevSquare,VRR_OUT_ZERO,VRR_OUT_FIVE);
 
     uint16union_t magnitude;
     magnitude.l = prevRoots[Packet_Parameter1];
@@ -503,7 +331,7 @@ void ReceivedPacket(void)
  *
  *  @return void
  */
-void PITCallback(void* arg)
+void AnalogSampleCallback(void* arg)
 {
   static uint8_t channel;
 
@@ -547,7 +375,8 @@ bool TowerInit(void)
   && LEDs_Init()
   && Packet_Init(BAUD_RATE, CPU_BUS_CLK_HZ)
   && FTM_Init()
-  && PIT_Init(CPU_BUS_CLK_HZ, PITCallback, NULL))
+  && VRR_Init()
+  && PIT_Init(CPU_BUS_CLK_HZ, AnalogSampleCallback, NULL))
   {
     success = true;
 
@@ -606,12 +435,16 @@ static void InitModulesThread(void* pData)
     AnalogThreadData[analogNb].semaphoreRMS = OS_SemaphoreCreate(0);
   }
 
+  // Create semaphores for mutual exclusions
+  FlashAccessSemaphore      = OS_SemaphoreCreate(1);
+  RMSAccessSemaphore        = OS_SemaphoreCreate(1);
+  FrequencyAccessSemaphore  = OS_SemaphoreCreate(1);
+
   // Create semaphores for threads
-  FlashAccessSemaphore = OS_SemaphoreCreate(1);
-  LEDOffSemaphore      = OS_SemaphoreCreate(0);
-  RaisesSemaphore      = OS_SemaphoreCreate(0);
-  LowersSemaphore      = OS_SemaphoreCreate(0);
-  FrequencySemaphore   = OS_SemaphoreCreate(0);
+  LEDOffSemaphore           = OS_SemaphoreCreate(0);
+  RaisesSemaphore           = OS_SemaphoreCreate(0);
+  LowersSemaphore           = OS_SemaphoreCreate(0);
+  FrequencySemaphore        = OS_SemaphoreCreate(0);
 
   // Initializes the main tower components and sets the default or stored values
   if(TowerInit())
@@ -624,9 +457,9 @@ static void InitModulesThread(void* pData)
   PIT_Set(PeriodAnalogPoll / NB_ANALOG_CHANNELS, true);
 
   // Put initial zero values to tower output channels
-  ProtectedAnalogPut(ANALOG_CHANNEL_1, VRR_ZERO);
-  ProtectedAnalogPut(ANALOG_CHANNEL_2, VRR_ZERO);
-  ProtectedAnalogPut(ANALOG_CHANNEL_3, VRR_ZERO);
+  VRR_ProtectedAnalogPut(ANALOG_CHANNEL_1, VRR_OUT_ZERO);
+  VRR_ProtectedAnalogPut(ANALOG_CHANNEL_2, VRR_OUT_ZERO);
+  VRR_ProtectedAnalogPut(ANALOG_CHANNEL_3, VRR_OUT_ZERO);
 
   OS_EnableInterrupts();
 
@@ -674,7 +507,7 @@ static void PacketThread(void* pData)
  *  @param pData is not used but is required by the OS to create a thread.
  *  @note Assumes that FTM_Init has been called successfully.
  */
-static void FTMLEDsOffThread(void* pData)
+static void LEDsOffThread(void* pData)
 {
   for (;;)
   {
@@ -706,18 +539,35 @@ void CalculateRMSThread(void* pData)
   {
     (void)OS_SemaphoreWait(analogData->semaphoreRMS, 0);
 
-    uint16_t prevRoot = analogData->currentRMS;
+    (void)OS_SemaphoreWait(FrequencyAccessSemaphore, 0);
+    uint32_t analogPoll = PeriodAnalogPoll;
+    (void)OS_SemaphoreSignal(FrequencyAccessSemaphore);
 
-    uint16_t rms = CalculateRMS(analogData->sampleData, ANALOG_SAMPLE_SIZE, prevRoot);
+    (void)OS_SemaphoreWait(RMSAccessSemaphore, 0);
+    uint16_t prevRoot = analogData->currentRMS;
+    (void)OS_SemaphoreSignal(RMSAccessSemaphore);
+
+    OS_DisableInterrupts();
+    int16_t sampleData[ANALOG_SAMPLE_SIZE*2];
+    for(uint8_t i = 0; i < ANALOG_SAMPLE_SIZE; i++)
+    {
+       sampleData[i] = analogData->sampleData[i];
+    }
+    OS_EnableInterrupts();
+
+    uint16_t rms = VRR_CalculateRMS(sampleData, ANALOG_SAMPLE_SIZE, prevRoot);
+
+    (void)OS_SemaphoreWait(RMSAccessSemaphore, 0);
     analogData->currentRMS = rms;
+    (void)OS_SemaphoreSignal(RMSAccessSemaphore);
 
     if(rms < VRR_LIMIT_LOW)
     {
-      CheckRMS(&timerDelay, &minDelay, &timerRate, (VRR_LIMIT_LOW-rms), &alarm, &adjustment, RaisesSemaphore, ANALOG_CHANNEL_1);
+      VRR_CheckAlarm(&timerDelay, &minDelay, &timerRate, analogPoll, TimingMode, (VRR_LIMIT_LOW-rms), &alarm, &adjustment, RaisesSemaphore, ANALOG_CHANNEL_1);
     }
     else if(rms > VRR_LIMIT_HIGH)
     {
-      CheckRMS(&timerDelay, &minDelay, &timerRate, (rms-VRR_LIMIT_HIGH), &alarm, &adjustment, LowersSemaphore, ANALOG_CHANNEL_2);
+      VRR_CheckAlarm(&timerDelay, &minDelay, &timerRate, analogPoll, TimingMode, (rms-VRR_LIMIT_HIGH), &alarm, &adjustment, LowersSemaphore, ANALOG_CHANNEL_2);
     }
     else
     {
@@ -725,12 +575,12 @@ void CalculateRMSThread(void* pData)
     }
 
     allAlarms[analogData->channelNb] = alarm;
-    if(!ArrayAnyTrue(allAlarms, NB_ANALOG_CHANNELS))
+    if(!VRR_ArrayAnyTrue(allAlarms, NB_ANALOG_CHANNELS))
     {
       adjustment = false;
-      ProtectedAnalogPut(ANALOG_CHANNEL_1, VRR_ZERO);
-      ProtectedAnalogPut(ANALOG_CHANNEL_2, VRR_ZERO);
-      ProtectedAnalogPut(ANALOG_CHANNEL_3, VRR_ZERO);
+      VRR_ProtectedAnalogPut(ANALOG_CHANNEL_1, VRR_OUT_ZERO);
+      VRR_ProtectedAnalogPut(ANALOG_CHANNEL_2, VRR_OUT_ZERO);
+      VRR_ProtectedAnalogPut(ANALOG_CHANNEL_3, VRR_OUT_ZERO);
     }
   }
 }
@@ -744,86 +594,35 @@ void CalculateFrequencyThread(void* pData)
   {
     (void)OS_SemaphoreWait(FrequencySemaphore, 0);
 
-    OS_DisableInterrupts(); // TODO: remove interrupts disable
+    (void)OS_SemaphoreWait(FrequencyAccessSemaphore, 0);
+    uint32_t analogPoll = PeriodAnalogPoll;
+    (void)OS_SemaphoreSignal(FrequencyAccessSemaphore);
 
-    bool negCrossingFound = false;
-    uint32_t negCrossing1 = 0;
-    uint32_t negCrossing2 = 0;
+    OS_DisableInterrupts();
     TAnalogThreadData* channelData = &AnalogThreadData[ANALOG_CHANNEL_1];
-
-    if(channelData->currentRMS > VRR_LIMIT_FREQUENCY)
+    int16_t sampleData[ANALOG_SAMPLE_SIZE*2];
+    for(uint8_t i = 0; i < ANALOG_SAMPLE_SIZE*2; i++)
     {
-      for(uint8_t i = 0; i < ANALOG_SAMPLE_SIZE*2 - 1; i++)
+      if(i < ANALOG_SAMPLE_SIZE)
       {
-        int16_t leftVal;
-        int16_t rightVal;
-
-        if(i < ANALOG_SAMPLE_SIZE)
-        {
-          leftVal = channelData->prevSampleData[i];
-        }
-        else
-        {
-          leftVal = channelData->sampleData[i - ANALOG_SAMPLE_SIZE];
-        }
-
-        if(i+1 < ANALOG_SAMPLE_SIZE)
-        {
-          rightVal = channelData->prevSampleData[i+1];
-        }
-        else
-        {
-          rightVal = channelData->sampleData[i+1 - ANALOG_SAMPLE_SIZE];
-        }
-
-        if(leftVal >= 0 && 0 > rightVal && negCrossingFound)
-        {
-          // m = rise over run, run = 1 sample
-          int32_t m = (rightVal - leftVal);
-          // x = -b/m
-          int32_t x = ((-leftVal) << 10) / m;
-          negCrossing2 = (i << 10) + x;
-
-          uint32_t distance = negCrossing2 - negCrossing1;
-
-          uint32_t oldPoll = PeriodAnalogPoll >> 10;
-
-          uint64_t newPoll = distance * oldPoll;
-
-          uint64_t frequency = (10000000000 / newPoll); // 10 bill
-
-          if(Frequency != frequency && frequency >= 475 && frequency <= 525)
-          {
-            Frequency = frequency;
-            PeriodAnalogPoll = (1000000000 / (Frequency/10)) / ANALOG_SAMPLE_SIZE; // 1 billion
-            PIT_Set(PeriodAnalogPoll / NB_ANALOG_CHANNELS, true);
-          }
-
-          break;
-        }
-        else if(leftVal >= 0 && 0 > rightVal && !negCrossingFound)
-        {
-          negCrossingFound = true;
-
-          // m = rise over run, run = 1 sample
-          int32_t m = (rightVal - leftVal);
-          // x = -b/m
-          int32_t x = ((-leftVal) << 10) / m;
-          negCrossing1 = (i << 10) + x;
-        }
+        sampleData[i] = channelData->prevSampleData[i];
       }
-
-      ArrayCopy(channelData->sampleData, channelData->prevSampleData, ANALOG_SAMPLE_SIZE);
-
-      OS_EnableInterrupts();
+      else
+      {
+        sampleData[i] = channelData->sampleData[i - ANALOG_SAMPLE_SIZE];
+      }
     }
-    else
+    VRR_ArrayCopy(channelData->sampleData, channelData->prevSampleData, ANALOG_SAMPLE_SIZE);
+    OS_EnableInterrupts();
+
+    (void)OS_SemaphoreWait(RMSAccessSemaphore, 0);
+    uint16_t rms = channelData->currentRMS;
+    (void)OS_SemaphoreSignal(RMSAccessSemaphore);
+
+    uint32_t frequency = VRR_CalculateFrequency(sampleData,rms,analogPoll);
+    if(frequency)
     {
-      OS_DisableInterrupts();
-      Frequency = 500;
-      PeriodAnalogPoll = (1000000000 / (Frequency/10)) / ANALOG_SAMPLE_SIZE;
-      PIT_Set(PeriodAnalogPoll / NB_ANALOG_CHANNELS, true);
-      OS_EnableInterrupts();
+      VRR_SetFrequency(FrequencyAccessSemaphore,&Frequency,frequency,rms,&PeriodAnalogPoll);
     }
   }
 }
@@ -892,9 +691,9 @@ int main(void)
                           &PacketThreadStack[THREAD_STACK_SIZE - 1],
                           7);
   // 8th Highest priority
-  error = OS_ThreadCreate(FTMLEDsOffThread,
+  error = OS_ThreadCreate(LEDsOffThread,
                           NULL,
-                          &FTMLEDsOffThreadStack[THREAD_STACK_SIZE - 1],
+                          &LEDsOffThreadStack[THREAD_STACK_SIZE - 1],
                           8);
   // 9th Highest priority
   error = OS_ThreadCreate(RaisesThread,
