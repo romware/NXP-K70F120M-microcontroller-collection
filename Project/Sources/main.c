@@ -66,6 +66,7 @@ const uint8_t COMMAND_SPECTRUM     =       0x19;             /*!< The serial com
 
 static uint32_t PeriodAnalogPoll   =    1250000;             /*!< Period of analog polling (16 samples per cycle, 50 Hz default) */
 static uint32_t Frequency          =        500;             /*!< The frequency of the VRR */
+static uint32_t Spectrum[8];                                 /*!< The spectrum harmonics of the VRR */
 static uint8_t TimingMode          =          1;             /*!< The timing mode of the VRR */
 
 volatile uint8_t* NvCountRaises;                             /*!< Number of raises pointer to flash */
@@ -76,11 +77,12 @@ static OS_ECB* LEDOffSemaphore;                              /*!< LED off semaph
 static OS_ECB* RaisesSemaphore;                              /*!< Raises semaphore for Flash */
 static OS_ECB* LowersSemaphore;                              /*!< Lowers semaphore for Flash */
 static OS_ECB* FrequencySemaphore;                           /*!< Frequency semaphore for VRR */
-static OS_ECB* FFTSemaphore;                                 /*!< FFT semaphore for VRR */
+static OS_ECB* SpectrumSemaphore;                            /*!< Spectrum semaphore for VRR */
 
 static OS_ECB* FlashAccessSemaphore;                         /*!< Mutex semaphore for Flash */
 static OS_ECB* RMSAccessSemaphore;                           /*!< Mutex semaphore for RMS */
 static OS_ECB* FrequencyAccessSemaphore;                     /*!< Mutex semaphore for Frequency */
+static OS_ECB* SpectrumAccessSemaphore;                      /*!< Mutex semaphore for Spectrum */
 
 // Thread stacks
 OS_THREAD_STACK(InitModulesThreadStack, THREAD_STACK_SIZE);  /*!< The stack for the Initial thread. */
@@ -89,7 +91,7 @@ OS_THREAD_STACK(PacketThreadStack, THREAD_STACK_SIZE);       /*!< The stack for 
 OS_THREAD_STACK(RaisesThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Flash Raises thread. */
 OS_THREAD_STACK(LowersThreadStack, THREAD_STACK_SIZE);       /*!< The stack for the Flash Lowers thread. */
 OS_THREAD_STACK(FrequencyThreadStack, THREAD_STACK_SIZE);    /*!< The stack for the Frequency thread. */
-OS_THREAD_STACK(FFTThreadStack, THREAD_STACK_SIZE);          /*!< The stack for the FFT thread. */
+OS_THREAD_STACK(SpectrumThreadStack, THREAD_STACK_SIZE);     /*!< The stack for the Spectrum thread. */
 
 static uint32_t RMSThreadStacks[NB_ANALOG_CHANNELS][THREAD_STACK_SIZE] __attribute__ ((aligned(0x08)));
 
@@ -224,37 +226,11 @@ static bool HandleTowerSpectrum(void)
   // Check if harmonic number is between 0 and 7
   if(Packet_Parameter1 >= 0 && Packet_Parameter1 <= 7)
   {
-    uint8_t memory[500];
-    size_t length = 500;
-    kiss_fftr_cfg config = kiss_fftr_alloc(ANALOG_SAMPLE_SIZE, 0, memory, &length);
-
-    TAnalogThreadData* channelData = &AnalogThreadData[ANALOG_CHANNEL_1];
-
-    kiss_fft_scalar timedata[ANALOG_SAMPLE_SIZE];
-
-    OS_DisableInterrupts();
-    for(uint8_t i = 0; i < ANALOG_SAMPLE_SIZE; i++)
-    {
-      timedata[i] = channelData->prevSampleData[i];
-    }
-    OS_EnableInterrupts();
-
-    kiss_fft_cpx spectrum[(ANALOG_SAMPLE_SIZE/2)+1];
-
-    kiss_fftr(config, timedata, spectrum);
-
-    static uint32_t prevRoots[7];
-    uint32_t prevRoot = prevRoots[Packet_Parameter1];
-    uint32_t prevSquare = prevRoot * prevRoot;
-
-    int64_t real = spectrum[Packet_Parameter1].r / (ANALOG_SAMPLE_SIZE/2);
-    int64_t imaginary = spectrum[Packet_Parameter1].i / (ANALOG_SAMPLE_SIZE/2);
-    int64_t targetSquare = (real * real) + (imaginary * imaginary);
-
-    prevRoots[Packet_Parameter1] = VRR_QuickSquareRoot(targetSquare,prevRoot,prevSquare,VRR_OUT_ZERO,VRR_OUT_FIVE);
-
     uint16union_t magnitude;
-    magnitude.l = prevRoots[Packet_Parameter1];
+
+    (void)OS_SemaphoreWait(SpectrumAccessSemaphore,0);
+    magnitude.l = Spectrum[Packet_Parameter1];
+    (void)OS_SemaphoreSignal(SpectrumAccessSemaphore);
 
     return Packet_Put(COMMAND_SPECTRUM,Packet_Parameter1,magnitude.s.Lo,magnitude.s.Hi);
   }
@@ -359,6 +335,7 @@ void AnalogSampleCallback(void* arg)
   if(channel == 0 && channelData->sampleDataIndex == 0)
   {
     (void)OS_SemaphoreSignal(FrequencySemaphore);
+    (void)OS_SemaphoreSignal(SpectrumSemaphore);
   }
 }
 
@@ -439,12 +416,14 @@ static void InitModulesThread(void* pData)
   FlashAccessSemaphore      = OS_SemaphoreCreate(1);
   RMSAccessSemaphore        = OS_SemaphoreCreate(1);
   FrequencyAccessSemaphore  = OS_SemaphoreCreate(1);
+  SpectrumAccessSemaphore   = OS_SemaphoreCreate(1);
 
   // Create semaphores for threads
   LEDOffSemaphore           = OS_SemaphoreCreate(0);
   RaisesSemaphore           = OS_SemaphoreCreate(0);
   LowersSemaphore           = OS_SemaphoreCreate(0);
   FrequencySemaphore        = OS_SemaphoreCreate(0);
+  SpectrumSemaphore         = OS_SemaphoreCreate(0);
 
   // Initializes the main tower components and sets the default or stored values
   if(TowerInit())
@@ -627,6 +606,55 @@ void CalculateFrequencyThread(void* pData)
   }
 }
 
+/*! @brief Calculates the Spectrum value on an ADC channel. TODO:comments
+ *
+ */
+void CalculateSpectrumThread(void* pData)
+{
+  uint8_t memory[500];
+  size_t length = 500;
+  kiss_fftr_cfg config = kiss_fftr_alloc(ANALOG_SAMPLE_SIZE, 0, memory, &length);
+  static uint8_t harmonic = 0;
+
+  for (;;)
+  {
+    (void)OS_SemaphoreWait(SpectrumSemaphore, 0);
+
+    kiss_fft_scalar timedata[ANALOG_SAMPLE_SIZE];
+
+    OS_DisableInterrupts();
+    TAnalogThreadData* channelData = &AnalogThreadData[ANALOG_CHANNEL_1];
+    for(uint8_t i = 0; i < ANALOG_SAMPLE_SIZE; i++)
+    {
+      timedata[i] = channelData->prevSampleData[i];
+    }
+    OS_EnableInterrupts();
+
+    kiss_fft_cpx spectrum[(ANALOG_SAMPLE_SIZE/2)+1];
+
+    kiss_fftr(config, timedata, spectrum);
+
+    (void)OS_SemaphoreWait(SpectrumAccessSemaphore,0);
+
+    uint32_t prevRoot = Spectrum[harmonic];
+    uint32_t prevSquare = prevRoot * prevRoot;
+
+    int64_t real = spectrum[harmonic].r / (ANALOG_SAMPLE_SIZE/2);
+    int64_t imaginary = spectrum[harmonic].i / (ANALOG_SAMPLE_SIZE/2);
+    int64_t targetSquare = (real * real) + (imaginary * imaginary);
+
+    Spectrum[harmonic] = VRR_QuickSquareRoot(targetSquare,prevRoot,prevSquare,VRR_OUT_ZERO,VRR_OUT_FIVE);
+
+    harmonic++;
+    if(harmonic >= 8)
+    {
+      harmonic = 0;
+    }
+
+    (void)OS_SemaphoreSignal(SpectrumAccessSemaphore);
+  }
+}
+
 /*! @brief Increments the raises count and writes to Flash.
  *
  */
@@ -686,25 +714,30 @@ int main(void)
                           &FrequencyThreadStack[THREAD_STACK_SIZE - 1],
                           6);
   // 7th Highest priority
+  error = OS_ThreadCreate(CalculateSpectrumThread,
+                          NULL,
+                          &SpectrumThreadStack[THREAD_STACK_SIZE - 1],
+                          7);
+  // 8th Highest priority
   error = OS_ThreadCreate(PacketThread,
                           NULL,
                           &PacketThreadStack[THREAD_STACK_SIZE - 1],
-                          7);
-  // 8th Highest priority
+                          8);
+  // 9th Highest priority
   error = OS_ThreadCreate(LEDsOffThread,
                           NULL,
                           &LEDsOffThreadStack[THREAD_STACK_SIZE - 1],
-                          8);
-  // 9th Highest priority
+                          9);
+  // 10th Highest priority
   error = OS_ThreadCreate(RaisesThread,
                           NULL,
                           &RaisesThreadStack[THREAD_STACK_SIZE - 1],
-                          9);
-  // 10th Highest priority
+                          10);
+  // 11th Highest priority
   error = OS_ThreadCreate(LowersThread,
                           NULL,
                           &LowersThreadStack[THREAD_STACK_SIZE - 1],
-                          10);
+                          11);
 
   // Start multithreading - never returns!
   OS_Start();
