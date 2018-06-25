@@ -20,8 +20,8 @@
 ** @brief
 **         Main module.
 **         This module contains user's application code.
-** @author 12403756, 12551519
-** @date 2018-04-13
+** @author 12551519
+** @date 2018-05-13
 */         
 /*!
 **  @addtogroup main_module main module documentation
@@ -63,10 +63,10 @@
 
 #define NB_ANALOG_CHANNELS 3                                 /*!< Number of analog channels */
 
-#define VRR_SAMPLE_SIZE 16                                   /*!< Number of analog samples per cycle */
+#define ANALOG_SAMPLE_SIZE 16                                   /*!< Number of analog samples per cycle */
 
 const uint64_t PERIOD_TIMER_DELAY  = 5000000000;             /*!< Period of analog timer delay (5 seconds) */
-static uint32_t Period_Analog_Poll =    1250000;             /*!< Period of analog polling (16 samples per cycle, 47.5-52.5 Hz) */
+const uint64_t PERIOD_MIN_DELAY    = 1000000000;             /*!< Period of analog timer delay minium (1 second) */
 
 const uint8_t COMMAND_TIMING       =       0x10;             /*!< The serial command byte for tower timing */
 const uint8_t COMMAND_RAISES       =       0x11;             /*!< The serial command byte for tower raises */
@@ -83,9 +83,9 @@ const int16_t VRR_LIMIT_LOW        =       6553;             /*!< VRR_VOLT x2 */
 const int16_t VRR_LIMIT_HIGH       =       9830;             /*!< VRR_VOLT x3 */
 const int16_t VRR_OUTPUT_5V        =      16384;             /*!< VRR_VOLT x5 */
 
-static uint8_t Timing_Mode         =          1;             /*!< The timing mode of the VRR */
-
-static float Frequency             =         50;             /*!< The frequency of the VRR */
+static uint32_t PeriodAnalogPoll   =    1250000;             /*!< Period of analog polling (16 samples per cycle, 50 Hz default) */
+static uint32_t Frequency          =        500;             /*!< The frequency of the VRR */
+static uint8_t TimingMode          =          1;             /*!< The timing mode of the VRR */
 
 volatile uint8_t* NvCountRaises;                             /*!< Number of raises pointer to flash */
 volatile uint8_t* NvCountLowers;                             /*!< Number of lowers pointer to flash */
@@ -133,8 +133,8 @@ typedef struct AnalogThreadData
 {
   OS_ECB* semaphoreRMS;
   uint8_t channelNb;
-  int16_t sampleData[VRR_SAMPLE_SIZE];
-  int16_t prevSampleData[VRR_SAMPLE_SIZE];
+  int16_t sampleData[ANALOG_SAMPLE_SIZE];
+  int16_t prevSampleData[ANALOG_SAMPLE_SIZE];
   uint16_t sampleDataIndex;
   uint16 currentRMS;
   uint16 currentRMSSquared;
@@ -260,24 +260,26 @@ uint16_t CalculateRMS(const int16_t data[], const uint8_t length, const uint16_t
  *
  *  @return
  */
-void CheckRMS(uint64_t* timerDelay, uint64_t* timerRate, const uint16_t deviation, bool* alarm, bool* adjustment, OS_ECB* semaphore, const int8_t channel)
+void CheckRMS(int64_t* timerDelay, int64_t* minDelay, int64_t* timerRate, const uint16_t deviation, bool* alarm, bool* adjustment, OS_ECB* semaphore, const int8_t channel)
 {
   if(!(*alarm))
   {
     *alarm = true;
     *timerDelay = PERIOD_TIMER_DELAY;
-    *timerRate = Period_Analog_Poll;
+    *minDelay = PERIOD_MIN_DELAY;
+    *timerRate = PeriodAnalogPoll;
     ProtectedAnalogPut(ANALOG_CHANNEL_3, VRR_OUTPUT_5V);
   }
-  else if(*timerDelay >= *timerRate)
+  else if(*timerDelay >= *timerRate || *minDelay >= *timerRate)
   {
-    if(Timing_Mode == TIMING_INVERSE)
+    if(TimingMode == TIMING_INVERSE)
     {
-      *timerRate = (deviation/(uint16_t)VRR_VOLT_HALF) * Period_Analog_Poll;
+      *timerRate = (deviation/(uint16_t)VRR_VOLT_HALF) * PeriodAnalogPoll;
     }
     *timerDelay -= *timerRate;
+    *minDelay -= PeriodAnalogPoll;
   }
-  else if((*timerDelay < *timerRate) && !*adjustment)
+  else if(!*adjustment)
   {
     *adjustment = true;
     ProtectedAnalogPut(channel, VRR_OUTPUT_5V);
@@ -295,12 +297,12 @@ static bool HandleTowerTiming(void)
   if(Packet_Parameter1 == TIMING_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Sends the timing mode packet
-    return Packet_Put(COMMAND_TIMING,TIMING_GET,Timing_Mode,0);
+    return Packet_Put(COMMAND_TIMING,TIMING_GET,TimingMode,0);
   }
   else if((Packet_Parameter1 == TIMING_DEFINITE || Packet_Parameter1 == TIMING_INVERSE) && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Sets the timing mode
-    Timing_Mode = Packet_Parameter1;
+    TimingMode = Packet_Parameter1;
     return Flash_Write((uint32_t*)NvTimingMode,Packet_Parameter1,8);
   }
   return false;
@@ -355,7 +357,7 @@ static bool HandleTowerFrequency(void)
   int16union_t frequency;
 
   OS_DisableInterrupts();
-  frequency.l = (int16_t)(Frequency * 10);
+  frequency.l = (int16_t)Frequency;
   OS_EnableInterrupts();
 
   // Sends the frequency packet
@@ -396,20 +398,20 @@ static bool HandleTowerSpectrum(void)
   {
     uint8_t memory[500];
     size_t length = 500;
-    kiss_fftr_cfg config = kiss_fftr_alloc(VRR_SAMPLE_SIZE, 0, memory, &length);
+    kiss_fftr_cfg config = kiss_fftr_alloc(ANALOG_SAMPLE_SIZE, 0, memory, &length);
 
     TAnalogThreadData* channelData = &AnalogThreadData[ANALOG_CHANNEL_1];
 
-    kiss_fft_scalar timedata[VRR_SAMPLE_SIZE];
+    kiss_fft_scalar timedata[ANALOG_SAMPLE_SIZE];
 
     OS_DisableInterrupts();
-    for(uint8_t i = 0; i < VRR_SAMPLE_SIZE; i++)
+    for(uint8_t i = 0; i < ANALOG_SAMPLE_SIZE; i++)
     {
       timedata[i] = channelData->prevSampleData[i];
     }
     OS_EnableInterrupts();
 
-    kiss_fft_cpx spectrum[(VRR_SAMPLE_SIZE/2)+1];
+    kiss_fft_cpx spectrum[(ANALOG_SAMPLE_SIZE/2)+1];
 
     kiss_fftr(config, timedata, spectrum);
 
@@ -417,8 +419,8 @@ static bool HandleTowerSpectrum(void)
     uint32_t prevRoot = prevRoots[Packet_Parameter1];
     uint32_t prevSquare = prevRoot * prevRoot;
 
-    int64_t real = spectrum[Packet_Parameter1].r / (VRR_SAMPLE_SIZE/2);
-    int64_t imaginary = spectrum[Packet_Parameter1].i / (VRR_SAMPLE_SIZE/2);
+    int64_t real = spectrum[Packet_Parameter1].r / (ANALOG_SAMPLE_SIZE/2);
+    int64_t imaginary = spectrum[Packet_Parameter1].i / (ANALOG_SAMPLE_SIZE/2);
     int64_t targetSquare = (real * real) + (imaginary * imaginary);
 
     prevRoots[Packet_Parameter1] = QuickSquareRoot(targetSquare,prevRoot,prevSquare,VRR_LIMIT_LOW,VRR_OUTPUT_5V);
@@ -513,7 +515,7 @@ void PITCallback(void* arg)
 
   channelData->sampleData[channelData->sampleDataIndex] = analogInputValue;
   channelData->sampleDataIndex++;
-  if(channelData->sampleDataIndex >= VRR_SAMPLE_SIZE)
+  if(channelData->sampleDataIndex >= ANALOG_SAMPLE_SIZE)
   {
     channelData->sampleDataIndex = 0;
   }
@@ -619,7 +621,7 @@ static void InitModulesThread(void* pData)
   }
   
   // Set the PIT with the analog polling period
-  PIT_Set(Period_Analog_Poll / NB_ANALOG_CHANNELS, true);
+  PIT_Set(PeriodAnalogPoll / NB_ANALOG_CHANNELS, true);
 
   // Put initial zero values to tower output channels
   ProtectedAnalogPut(ANALOG_CHANNEL_1, VRR_ZERO);
@@ -695,8 +697,9 @@ void CalculateRMSThread(void* pData)
   static bool allAlarms[NB_ANALOG_CHANNELS];
   static bool adjustment;
 
-  uint64_t timerDelay;
-  uint64_t timerRate;
+  int64_t timerDelay;
+  int64_t minDelay;
+  int64_t timerRate;
   bool alarm;
 
   for (;;)
@@ -705,16 +708,16 @@ void CalculateRMSThread(void* pData)
 
     uint16_t prevRoot = analogData->currentRMS;
 
-    uint16_t rms = CalculateRMS(analogData->sampleData, VRR_SAMPLE_SIZE, prevRoot);
+    uint16_t rms = CalculateRMS(analogData->sampleData, ANALOG_SAMPLE_SIZE, prevRoot);
     analogData->currentRMS = rms;
 
     if(rms < VRR_LIMIT_LOW)
     {
-      CheckRMS(&timerDelay, &timerRate, (VRR_LIMIT_LOW-rms), &alarm, &adjustment, RaisesSemaphore, ANALOG_CHANNEL_1);
+      CheckRMS(&timerDelay, &minDelay, &timerRate, (VRR_LIMIT_LOW-rms), &alarm, &adjustment, RaisesSemaphore, ANALOG_CHANNEL_1);
     }
     else if(rms > VRR_LIMIT_HIGH)
     {
-      CheckRMS(&timerDelay, &timerRate, (rms-VRR_LIMIT_HIGH), &alarm, &adjustment, LowersSemaphore, ANALOG_CHANNEL_2);
+      CheckRMS(&timerDelay, &minDelay, &timerRate, (rms-VRR_LIMIT_HIGH), &alarm, &adjustment, LowersSemaphore, ANALOG_CHANNEL_2);
     }
     else
     {
@@ -744,52 +747,56 @@ void CalculateFrequencyThread(void* pData)
     OS_DisableInterrupts(); // TODO: remove interrupts disable
 
     bool negCrossingFound = false;
-    float negCrossing1 = 0;
-    float negCrossing2 = 0;
+    uint32_t negCrossing1 = 0;
+    uint32_t negCrossing2 = 0;
     TAnalogThreadData* channelData = &AnalogThreadData[ANALOG_CHANNEL_1];
 
     if(channelData->currentRMS > VRR_LIMIT_FREQUENCY)
     {
-      for(uint8_t i = 0; i < VRR_SAMPLE_SIZE*2 - 1; i++)
+      for(uint8_t i = 0; i < ANALOG_SAMPLE_SIZE*2 - 1; i++)
       {
         int16_t leftVal;
         int16_t rightVal;
 
-        if(i < VRR_SAMPLE_SIZE)
+        if(i < ANALOG_SAMPLE_SIZE)
         {
           leftVal = channelData->prevSampleData[i];
         }
         else
         {
-          leftVal = channelData->sampleData[i - VRR_SAMPLE_SIZE];
+          leftVal = channelData->sampleData[i - ANALOG_SAMPLE_SIZE];
         }
 
-        if(i+1 < VRR_SAMPLE_SIZE)
+        if(i+1 < ANALOG_SAMPLE_SIZE)
         {
           rightVal = channelData->prevSampleData[i+1];
         }
         else
         {
-          rightVal = channelData->sampleData[i+1 - VRR_SAMPLE_SIZE];
+          rightVal = channelData->sampleData[i+1 - ANALOG_SAMPLE_SIZE];
         }
 
         if(leftVal >= 0 && 0 > rightVal && negCrossingFound)
         {
           // m = rise over run, run = 1 sample
-          float m = (rightVal - leftVal);
+          int32_t m = (rightVal - leftVal);
           // x = -b/m
-          float x = (float)(-leftVal) / m;
-          negCrossing2 = (float)i + x;
+          int32_t x = ((-leftVal) << 10) / m;
+          negCrossing2 = (i << 10) + x;
 
-          float distance = negCrossing2 - negCrossing1;
+          uint32_t distance = negCrossing2 - negCrossing1;
 
-          float frequency = (float)1000000000 / (distance * (float)Period_Analog_Poll);
+          uint32_t oldPoll = PeriodAnalogPoll >> 10;
 
-          if(Frequency != frequency && frequency >= 47.5 && frequency <= 52.5)
+          uint64_t newPoll = distance * oldPoll;
+
+          uint64_t frequency = (10000000000 / newPoll); // 10 bill
+
+          if(Frequency != frequency && frequency >= 475 && frequency <= 525)
           {
             Frequency = frequency;
-            Period_Analog_Poll = (1000000000 / Frequency) / VRR_SAMPLE_SIZE;
-            PIT_Set(Period_Analog_Poll / NB_ANALOG_CHANNELS, true);
+            PeriodAnalogPoll = (1000000000 / (Frequency/10)) / ANALOG_SAMPLE_SIZE; // 1 billion
+            PIT_Set(PeriodAnalogPoll / NB_ANALOG_CHANNELS, true);
           }
 
           break;
@@ -799,23 +806,23 @@ void CalculateFrequencyThread(void* pData)
           negCrossingFound = true;
 
           // m = rise over run, run = 1 sample
-          float m = (rightVal - leftVal);
+          int32_t m = (rightVal - leftVal);
           // x = -b/m
-          float x = (float)(-leftVal) / m;
-          negCrossing1 = (float)i + x;
+          int32_t x = ((-leftVal) << 10) / m;
+          negCrossing1 = (i << 10) + x;
         }
       }
 
-      ArrayCopy(channelData->sampleData, channelData->prevSampleData, VRR_SAMPLE_SIZE);
+      ArrayCopy(channelData->sampleData, channelData->prevSampleData, ANALOG_SAMPLE_SIZE);
 
       OS_EnableInterrupts();
     }
     else
     {
       OS_DisableInterrupts();
-      Frequency = 50;
-      Period_Analog_Poll = (1000000000 / Frequency) / VRR_SAMPLE_SIZE;
-      PIT_Set(Period_Analog_Poll / NB_ANALOG_CHANNELS, true);
+      Frequency = 500;
+      PeriodAnalogPoll = (1000000000 / (Frequency/10)) / ANALOG_SAMPLE_SIZE;
+      PIT_Set(PeriodAnalogPoll / NB_ANALOG_CHANNELS, true);
       OS_EnableInterrupts();
     }
   }
