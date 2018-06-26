@@ -96,14 +96,15 @@ $(document).ready(function(){initNavTree('main_8c.html','');});
 <code>#include &quot;kiss_fft.h&quot;</code><br />
 <code>#include &quot;kiss_fftr.h&quot;</code><br />
 <code>#include &quot;analog.h&quot;</code><br />
-<code>#include &lt;math.h&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:gad4455691936f92fdd6c37566fc58ba1f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#gad4455691936f92fdd6c37566fc58ba1f">BAUD_RATE</a>&#160;&#160;&#160;115200</td></tr>
 <tr class="separator:gad4455691936f92fdd6c37566fc58ba1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga26db2f437905e35d7c8305cfd9842307"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#ga26db2f437905e35d7c8305cfd9842307">FIXED_POINT</a>&#160;&#160;&#160;32</td></tr>
+<tr class="separator:ga26db2f437905e35d7c8305cfd9842307"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c25da63ce17c691412129c3d7e9ecf2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0c25da63ce17c691412129c3d7e9ecf2"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>analogData</b>&#160;&#160;&#160;((<a class="el" href="group__main__module.html#gae5f40603a116adc42529ceedda6942c7">TAnalogThreadData</a>*)pData)</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>analogData</b>&#160;&#160;&#160;((<a class="el" href="_v_r_r_8h.html#ae5f40603a116adc42529ceedda6942c7">TAnalogThreadData</a>*)pData)</td></tr>
 <tr class="separator:a0c25da63ce17c691412129c3d7e9ecf2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -122,6 +123,27 @@ Functions</h2></td></tr>
 <tr class="separator:gaf1afd8f3ce4eedf9ad5254b8750ad1fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga9abdf6124e333220d024a49b5ce39883"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#ga9abdf6124e333220d024a49b5ce39883">OS_THREAD_STACK</a> (SpectrumThreadStack, THREAD_STACK_SIZE)</td></tr>
 <tr class="separator:ga9abdf6124e333220d024a49b5ce39883"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad34224c2b50d9cf295ffb21b305b149f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#gad34224c2b50d9cf295ffb21b305b149f">ArrayCopy</a> (int16_t array1[], int16_t array2[], const uint8_t length)</td></tr>
+<tr class="memdesc:gad34224c2b50d9cf295ffb21b305b149f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert samples from one array into another.  <a href="group__main__module.html#gad34224c2b50d9cf295ffb21b305b149f">More...</a><br /></td></tr>
+<tr class="separator:gad34224c2b50d9cf295ffb21b305b149f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa069de5ba1209f491602c162f072b664"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#gaa069de5ba1209f491602c162f072b664">ArrayAnyTrue</a> (const bool data[], const uint8_t length)</td></tr>
+<tr class="memdesc:gaa069de5ba1209f491602c162f072b664"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if any alarm in an array is true.  <a href="group__main__module.html#gaa069de5ba1209f491602c162f072b664">More...</a><br /></td></tr>
+<tr class="separator:gaa069de5ba1209f491602c162f072b664"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga30c3cdc49b63ff8d4b2c0ef1e70bc108"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#ga30c3cdc49b63ff8d4b2c0ef1e70bc108">ProtectedGetAnalogSamplePeriod</a> (void)</td></tr>
+<tr class="memdesc:ga30c3cdc49b63ff8d4b2c0ef1e70bc108"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the Analog Sample Period.  <a href="group__main__module.html#ga30c3cdc49b63ff8d4b2c0ef1e70bc108">More...</a><br /></td></tr>
+<tr class="separator:ga30c3cdc49b63ff8d4b2c0ef1e70bc108"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadbebeafdb3e77340dbd2d75495f7a879"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#gadbebeafdb3e77340dbd2d75495f7a879">ProtectedGetRMS</a> (<a class="el" href="_v_r_r_8h.html#ae5f40603a116adc42529ceedda6942c7">TAnalogThreadData</a> *channelData)</td></tr>
+<tr class="memdesc:gadbebeafdb3e77340dbd2d75495f7a879"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current RMS of a channel.  <a href="group__main__module.html#gadbebeafdb3e77340dbd2d75495f7a879">More...</a><br /></td></tr>
+<tr class="separator:gadbebeafdb3e77340dbd2d75495f7a879"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae89738835c20ca367e44b56d544507f5"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#gae89738835c20ca367e44b56d544507f5">ProtectedSetRMS</a> (<a class="el" href="_v_r_r_8h.html#ae5f40603a116adc42529ceedda6942c7">TAnalogThreadData</a> *channelData, const uint16_t rms)</td></tr>
+<tr class="memdesc:gae89738835c20ca367e44b56d544507f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the current RMS of a channel.  <a href="group__main__module.html#gae89738835c20ca367e44b56d544507f5">More...</a><br /></td></tr>
+<tr class="separator:gae89738835c20ca367e44b56d544507f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2eb25994db6055485099e1c3088154f5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#ga2eb25994db6055485099e1c3088154f5">ProtectedGetCycle</a> (<a class="el" href="_v_r_r_8h.html#ae5f40603a116adc42529ceedda6942c7">TAnalogThreadData</a> *channelData, int16_t sampleData[])</td></tr>
+<tr class="memdesc:ga2eb25994db6055485099e1c3088154f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the sample data of one analog cycle.  <a href="group__main__module.html#ga2eb25994db6055485099e1c3088154f5">More...</a><br /></td></tr>
+<tr class="separator:ga2eb25994db6055485099e1c3088154f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7f941dc4a9429f548c9b2c2f4fa6e16d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#ga7f941dc4a9429f548c9b2c2f4fa6e16d">ProtectedGetTwoCycles</a> (<a class="el" href="_v_r_r_8h.html#ae5f40603a116adc42529ceedda6942c7">TAnalogThreadData</a> *channelData, int16_t sampleData[])</td></tr>
+<tr class="memdesc:ga7f941dc4a9429f548c9b2c2f4fa6e16d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the sample data of two analog cycles.  <a href="group__main__module.html#ga7f941dc4a9429f548c9b2c2f4fa6e16d">More...</a><br /></td></tr>
+<tr class="separator:ga7f941dc4a9429f548c9b2c2f4fa6e16d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaf57dd4c5e7e444cfe5571d411f9548c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__main__module.html#gaf57dd4c5e7e444cfe5571d411f9548c9">ReceivedPacket</a> (void)</td></tr>
 <tr class="memdesc:gaf57dd4c5e7e444cfe5571d411f9548c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes the command depending on what packet has been received.  <a href="group__main__module.html#gaf57dd4c5e7e444cfe5571d411f9548c9">More...</a><br /></td></tr>
 <tr class="separator:gaf57dd4c5e7e444cfe5571d411f9548c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -175,15 +197,14 @@ Variables</h2></td></tr>
 <div class="textblock"><p>Main module. This module contains user's application code. </p>
 <dl class="section version"><dt>Version</dt><dd>2.0 </dd></dl>
 <dl class="section author"><dt>Author</dt><dd>12551519 </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>2018-05-13</dd></dl>
-<dl class="section version"><dt>Version</dt><dd>6.0 </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>2018-05-13 </dd></dl>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_08d237fc27d4ecd563f71c5d52f2fecc.html">sources</a></li><li class="navelem"><a class="el" href="main_8c.html">main.c</a></li>
-    <li class="footer">Generated on Mon Jun 25 2018 20:39:19 for Project by
+    <li class="footer">Generated on Tue Jun 26 2018 16:43:03 for Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

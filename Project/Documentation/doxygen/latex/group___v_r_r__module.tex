@@ -7,11 +7,7 @@ bool \hyperlink{group___v_r_r__module_ga756bc6b6907a4561fe65c47e79fcac7a}{V\+R\+
 \begin{DoxyCompactList}\small\item\em Sets up the V\+R\+R before first use. \end{DoxyCompactList}\item 
 bool \hyperlink{group___v_r_r__module_ga93027d44790f5625dc76fe8546c9692b}{V\+R\+R\+\_\+\+Protected\+Analog\+Put} (uint8\+\_\+t const channel\+Nb, int16\+\_\+t const value)
 \begin{DoxyCompactList}\small\item\em Sends a value to an analog input channel. \end{DoxyCompactList}\item 
-void \hyperlink{group___v_r_r__module_ga8522aea3405b3832f6d4b685f98abef8}{V\+R\+R\+\_\+\+Array\+Copy} (int16\+\_\+t array1\mbox{[}$\,$\mbox{]}, int16\+\_\+t array2\mbox{[}$\,$\mbox{]}, const uint8\+\_\+t length)
-\begin{DoxyCompactList}\small\item\em Insert samples from one array into another. \end{DoxyCompactList}\item 
-bool \hyperlink{group___v_r_r__module_ga77bce40d62678d121ab09cb771c49493}{V\+R\+R\+\_\+\+Array\+Any\+True} (const bool data\mbox{[}$\,$\mbox{]}, const uint8\+\_\+t length)
-\begin{DoxyCompactList}\small\item\em Checks if any alarm in an array is true. \end{DoxyCompactList}\item 
-uint32\+\_\+t \hyperlink{group___v_r_r__module_ga71340103bb9bb352a49355047d8ca2fe}{V\+R\+R\+\_\+\+Quick\+Square\+Root} (const uint32\+\_\+t target\+Square, uint32\+\_\+t prev\+Root, uint32\+\_\+t prev\+Square, const uint32\+\_\+t low\+Limit, const uint32\+\_\+t high\+Limit)
+uint32\+\_\+t \hyperlink{group___v_r_r__module_gaf7bfe3281cde13a415309080ff5b0dc4}{V\+R\+R\+\_\+\+Quick\+Square\+Root} (const uint32\+\_\+t target\+Square, uint32\+\_\+t prev\+Root)
 \begin{DoxyCompactList}\small\item\em Calculates the square root of a given value efficiently using previous roots. \end{DoxyCompactList}\item 
 uint16\+\_\+t \hyperlink{group___v_r_r__module_ga133f79b2a87bb1e8c5ec256642b2e0d5}{V\+R\+R\+\_\+\+Calculate\+R\+M\+S} (const int16\+\_\+t data\mbox{[}$\,$\mbox{]}, const uint8\+\_\+t length, const uint16\+\_\+t prev\+Root)
 \begin{DoxyCompactList}\small\item\em Calculates R\+M\+S of given values. \end{DoxyCompactList}\item 
@@ -30,6 +26,10 @@ const uint64\+\_\+t \hyperlink{group___v_r_r__module_ga6dcb39a1c723e97c190362e56
 \item 
 const uint32\+\_\+t \hyperlink{group___v_r_r__module_ga9cff33455fa636577df049d46c6a732c}{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+D\+E\+F\+A\+U\+L\+T} = 500
 \item 
+const uint32\+\_\+t \hyperlink{group___v_r_r__module_gac34989c91ba32cf4a1203e112a690e99}{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W} = 475
+\item 
+const uint32\+\_\+t \hyperlink{group___v_r_r__module_gaa6799d90e01e04a1f23b6a1046b9d2c2}{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H} = 525
+\item 
 const int16\+\_\+t \hyperlink{group___v_r_r__module_gad55bb968f6baf24de7bc84da9af56299}{V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+Z\+E\+R\+O} = 0
 \item 
 const int16\+\_\+t \hyperlink{group___v_r_r__module_gab6986e66860b0f542175fa87d09b9b0c}{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+H\+A\+L\+F} = 1638
@@ -38,9 +38,11 @@ const int16\+\_\+t \hyperlink{group___v_r_r__module_gad3aaefa339469ae93a965e64c9
 \item 
 const int16\+\_\+t \hyperlink{group___v_r_r__module_ga9475d7ceaf1b4b9d63d458bc8df3c5e0}{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y} = 4915
 \item 
-const int16\+\_\+t \hyperlink{group___v_r_r__module_ga18eb3dafde58338caa5182fc2c2e9d82}{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W} = 6553
+const int16\+\_\+t \hyperlink{group___v_r_r__module_ga7fbce20dbb31f9b5e6891e728242b3b7}{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W} = 6553
 \item 
-const int16\+\_\+t \hyperlink{group___v_r_r__module_gaf47e40bfdb9ee19a02d47d30cfca0237}{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H} = 9830
+const int16\+\_\+t \hyperlink{group___v_r_r__module_ga5d7a8b53b78d87dd46bd3d348a81e9c3}{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+N\+O\+M\+I\+N\+A\+L} = 8192
+\item 
+const int16\+\_\+t \hyperlink{group___v_r_r__module_ga0222ba2e8509010d4dcdd18351cf44ba}{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H} = 9830
 \item 
 const int16\+\_\+t \hyperlink{group___v_r_r__module_gadc76104466768c55588f9dfa0d80d851}{V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+F\+I\+V\+E} = 16384
 \end{DoxyCompactItemize}
@@ -50,53 +52,6 @@ const int16\+\_\+t \hyperlink{group___v_r_r__module_gadc76104466768c55588f9dfa0d
 
 
 \subsection{Function Documentation}
-\hypertarget{group___v_r_r__module_ga77bce40d62678d121ab09cb771c49493}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+Array\+Any\+True@{V\+R\+R\+\_\+\+Array\+Any\+True}}
-\index{V\+R\+R\+\_\+\+Array\+Any\+True@{V\+R\+R\+\_\+\+Array\+Any\+True}!V\+R\+R module documentation@{V\+R\+R module documentation}}
-\subsubsection[{V\+R\+R\+\_\+\+Array\+Any\+True(const bool data[], const uint8\+\_\+t length)}]{\setlength{\rightskip}{0pt plus 5cm}bool V\+R\+R\+\_\+\+Array\+Any\+True (
-\begin{DoxyParamCaption}
-\item[{const bool}]{data\mbox{[}$\,$\mbox{]}, }
-\item[{const uint8\+\_\+t}]{length}
-\end{DoxyParamCaption}
-)}\label{group___v_r_r__module_ga77bce40d62678d121ab09cb771c49493}
-
-
-Checks if any alarm in an array is true. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em data} & is the array. \\
-\hline
-{\em length} & is the length of the array. \\
-\hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-bool -\/ T\+R\+U\+E if any item is true 
-\end{DoxyReturn}
-\hypertarget{group___v_r_r__module_ga8522aea3405b3832f6d4b685f98abef8}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+Array\+Copy@{V\+R\+R\+\_\+\+Array\+Copy}}
-\index{V\+R\+R\+\_\+\+Array\+Copy@{V\+R\+R\+\_\+\+Array\+Copy}!V\+R\+R module documentation@{V\+R\+R module documentation}}
-\subsubsection[{V\+R\+R\+\_\+\+Array\+Copy(int16\+\_\+t array1[], int16\+\_\+t array2[], const uint8\+\_\+t length)}]{\setlength{\rightskip}{0pt plus 5cm}void V\+R\+R\+\_\+\+Array\+Copy (
-\begin{DoxyParamCaption}
-\item[{int16\+\_\+t}]{array1\mbox{[}$\,$\mbox{]}, }
-\item[{int16\+\_\+t}]{array2\mbox{[}$\,$\mbox{]}, }
-\item[{const uint8\+\_\+t}]{length}
-\end{DoxyParamCaption}
-)}\label{group___v_r_r__module_ga8522aea3405b3832f6d4b685f98abef8}
-
-
-Insert samples from one array into another. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em array1} & is the array transferring from. \\
-\hline
-{\em array2} & is the array transferring to. \\
-\hline
-{\em length} & is the length of both arrays. \\
-\hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-void 
-\end{DoxyReturn}
 \hypertarget{group___v_r_r__module_ga62b2158646147efadf49c870f3245c0d}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+Calculate\+Frequency@{V\+R\+R\+\_\+\+Calculate\+Frequency}}
 \index{V\+R\+R\+\_\+\+Calculate\+Frequency@{V\+R\+R\+\_\+\+Calculate\+Frequency}!V\+R\+R module documentation@{V\+R\+R module documentation}}
 \subsubsection[{V\+R\+R\+\_\+\+Calculate\+Frequency(const int16\+\_\+t sample\+Data[], const uint16\+\_\+t rms, const uint32\+\_\+t period\+Analog\+Sample)}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t V\+R\+R\+\_\+\+Calculate\+Frequency (
@@ -229,17 +184,14 @@ Sends a value to an analog input channel.
 \begin{DoxyReturn}{Returns}
 bool -\/ true if the analog value was output successfully. 
 \end{DoxyReturn}
-\hypertarget{group___v_r_r__module_ga71340103bb9bb352a49355047d8ca2fe}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+Quick\+Square\+Root@{V\+R\+R\+\_\+\+Quick\+Square\+Root}}
+\hypertarget{group___v_r_r__module_gaf7bfe3281cde13a415309080ff5b0dc4}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+Quick\+Square\+Root@{V\+R\+R\+\_\+\+Quick\+Square\+Root}}
 \index{V\+R\+R\+\_\+\+Quick\+Square\+Root@{V\+R\+R\+\_\+\+Quick\+Square\+Root}!V\+R\+R module documentation@{V\+R\+R module documentation}}
-\subsubsection[{V\+R\+R\+\_\+\+Quick\+Square\+Root(const uint32\+\_\+t target\+Square, uint32\+\_\+t prev\+Root, uint32\+\_\+t prev\+Square, const uint32\+\_\+t low\+Limit, const uint32\+\_\+t high\+Limit)}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t V\+R\+R\+\_\+\+Quick\+Square\+Root (
+\subsubsection[{V\+R\+R\+\_\+\+Quick\+Square\+Root(const uint32\+\_\+t target\+Square, uint32\+\_\+t prev\+Root)}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t V\+R\+R\+\_\+\+Quick\+Square\+Root (
 \begin{DoxyParamCaption}
 \item[{const uint32\+\_\+t}]{target\+Square, }
-\item[{uint32\+\_\+t}]{prev\+Root, }
-\item[{uint32\+\_\+t}]{prev\+Square, }
-\item[{const uint32\+\_\+t}]{low\+Limit, }
-\item[{const uint32\+\_\+t}]{high\+Limit}
+\item[{uint32\+\_\+t}]{prev\+Root}
 \end{DoxyParamCaption}
-)}\label{group___v_r_r__module_ga71340103bb9bb352a49355047d8ca2fe}
+)}\label{group___v_r_r__module_gaf7bfe3281cde13a415309080ff5b0dc4}
 
 
 Calculates the square root of a given value efficiently using previous roots. 
@@ -250,15 +202,9 @@ Calculates the square root of a given value efficiently using previous roots.
 \hline
 {\em prev\+Root} & is the previously calculated root. \\
 \hline
-{\em prev\+Square} & is the previously calculated square. \\
-\hline
-{\em low\+Limit} & is estimated lowest root. \\
-\hline
-{\em high\+Limit} & is estimated highest root. \\
-\hline
 \end{DoxyParams}
 \begin{DoxyNote}{Note}
-Tested speed of Math.\+h sqrt function -\/ 38us whereas this is 25us. Therefore on average 13us faster. 
+tested speed of Math.\+h sqrt function -\/ 38us whereas this is 25us. Therefore on average 13us faster. 
 \end{DoxyNote}
 \begin{DoxyReturn}{Returns}
 uint32 -\/ Square root value 
@@ -300,16 +246,16 @@ void
 \hypertarget{group___v_r_r__module_ga9cff33455fa636577df049d46c6a732c}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+D\+E\+F\+A\+U\+L\+T@{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+D\+E\+F\+A\+U\+L\+T}}
 \index{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+D\+E\+F\+A\+U\+L\+T@{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+D\+E\+F\+A\+U\+L\+T}!V\+R\+R module documentation@{V\+R\+R module documentation}}
 \subsubsection[{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+D\+E\+F\+A\+U\+L\+T}]{\setlength{\rightskip}{0pt plus 5cm}const uint32\+\_\+t V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+D\+E\+F\+A\+U\+L\+T = 500}\label{group___v_r_r__module_ga9cff33455fa636577df049d46c6a732c}
-Default frequency (50\+Hz) \hypertarget{group___v_r_r__module_ga9475d7ceaf1b4b9d63d458bc8df3c5e0}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y@{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y}}
+Default frequency (50\+Hz) \hypertarget{group___v_r_r__module_gaa6799d90e01e04a1f23b6a1046b9d2c2}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H@{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H}}
+\index{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H@{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H}]{\setlength{\rightskip}{0pt plus 5cm}const uint32\+\_\+t V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H = 525}\label{group___v_r_r__module_gaa6799d90e01e04a1f23b6a1046b9d2c2}
+High limit frequency (52.\+5\+Hz) \hypertarget{group___v_r_r__module_gac34989c91ba32cf4a1203e112a690e99}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W@{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W}}
+\index{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W@{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W}]{\setlength{\rightskip}{0pt plus 5cm}const uint32\+\_\+t V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W = 475}\label{group___v_r_r__module_gac34989c91ba32cf4a1203e112a690e99}
+Low limit frequency (47.\+5\+Hz) \hypertarget{group___v_r_r__module_ga9475d7ceaf1b4b9d63d458bc8df3c5e0}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y@{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y}}
 \index{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y@{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y}!V\+R\+R module documentation@{V\+R\+R module documentation}}
 \subsubsection[{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y}]{\setlength{\rightskip}{0pt plus 5cm}const int16\+\_\+t V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y = 4915}\label{group___v_r_r__module_ga9475d7ceaf1b4b9d63d458bc8df3c5e0}
-V\+R\+R\+\_\+\+V\+O\+L\+T x1.\+5 \hypertarget{group___v_r_r__module_gaf47e40bfdb9ee19a02d47d30cfca0237}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H@{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H}}
-\index{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H@{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H}!V\+R\+R module documentation@{V\+R\+R module documentation}}
-\subsubsection[{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H}]{\setlength{\rightskip}{0pt plus 5cm}const int16\+\_\+t V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H = 9830}\label{group___v_r_r__module_gaf47e40bfdb9ee19a02d47d30cfca0237}
-V\+R\+R\+\_\+\+V\+O\+L\+T x3 \hypertarget{group___v_r_r__module_ga18eb3dafde58338caa5182fc2c2e9d82}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W@{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W}}
-\index{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W@{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W}!V\+R\+R module documentation@{V\+R\+R module documentation}}
-\subsubsection[{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W}]{\setlength{\rightskip}{0pt plus 5cm}const int16\+\_\+t V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W = 6553}\label{group___v_r_r__module_ga18eb3dafde58338caa5182fc2c2e9d82}
-V\+R\+R\+\_\+\+V\+O\+L\+T x2 \hypertarget{group___v_r_r__module_gadc76104466768c55588f9dfa0d80d851}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+F\+I\+V\+E@{V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+F\+I\+V\+E}}
+V\+R\+R\+\_\+\+V\+O\+L\+T x1.\+5 \hypertarget{group___v_r_r__module_gadc76104466768c55588f9dfa0d80d851}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+F\+I\+V\+E@{V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+F\+I\+V\+E}}
 \index{V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+F\+I\+V\+E@{V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+F\+I\+V\+E}!V\+R\+R module documentation@{V\+R\+R module documentation}}
 \subsubsection[{V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+F\+I\+V\+E}]{\setlength{\rightskip}{0pt plus 5cm}const int16\+\_\+t V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+F\+I\+V\+E = 16384}\label{group___v_r_r__module_gadc76104466768c55588f9dfa0d80d851}
 V\+R\+R\+\_\+\+V\+O\+L\+T x5 \hypertarget{group___v_r_r__module_gad55bb968f6baf24de7bc84da9af56299}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+Z\+E\+R\+O@{V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+Z\+E\+R\+O}}
@@ -327,4 +273,13 @@ Period of analog timer delay (5 seconds) \hypertarget{group___v_r_r__module_gad3
 One volt ((2$^\wedge$15 -\/ 1)/10) \hypertarget{group___v_r_r__module_gab6986e66860b0f542175fa87d09b9b0c}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+H\+A\+L\+F@{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+H\+A\+L\+F}}
 \index{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+H\+A\+L\+F@{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+H\+A\+L\+F}!V\+R\+R module documentation@{V\+R\+R module documentation}}
 \subsubsection[{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+H\+A\+L\+F}]{\setlength{\rightskip}{0pt plus 5cm}const int16\+\_\+t V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+H\+A\+L\+F = 1638}\label{group___v_r_r__module_gab6986e66860b0f542175fa87d09b9b0c}
-V\+R\+R\+\_\+\+V\+O\+L\+T x0.\+5 
+V\+R\+R\+\_\+\+V\+O\+L\+T x0.\+5 \hypertarget{group___v_r_r__module_ga0222ba2e8509010d4dcdd18351cf44ba}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H@{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H}}
+\index{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H@{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H}]{\setlength{\rightskip}{0pt plus 5cm}const int16\+\_\+t V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H = 9830}\label{group___v_r_r__module_ga0222ba2e8509010d4dcdd18351cf44ba}
+V\+R\+R\+\_\+\+V\+O\+L\+T x3 \hypertarget{group___v_r_r__module_ga7fbce20dbb31f9b5e6891e728242b3b7}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W@{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W}}
+\index{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W@{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W}]{\setlength{\rightskip}{0pt plus 5cm}const int16\+\_\+t V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W = 6553}\label{group___v_r_r__module_ga7fbce20dbb31f9b5e6891e728242b3b7}
+V\+R\+R\+\_\+\+V\+O\+L\+T x2 \hypertarget{group___v_r_r__module_ga5d7a8b53b78d87dd46bd3d348a81e9c3}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+N\+O\+M\+I\+N\+A\+L@{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+N\+O\+M\+I\+N\+A\+L}}
+\index{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+N\+O\+M\+I\+N\+A\+L@{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+N\+O\+M\+I\+N\+A\+L}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+N\+O\+M\+I\+N\+A\+L}]{\setlength{\rightskip}{0pt plus 5cm}const int16\+\_\+t V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+N\+O\+M\+I\+N\+A\+L = 8192}\label{group___v_r_r__module_ga5d7a8b53b78d87dd46bd3d348a81e9c3}
+V\+R\+R\+\_\+\+V\+O\+L\+T x2.\+5 

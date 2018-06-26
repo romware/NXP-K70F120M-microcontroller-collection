@@ -242,12 +242,12 @@ var NAVTREEINDEX59 =
 "group___s_p_i___register___masks.html#gaf90e19a9b8d8a54d8ae278820d8f1558":[4,0,2,0,0,11388],
 "group___s_p_i___register___masks.html#gafb0dfe436cd6273ce0b0052aca58499e":[4,0,2,0,0,11346],
 "group___sys_tick___peripheral.html":[2,16,53],
-"group___sys_tick___peripheral.html#ga0c9d5fa2fdb81e177e61d0e980507c51":[2,16,53,4],
 "group___sys_tick___peripheral.html#ga0c9d5fa2fdb81e177e61d0e980507c51":[4,0,2,0,0,11453],
+"group___sys_tick___peripheral.html#ga0c9d5fa2fdb81e177e61d0e980507c51":[2,16,53,4],
 "group___sys_tick___peripheral.html#ga19e2a0c9400dcdfd462a92ca83cff253":[4,0,2,0,0,13319],
 "group___sys_tick___peripheral.html#ga19e2a0c9400dcdfd462a92ca83cff253":[2,16,53,5],
-"group___sys_tick___peripheral.html#gaeef73642fdef722ce658e468dad877ea":[2,16,53,3],
 "group___sys_tick___peripheral.html#gaeef73642fdef722ce658e468dad877ea":[4,0,2,0,0,11452],
+"group___sys_tick___peripheral.html#gaeef73642fdef722ce658e468dad877ea":[2,16,53,3],
 "group___sys_tick___register___accessor___macros.html":[2,16,53,0],
 "group___sys_tick___register___accessor___macros.html#ga07f2beb63f7b50b9e1fa8b383d9ca87c":[4,0,2,0,0,11468]
 };

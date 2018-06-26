@@ -25,13 +25,14 @@ Main module. This module contains user\textquotesingle{}s application code.
 {\ttfamily \#include \char`\"{}kiss\+\_\+fft.\+h\char`\"{}}\\*
 {\ttfamily \#include \char`\"{}kiss\+\_\+fftr.\+h\char`\"{}}\\*
 {\ttfamily \#include \char`\"{}analog.\+h\char`\"{}}\\*
-{\ttfamily \#include $<$math.\+h$>$}\\*
 \subsection*{Macros}
 \begin{DoxyCompactItemize}
 \item 
 \#define \hyperlink{group__main__module_gad4455691936f92fdd6c37566fc58ba1f}{B\+A\+U\+D\+\_\+\+R\+A\+T\+E}~115200
 \item 
-\hypertarget{main_8c_a0c25da63ce17c691412129c3d7e9ecf2}{}\#define {\bfseries analog\+Data}~((\hyperlink{group__main__module_gae5f40603a116adc42529ceedda6942c7}{T\+Analog\+Thread\+Data}$\ast$)p\+Data)\label{main_8c_a0c25da63ce17c691412129c3d7e9ecf2}
+\#define \hyperlink{group__main__module_ga26db2f437905e35d7c8305cfd9842307}{F\+I\+X\+E\+D\+\_\+\+P\+O\+I\+N\+T}~32
+\item 
+\hypertarget{main_8c_a0c25da63ce17c691412129c3d7e9ecf2}{}\#define {\bfseries analog\+Data}~((\hyperlink{_v_r_r_8h_ae5f40603a116adc42529ceedda6942c7}{T\+Analog\+Thread\+Data}$\ast$)p\+Data)\label{main_8c_a0c25da63ce17c691412129c3d7e9ecf2}
 
 \end{DoxyCompactItemize}
 \subsection*{Functions}
@@ -51,6 +52,20 @@ Main module. This module contains user\textquotesingle{}s application code.
 \item 
 \hyperlink{group__main__module_ga9abdf6124e333220d024a49b5ce39883}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Spectrum\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
 \item 
+void \hyperlink{group__main__module_gad34224c2b50d9cf295ffb21b305b149f}{Array\+Copy} (int16\+\_\+t array1\mbox{[}$\,$\mbox{]}, int16\+\_\+t array2\mbox{[}$\,$\mbox{]}, const uint8\+\_\+t length)
+\begin{DoxyCompactList}\small\item\em Insert samples from one array into another. \end{DoxyCompactList}\item 
+bool \hyperlink{group__main__module_gaa069de5ba1209f491602c162f072b664}{Array\+Any\+True} (const bool data\mbox{[}$\,$\mbox{]}, const uint8\+\_\+t length)
+\begin{DoxyCompactList}\small\item\em Checks if any alarm in an array is true. \end{DoxyCompactList}\item 
+uint32\+\_\+t \hyperlink{group__main__module_ga30c3cdc49b63ff8d4b2c0ef1e70bc108}{Protected\+Get\+Analog\+Sample\+Period} (void)
+\begin{DoxyCompactList}\small\item\em Returns the Analog Sample Period. \end{DoxyCompactList}\item 
+uint16\+\_\+t \hyperlink{group__main__module_gadbebeafdb3e77340dbd2d75495f7a879}{Protected\+Get\+R\+M\+S} (\hyperlink{_v_r_r_8h_ae5f40603a116adc42529ceedda6942c7}{T\+Analog\+Thread\+Data} $\ast$channel\+Data)
+\begin{DoxyCompactList}\small\item\em Returns the current R\+M\+S of a channel. \end{DoxyCompactList}\item 
+uint16\+\_\+t \hyperlink{group__main__module_gae89738835c20ca367e44b56d544507f5}{Protected\+Set\+R\+M\+S} (\hyperlink{_v_r_r_8h_ae5f40603a116adc42529ceedda6942c7}{T\+Analog\+Thread\+Data} $\ast$channel\+Data, const uint16\+\_\+t rms)
+\begin{DoxyCompactList}\small\item\em Sets the current R\+M\+S of a channel. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga2eb25994db6055485099e1c3088154f5}{Protected\+Get\+Cycle} (\hyperlink{_v_r_r_8h_ae5f40603a116adc42529ceedda6942c7}{T\+Analog\+Thread\+Data} $\ast$channel\+Data, int16\+\_\+t sample\+Data\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Gets the sample data of one analog cycle. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga7f941dc4a9429f548c9b2c2f4fa6e16d}{Protected\+Get\+Two\+Cycles} (\hyperlink{_v_r_r_8h_ae5f40603a116adc42529ceedda6942c7}{T\+Analog\+Thread\+Data} $\ast$channel\+Data, int16\+\_\+t sample\+Data\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Gets the sample data of two analog cycles. \end{DoxyCompactList}\item 
 void \hyperlink{group__main__module_gaf57dd4c5e7e444cfe5571d411f9548c9}{Received\+Packet} (void)
 \begin{DoxyCompactList}\small\item\em Executes the command depending on what packet has been received. \end{DoxyCompactList}\item 
 void \hyperlink{group__main__module_ga5bb615c293d6b116d3c327bd223f2a4a}{Analog\+Sample\+Callback} (void $\ast$arg)
@@ -103,8 +118,5 @@ Main module. This module contains user\textquotesingle{}s application code.
 12551519 
 \end{DoxyAuthor}
 \begin{DoxyDate}{Date}
-2018-\/05-\/13
+2018-\/05-\/13 
 \end{DoxyDate}
-\begin{DoxyVersion}{Version}
-6.\+0 
-\end{DoxyVersion}

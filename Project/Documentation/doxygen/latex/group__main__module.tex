@@ -1,26 +1,12 @@
 \hypertarget{group__main__module}{}\section{main module documentation}
 \label{group__main__module}\index{main module documentation@{main module documentation}}
-\subsection*{Data Structures}
-\begin{DoxyCompactItemize}
-\item 
-struct \hyperlink{struct_analog_thread_data}{Analog\+Thread\+Data}
-\begin{DoxyCompactList}\small\item\em Data structure used to pass Analog configuration to a user thread. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Macros}
 \begin{DoxyCompactItemize}
 \item 
 \#define \hyperlink{group__main__module_gad4455691936f92fdd6c37566fc58ba1f}{B\+A\+U\+D\+\_\+\+R\+A\+T\+E}~115200
 \item 
-\hypertarget{group__main__module_ga90b7a8cb7bc3fdbd98014a3e15ee6e9a}{}\#define {\bfseries T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E}~100\label{group__main__module_ga90b7a8cb7bc3fdbd98014a3e15ee6e9a}
-
-\item 
-\hypertarget{group__main__module_ga300da08cc989dc0963caf3a5afc024b8}{}\#define {\bfseries N\+B\+\_\+\+A\+N\+A\+L\+O\+G\+\_\+\+C\+H\+A\+N\+N\+E\+L\+S}~2\label{group__main__module_ga300da08cc989dc0963caf3a5afc024b8}
-
+\#define \hyperlink{group__main__module_ga26db2f437905e35d7c8305cfd9842307}{F\+I\+X\+E\+D\+\_\+\+P\+O\+I\+N\+T}~32
 \end{DoxyCompactItemize}
-\subsection*{Typedefs}
-\begin{DoxyCompactItemize}
-\item 
-typedef struct \hyperlink{struct_analog_thread_data}{Analog\+Thread\+Data} \hyperlink{group__main__module_gae5f40603a116adc42529ceedda6942c7}{T\+Analog\+Thread\+Data}
-\begin{DoxyCompactList}\small\item\em Data structure used to pass Analog configuration to a user thread. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
@@ -38,6 +24,20 @@ typedef struct \hyperlink{struct_analog_thread_data}{Analog\+Thread\+Data} \hype
 \item 
 \hyperlink{group__main__module_ga9abdf6124e333220d024a49b5ce39883}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Spectrum\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
 \item 
+void \hyperlink{group__main__module_gad34224c2b50d9cf295ffb21b305b149f}{Array\+Copy} (int16\+\_\+t array1\mbox{[}$\,$\mbox{]}, int16\+\_\+t array2\mbox{[}$\,$\mbox{]}, const uint8\+\_\+t length)
+\begin{DoxyCompactList}\small\item\em Insert samples from one array into another. \end{DoxyCompactList}\item 
+bool \hyperlink{group__main__module_gaa069de5ba1209f491602c162f072b664}{Array\+Any\+True} (const bool data\mbox{[}$\,$\mbox{]}, const uint8\+\_\+t length)
+\begin{DoxyCompactList}\small\item\em Checks if any alarm in an array is true. \end{DoxyCompactList}\item 
+uint32\+\_\+t \hyperlink{group__main__module_ga30c3cdc49b63ff8d4b2c0ef1e70bc108}{Protected\+Get\+Analog\+Sample\+Period} (void)
+\begin{DoxyCompactList}\small\item\em Returns the Analog Sample Period. \end{DoxyCompactList}\item 
+uint16\+\_\+t \hyperlink{group__main__module_gadbebeafdb3e77340dbd2d75495f7a879}{Protected\+Get\+R\+M\+S} (\hyperlink{_v_r_r_8h_ae5f40603a116adc42529ceedda6942c7}{T\+Analog\+Thread\+Data} $\ast$channel\+Data)
+\begin{DoxyCompactList}\small\item\em Returns the current R\+M\+S of a channel. \end{DoxyCompactList}\item 
+uint16\+\_\+t \hyperlink{group__main__module_gae89738835c20ca367e44b56d544507f5}{Protected\+Set\+R\+M\+S} (\hyperlink{_v_r_r_8h_ae5f40603a116adc42529ceedda6942c7}{T\+Analog\+Thread\+Data} $\ast$channel\+Data, const uint16\+\_\+t rms)
+\begin{DoxyCompactList}\small\item\em Sets the current R\+M\+S of a channel. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga2eb25994db6055485099e1c3088154f5}{Protected\+Get\+Cycle} (\hyperlink{_v_r_r_8h_ae5f40603a116adc42529ceedda6942c7}{T\+Analog\+Thread\+Data} $\ast$channel\+Data, int16\+\_\+t sample\+Data\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Gets the sample data of one analog cycle. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga7f941dc4a9429f548c9b2c2f4fa6e16d}{Protected\+Get\+Two\+Cycles} (\hyperlink{_v_r_r_8h_ae5f40603a116adc42529ceedda6942c7}{T\+Analog\+Thread\+Data} $\ast$channel\+Data, int16\+\_\+t sample\+Data\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Gets the sample data of two analog cycles. \end{DoxyCompactList}\item 
 void \hyperlink{group__main__module_gaf57dd4c5e7e444cfe5571d411f9548c9}{Received\+Packet} (void)
 \begin{DoxyCompactList}\small\item\em Executes the command depending on what packet has been received. \end{DoxyCompactList}\item 
 void \hyperlink{group__main__module_ga5bb615c293d6b116d3c327bd223f2a4a}{Analog\+Sample\+Callback} (void $\ast$arg)
@@ -56,14 +56,7 @@ void \hyperlink{group__main__module_ga58206eaf11b86e19e48708e5d3e5cc3f}{Lowers\+
 \begin{DoxyCompactList}\small\item\em Increments the lowers count and writes to Flash. \end{DoxyCompactList}\item 
 \hypertarget{group__main__module_ga840291bc02cba5474a4cb46a9b9566fe}{}int {\bfseries main} (void)\label{group__main__module_ga840291bc02cba5474a4cb46a9b9566fe}
 
-\item 
-\hypertarget{group__main__module_gaeac4abe1062c9f3b5d9eb540e300482a}{}void {\bfseries L\+P\+T\+M\+R\+Init} (const uint16\+\_\+t count)\label{group__main__module_gaeac4abe1062c9f3b5d9eb540e300482a}
-
-\item 
-void \hyperlink{group__main__module_gae3cf366e06ba6a7a895b06f7cd6dab35}{\+\_\+\+\_\+attribute\+\_\+\+\_\+} ((interrupt)) L\+P\+Timer\+\_\+\+I\+S\+R(void)
-\begin{DoxyCompactList}\small\item\em Interrupt service routine for the F\+T\+M. \end{DoxyCompactList}\item 
-void \hyperlink{group__main__module_ga57d918b99919e3a8dd4e1b736370015a}{Analog\+Loopback\+Thread} (void $\ast$p\+Data)
-\begin{DoxyCompactList}\small\item\em Samples a value on an A\+D\+C channel and sends it to the corresponding D\+A\+C channel. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{DoxyCompactItemize}
 \subsection*{Variables}
 \begin{DoxyCompactItemize}
 \item 
@@ -84,9 +77,6 @@ volatile uint8\+\_\+t $\ast$ \hyperlink{group__main__module_ga515a64111062904ebd
 volatile uint8\+\_\+t $\ast$ \hyperlink{group__main__module_ga5f7c64789a946f4a8d7c20e94b875f30}{Nv\+Count\+Lowers}
 \item 
 volatile uint8\+\_\+t $\ast$ \hyperlink{group__main__module_ga56dcc37aec297d091908aa8c6c90a89e}{Nv\+Timing\+Mode}
-\item 
-\hypertarget{group__main__module_ga8916636821cdde434ff4869a5d9ef1b7}{}const uint8\+\_\+t {\bfseries A\+N\+A\+L\+O\+G\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+P\+R\+I\+O\+R\+I\+T\+I\+E\+S} \mbox{[}N\+B\+\_\+\+A\+N\+A\+L\+O\+G\+\_\+\+C\+H\+A\+N\+N\+E\+L\+S\mbox{]} = \{1, 2\}\label{group__main__module_ga8916636821cdde434ff4869a5d9ef1b7}
-
 \end{DoxyCompactItemize}
 
 
@@ -97,48 +87,12 @@ volatile uint8\+\_\+t $\ast$ \hyperlink{group__main__module_ga56dcc37aec297d0919
 \hypertarget{group__main__module_gad4455691936f92fdd6c37566fc58ba1f}{}\index{main module documentation@{main module documentation}!B\+A\+U\+D\+\_\+\+R\+A\+T\+E@{B\+A\+U\+D\+\_\+\+R\+A\+T\+E}}
 \index{B\+A\+U\+D\+\_\+\+R\+A\+T\+E@{B\+A\+U\+D\+\_\+\+R\+A\+T\+E}!main module documentation@{main module documentation}}
 \subsubsection[{B\+A\+U\+D\+\_\+\+R\+A\+T\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define B\+A\+U\+D\+\_\+\+R\+A\+T\+E~115200}\label{group__main__module_gad4455691936f92fdd6c37566fc58ba1f}
-U\+A\+R\+T2 Baud Rate 
-
-\subsection{Typedef Documentation}
-\hypertarget{group__main__module_gae5f40603a116adc42529ceedda6942c7}{}\index{main module documentation@{main module documentation}!T\+Analog\+Thread\+Data@{T\+Analog\+Thread\+Data}}
-\index{T\+Analog\+Thread\+Data@{T\+Analog\+Thread\+Data}!main module documentation@{main module documentation}}
-\subsubsection[{T\+Analog\+Thread\+Data}]{\setlength{\rightskip}{0pt plus 5cm}typedef struct {\bf Analog\+Thread\+Data}  {\bf T\+Analog\+Thread\+Data}}\label{group__main__module_gae5f40603a116adc42529ceedda6942c7}
-
-
-Data structure used to pass Analog configuration to a user thread. 
-
-
+U\+A\+R\+T2 Baud Rate \hypertarget{group__main__module_ga26db2f437905e35d7c8305cfd9842307}{}\index{main module documentation@{main module documentation}!F\+I\+X\+E\+D\+\_\+\+P\+O\+I\+N\+T@{F\+I\+X\+E\+D\+\_\+\+P\+O\+I\+N\+T}}
+\index{F\+I\+X\+E\+D\+\_\+\+P\+O\+I\+N\+T@{F\+I\+X\+E\+D\+\_\+\+P\+O\+I\+N\+T}!main module documentation@{main module documentation}}
+\subsubsection[{F\+I\+X\+E\+D\+\_\+\+P\+O\+I\+N\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define F\+I\+X\+E\+D\+\_\+\+P\+O\+I\+N\+T~32}\label{group__main__module_ga26db2f437905e35d7c8305cfd9842307}
+kiss\+\_\+fft fixed point enable at 32-\/bit 
 
 \subsection{Function Documentation}
-\hypertarget{group__main__module_gae3cf366e06ba6a7a895b06f7cd6dab35}{}\index{main module documentation@{main module documentation}!\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}}
-\index{\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}!main module documentation@{main module documentation}}
-\subsubsection[{\+\_\+\+\_\+attribute\+\_\+\+\_\+((interrupt)) L\+P\+Timer\+\_\+\+I\+S\+R(void)}]{\setlength{\rightskip}{0pt plus 5cm}void \+\_\+\+\_\+attribute\+\_\+\+\_\+ (
-\begin{DoxyParamCaption}
-\item[{(interrupt)}]{}
-\end{DoxyParamCaption}
-)}\label{group__main__module_gae3cf366e06ba6a7a895b06f7cd6dab35}
-
-
-Interrupt service routine for the F\+T\+M. 
-
-Interrupt service routine for the U\+A\+R\+T.
-
-Interrupt service routine for the P\+I\+T.
-
-If a timer channel was set up as output compare, then the user callback function will be called. \begin{DoxyNote}{Note}
-Assumes the F\+T\+M has been initialized. 
-\end{DoxyNote}
-\hypertarget{group__main__module_ga57d918b99919e3a8dd4e1b736370015a}{}\index{main module documentation@{main module documentation}!Analog\+Loopback\+Thread@{Analog\+Loopback\+Thread}}
-\index{Analog\+Loopback\+Thread@{Analog\+Loopback\+Thread}!main module documentation@{main module documentation}}
-\subsubsection[{Analog\+Loopback\+Thread(void $\ast$p\+Data)}]{\setlength{\rightskip}{0pt plus 5cm}void Analog\+Loopback\+Thread (
-\begin{DoxyParamCaption}
-\item[{void $\ast$}]{p\+Data}
-\end{DoxyParamCaption}
-)}\label{group__main__module_ga57d918b99919e3a8dd4e1b736370015a}
-
-
-Samples a value on an A\+D\+C channel and sends it to the corresponding D\+A\+C channel. 
-
 \hypertarget{group__main__module_ga5bb615c293d6b116d3c327bd223f2a4a}{}\index{main module documentation@{main module documentation}!Analog\+Sample\+Callback@{Analog\+Sample\+Callback}}
 \index{Analog\+Sample\+Callback@{Analog\+Sample\+Callback}!main module documentation@{main module documentation}}
 \subsubsection[{Analog\+Sample\+Callback(void $\ast$arg)}]{\setlength{\rightskip}{0pt plus 5cm}void Analog\+Sample\+Callback (
@@ -150,6 +104,53 @@ Samples a value on an A\+D\+C channel and sends it to the corresponding D\+A\+C 
 
 Reads analog data from the A\+D\+C on a specific channel. 
 
+\begin{DoxyReturn}{Returns}
+void 
+\end{DoxyReturn}
+\hypertarget{group__main__module_gaa069de5ba1209f491602c162f072b664}{}\index{main module documentation@{main module documentation}!Array\+Any\+True@{Array\+Any\+True}}
+\index{Array\+Any\+True@{Array\+Any\+True}!main module documentation@{main module documentation}}
+\subsubsection[{Array\+Any\+True(const bool data[], const uint8\+\_\+t length)}]{\setlength{\rightskip}{0pt plus 5cm}bool Array\+Any\+True (
+\begin{DoxyParamCaption}
+\item[{const bool}]{data\mbox{[}$\,$\mbox{]}, }
+\item[{const uint8\+\_\+t}]{length}
+\end{DoxyParamCaption}
+)}\label{group__main__module_gaa069de5ba1209f491602c162f072b664}
+
+
+Checks if any alarm in an array is true. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & is the array. \\
+\hline
+{\em length} & is the length of the array. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bool -\/ T\+R\+U\+E if any item is true 
+\end{DoxyReturn}
+\hypertarget{group__main__module_gad34224c2b50d9cf295ffb21b305b149f}{}\index{main module documentation@{main module documentation}!Array\+Copy@{Array\+Copy}}
+\index{Array\+Copy@{Array\+Copy}!main module documentation@{main module documentation}}
+\subsubsection[{Array\+Copy(int16\+\_\+t array1[], int16\+\_\+t array2[], const uint8\+\_\+t length)}]{\setlength{\rightskip}{0pt plus 5cm}void Array\+Copy (
+\begin{DoxyParamCaption}
+\item[{int16\+\_\+t}]{array1\mbox{[}$\,$\mbox{]}, }
+\item[{int16\+\_\+t}]{array2\mbox{[}$\,$\mbox{]}, }
+\item[{const uint8\+\_\+t}]{length}
+\end{DoxyParamCaption}
+)}\label{group__main__module_gad34224c2b50d9cf295ffb21b305b149f}
+
+
+Insert samples from one array into another. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em array1} & is the array transferring from. \\
+\hline
+{\em array2} & is the array transferring to. \\
+\hline
+{\em length} & is the length of both arrays. \\
+\hline
+\end{DoxyParams}
 \begin{DoxyReturn}{Returns}
 void 
 \end{DoxyReturn}
@@ -237,9 +238,7 @@ Assumes that Flash\+\_\+\+Init has been called successfully.
 \item[{T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E}]{}
 \end{DoxyParamCaption}
 )}\label{group__main__module_gac2875955d67e96abf6cfa8aaad5e9f75}
-The stack for the Initial thread.
-
-The stack for the L\+E\+D Init thread. \hypertarget{group__main__module_ga78e32208fd29f8777453fba66cb23512}{}\index{main module documentation@{main module documentation}!O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}}
+The stack for the Initial thread. \hypertarget{group__main__module_ga78e32208fd29f8777453fba66cb23512}{}\index{main module documentation@{main module documentation}!O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}}
 \index{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}!main module documentation@{main module documentation}}
 \subsubsection[{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K(\+L\+E\+Ds\+Off\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)}]{\setlength{\rightskip}{0pt plus 5cm}O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K (
 \begin{DoxyParamCaption}
@@ -287,7 +286,80 @@ The stack for the Frequency thread. \hypertarget{group__main__module_ga9abdf6124
 \item[{T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E}]{}
 \end{DoxyParamCaption}
 )}\label{group__main__module_ga9abdf6124e333220d024a49b5ce39883}
-The stack for the Spectrum thread. \hypertarget{group__main__module_gad6f4e9bc8436aeebcc4776b05a7173ae}{}\index{main module documentation@{main module documentation}!Raises\+Thread@{Raises\+Thread}}
+The stack for the Spectrum thread. \hypertarget{group__main__module_ga30c3cdc49b63ff8d4b2c0ef1e70bc108}{}\index{main module documentation@{main module documentation}!Protected\+Get\+Analog\+Sample\+Period@{Protected\+Get\+Analog\+Sample\+Period}}
+\index{Protected\+Get\+Analog\+Sample\+Period@{Protected\+Get\+Analog\+Sample\+Period}!main module documentation@{main module documentation}}
+\subsubsection[{Protected\+Get\+Analog\+Sample\+Period(void)}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t Protected\+Get\+Analog\+Sample\+Period (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{group__main__module_ga30c3cdc49b63ff8d4b2c0ef1e70bc108}
+
+
+Returns the Analog Sample Period. 
+
+\begin{DoxyReturn}{Returns}
+uint32 -\/ Analog Sample Period 
+\end{DoxyReturn}
+\hypertarget{group__main__module_ga2eb25994db6055485099e1c3088154f5}{}\index{main module documentation@{main module documentation}!Protected\+Get\+Cycle@{Protected\+Get\+Cycle}}
+\index{Protected\+Get\+Cycle@{Protected\+Get\+Cycle}!main module documentation@{main module documentation}}
+\subsubsection[{Protected\+Get\+Cycle(\+T\+Analog\+Thread\+Data $\ast$channel\+Data, int16\+\_\+t sample\+Data[])}]{\setlength{\rightskip}{0pt plus 5cm}void Protected\+Get\+Cycle (
+\begin{DoxyParamCaption}
+\item[{{\bf T\+Analog\+Thread\+Data} $\ast$}]{channel\+Data, }
+\item[{int16\+\_\+t}]{sample\+Data\mbox{[}$\,$\mbox{]}}
+\end{DoxyParamCaption}
+)}\label{group__main__module_ga2eb25994db6055485099e1c3088154f5}
+
+
+Gets the sample data of one analog cycle. 
+
+\begin{DoxyReturn}{Returns}
+void 
+\end{DoxyReturn}
+\hypertarget{group__main__module_gadbebeafdb3e77340dbd2d75495f7a879}{}\index{main module documentation@{main module documentation}!Protected\+Get\+R\+M\+S@{Protected\+Get\+R\+M\+S}}
+\index{Protected\+Get\+R\+M\+S@{Protected\+Get\+R\+M\+S}!main module documentation@{main module documentation}}
+\subsubsection[{Protected\+Get\+R\+M\+S(\+T\+Analog\+Thread\+Data $\ast$channel\+Data)}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t Protected\+Get\+R\+M\+S (
+\begin{DoxyParamCaption}
+\item[{{\bf T\+Analog\+Thread\+Data} $\ast$}]{channel\+Data}
+\end{DoxyParamCaption}
+)}\label{group__main__module_gadbebeafdb3e77340dbd2d75495f7a879}
+
+
+Returns the current R\+M\+S of a channel. 
+
+\begin{DoxyReturn}{Returns}
+uint16\+\_\+t -\/ R\+M\+S value 
+\end{DoxyReturn}
+\hypertarget{group__main__module_ga7f941dc4a9429f548c9b2c2f4fa6e16d}{}\index{main module documentation@{main module documentation}!Protected\+Get\+Two\+Cycles@{Protected\+Get\+Two\+Cycles}}
+\index{Protected\+Get\+Two\+Cycles@{Protected\+Get\+Two\+Cycles}!main module documentation@{main module documentation}}
+\subsubsection[{Protected\+Get\+Two\+Cycles(\+T\+Analog\+Thread\+Data $\ast$channel\+Data, int16\+\_\+t sample\+Data[])}]{\setlength{\rightskip}{0pt plus 5cm}void Protected\+Get\+Two\+Cycles (
+\begin{DoxyParamCaption}
+\item[{{\bf T\+Analog\+Thread\+Data} $\ast$}]{channel\+Data, }
+\item[{int16\+\_\+t}]{sample\+Data\mbox{[}$\,$\mbox{]}}
+\end{DoxyParamCaption}
+)}\label{group__main__module_ga7f941dc4a9429f548c9b2c2f4fa6e16d}
+
+
+Gets the sample data of two analog cycles. 
+
+\begin{DoxyReturn}{Returns}
+void 
+\end{DoxyReturn}
+\hypertarget{group__main__module_gae89738835c20ca367e44b56d544507f5}{}\index{main module documentation@{main module documentation}!Protected\+Set\+R\+M\+S@{Protected\+Set\+R\+M\+S}}
+\index{Protected\+Set\+R\+M\+S@{Protected\+Set\+R\+M\+S}!main module documentation@{main module documentation}}
+\subsubsection[{Protected\+Set\+R\+M\+S(\+T\+Analog\+Thread\+Data $\ast$channel\+Data, const uint16\+\_\+t rms)}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t Protected\+Set\+R\+M\+S (
+\begin{DoxyParamCaption}
+\item[{{\bf T\+Analog\+Thread\+Data} $\ast$}]{channel\+Data, }
+\item[{const uint16\+\_\+t}]{rms}
+\end{DoxyParamCaption}
+)}\label{group__main__module_gae89738835c20ca367e44b56d544507f5}
+
+
+Sets the current R\+M\+S of a channel. 
+
+\begin{DoxyReturn}{Returns}
+void 
+\end{DoxyReturn}
+\hypertarget{group__main__module_gad6f4e9bc8436aeebcc4776b05a7173ae}{}\index{main module documentation@{main module documentation}!Raises\+Thread@{Raises\+Thread}}
 \index{Raises\+Thread@{Raises\+Thread}!main module documentation@{main module documentation}}
 \subsubsection[{Raises\+Thread(void $\ast$p\+Data)}]{\setlength{\rightskip}{0pt plus 5cm}void Raises\+Thread (
 \begin{DoxyParamCaption}

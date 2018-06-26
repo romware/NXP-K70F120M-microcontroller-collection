@@ -97,14 +97,14 @@ var NAVTREEINDEX =
 "group___u_s_b_h_s___register___accessor___macros.html#ga6b8c0f873e02e61f780bb89327f3e417",
 "group___u_s_b_h_s___register___masks.html#ga65dfa2d306429d2ea35b8d89e3ce6129",
 "group___u_s_b_h_s___register___masks.html#gaea89bbf335d312ebef55d9db67afec62",
-"group__main__module.html#gac2875955d67e96abf6cfa8aaad5e9f75",
-"struct_d_d_r___mem_map.html#a0ba795cf9fec601e947772a28e6bab4f",
-"struct_e_n_e_t___mem_map.html#ac8d2c6366107a9a30857cb24e064b07a",
-"struct_f_t_m___mem_map.html#aacdd40604d98720d58618c5e9f0fb0fd",
-"struct_l_d_d___f_l_a_s_h___t_error_status.html#a2c071a468d63d1572589e327dfe46fd4",
-"struct_l_m_e_m___mem_map.html#ad88f5f6b11fe26dbd6065a1767e6f4df",
-"struct_s_m_c___mem_map.html#a0fddef87e229c4cf1b3be0d29589e964",
-"struct_u_s_b_h_s___mem_map.html#a23b580e1655533bb112fd6e4d2a60e71"
+"group__main__module.html#ga840291bc02cba5474a4cb46a9b9566fe",
+"struct_core_debug___mem_map.html#ad9c98f7390e5d3a6b54df56ddea32e8b",
+"struct_e_n_e_t___mem_map.html#aabb287e28a91a136a3ff790db65f9041",
+"struct_f_t_m___mem_map.html#a3bd4b174127a80c7f8bd910b66e6de60",
+"struct_l_d_d___e_t_h___t_stats.html#ac955c4d1539ab834871ba5e12a59c5e9",
+"struct_l_l_w_u___mem_map.html#ae8dea688fae93c1a5f9dd22b70cdc5cf",
+"struct_s_i_m___mem_map.html#ad2fdee624a3af7bd030a350a9632a6a9",
+"struct_u_s_b_h_s___mem_map.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
