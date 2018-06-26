@@ -12,7 +12,7 @@
 **     Contents    :
 **         No public methods
 **     Authors     : 12403756
-**                 : Mark Borgerding (kiss_fft files)  Copyright (c) 2003-2010. See kiss_fft_guts.h for details.
+**                 : Mark Borgerding (kiss_fft files)  Copyright (c) 2003-2010. See kiss_fft.h for details.
 **
 ** ###################################################################*/
 /*!
@@ -67,6 +67,7 @@
 #define DAC_0V_OUT 0                            /*!< DAC 0 volts out */
 #define RMS_UPPER_LIMIT 9830                    /*!< VRR RMS upper limit */
 #define RMS_LOWER_LIMIT 6554                    /*!< VRR RMS lower limit */
+#define RMS_NOMINAL 8192                        /*!< VRR RMS nominal value */
 #define RMS_FREQUENCY_MIN 4915                  /*!< VRR RMS frequency measure minimum level */
 #define ALARM_TIMER 5000000000                  /*!< Alarm Timer in nanoSeconds */
 #define ALARM_TIMER_MIN 1000000000              /*!< Minimum Alarm Timer in nanoSeconds */
@@ -1298,11 +1299,11 @@ void RMSThread(void* pData)
       {
         if(overVoltage)
         {
-          deltaVoltage = rms - RMS_UPPER_LIMIT;
+          deltaVoltage = rms - RMS_NOMINAL;
         }
         else if(underVoltage)
         {
-          deltaVoltage = RMS_LOWER_LIMIT - rms;
+          deltaVoltage = RMS_NOMINAL - rms;
         }
 
         // Decrement counter by inverse amount
