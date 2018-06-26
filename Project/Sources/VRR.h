@@ -27,8 +27,9 @@ extern const int16_t VRR_OUT_ZERO;         /*!< VRR_VOLT x0 */
 extern const int16_t VRR_VOLT_HALF;        /*!< VRR_VOLT x0.5 */
 extern const int16_t VRR_VOLT;             /*!< One volt ((2^15 - 1)/10) */
 extern const int16_t VRR_LIMIT_FREQUENCY;  /*!< VRR_VOLT x1.5 */
-extern const int16_t VRR_LIMIT_LOW;        /*!< VRR_VOLT x2 */
-extern const int16_t VRR_LIMIT_HIGH;       /*!< VRR_VOLT x3 */
+extern const int16_t VRR_VOLT_LIMIT_LOW;   /*!< VRR_VOLT x2 */
+extern const int16_t VRR_VOLT_NOMINAL;     /*!< VRR_VOLT x2.5 */
+extern const int16_t VRR_VOLT_LIMIT_HIGH;  /*!< VRR_VOLT x3 */
 extern const int16_t VRR_OUT_FIVE;         /*!< VRR_VOLT x5 */
 
 /*! @brief Timing mode parameters for tower to PC protocol

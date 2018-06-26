@@ -555,15 +555,15 @@ void CalculateRMSThread(void* pData)
     (void)OS_SemaphoreSignal(RMSAccessSemaphore);
 
     // Check if the RMS is within boundary
-    if(rms < VRR_LIMIT_LOW)
+    if(rms < VRR_VOLT_LIMIT_LOW)
     {
       // Handle the alarm and adjustments for raising
-      VRR_CheckAlarm(&timerDelay, &minDelay, &timerRate, analogPoll, TimingMode, (VRR_LIMIT_LOW-rms), &alarm, &adjustment, RaisesSemaphore, VRR_CHANNEL_1);
+      VRR_CheckAlarm(&timerDelay, &minDelay, &timerRate, analogPoll, TimingMode, (VRR_VOLT_NOMINAL-rms), &alarm, &adjustment, RaisesSemaphore, VRR_CHANNEL_1);
     }
-    else if(rms > VRR_LIMIT_HIGH)
+    else if(rms > VRR_VOLT_LIMIT_HIGH)
     {
       // Handle the alarm and adjustments for lowering
-      VRR_CheckAlarm(&timerDelay, &minDelay, &timerRate, analogPoll, TimingMode, (rms-VRR_LIMIT_HIGH), &alarm, &adjustment, LowersSemaphore, VRR_CHANNEL_2);
+      VRR_CheckAlarm(&timerDelay, &minDelay, &timerRate, analogPoll, TimingMode, (rms-VRR_VOLT_NOMINAL), &alarm, &adjustment, LowersSemaphore, VRR_CHANNEL_2);
     }
     else
     {

@@ -20,18 +20,21 @@
 #include "OS.h"
 #include "PIT.h"
 
-const uint64_t VRR_PERIOD_TIMER_DELAY = 5000000000;             /*!< Period of analog timer delay (5 seconds) */
-const uint64_t VRR_PERIOD_MIN_DELAY   = 1000000000;             /*!< Period of analog timer delay minium (1 second) */
+const uint64_t VRR_PERIOD_TIMER_DELAY   = 5000000000;             /*!< Period of analog timer delay (5 seconds) */
+const uint64_t VRR_PERIOD_MIN_DELAY     = 1000000000;             /*!< Period of analog timer delay minium (1 second) */
 
-const uint32_t VRR_FREQUENCY_DEFAULT  =        500;             /*!< Default frequency (50Hz) */
+const uint32_t VRR_FREQUENCY_DEFAULT    =        500;             /*!< Default frequency (50Hz) */
+const uint32_t VRR_FREQUENCY_LIMIT_LOW  =        475;             /*!< Low limit frequency (47.5Hz) */
+const uint32_t VRR_FREQUENCY_LIMIT_HIGH =        525;             /*!< High limit frequency (52.5Hz) */
 
-const int16_t VRR_OUT_ZERO            =          0;             /*!< VRR_VOLT x0 */
-const int16_t VRR_VOLT_HALF           =       1638;             /*!< VRR_VOLT x0.5 */
-const int16_t VRR_VOLT                =       3277;             /*!< One volt ((2^15 - 1)/10) */
-const int16_t VRR_LIMIT_FREQUENCY     =       4915;             /*!< VRR_VOLT x1.5 */
-const int16_t VRR_LIMIT_LOW           =       6553;             /*!< VRR_VOLT x2 */
-const int16_t VRR_LIMIT_HIGH          =       9830;             /*!< VRR_VOLT x3 */
-const int16_t VRR_OUT_FIVE            =      16384;             /*!< VRR_VOLT x5 */
+const int16_t VRR_OUT_ZERO              =          0;             /*!< VRR_VOLT x0 */
+const int16_t VRR_VOLT_HALF             =       1638;             /*!< VRR_VOLT x0.5 */
+const int16_t VRR_VOLT                  =       3277;             /*!< One volt ((2^15 - 1)/10) */
+const int16_t VRR_LIMIT_FREQUENCY       =       4915;             /*!< VRR_VOLT x1.5 */
+const int16_t VRR_VOLT_LIMIT_LOW        =       6553;             /*!< VRR_VOLT x2 */
+const int16_t VRR_VOLT_NOMINAL          =       8192;             /*!< VRR_VOLT x2.5 */
+const int16_t VRR_VOLT_LIMIT_HIGH       =       9830;             /*!< VRR_VOLT x3 */
+const int16_t VRR_OUT_FIVE              =      16384;             /*!< VRR_VOLT x5 */
 
 
 /*! @brief Sets up the VRR before first use.
@@ -223,7 +226,7 @@ void VRR_SetFrequency(OS_ECB* frequencyAccess, uint32_t * frequencyPtr, const ui
     *periodAnalogSamplePtr = (VRR_PERIOD_MIN_DELAY / (*frequencyPtr/10)) / VRR_SAMPLE_SIZE;
     PIT_Set(*periodAnalogSamplePtr / VRR_NB_CHANNELS, true);
   }
-  else if(*frequencyPtr != frequency && frequency >= 475 && frequency <= 525)
+  else if(*frequencyPtr != frequency && frequency >= VRR_FREQUENCY_LIMIT_LOW && frequency <= VRR_FREQUENCY_LIMIT_HIGH)
   {
     // Set the frequency to the newly calculated value
     *frequencyPtr = frequency;
@@ -282,7 +285,7 @@ uint32_t VRR_CalculateFrequency(const int16_t sampleData[], const uint16_t rms, 
       uint64_t newPoll = distance * oldPoll;
 
       // Calculate the frequency * 10 by dividing the sample rate from 1 second multiplied by 10
-      uint64_t frequency = (10000000000 / newPoll); // 10 bill
+      uint64_t frequency = (10000000000 / newPoll);
       return frequency;
     }
   }
