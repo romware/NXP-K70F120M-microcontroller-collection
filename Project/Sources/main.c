@@ -53,9 +53,9 @@
 // Analog functions
 #include "analog.h"
 
-#include <math.h>
-
 #define BAUD_RATE 115200                                     /*!< UART2 Baud Rate */
+
+#define FIXED_POINT 32                                       /*!< kiss_fft fixed point enable at 32-bit */
 
 const uint8_t COMMAND_TIMING       =       0x10;             /*!< The serial command byte for tower timing */
 const uint8_t COMMAND_RAISES       =       0x11;             /*!< The serial command byte for tower raises */
@@ -116,6 +116,117 @@ static TAnalogThreadData AnalogThreadData[VRR_NB_CHANNELS] =
     .channelNb = VRR_CHANNEL_3
   }
 };
+
+/*! @brief Insert samples from one array into another.
+ *
+ *  @param array1 is the array transferring from.
+ *  @param array2 is the array transferring to.
+ *  @param length is the length of both arrays.
+ *  @return void
+ */
+void ArrayCopy(int16_t array1[], int16_t array2[], const uint8_t length)
+{
+  for(uint8_t i = 0; i < length; i++)
+  {
+    array2[i] = array1[i];
+  }
+}
+
+/*! @brief Checks if any alarm in an array is true.
+ *
+ *  @param data is the array.
+ *  @param length is the length of the array.
+ *  @return bool - TRUE if any item is true
+ */
+bool ArrayAnyTrue(const bool data[], const uint8_t length)
+{
+  for(uint8_t i = 0; i < length; i++)
+  {
+    if(data[i])
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+/*! @brief Returns the Analog Sample Period
+ *
+ *  @return uint32 - Analog Sample Period
+ */
+uint32_t ProtectedGetAnalogSamplePeriod(void)
+{
+  // Protect access for frequency reading
+  (void)OS_SemaphoreWait(FrequencyAccessSemaphore, 0);
+  uint32_t analogPoll = PeriodAnalogSample;
+  (void)OS_SemaphoreSignal(FrequencyAccessSemaphore);
+  return analogPoll;
+}
+
+/*! @brief Returns the current RMS of a channel
+ *
+ *  @return uint16_t - RMS value
+ */
+uint16_t ProtectedGetRMS(TAnalogThreadData* channelData)
+{
+  // Protect access for RMS reading
+  (void)OS_SemaphoreWait(RMSAccessSemaphore, 0);
+  uint16_t prevRoot = channelData->currentRMS;
+  (void)OS_SemaphoreSignal(RMSAccessSemaphore);
+  return prevRoot;
+}
+
+/*! @brief Sets the current RMS of a channel
+ *
+ *  @return void
+ */
+uint16_t ProtectedSetRMS(TAnalogThreadData* channelData, const uint16_t rms)
+{
+  // Protect access for RMS writing
+  (void)OS_SemaphoreWait(RMSAccessSemaphore, 0);
+  channelData->currentRMS = rms;
+  (void)OS_SemaphoreSignal(RMSAccessSemaphore);
+}
+
+/*! @brief Gets the sample data of one analog cycle
+ *
+ *  @return void
+ */
+void ProtectedGetCycle(TAnalogThreadData* channelData, int16_t sampleData[])
+{
+  // Protect access for sample data reading
+  OS_DisableInterrupts();
+  for(uint8_t i = 0; i < VRR_SAMPLE_SIZE; i++)
+  {
+    // Copy array locally from most recent cycle
+    sampleData[i] = channelData->sampleData[i];
+  }
+  OS_EnableInterrupts();
+}
+
+/*! @brief Gets the sample data of two analog cycles
+ *
+ *  @return void
+ */
+void ProtectedGetTwoCycles(TAnalogThreadData* channelData, int16_t sampleData[])
+{
+  // Protect access for sample data reading
+  OS_DisableInterrupts();
+  for(uint8_t i = 0; i < VRR_SAMPLE_SIZE*2; i++)
+  {
+    // Copy array locally from the two most recent cycles
+    if(i < VRR_SAMPLE_SIZE)
+    {
+      sampleData[i] = channelData->prevSampleData[i];
+    }
+    else
+    {
+      sampleData[i] = channelData->sampleData[i - VRR_SAMPLE_SIZE];
+    }
+  }
+  ArrayCopy(channelData->sampleData, channelData->prevSampleData, VRR_SAMPLE_SIZE);
+  OS_EnableInterrupts();
+}
 
 /*! @brief Sets the tower timing mode or sends the packet to the PC
  *
@@ -504,7 +615,6 @@ static void LEDsOffThread(void* pData)
   }
 }
 
-
 /*! @brief Calculates the RMS value on an ADC channel
  *
  *  @param pData is not used to store the channels data.
@@ -517,7 +627,6 @@ void CalculateRMSThread(void* pData)
 
   static bool allAlarms[VRR_NB_CHANNELS];
   static bool adjustment;
-
   int64_t timerDelay;
   int64_t minDelay;
   int64_t timerRate;
@@ -527,32 +636,17 @@ void CalculateRMSThread(void* pData)
   {
     (void)OS_SemaphoreWait(analogData->semaphoreRMS, 0);
 
-    // Protect access for frequency reading
-    (void)OS_SemaphoreWait(FrequencyAccessSemaphore, 0);
-    uint32_t analogPoll = PeriodAnalogSample;
-    (void)OS_SemaphoreSignal(FrequencyAccessSemaphore);
+    // Get analog sample period and current RMS
+    uint32_t analogPoll = ProtectedGetAnalogSamplePeriod();
+    uint16_t prevRoot = ProtectedGetRMS(analogData);
 
-    // Protect access for RMS reading
-    (void)OS_SemaphoreWait(RMSAccessSemaphore, 0);
-    uint16_t prevRoot = analogData->currentRMS;
-    (void)OS_SemaphoreSignal(RMSAccessSemaphore);
-
-    // Protect access for sample data reading
-    OS_DisableInterrupts();
-    int16_t sampleData[VRR_SAMPLE_SIZE*2];
-    for(uint8_t i = 0; i < VRR_SAMPLE_SIZE; i++)
-    {
-       sampleData[i] = analogData->sampleData[i];
-    }
-    OS_EnableInterrupts();
+    // Get current sample data
+    int16_t sampleData[VRR_SAMPLE_SIZE];
+    ProtectedGetCycle(analogData, sampleData);
 
     // Calculate the RMS based on sample data
     uint16_t rms = VRR_CalculateRMS(sampleData, VRR_SAMPLE_SIZE, prevRoot);
-
-    // Protect access for RMS writing
-    (void)OS_SemaphoreWait(RMSAccessSemaphore, 0);
-    analogData->currentRMS = rms;
-    (void)OS_SemaphoreSignal(RMSAccessSemaphore);
+    ProtectedSetRMS(analogData, rms);
 
     // Check if the RMS is within boundary
     if(rms < VRR_VOLT_LIMIT_LOW)
@@ -575,7 +669,7 @@ void CalculateRMSThread(void* pData)
     allAlarms[analogData->channelNb] = alarm;
 
     // Turn off alarm and adjustment signals if all channels are within boundaries
-    if(!VRR_ArrayAnyTrue(allAlarms, VRR_NB_CHANNELS))
+    if(!ArrayAnyTrue(allAlarms, VRR_NB_CHANNELS))
     {
       adjustment = false;
       VRR_ProtectedAnalogPut(VRR_CHANNEL_1, VRR_OUT_ZERO);
@@ -596,34 +690,15 @@ void CalculateFrequencyThread(void* pData)
   {
     (void)OS_SemaphoreWait(FrequencySemaphore, 0);
 
-    // Protect access for frequency reading
-    (void)OS_SemaphoreWait(FrequencyAccessSemaphore, 0);
-    uint32_t analogPoll = PeriodAnalogSample;
-    (void)OS_SemaphoreSignal(FrequencyAccessSemaphore);
-
-    // Protect access for sample data reading
-    OS_DisableInterrupts();
     TAnalogThreadData* channelData = &AnalogThreadData[VRR_CHANNEL_1];
-    int16_t sampleData[VRR_SAMPLE_SIZE*2];
-    for(uint8_t i = 0; i < VRR_SAMPLE_SIZE*2; i++)
-    {
-      // Copy array locally from the two most recent samples
-      if(i < VRR_SAMPLE_SIZE)
-      {
-        sampleData[i] = channelData->prevSampleData[i];
-      }
-      else
-      {
-        sampleData[i] = channelData->sampleData[i - VRR_SAMPLE_SIZE];
-      }
-    }
-    VRR_ArrayCopy(channelData->sampleData, channelData->prevSampleData, VRR_SAMPLE_SIZE);
-    OS_EnableInterrupts();
 
-    // Protect access for RMS reading
-    (void)OS_SemaphoreWait(RMSAccessSemaphore, 0);
-    uint16_t rms = channelData->currentRMS;
-    (void)OS_SemaphoreSignal(RMSAccessSemaphore);
+    // Get analog sample period and current RMS
+    uint32_t analogPoll = ProtectedGetAnalogSamplePeriod();
+    uint16_t rms = ProtectedGetRMS(channelData);
+
+    // Get the most recent two sample data cycles
+    int16_t sampleData[VRR_SAMPLE_SIZE*2];
+    ProtectedGetTwoCycles(channelData, sampleData);
 
     // Calculate the frequency of this channel
     uint32_t frequency = VRR_CalculateFrequency(sampleData,rms,analogPoll);
@@ -642,7 +717,7 @@ void CalculateFrequencyThread(void* pData)
  */
 void CalculateSpectrumThread(void* pData)
 {
-  // Alocate memory for FFT library configuration
+  // Allocate memory for FFT library configuration
   uint8_t memory[512];
   size_t length = 512;
   kiss_fftr_cfg config = kiss_fftr_alloc(VRR_SAMPLE_SIZE, 0, memory, &length);
@@ -654,12 +729,11 @@ void CalculateSpectrumThread(void* pData)
   {
     (void)OS_SemaphoreWait(SpectrumSemaphore, 0);
 
-
-    kiss_fft_scalar timedata[VRR_SAMPLE_SIZE];
+    TAnalogThreadData* channelData = &AnalogThreadData[VRR_CHANNEL_1];
 
     // Protect access for sample data reading
     OS_DisableInterrupts();
-    TAnalogThreadData* channelData = &AnalogThreadData[VRR_CHANNEL_1];
+    kiss_fft_scalar timedata[VRR_SAMPLE_SIZE];
     for(uint8_t i = 0; i < VRR_SAMPLE_SIZE; i++)
     {
       timedata[i] = channelData->prevSampleData[i];
@@ -685,7 +759,7 @@ void CalculateSpectrumThread(void* pData)
     int64_t targetSquare = (real * real) + (imaginary * imaginary);
 
     // Calculate the square root efficiently of selected harmonic
-    Spectrum[harmonic] = VRR_QuickSquareRoot(targetSquare,prevRoot,prevSquare,VRR_OUT_ZERO,VRR_OUT_FIVE);
+    Spectrum[harmonic] = VRR_QuickSquareRoot(targetSquare,prevRoot);
 
     // Increment harmonic
     harmonic++;

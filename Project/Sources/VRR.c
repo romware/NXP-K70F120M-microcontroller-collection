@@ -59,78 +59,46 @@ bool VRR_ProtectedAnalogPut(uint8_t const channelNb, int16_t const value)
   OS_EnableInterrupts();
 }
 
-/*! @brief Insert samples from one array into another.
- *
- *  @param array1 is the array transferring from.
- *  @param array2 is the array transferring to.
- *  @param length is the length of both arrays.
- *  @return void
- */
-void VRR_ArrayCopy(int16_t array1[], int16_t array2[], const uint8_t length)
-{
-  for(uint8_t i = 0; i < length; i++)
-  {
-    array2[i] = array1[i];
-  }
-}
-
-/*! @brief Checks if any alarm in an array is true.
- *
- *  @param data is the array.
- *  @param length is the length of the array.
- *  @return bool - TRUE if any item is true
- */
-bool VRR_ArrayAnyTrue(const bool data[], const uint8_t length)
-{
-  for(uint8_t i = 0; i < length; i++)
-  {
-    if(data[i])
-    {
-      return true;
-    }
-  }
-  return false;
-}
-
 /*! @brief Calculates the square root of a given value efficiently using previous roots.
  *
  *  @param targetSquare is the number to find the root of.
  *  @param prevRoot is the previously calculated root.
- *  @param prevSquare is the previously calculated square.
- *  @param lowLimit is estimated lowest root.
- *  @param highLimit is estimated highest root.
- *  @note Tested speed of Math.h sqrt function - 38us whereas this is 25us. Therefore on average 13us faster.
+ *  @note tested speed of Math.h sqrt function - 38us whereas this is 25us. Therefore on average 13us faster.
  *  @return uint32 - Square root value
  */
-uint32_t VRR_QuickSquareRoot(const uint32_t targetSquare, uint32_t prevRoot, uint32_t prevSquare, const uint32_t lowLimit, const uint32_t highLimit)
+uint32_t VRR_QuickSquareRoot(const uint32_t targetSquare, uint32_t prevRoot)
 {
-  // Use the previous square root as the starting estimate
-  if(!prevRoot || !prevSquare)
+  int32_t distance;
+  uint32_t targetRoot = 1;
+
+  // If there is a previous estimate use it as a starting point
+  if(prevRoot)
   {
-    prevRoot = (lowLimit + highLimit) / 2;
-    prevSquare = prevRoot * prevRoot;
+    targetRoot = prevRoot;
   }
 
-  bool increment = false;
-  bool decrement = false;
-
-  // Loop while comparing the target square with the calculated square
-  while((prevSquare != targetSquare) && !(increment && decrement))
+  // Ensure the square is not 0
+  if(targetSquare)
   {
-    // Increment or decrement the root so that the squares are closer until they match
-    if(prevSquare < targetSquare)
+    // Keep track of last estimate
+    prevRoot = targetRoot;
+
+    // Use Newton's method to adjust root estimate
+    targetRoot = (targetRoot + (targetSquare / targetRoot)) / 2;
+
+    // Find distance between root estimates
+    distance = targetRoot - prevRoot;
+
+    // Repeat until estimates distance is 1 or less
+    while(distance > 1 || distance < -1)
     {
-      prevRoot++;
-      increment = true;
+      prevRoot = targetRoot;
+      targetRoot = (targetRoot + (targetSquare / targetRoot)) / 2;
+      distance = targetRoot - prevRoot;
     }
-    else
-    {
-      prevRoot--;
-      decrement = true;
-    }
-    prevSquare = prevRoot * prevRoot;
+    return targetRoot;
   }
-  return prevRoot;
+  return 0;
 }
 
 /*! @brief Calculates RMS of given values.
@@ -149,11 +117,8 @@ uint16_t VRR_CalculateRMS(const int16_t data[], const uint8_t length, const uint
     sum += (data[i])*(data[i]);
   }
 
-  // Square the previous RMS
-  uint32_t prevSquare = prevRoot*prevRoot;
-
   // Calculate efficiently the square root of the sum squared
-  return (uint16_t)VRR_QuickSquareRoot((sum/length), prevRoot, prevSquare, VRR_OUT_ZERO, VRR_OUT_FIVE);
+  return (uint16_t)VRR_QuickSquareRoot((sum/length), prevRoot);
 }
 
 /*! @brief Triggers the alarm, adjustment and timer when the RMS is out of bounds.
@@ -170,7 +135,8 @@ uint16_t VRR_CalculateRMS(const int16_t data[], const uint8_t length, const uint
  *  @param channel is the the channel number on the ADC.
  *  @return void
  */
-void VRR_CheckAlarm(int64_t* timerDelay, int64_t* minDelay, int64_t* timerRate, const uint32_t defaultRate, const uint8_t mode, const uint16_t deviation, bool* alarm, bool* adjustment, OS_ECB* semaphore, const int8_t channel)
+void VRR_CheckAlarm(int64_t* timerDelay, int64_t* minDelay, int64_t* timerRate, const uint32_t defaultRate, const uint8_t mode,
+                    const uint16_t deviation, bool* alarm, bool* adjustment, OS_ECB* semaphore, const int8_t channel)
 {
   // Check if alarm has been triggered, or timer is still decrementing or adjustment has been signaled
   if(!(*alarm))

@@ -78,34 +78,14 @@ bool VRR_Init(void);
  */
 bool VRR_ProtectedAnalogPut(uint8_t const channelNb, int16_t const value);
 
-/*! @brief Insert samples from one array into another.
- *
- *  @param array1 is the array transferring from.
- *  @param array2 is the array transferring to.
- *  @param length is the length of both arrays.
- *  @return void
- */
-void VRR_ArrayCopy(int16_t array1[], int16_t array2[], const uint8_t length);
-
-/*! @brief Checks if any alarm in an array is true.
- *
- *  @param data is the array.
- *  @param length is the length of the array.
- *  @return bool - TRUE if any item is true
- */
-bool VRR_ArrayAnyTrue(const bool data[], const uint8_t length);
-
 /*! @brief Calculates the square root of a given value efficiently using previous roots.
  *
  *  @param targetSquare is the number to find the root of.
  *  @param prevRoot is the previously calculated root.
- *  @param prevSquare is the previously calculated square.
- *  @param lowLimit is estimated lowest root.
- *  @param highLimit is estimated highest root.
- *  @note Tested speed of Math.h sqrt function - 38us whereas this is 25us. Therefore on average 13us faster.
+ *  @note tested speed of Math.h sqrt function - 38us whereas this is 25us. Therefore on average 13us faster.
  *  @return uint32 - Square root value
  */
-uint32_t VRR_QuickSquareRoot(const uint32_t targetSquare, uint32_t prevRoot, uint32_t prevSquare, const uint32_t lowLimit, const uint32_t highLimit);
+uint32_t VRR_QuickSquareRoot(const uint32_t targetSquare, uint32_t prevRoot);
 
 /*! @brief Calculates RMS of given values.
  *
@@ -130,7 +110,8 @@ uint16_t VRR_CalculateRMS(const int16_t data[], const uint8_t length, const uint
  *  @param channel is the the channel number on the ADC.
  *  @return void
  */
-void VRR_CheckAlarm(int64_t* timerDelay, int64_t* minDelay, int64_t* timerRate, const uint32_t defaultRate, const uint8_t mode, const uint16_t deviation, bool* alarm, bool* adjustment, OS_ECB* semaphore, const int8_t channel);
+void VRR_CheckAlarm(int64_t* timerDelay, int64_t* minDelay, int64_t* timerRate, const uint32_t defaultRate, const uint8_t mode,
+                    const uint16_t deviation, bool* alarm, bool* adjustment, OS_ECB* semaphore, const int8_t channel);
 
 /*! @brief Sets the frequency to a new value.
  *
