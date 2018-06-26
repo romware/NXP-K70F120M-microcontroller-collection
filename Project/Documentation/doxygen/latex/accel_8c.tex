@@ -1,0 +1,344 @@
+\hypertarget{accel_8c}{}\section{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/accel.c File Reference}
+\label{accel_8c}\index{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/accel.\+c@{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/accel.\+c}}
+
+
+H\+A\+L for the accelerometer.  
+
+
+{\ttfamily \#include \char`\"{}accel.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}I2\+C.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}median.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}M\+K70\+F12.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}P\+I\+T.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}C\+P\+U.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}P\+E\+\_\+types.\+h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group__accel__module_ga1bc789dd23d29046c0f3ca271c90de46}{}\#define {\bfseries A\+D\+D\+R\+E\+S\+S\+\_\+\+O\+U\+T\+\_\+\+X\+\_\+\+M\+S\+B}~0x01\label{group__accel__module_ga1bc789dd23d29046c0f3ca271c90de46}
+
+\item 
+\hypertarget{group__accel__module_gac241f4b556e4612da1bccb0b7eae251f}{}\#define {\bfseries A\+D\+D\+R\+E\+S\+S\+\_\+\+O\+U\+T\+\_\+\+X\+\_\+\+L\+S\+B}~0x02\label{group__accel__module_gac241f4b556e4612da1bccb0b7eae251f}
+
+\item 
+\hypertarget{group__accel__module_ga7f6486920ac182271af3285b8c0b169e}{}\#define {\bfseries A\+D\+D\+R\+E\+S\+S\+\_\+\+O\+U\+T\+\_\+\+Y\+\_\+\+M\+S\+B}~0x03\label{group__accel__module_ga7f6486920ac182271af3285b8c0b169e}
+
+\item 
+\hypertarget{group__accel__module_ga2e1d7eb43e141d583b0e276219b84f21}{}\#define {\bfseries A\+D\+D\+R\+E\+S\+S\+\_\+\+O\+U\+T\+\_\+\+Y\+\_\+\+L\+S\+B}~0x04\label{group__accel__module_ga2e1d7eb43e141d583b0e276219b84f21}
+
+\item 
+\hypertarget{group__accel__module_ga25b0e9ce86c29dd0f7768ba8afec1aaa}{}\#define {\bfseries A\+D\+D\+R\+E\+S\+S\+\_\+\+O\+U\+T\+\_\+\+Z\+\_\+\+M\+S\+B}~0x05\label{group__accel__module_ga25b0e9ce86c29dd0f7768ba8afec1aaa}
+
+\item 
+\hypertarget{group__accel__module_ga40bdfae04754fa2136e764575643d61f}{}\#define {\bfseries A\+D\+D\+R\+E\+S\+S\+\_\+\+O\+U\+T\+\_\+\+Z\+\_\+\+L\+S\+B}~0x06\label{group__accel__module_ga40bdfae04754fa2136e764575643d61f}
+
+\item 
+\hypertarget{group__accel__module_gac8e459a68b69415ef270a53cdcccf6e2}{}\#define {\bfseries A\+D\+D\+R\+E\+S\+S\+\_\+\+I\+N\+T\+\_\+\+S\+O\+U\+R\+C\+E}~0x0\+C\label{group__accel__module_gac8e459a68b69415ef270a53cdcccf6e2}
+
+\item 
+\hypertarget{group__accel__module_ga06206757c9548bd8bfe8a318ba4fea62}{}\#define {\bfseries I\+N\+T\+\_\+\+S\+O\+U\+R\+C\+E}~\hyperlink{accel_8c_a96f44d20f1dbf1c8785a7bc99a46164c}{I\+N\+T\+\_\+\+S\+O\+U\+R\+C\+E\+\_\+\+Union.\+byte}\label{group__accel__module_ga06206757c9548bd8bfe8a318ba4fea62}
+
+\item 
+\hypertarget{group__accel__module_ga4aa8383d698a71fdde7a65d341a7fb22}{}\#define {\bfseries I\+N\+T\+\_\+\+S\+O\+U\+R\+C\+E\+\_\+\+S\+R\+C\+\_\+\+D\+R\+D\+Y}~\hyperlink{accel_8c_ac39436b463ef99cb345056424d3534ae}{I\+N\+T\+\_\+\+S\+O\+U\+R\+C\+E\+\_\+\+Union.\+bits.\+S\+R\+C\+\_\+\+D\+R\+D\+Y}\label{group__accel__module_ga4aa8383d698a71fdde7a65d341a7fb22}
+
+\item 
+\hypertarget{group__accel__module_ga1712c6efcb6cef5c4ac52f92c9fe17c9}{}\#define {\bfseries I\+N\+T\+\_\+\+S\+O\+U\+R\+C\+E\+\_\+\+S\+R\+C\+\_\+\+F\+F\+\_\+\+M\+T}~\hyperlink{accel_8c_a77f29426c05f9cb1462324f32c4ed4ae}{C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+Union.\+bits.\+S\+R\+C\+\_\+\+F\+F\+\_\+\+M\+T}\label{group__accel__module_ga1712c6efcb6cef5c4ac52f92c9fe17c9}
+
+\item 
+\hypertarget{group__accel__module_ga8068521ad5a318a5a8503345fdc3ec59}{}\#define {\bfseries I\+N\+T\+\_\+\+S\+O\+U\+R\+C\+E\+\_\+\+S\+R\+C\+\_\+\+P\+U\+L\+S\+E}~\hyperlink{accel_8c_aee3a9487c1e1ad2ec18019bb310966f5}{C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+Union.\+bits.\+S\+R\+C\+\_\+\+P\+U\+L\+S\+E}\label{group__accel__module_ga8068521ad5a318a5a8503345fdc3ec59}
+
+\item 
+\hypertarget{group__accel__module_gabaf7a35d9d86244bb5fe74b6e70acd42}{}\#define {\bfseries I\+N\+T\+\_\+\+S\+O\+U\+R\+C\+E\+\_\+\+S\+R\+C\+\_\+\+L\+N\+D\+P\+R\+T}~\hyperlink{accel_8c_af8b052367f8eb2c4989475c07cbd75f1}{C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+Union.\+bits.\+S\+R\+C\+\_\+\+L\+N\+D\+P\+R\+T}\label{group__accel__module_gabaf7a35d9d86244bb5fe74b6e70acd42}
+
+\item 
+\hypertarget{group__accel__module_gac19c5e885d22ca2501b860a12dd73d8a}{}\#define {\bfseries I\+N\+T\+\_\+\+S\+O\+U\+R\+C\+E\+\_\+\+S\+R\+C\+\_\+\+T\+R\+A\+N\+S}~\hyperlink{accel_8c_ae0b2f75a4b308f31740c4a1474249d74}{C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+Union.\+bits.\+S\+R\+C\+\_\+\+T\+R\+A\+N\+S}\label{group__accel__module_gac19c5e885d22ca2501b860a12dd73d8a}
+
+\item 
+\hypertarget{group__accel__module_ga41ab092f64a12bbfe3919936e495589d}{}\#define {\bfseries I\+N\+T\+\_\+\+S\+O\+U\+R\+C\+E\+\_\+\+S\+R\+C\+\_\+\+F\+I\+F\+O}~\hyperlink{accel_8c_ac35eeae0162158b672b9b7475fe5405a}{C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+Union.\+bits.\+S\+R\+C\+\_\+\+F\+I\+F\+O}\label{group__accel__module_ga41ab092f64a12bbfe3919936e495589d}
+
+\item 
+\hypertarget{group__accel__module_ga8351be89a7b633d5307a31a54880b3ef}{}\#define {\bfseries I\+N\+T\+\_\+\+S\+O\+U\+R\+C\+E\+\_\+\+S\+R\+C\+\_\+\+A\+S\+L\+P}~\hyperlink{accel_8c_acfe1ff99f19cd50c2a089e5313e0db18}{C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+Union.\+bits.\+S\+R\+C\+\_\+\+A\+S\+L\+P}\label{group__accel__module_ga8351be89a7b633d5307a31a54880b3ef}
+
+\item 
+\hypertarget{group__accel__module_ga596d558f36a2924d990dcae16117a5cc}{}\#define {\bfseries A\+D\+D\+R\+E\+S\+S\+\_\+\+C\+T\+R\+L\+\_\+\+R\+E\+G1}~0x2\+A\label{group__accel__module_ga596d558f36a2924d990dcae16117a5cc}
+
+\item 
+\hypertarget{group__accel__module_gabd83ea49367ca7850ffc9091890aa46b}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G1}~\hyperlink{accel_8c_a96f44d20f1dbf1c8785a7bc99a46164c}{C\+T\+R\+L\+\_\+\+R\+E\+G1\+\_\+\+Union.\+byte}\label{group__accel__module_gabd83ea49367ca7850ffc9091890aa46b}
+
+\item 
+\hypertarget{group__accel__module_ga58a35d4098c40f651108bad4f42606be}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G1\+\_\+\+A\+C\+T\+I\+V\+E}~\hyperlink{accel_8c_a9c114f16b9edcd397845a7fe847d2043}{C\+T\+R\+L\+\_\+\+R\+E\+G1\+\_\+\+Union.\+bits.\+A\+C\+T\+I\+V\+E}\label{group__accel__module_ga58a35d4098c40f651108bad4f42606be}
+
+\item 
+\hypertarget{group__accel__module_ga90b65e7eecb07db7ee83987093c56a7f}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G1\+\_\+\+F\+\_\+\+R\+E\+A\+D}~\hyperlink{accel_8c_a176e6b897e703d742c47a3fdf1b92eb2}{C\+T\+R\+L\+\_\+\+R\+E\+G1\+\_\+\+Union.\+bits.\+F\+\_\+\+R\+E\+A\+D}\label{group__accel__module_ga90b65e7eecb07db7ee83987093c56a7f}
+
+\item 
+\hypertarget{group__accel__module_ga8be6ba1f1fe4311a05d462f730b7dbdd}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G1\+\_\+\+L\+N\+O\+I\+S\+E}~\hyperlink{accel_8c_a5e85ae95bebf0d48ee679b7b1cf20d5b}{C\+T\+R\+L\+\_\+\+R\+E\+G1\+\_\+\+Union.\+bits.\+L\+N\+O\+I\+S\+E}\label{group__accel__module_ga8be6ba1f1fe4311a05d462f730b7dbdd}
+
+\item 
+\hypertarget{group__accel__module_gaed6eca0a6b7cb800d7de4400a52cf556}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G1\+\_\+\+D\+R}~\hyperlink{accel_8c_a2c3e455107759b4d70b168e43fea4219}{C\+T\+R\+L\+\_\+\+R\+E\+G1\+\_\+\+Union.\+bits.\+D\+R}\label{group__accel__module_gaed6eca0a6b7cb800d7de4400a52cf556}
+
+\item 
+\hypertarget{group__accel__module_ga7245fe0e235bbe17a78655e0344dfd37}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G1\+\_\+\+A\+S\+L\+P\+\_\+\+R\+A\+T\+E}~\hyperlink{accel_8c_a15d72faada7955cc863ee2454e499b1b}{C\+T\+R\+L\+\_\+\+R\+E\+G1\+\_\+\+Union.\+bits.\+A\+S\+L\+P\+\_\+\+R\+A\+T\+E}\label{group__accel__module_ga7245fe0e235bbe17a78655e0344dfd37}
+
+\item 
+\hypertarget{group__accel__module_ga5ac89f21caba0366745a91bca43d6243}{}\#define {\bfseries A\+D\+D\+R\+E\+S\+S\+\_\+\+C\+T\+R\+L\+\_\+\+R\+E\+G2}~0x2\+B\label{group__accel__module_ga5ac89f21caba0366745a91bca43d6243}
+
+\item 
+\hypertarget{group__accel__module_gaa4a445e2b5c3df9162cc6147c1572e17}{}\#define {\bfseries A\+D\+D\+R\+E\+S\+S\+\_\+\+C\+T\+R\+L\+\_\+\+R\+E\+G3}~0x2\+C\label{group__accel__module_gaa4a445e2b5c3df9162cc6147c1572e17}
+
+\item 
+\hypertarget{group__accel__module_gacdb673970b82f2380da68c9e8d1dc5c6}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G3}~\hyperlink{accel_8c_a96f44d20f1dbf1c8785a7bc99a46164c}{C\+T\+R\+L\+\_\+\+R\+E\+G3\+\_\+\+Union.\+byte}\label{group__accel__module_gacdb673970b82f2380da68c9e8d1dc5c6}
+
+\item 
+\hypertarget{group__accel__module_gaaf149de4e9994db16fc38f1c37a1b086}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G3\+\_\+\+P\+P\+\_\+\+O\+D}~\hyperlink{accel_8c_a1a8bacd733e6410ea0fdbfea65be0682}{C\+T\+R\+L\+\_\+\+R\+E\+G3\+\_\+\+Union.\+bits.\+P\+P\+\_\+\+O\+D}\label{group__accel__module_gaaf149de4e9994db16fc38f1c37a1b086}
+
+\item 
+\hypertarget{group__accel__module_ga4387f4aa195e12686a1d899fc05e8122}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G3\+\_\+\+I\+P\+O\+L}~\hyperlink{accel_8c_a60eda525b85b5f80b3c09d4633165705}{C\+T\+R\+L\+\_\+\+R\+E\+G3\+\_\+\+Union.\+bits.\+I\+P\+O\+L}\label{group__accel__module_ga4387f4aa195e12686a1d899fc05e8122}
+
+\item 
+\hypertarget{group__accel__module_gad59dac296c20eeb94373ce9c016fbf87}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G3\+\_\+\+W\+A\+K\+E\+\_\+\+F\+F\+\_\+\+M\+T}~\hyperlink{accel_8c_a5a9cd1fabb67e7b23131b09b74a3aef8}{C\+T\+R\+L\+\_\+\+R\+E\+G3\+\_\+\+Union.\+bits.\+W\+A\+K\+E\+\_\+\+F\+F\+\_\+\+M\+T}\label{group__accel__module_gad59dac296c20eeb94373ce9c016fbf87}
+
+\item 
+\hypertarget{group__accel__module_ga70780e1bb0a043940b319c7d0e809f16}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G3\+\_\+\+W\+A\+K\+E\+\_\+\+P\+U\+L\+S\+E}~\hyperlink{accel_8c_ab6632b49510fcd5fc7311f878fcbbe14}{C\+T\+R\+L\+\_\+\+R\+E\+G3\+\_\+\+Union.\+bits.\+W\+A\+K\+E\+\_\+\+P\+U\+L\+S\+E}\label{group__accel__module_ga70780e1bb0a043940b319c7d0e809f16}
+
+\item 
+\hypertarget{group__accel__module_ga4aa9823c93b607b9782b48b6237cfb9b}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G3\+\_\+\+W\+A\+K\+E\+\_\+\+L\+N\+D\+P\+R\+T}~\hyperlink{accel_8c_a700b70ff2aabdb4141620f413d8bd1d1}{C\+T\+R\+L\+\_\+\+R\+E\+G3\+\_\+\+Union.\+bits.\+W\+A\+K\+E\+\_\+\+L\+N\+D\+P\+R\+T}\label{group__accel__module_ga4aa9823c93b607b9782b48b6237cfb9b}
+
+\item 
+\hypertarget{group__accel__module_gae7d829220491dc28782fabd56ca80870}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G3\+\_\+\+W\+A\+K\+E\+\_\+\+T\+R\+A\+N\+S}~\hyperlink{accel_8c_a3ed14f173e1a48868fbda54e270c303d}{C\+T\+R\+L\+\_\+\+R\+E\+G3\+\_\+\+Union.\+bits.\+W\+A\+K\+E\+\_\+\+T\+R\+A\+N\+S}\label{group__accel__module_gae7d829220491dc28782fabd56ca80870}
+
+\item 
+\hypertarget{group__accel__module_ga0cc835348915582c6f7a39d546d739d4}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G3\+\_\+\+F\+I\+F\+O\+\_\+\+G\+A\+T\+E}~\hyperlink{accel_8c_a22ea01efb74f287ca51a6d0b6552e920}{C\+T\+R\+L\+\_\+\+R\+E\+G3\+\_\+\+Union.\+bits.\+F\+I\+F\+O\+\_\+\+G\+A\+T\+E}\label{group__accel__module_ga0cc835348915582c6f7a39d546d739d4}
+
+\item 
+\hypertarget{group__accel__module_gadc3d98ee18479004290f6cc9966b3509}{}\#define {\bfseries A\+D\+D\+R\+E\+S\+S\+\_\+\+C\+T\+R\+L\+\_\+\+R\+E\+G4}~0x2\+D\label{group__accel__module_gadc3d98ee18479004290f6cc9966b3509}
+
+\item 
+\hypertarget{group__accel__module_ga36c532b0a660c101907dcad7ee399fbd}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G4}~\hyperlink{accel_8c_a96f44d20f1dbf1c8785a7bc99a46164c}{C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+Union.\+byte}\label{group__accel__module_ga36c532b0a660c101907dcad7ee399fbd}
+
+\item 
+\hypertarget{group__accel__module_ga14be1d8bc870cb9eb6b40252a30db82c}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+I\+N\+T\+\_\+\+E\+N\+\_\+\+D\+R\+D\+Y}~\hyperlink{accel_8c_ae136349651ad32006a4ff81765056040}{C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+Union.\+bits.\+I\+N\+T\+\_\+\+E\+N\+\_\+\+D\+R\+D\+Y}\label{group__accel__module_ga14be1d8bc870cb9eb6b40252a30db82c}
+
+\item 
+\hypertarget{group__accel__module_gafd165e78c0f3fd8ef68220f67ede39c5}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+I\+N\+T\+\_\+\+E\+N\+\_\+\+F\+F\+\_\+\+M\+T}~\hyperlink{accel_8c_a3dc6e0a1e88d0554b76540c581dd4ca4}{C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+Union.\+bits.\+I\+N\+T\+\_\+\+E\+N\+\_\+\+F\+F\+\_\+\+M\+T}\label{group__accel__module_gafd165e78c0f3fd8ef68220f67ede39c5}
+
+\item 
+\hypertarget{group__accel__module_ga13d90e1a77f7b00d514348002b1c01f2}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+I\+N\+T\+\_\+\+E\+N\+\_\+\+P\+U\+L\+S\+E}~\hyperlink{accel_8c_afc7709cbf42105c1f160c383bbec2023}{C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+Union.\+bits.\+I\+N\+T\+\_\+\+E\+N\+\_\+\+P\+U\+L\+S\+E}\label{group__accel__module_ga13d90e1a77f7b00d514348002b1c01f2}
+
+\item 
+\hypertarget{group__accel__module_ga095b51ada61480f54d3fc86d6b82cd92}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+I\+N\+T\+\_\+\+E\+N\+\_\+\+L\+N\+D\+P\+R\+T}~\hyperlink{accel_8c_a27d25427dedad1ca7f49432d1845af73}{C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+Union.\+bits.\+I\+N\+T\+\_\+\+E\+N\+\_\+\+L\+N\+D\+P\+R\+T}\label{group__accel__module_ga095b51ada61480f54d3fc86d6b82cd92}
+
+\item 
+\hypertarget{group__accel__module_ga7929a9c2e7d00122428e910087adfd80}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+I\+N\+T\+\_\+\+E\+N\+\_\+\+T\+R\+A\+N\+S}~\hyperlink{accel_8c_ab9da2cde5dd847313bc367bc233d05e9}{C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+Union.\+bits.\+I\+N\+T\+\_\+\+E\+N\+\_\+\+T\+R\+A\+N\+S}\label{group__accel__module_ga7929a9c2e7d00122428e910087adfd80}
+
+\item 
+\hypertarget{group__accel__module_ga2850b1c9df2623a1208e4e5902e2a963}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+I\+N\+T\+\_\+\+E\+N\+\_\+\+F\+I\+F\+O}~\hyperlink{accel_8c_a783d7438bd94accd165bba7abe1ec520}{C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+Union.\+bits.\+I\+N\+T\+\_\+\+E\+N\+\_\+\+F\+I\+F\+O}\label{group__accel__module_ga2850b1c9df2623a1208e4e5902e2a963}
+
+\item 
+\hypertarget{group__accel__module_gaf585eae83a172887d6e4a09776201ece}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+I\+N\+T\+\_\+\+E\+N\+\_\+\+A\+S\+L\+P}~\hyperlink{accel_8c_adbe32d0cc8c6d5c9ec9c09cee1a9794b}{C\+T\+R\+L\+\_\+\+R\+E\+G4\+\_\+\+Union.\+bits.\+I\+N\+T\+\_\+\+E\+N\+\_\+\+A\+S\+L\+P}\label{group__accel__module_gaf585eae83a172887d6e4a09776201ece}
+
+\item 
+\hypertarget{group__accel__module_ga49ce134ea00f6ed183170893a6c3eb5c}{}\#define {\bfseries A\+D\+D\+R\+E\+S\+S\+\_\+\+C\+T\+R\+L\+\_\+\+R\+E\+G5}~0x2\+E\label{group__accel__module_ga49ce134ea00f6ed183170893a6c3eb5c}
+
+\item 
+\hypertarget{group__accel__module_ga97cbbf0a1e80e40544629e925e5a9026}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G5}~\hyperlink{accel_8c_a96f44d20f1dbf1c8785a7bc99a46164c}{C\+T\+R\+L\+\_\+\+R\+E\+G5\+\_\+\+Union.\+byte}\label{group__accel__module_ga97cbbf0a1e80e40544629e925e5a9026}
+
+\item 
+\hypertarget{group__accel__module_gad05d274f8ecae9855e046ba41ef1ed92}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G5\+\_\+\+I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+D\+R\+D\+Y}~\hyperlink{accel_8c_af62ca343abd81859a54fc347f38c0f76}{C\+T\+R\+L\+\_\+\+R\+E\+G5\+\_\+\+Union.\+bits.\+I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+D\+R\+D\+Y}\label{group__accel__module_gad05d274f8ecae9855e046ba41ef1ed92}
+
+\item 
+\hypertarget{group__accel__module_gaa52dbce803d113ac4b2bbbf24856746a}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G5\+\_\+\+I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+F\+F\+\_\+\+M\+T}~\hyperlink{accel_8c_ab781df7ed3c96435ed9528b178fc433f}{C\+T\+R\+L\+\_\+\+R\+E\+G5\+\_\+\+Union.\+bits.\+I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+F\+F\+\_\+\+M\+T}\label{group__accel__module_gaa52dbce803d113ac4b2bbbf24856746a}
+
+\item 
+\hypertarget{group__accel__module_ga789767ffe8f1255faef94813f58e95c0}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G5\+\_\+\+I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+P\+U\+L\+S\+E}~\hyperlink{accel_8c_a6090cd9b7d757fce5aedb4bd80679442}{C\+T\+R\+L\+\_\+\+R\+E\+G5\+\_\+\+Union.\+bits.\+I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+P\+U\+L\+S\+E}\label{group__accel__module_ga789767ffe8f1255faef94813f58e95c0}
+
+\item 
+\hypertarget{group__accel__module_ga831ca72150d851701a255830448716aa}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G5\+\_\+\+I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+L\+N\+D\+P\+R\+T}~\hyperlink{accel_8c_a8f31e3b92ce5d814a88ed9984d94ffc9}{C\+T\+R\+L\+\_\+\+R\+E\+G5\+\_\+\+Union.\+bits.\+I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+L\+N\+D\+P\+R\+T}\label{group__accel__module_ga831ca72150d851701a255830448716aa}
+
+\item 
+\hypertarget{group__accel__module_ga53e1a8584bc2519fd797d36dab795fa6}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G5\+\_\+\+I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+T\+R\+A\+N\+S}~\hyperlink{accel_8c_a88f382fb04b4e4435e09aaf0c67f475e}{C\+T\+R\+L\+\_\+\+R\+E\+G5\+\_\+\+Union.\+bits.\+I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+T\+R\+A\+N\+S}\label{group__accel__module_ga53e1a8584bc2519fd797d36dab795fa6}
+
+\item 
+\hypertarget{group__accel__module_gac034dd24938c15394a78133d5d86d0e4}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G5\+\_\+\+I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+F\+I\+F\+O}~\hyperlink{accel_8c_a8ca93fd5de2f4738cdd2bc91afb9642d}{C\+T\+R\+L\+\_\+\+R\+E\+G5\+\_\+\+Union.\+bits.\+I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+F\+I\+F\+O}\label{group__accel__module_gac034dd24938c15394a78133d5d86d0e4}
+
+\item 
+\hypertarget{group__accel__module_gac3e62ab50f121e03ebd148322447bb5c}{}\#define {\bfseries C\+T\+R\+L\+\_\+\+R\+E\+G5\+\_\+\+I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+A\+S\+L\+P}~\hyperlink{accel_8c_ab1b1c07d106d7e810c1069491579330a}{C\+T\+R\+L\+\_\+\+R\+E\+G5\+\_\+\+Union.\+bits.\+I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+A\+S\+L\+P}\label{group__accel__module_gac3e62ab50f121e03ebd148322447bb5c}
+
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group__accel__module_ga38caa5d9a167740576806a2d7325683e}{}enum {\bfseries T\+Output\+Data\+Rate} \{ \\*
+{\bfseries D\+A\+T\+E\+\_\+\+R\+A\+T\+E\+\_\+800\+\_\+\+H\+Z}, 
+{\bfseries D\+A\+T\+E\+\_\+\+R\+A\+T\+E\+\_\+400\+\_\+\+H\+Z}, 
+{\bfseries D\+A\+T\+E\+\_\+\+R\+A\+T\+E\+\_\+200\+\_\+\+H\+Z}, 
+{\bfseries D\+A\+T\+E\+\_\+\+R\+A\+T\+E\+\_\+100\+\_\+\+H\+Z}, 
+\\*
+{\bfseries D\+A\+T\+E\+\_\+\+R\+A\+T\+E\+\_\+50\+\_\+\+H\+Z}, 
+{\bfseries D\+A\+T\+E\+\_\+\+R\+A\+T\+E\+\_\+12\+\_\+5\+\_\+\+H\+Z}, 
+{\bfseries D\+A\+T\+E\+\_\+\+R\+A\+T\+E\+\_\+6\+\_\+25\+\_\+\+H\+Z}, 
+{\bfseries D\+A\+T\+E\+\_\+\+R\+A\+T\+E\+\_\+1\+\_\+56\+\_\+\+H\+Z}
+ \}\label{group__accel__module_ga38caa5d9a167740576806a2d7325683e}
+
+\item 
+\hypertarget{group__accel__module_ga0fff739d8d806336d0af6bd1f0ec484d}{}enum {\bfseries T\+S\+L\+E\+E\+P\+Mode\+Rate} \{ {\bfseries S\+L\+E\+E\+P\+\_\+\+M\+O\+D\+E\+\_\+\+R\+A\+T\+E\+\_\+50\+\_\+\+H\+Z}, 
+{\bfseries S\+L\+E\+E\+P\+\_\+\+M\+O\+D\+E\+\_\+\+R\+A\+T\+E\+\_\+12\+\_\+5\+\_\+\+H\+Z}, 
+{\bfseries S\+L\+E\+E\+P\+\_\+\+M\+O\+D\+E\+\_\+\+R\+A\+T\+E\+\_\+6\+\_\+25\+\_\+\+H\+Z}, 
+{\bfseries S\+L\+E\+E\+P\+\_\+\+M\+O\+D\+E\+\_\+\+R\+A\+T\+E\+\_\+1\+\_\+56\+\_\+\+H\+Z}
+ \}\label{group__accel__module_ga0fff739d8d806336d0af6bd1f0ec484d}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{group__accel__module_gad5a20dbb7475bf6023e591d6a4e7312d}{Accel\+\_\+\+Init} (const \hyperlink{struct_t_accel_setup}{T\+Accel\+Setup} $\ast$const accel\+Setup)
+\begin{DoxyCompactList}\small\item\em Initializes the accelerometer by calling the initialization routines of the supporting software modules. \end{DoxyCompactList}\item 
+void \hyperlink{group__accel__module_ga8cc8e053f2474e24cb761f1de0f769d8}{Accel\+\_\+\+Read\+X\+Y\+Z} (uint8\+\_\+t data\mbox{[}3\mbox{]})
+\begin{DoxyCompactList}\small\item\em Reads X, Y and Z accelerations. \end{DoxyCompactList}\item 
+void \hyperlink{group__accel__module_ga4f26113eba1169f1d886f8236626f4a7}{Accel\+\_\+\+Set\+Mode} (const T\+Accel\+Mode mode)
+\begin{DoxyCompactList}\small\item\em Set the mode of the accelerometer. \end{DoxyCompactList}\item 
+void \hyperlink{group__accel__module_ga445500277ba0e363873b34cffc015745}{\+\_\+\+\_\+attribute\+\_\+\+\_\+} ((interrupt))
+\begin{DoxyCompactList}\small\item\em Interrupt service routine for the accelerometer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const uint32\+\_\+t \hyperlink{group__accel__module_ga4b8052f26442dadff956fa68b94b62f2}{P\+E\+R\+I\+O\+D\+\_\+\+I2\+C\+\_\+\+P\+O\+L\+L}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+H\+A\+L for the accelerometer. 
+
+This contains the functions for interfacing to the M\+M\+A8451\+Q accelerometer.
+
+\begin{DoxyAuthor}{Author}
+12403756, 12551519 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2018-\/04-\/29 
+\end{DoxyDate}
+
+
+\subsection{Variable Documentation}
+\hypertarget{accel_8c_a9c114f16b9edcd397845a7fe847d2043}{}\index{accel.\+c@{accel.\+c}!A\+C\+T\+I\+V\+E@{A\+C\+T\+I\+V\+E}}
+\index{A\+C\+T\+I\+V\+E@{A\+C\+T\+I\+V\+E}!accel.\+c@{accel.\+c}}
+\subsubsection[{A\+C\+T\+I\+V\+E}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t A\+C\+T\+I\+V\+E}\label{accel_8c_a9c114f16b9edcd397845a7fe847d2043}
+Mode selection. \hypertarget{accel_8c_a15d72faada7955cc863ee2454e499b1b}{}\index{accel.\+c@{accel.\+c}!A\+S\+L\+P\+\_\+\+R\+A\+T\+E@{A\+S\+L\+P\+\_\+\+R\+A\+T\+E}}
+\index{A\+S\+L\+P\+\_\+\+R\+A\+T\+E@{A\+S\+L\+P\+\_\+\+R\+A\+T\+E}!accel.\+c@{accel.\+c}}
+\subsubsection[{A\+S\+L\+P\+\_\+\+R\+A\+T\+E}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t A\+S\+L\+P\+\_\+\+R\+A\+T\+E}\label{accel_8c_a15d72faada7955cc863ee2454e499b1b}
+Auto-\/\+W\+A\+K\+E sample frequency. \hypertarget{accel_8c_ae22526ad246995fdca2e7faf8b609df0}{}\index{accel.\+c@{accel.\+c}!bits@{bits}}
+\index{bits@{bits}!accel.\+c@{accel.\+c}}
+\subsubsection[{bits}]{\setlength{\rightskip}{0pt plus 5cm}struct \{ ... \}   bits}\label{accel_8c_ae22526ad246995fdca2e7faf8b609df0}
+The I\+N\+T\+\_\+\+S\+O\+U\+R\+C\+E bits accessed individually.
+
+The C\+T\+R\+L\+\_\+\+R\+E\+G1 bits accessed individually.
+
+The C\+T\+R\+L\+\_\+\+R\+E\+G3 bits accessed individually.
+
+The C\+T\+R\+L\+\_\+\+R\+E\+G4 bits accessed individually.
+
+The C\+T\+R\+L\+\_\+\+R\+E\+G5 bits accessed individually. \hypertarget{accel_8c_a96f44d20f1dbf1c8785a7bc99a46164c}{}\index{accel.\+c@{accel.\+c}!byte@{byte}}
+\index{byte@{byte}!accel.\+c@{accel.\+c}}
+\subsubsection[{byte}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t byte}\label{accel_8c_a96f44d20f1dbf1c8785a7bc99a46164c}
+The I\+N\+T\+\_\+\+S\+O\+U\+R\+C\+E bits accessed as a byte.
+
+The C\+T\+R\+L\+\_\+\+R\+E\+G1 bits accessed as a byte.
+
+The C\+T\+R\+L\+\_\+\+R\+E\+G3 bits accessed as a byte.
+
+The C\+T\+R\+L\+\_\+\+R\+E\+G4 bits accessed as a byte.
+
+The C\+T\+R\+L\+\_\+\+R\+E\+G5 bits accessed as a byte. \hypertarget{accel_8c_a2c3e455107759b4d70b168e43fea4219}{}\index{accel.\+c@{accel.\+c}!D\+R@{D\+R}}
+\index{D\+R@{D\+R}!accel.\+c@{accel.\+c}}
+\subsubsection[{D\+R}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t D\+R}\label{accel_8c_a2c3e455107759b4d70b168e43fea4219}
+Data rate selection. \hypertarget{accel_8c_a176e6b897e703d742c47a3fdf1b92eb2}{}\index{accel.\+c@{accel.\+c}!F\+\_\+\+R\+E\+A\+D@{F\+\_\+\+R\+E\+A\+D}}
+\index{F\+\_\+\+R\+E\+A\+D@{F\+\_\+\+R\+E\+A\+D}!accel.\+c@{accel.\+c}}
+\subsubsection[{F\+\_\+\+R\+E\+A\+D}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t F\+\_\+\+R\+E\+A\+D}\label{accel_8c_a176e6b897e703d742c47a3fdf1b92eb2}
+Fast read mode. \hypertarget{accel_8c_a22ea01efb74f287ca51a6d0b6552e920}{}\index{accel.\+c@{accel.\+c}!F\+I\+F\+O\+\_\+\+G\+A\+T\+E@{F\+I\+F\+O\+\_\+\+G\+A\+T\+E}}
+\index{F\+I\+F\+O\+\_\+\+G\+A\+T\+E@{F\+I\+F\+O\+\_\+\+G\+A\+T\+E}!accel.\+c@{accel.\+c}}
+\subsubsection[{F\+I\+F\+O\+\_\+\+G\+A\+T\+E}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t F\+I\+F\+O\+\_\+\+G\+A\+T\+E}\label{accel_8c_a22ea01efb74f287ca51a6d0b6552e920}
+F\+I\+F\+O gate bypass. \hypertarget{accel_8c_ab1b1c07d106d7e810c1069491579330a}{}\index{accel.\+c@{accel.\+c}!I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+A\+S\+L\+P@{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+A\+S\+L\+P}}
+\index{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+A\+S\+L\+P@{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+A\+S\+L\+P}!accel.\+c@{accel.\+c}}
+\subsubsection[{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+A\+S\+L\+P}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+A\+S\+L\+P}\label{accel_8c_ab1b1c07d106d7e810c1069491579330a}
+Auto-\/\+S\+L\+E\+E\+P/\+W\+A\+K\+E interrupt enable. \hypertarget{accel_8c_af62ca343abd81859a54fc347f38c0f76}{}\index{accel.\+c@{accel.\+c}!I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+D\+R\+D\+Y@{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+D\+R\+D\+Y}}
+\index{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+D\+R\+D\+Y@{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+D\+R\+D\+Y}!accel.\+c@{accel.\+c}}
+\subsubsection[{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+D\+R\+D\+Y}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+D\+R\+D\+Y}\label{accel_8c_af62ca343abd81859a54fc347f38c0f76}
+Data ready interrupt enable. \hypertarget{accel_8c_ab781df7ed3c96435ed9528b178fc433f}{}\index{accel.\+c@{accel.\+c}!I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+F\+F\+\_\+\+M\+T@{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+F\+F\+\_\+\+M\+T}}
+\index{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+F\+F\+\_\+\+M\+T@{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+F\+F\+\_\+\+M\+T}!accel.\+c@{accel.\+c}}
+\subsubsection[{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+F\+F\+\_\+\+M\+T}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+F\+F\+\_\+\+M\+T}\label{accel_8c_ab781df7ed3c96435ed9528b178fc433f}
+Freefall/motion interrupt enable. \hypertarget{accel_8c_a8ca93fd5de2f4738cdd2bc91afb9642d}{}\index{accel.\+c@{accel.\+c}!I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+F\+I\+F\+O@{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+F\+I\+F\+O}}
+\index{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+F\+I\+F\+O@{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+F\+I\+F\+O}!accel.\+c@{accel.\+c}}
+\subsubsection[{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+F\+I\+F\+O}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+F\+I\+F\+O}\label{accel_8c_a8ca93fd5de2f4738cdd2bc91afb9642d}
+F\+I\+F\+O interrupt enable. \hypertarget{accel_8c_a8f31e3b92ce5d814a88ed9984d94ffc9}{}\index{accel.\+c@{accel.\+c}!I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+L\+N\+D\+P\+R\+T@{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+L\+N\+D\+P\+R\+T}}
+\index{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+L\+N\+D\+P\+R\+T@{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+L\+N\+D\+P\+R\+T}!accel.\+c@{accel.\+c}}
+\subsubsection[{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+L\+N\+D\+P\+R\+T}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+L\+N\+D\+P\+R\+T}\label{accel_8c_a8f31e3b92ce5d814a88ed9984d94ffc9}
+Orientation interrupt enable. \hypertarget{accel_8c_a6090cd9b7d757fce5aedb4bd80679442}{}\index{accel.\+c@{accel.\+c}!I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+P\+U\+L\+S\+E@{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+P\+U\+L\+S\+E}}
+\index{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+P\+U\+L\+S\+E@{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+P\+U\+L\+S\+E}!accel.\+c@{accel.\+c}}
+\subsubsection[{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+P\+U\+L\+S\+E}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+P\+U\+L\+S\+E}\label{accel_8c_a6090cd9b7d757fce5aedb4bd80679442}
+Pulse detection interrupt enable. \hypertarget{accel_8c_a88f382fb04b4e4435e09aaf0c67f475e}{}\index{accel.\+c@{accel.\+c}!I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+T\+R\+A\+N\+S@{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+T\+R\+A\+N\+S}}
+\index{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+T\+R\+A\+N\+S@{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+T\+R\+A\+N\+S}!accel.\+c@{accel.\+c}}
+\subsubsection[{I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+T\+R\+A\+N\+S}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t I\+N\+T\+\_\+\+C\+F\+G\+\_\+\+T\+R\+A\+N\+S}\label{accel_8c_a88f382fb04b4e4435e09aaf0c67f475e}
+Transient interrupt enable. \hypertarget{accel_8c_adbe32d0cc8c6d5c9ec9c09cee1a9794b}{}\index{accel.\+c@{accel.\+c}!I\+N\+T\+\_\+\+E\+N\+\_\+\+A\+S\+L\+P@{I\+N\+T\+\_\+\+E\+N\+\_\+\+A\+S\+L\+P}}
+\index{I\+N\+T\+\_\+\+E\+N\+\_\+\+A\+S\+L\+P@{I\+N\+T\+\_\+\+E\+N\+\_\+\+A\+S\+L\+P}!accel.\+c@{accel.\+c}}
+\subsubsection[{I\+N\+T\+\_\+\+E\+N\+\_\+\+A\+S\+L\+P}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t I\+N\+T\+\_\+\+E\+N\+\_\+\+A\+S\+L\+P}\label{accel_8c_adbe32d0cc8c6d5c9ec9c09cee1a9794b}
+Auto-\/\+S\+L\+E\+E\+P/\+W\+A\+K\+E interrupt enable. \hypertarget{accel_8c_ae136349651ad32006a4ff81765056040}{}\index{accel.\+c@{accel.\+c}!I\+N\+T\+\_\+\+E\+N\+\_\+\+D\+R\+D\+Y@{I\+N\+T\+\_\+\+E\+N\+\_\+\+D\+R\+D\+Y}}
+\index{I\+N\+T\+\_\+\+E\+N\+\_\+\+D\+R\+D\+Y@{I\+N\+T\+\_\+\+E\+N\+\_\+\+D\+R\+D\+Y}!accel.\+c@{accel.\+c}}
+\subsubsection[{I\+N\+T\+\_\+\+E\+N\+\_\+\+D\+R\+D\+Y}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t I\+N\+T\+\_\+\+E\+N\+\_\+\+D\+R\+D\+Y}\label{accel_8c_ae136349651ad32006a4ff81765056040}
+Data ready interrupt enable. \hypertarget{accel_8c_a3dc6e0a1e88d0554b76540c581dd4ca4}{}\index{accel.\+c@{accel.\+c}!I\+N\+T\+\_\+\+E\+N\+\_\+\+F\+F\+\_\+\+M\+T@{I\+N\+T\+\_\+\+E\+N\+\_\+\+F\+F\+\_\+\+M\+T}}
+\index{I\+N\+T\+\_\+\+E\+N\+\_\+\+F\+F\+\_\+\+M\+T@{I\+N\+T\+\_\+\+E\+N\+\_\+\+F\+F\+\_\+\+M\+T}!accel.\+c@{accel.\+c}}
+\subsubsection[{I\+N\+T\+\_\+\+E\+N\+\_\+\+F\+F\+\_\+\+M\+T}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t I\+N\+T\+\_\+\+E\+N\+\_\+\+F\+F\+\_\+\+M\+T}\label{accel_8c_a3dc6e0a1e88d0554b76540c581dd4ca4}
+Freefall/motion interrupt enable. \hypertarget{accel_8c_a783d7438bd94accd165bba7abe1ec520}{}\index{accel.\+c@{accel.\+c}!I\+N\+T\+\_\+\+E\+N\+\_\+\+F\+I\+F\+O@{I\+N\+T\+\_\+\+E\+N\+\_\+\+F\+I\+F\+O}}
+\index{I\+N\+T\+\_\+\+E\+N\+\_\+\+F\+I\+F\+O@{I\+N\+T\+\_\+\+E\+N\+\_\+\+F\+I\+F\+O}!accel.\+c@{accel.\+c}}
+\subsubsection[{I\+N\+T\+\_\+\+E\+N\+\_\+\+F\+I\+F\+O}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t I\+N\+T\+\_\+\+E\+N\+\_\+\+F\+I\+F\+O}\label{accel_8c_a783d7438bd94accd165bba7abe1ec520}
+F\+I\+F\+O interrupt enable. \hypertarget{accel_8c_a27d25427dedad1ca7f49432d1845af73}{}\index{accel.\+c@{accel.\+c}!I\+N\+T\+\_\+\+E\+N\+\_\+\+L\+N\+D\+P\+R\+T@{I\+N\+T\+\_\+\+E\+N\+\_\+\+L\+N\+D\+P\+R\+T}}
+\index{I\+N\+T\+\_\+\+E\+N\+\_\+\+L\+N\+D\+P\+R\+T@{I\+N\+T\+\_\+\+E\+N\+\_\+\+L\+N\+D\+P\+R\+T}!accel.\+c@{accel.\+c}}
+\subsubsection[{I\+N\+T\+\_\+\+E\+N\+\_\+\+L\+N\+D\+P\+R\+T}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t I\+N\+T\+\_\+\+E\+N\+\_\+\+L\+N\+D\+P\+R\+T}\label{accel_8c_a27d25427dedad1ca7f49432d1845af73}
+Orientation interrupt enable. \hypertarget{accel_8c_afc7709cbf42105c1f160c383bbec2023}{}\index{accel.\+c@{accel.\+c}!I\+N\+T\+\_\+\+E\+N\+\_\+\+P\+U\+L\+S\+E@{I\+N\+T\+\_\+\+E\+N\+\_\+\+P\+U\+L\+S\+E}}
+\index{I\+N\+T\+\_\+\+E\+N\+\_\+\+P\+U\+L\+S\+E@{I\+N\+T\+\_\+\+E\+N\+\_\+\+P\+U\+L\+S\+E}!accel.\+c@{accel.\+c}}
+\subsubsection[{I\+N\+T\+\_\+\+E\+N\+\_\+\+P\+U\+L\+S\+E}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t I\+N\+T\+\_\+\+E\+N\+\_\+\+P\+U\+L\+S\+E}\label{accel_8c_afc7709cbf42105c1f160c383bbec2023}
+Pulse detection interrupt enable. \hypertarget{accel_8c_ab9da2cde5dd847313bc367bc233d05e9}{}\index{accel.\+c@{accel.\+c}!I\+N\+T\+\_\+\+E\+N\+\_\+\+T\+R\+A\+N\+S@{I\+N\+T\+\_\+\+E\+N\+\_\+\+T\+R\+A\+N\+S}}
+\index{I\+N\+T\+\_\+\+E\+N\+\_\+\+T\+R\+A\+N\+S@{I\+N\+T\+\_\+\+E\+N\+\_\+\+T\+R\+A\+N\+S}!accel.\+c@{accel.\+c}}
+\subsubsection[{I\+N\+T\+\_\+\+E\+N\+\_\+\+T\+R\+A\+N\+S}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t I\+N\+T\+\_\+\+E\+N\+\_\+\+T\+R\+A\+N\+S}\label{accel_8c_ab9da2cde5dd847313bc367bc233d05e9}
+Transient interrupt enable. \hypertarget{accel_8c_a60eda525b85b5f80b3c09d4633165705}{}\index{accel.\+c@{accel.\+c}!I\+P\+O\+L@{I\+P\+O\+L}}
+\index{I\+P\+O\+L@{I\+P\+O\+L}!accel.\+c@{accel.\+c}}
+\subsubsection[{I\+P\+O\+L}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t I\+P\+O\+L}\label{accel_8c_a60eda525b85b5f80b3c09d4633165705}
+Interrupt polarity. \hypertarget{accel_8c_a5e85ae95bebf0d48ee679b7b1cf20d5b}{}\index{accel.\+c@{accel.\+c}!L\+N\+O\+I\+S\+E@{L\+N\+O\+I\+S\+E}}
+\index{L\+N\+O\+I\+S\+E@{L\+N\+O\+I\+S\+E}!accel.\+c@{accel.\+c}}
+\subsubsection[{L\+N\+O\+I\+S\+E}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t L\+N\+O\+I\+S\+E}\label{accel_8c_a5e85ae95bebf0d48ee679b7b1cf20d5b}
+Reduced noise mode. \hypertarget{accel_8c_a1a8bacd733e6410ea0fdbfea65be0682}{}\index{accel.\+c@{accel.\+c}!P\+P\+\_\+\+O\+D@{P\+P\+\_\+\+O\+D}}
+\index{P\+P\+\_\+\+O\+D@{P\+P\+\_\+\+O\+D}!accel.\+c@{accel.\+c}}
+\subsubsection[{P\+P\+\_\+\+O\+D}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t P\+P\+\_\+\+O\+D}\label{accel_8c_a1a8bacd733e6410ea0fdbfea65be0682}
+Push-\/pull/open drain selection. \hypertarget{accel_8c_acfe1ff99f19cd50c2a089e5313e0db18}{}\index{accel.\+c@{accel.\+c}!S\+R\+C\+\_\+\+A\+S\+L\+P@{S\+R\+C\+\_\+\+A\+S\+L\+P}}
+\index{S\+R\+C\+\_\+\+A\+S\+L\+P@{S\+R\+C\+\_\+\+A\+S\+L\+P}!accel.\+c@{accel.\+c}}
+\subsubsection[{S\+R\+C\+\_\+\+A\+S\+L\+P}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t S\+R\+C\+\_\+\+A\+S\+L\+P}\label{accel_8c_acfe1ff99f19cd50c2a089e5313e0db18}
+Auto-\/\+S\+L\+E\+E\+P/\+W\+A\+K\+E interrupt status. \hypertarget{accel_8c_ac39436b463ef99cb345056424d3534ae}{}\index{accel.\+c@{accel.\+c}!S\+R\+C\+\_\+\+D\+R\+D\+Y@{S\+R\+C\+\_\+\+D\+R\+D\+Y}}
+\index{S\+R\+C\+\_\+\+D\+R\+D\+Y@{S\+R\+C\+\_\+\+D\+R\+D\+Y}!accel.\+c@{accel.\+c}}
+\subsubsection[{S\+R\+C\+\_\+\+D\+R\+D\+Y}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t S\+R\+C\+\_\+\+D\+R\+D\+Y}\label{accel_8c_ac39436b463ef99cb345056424d3534ae}
+Data ready interrupt status. \hypertarget{accel_8c_a77f29426c05f9cb1462324f32c4ed4ae}{}\index{accel.\+c@{accel.\+c}!S\+R\+C\+\_\+\+F\+F\+\_\+\+M\+T@{S\+R\+C\+\_\+\+F\+F\+\_\+\+M\+T}}
+\index{S\+R\+C\+\_\+\+F\+F\+\_\+\+M\+T@{S\+R\+C\+\_\+\+F\+F\+\_\+\+M\+T}!accel.\+c@{accel.\+c}}
+\subsubsection[{S\+R\+C\+\_\+\+F\+F\+\_\+\+M\+T}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t S\+R\+C\+\_\+\+F\+F\+\_\+\+M\+T}\label{accel_8c_a77f29426c05f9cb1462324f32c4ed4ae}
+Freefall/motion interrupt status. \hypertarget{accel_8c_ac35eeae0162158b672b9b7475fe5405a}{}\index{accel.\+c@{accel.\+c}!S\+R\+C\+\_\+\+F\+I\+F\+O@{S\+R\+C\+\_\+\+F\+I\+F\+O}}
+\index{S\+R\+C\+\_\+\+F\+I\+F\+O@{S\+R\+C\+\_\+\+F\+I\+F\+O}!accel.\+c@{accel.\+c}}
+\subsubsection[{S\+R\+C\+\_\+\+F\+I\+F\+O}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t S\+R\+C\+\_\+\+F\+I\+F\+O}\label{accel_8c_ac35eeae0162158b672b9b7475fe5405a}
+F\+I\+F\+O interrupt status. \hypertarget{accel_8c_af8b052367f8eb2c4989475c07cbd75f1}{}\index{accel.\+c@{accel.\+c}!S\+R\+C\+\_\+\+L\+N\+D\+P\+R\+T@{S\+R\+C\+\_\+\+L\+N\+D\+P\+R\+T}}
+\index{S\+R\+C\+\_\+\+L\+N\+D\+P\+R\+T@{S\+R\+C\+\_\+\+L\+N\+D\+P\+R\+T}!accel.\+c@{accel.\+c}}
+\subsubsection[{S\+R\+C\+\_\+\+L\+N\+D\+P\+R\+T}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t S\+R\+C\+\_\+\+L\+N\+D\+P\+R\+T}\label{accel_8c_af8b052367f8eb2c4989475c07cbd75f1}
+Orientation interrupt status. \hypertarget{accel_8c_aee3a9487c1e1ad2ec18019bb310966f5}{}\index{accel.\+c@{accel.\+c}!S\+R\+C\+\_\+\+P\+U\+L\+S\+E@{S\+R\+C\+\_\+\+P\+U\+L\+S\+E}}
+\index{S\+R\+C\+\_\+\+P\+U\+L\+S\+E@{S\+R\+C\+\_\+\+P\+U\+L\+S\+E}!accel.\+c@{accel.\+c}}
+\subsubsection[{S\+R\+C\+\_\+\+P\+U\+L\+S\+E}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t S\+R\+C\+\_\+\+P\+U\+L\+S\+E}\label{accel_8c_aee3a9487c1e1ad2ec18019bb310966f5}
+Pulse detection interrupt status. \hypertarget{accel_8c_ae0b2f75a4b308f31740c4a1474249d74}{}\index{accel.\+c@{accel.\+c}!S\+R\+C\+\_\+\+T\+R\+A\+N\+S@{S\+R\+C\+\_\+\+T\+R\+A\+N\+S}}
+\index{S\+R\+C\+\_\+\+T\+R\+A\+N\+S@{S\+R\+C\+\_\+\+T\+R\+A\+N\+S}!accel.\+c@{accel.\+c}}
+\subsubsection[{S\+R\+C\+\_\+\+T\+R\+A\+N\+S}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t S\+R\+C\+\_\+\+T\+R\+A\+N\+S}\label{accel_8c_ae0b2f75a4b308f31740c4a1474249d74}
+Transient interrupt status. \hypertarget{accel_8c_a5a9cd1fabb67e7b23131b09b74a3aef8}{}\index{accel.\+c@{accel.\+c}!W\+A\+K\+E\+\_\+\+F\+F\+\_\+\+M\+T@{W\+A\+K\+E\+\_\+\+F\+F\+\_\+\+M\+T}}
+\index{W\+A\+K\+E\+\_\+\+F\+F\+\_\+\+M\+T@{W\+A\+K\+E\+\_\+\+F\+F\+\_\+\+M\+T}!accel.\+c@{accel.\+c}}
+\subsubsection[{W\+A\+K\+E\+\_\+\+F\+F\+\_\+\+M\+T}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t W\+A\+K\+E\+\_\+\+F\+F\+\_\+\+M\+T}\label{accel_8c_a5a9cd1fabb67e7b23131b09b74a3aef8}
+Freefall/motion function in S\+L\+E\+E\+P mode. \hypertarget{accel_8c_a700b70ff2aabdb4141620f413d8bd1d1}{}\index{accel.\+c@{accel.\+c}!W\+A\+K\+E\+\_\+\+L\+N\+D\+P\+R\+T@{W\+A\+K\+E\+\_\+\+L\+N\+D\+P\+R\+T}}
+\index{W\+A\+K\+E\+\_\+\+L\+N\+D\+P\+R\+T@{W\+A\+K\+E\+\_\+\+L\+N\+D\+P\+R\+T}!accel.\+c@{accel.\+c}}
+\subsubsection[{W\+A\+K\+E\+\_\+\+L\+N\+D\+P\+R\+T}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t W\+A\+K\+E\+\_\+\+L\+N\+D\+P\+R\+T}\label{accel_8c_a700b70ff2aabdb4141620f413d8bd1d1}
+Orientation function in S\+L\+E\+E\+P mode. \hypertarget{accel_8c_ab6632b49510fcd5fc7311f878fcbbe14}{}\index{accel.\+c@{accel.\+c}!W\+A\+K\+E\+\_\+\+P\+U\+L\+S\+E@{W\+A\+K\+E\+\_\+\+P\+U\+L\+S\+E}}
+\index{W\+A\+K\+E\+\_\+\+P\+U\+L\+S\+E@{W\+A\+K\+E\+\_\+\+P\+U\+L\+S\+E}!accel.\+c@{accel.\+c}}
+\subsubsection[{W\+A\+K\+E\+\_\+\+P\+U\+L\+S\+E}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t W\+A\+K\+E\+\_\+\+P\+U\+L\+S\+E}\label{accel_8c_ab6632b49510fcd5fc7311f878fcbbe14}
+Pulse function in S\+L\+E\+E\+P mode. \hypertarget{accel_8c_a3ed14f173e1a48868fbda54e270c303d}{}\index{accel.\+c@{accel.\+c}!W\+A\+K\+E\+\_\+\+T\+R\+A\+N\+S@{W\+A\+K\+E\+\_\+\+T\+R\+A\+N\+S}}
+\index{W\+A\+K\+E\+\_\+\+T\+R\+A\+N\+S@{W\+A\+K\+E\+\_\+\+T\+R\+A\+N\+S}!accel.\+c@{accel.\+c}}
+\subsubsection[{W\+A\+K\+E\+\_\+\+T\+R\+A\+N\+S}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t W\+A\+K\+E\+\_\+\+T\+R\+A\+N\+S}\label{accel_8c_a3ed14f173e1a48868fbda54e270c303d}
+Transient function in S\+L\+E\+E\+P mode. 

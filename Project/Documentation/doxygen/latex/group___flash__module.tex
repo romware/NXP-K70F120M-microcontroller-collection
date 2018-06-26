@@ -1,0 +1,244 @@
+\hypertarget{group___flash__module}{}\section{Flash module documentation}
+\label{group___flash__module}\index{Flash module documentation@{Flash module documentation}}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{group___flash__module_gaa5782279b5e558cafc2f135c0a1177d3}{Flash\+\_\+\+Init} (void)
+\begin{DoxyCompactList}\small\item\em Enables the Flash module. \end{DoxyCompactList}\item 
+bool \hyperlink{group___flash__module_ga50871aff0f5af1e092aea3ed2545cf72}{Flash\+\_\+\+Allocate\+Var} (volatile void $\ast$$\ast$variable, const uint8\+\_\+t size)
+\begin{DoxyCompactList}\small\item\em Allocates space for a non-\/volatile variable in the Flash memory. \end{DoxyCompactList}\item 
+bool \hyperlink{group___flash__module_ga06868787ccef73e69bd236d3b93b68f3}{Flash\+\_\+\+Erase} (void)
+\begin{DoxyCompactList}\small\item\em Erases the entire Flash sector. \end{DoxyCompactList}\item 
+bool \hyperlink{group___flash__module_ga65d0676992303c4a7d5a5cea121a409b}{Flash\+\_\+\+Write} (volatile void $\ast$const address, const uint32\+\_\+t data, uint8\+\_\+t data\+Size)
+\begin{DoxyCompactList}\small\item\em Writes to flash with mutex access for use in an R\+T\+O\+S. \end{DoxyCompactList}\item 
+uint8\+\_\+t \hyperlink{group___flash__module_ga19cb5862dfb60718b63095ee9b427338}{\+\_\+\+F\+B} (volatile uint8\+\_\+t $\ast$flash\+Address)
+\begin{DoxyCompactList}\small\item\em Read one byte from flash with mutex access for use in R\+T\+O\+S. \end{DoxyCompactList}\item 
+uint16\+\_\+t \hyperlink{group___flash__module_gaaad09f647db2a10cedaa89892f723d2d}{\+\_\+\+F\+H} (volatile uint16\+\_\+t $\ast$flash\+Address)
+\begin{DoxyCompactList}\small\item\em Read one half word from flash with mutex access for use in R\+T\+O\+S. \end{DoxyCompactList}\item 
+uint32\+\_\+t \hyperlink{group___flash__module_gab68f612bfd13d413d78311f6b50712b0}{\+\_\+\+F\+W} (volatile uint32\+\_\+t $\ast$flash\+Address)
+\begin{DoxyCompactList}\small\item\em Read one word from flash with mutex access for use in R\+T\+O\+S. \end{DoxyCompactList}\item 
+uint64\+\_\+t \hyperlink{group___flash__module_ga37a9a47a85d05dfe965d08d856c1184a}{\+\_\+\+F\+P} (volatile uint64\+\_\+t $\ast$flash\+Address)
+\begin{DoxyCompactList}\small\item\em Read one phrase from flash with mutex access for use in R\+T\+O\+S. \end{DoxyCompactList}\item 
+void \hyperlink{group___flash__module_ga445500277ba0e363873b34cffc015745}{\+\_\+\+\_\+attribute\+\_\+\+\_\+} ((interrupt))
+\begin{DoxyCompactList}\small\item\em Interrupt service routine for the Flash. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+O\+S\+\_\+\+E\+C\+B $\ast$ \hyperlink{group___flash__module_ga7b51eb443d81e2c63615818e8e3bac4e}{C\+C\+I\+F\+Semaphore}
+\item 
+O\+S\+\_\+\+E\+C\+B $\ast$ \hyperlink{group___flash__module_gaa7d07a8c0083c83ae73e54469b80f627}{Flash\+Access\+Mutex}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Function Documentation}
+\hypertarget{group___flash__module_ga445500277ba0e363873b34cffc015745}{}\index{Flash module documentation@{Flash module documentation}!\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}!Flash module documentation@{Flash module documentation}}
+\subsubsection[{\+\_\+\+\_\+attribute\+\_\+\+\_\+((interrupt))}]{\setlength{\rightskip}{0pt plus 5cm}void \+\_\+\+\_\+attribute\+\_\+\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{(interrupt)}]{}
+\end{DoxyParamCaption}
+)}\label{group___flash__module_ga445500277ba0e363873b34cffc015745}
+
+
+Interrupt service routine for the Flash. 
+
+Interrupt service routine for the U\+A\+R\+T.
+
+Interrupt service routine for the R\+T\+C.
+
+Interrupt service routine for the P\+I\+T.
+
+Interrupt service routine for the I2\+C.
+
+Interrupt service routine for the F\+T\+M.
+
+Interrupt service routine for the accelerometer.
+
+\begin{DoxyNote}{Note}
+Assumes flash has been initialized and a R\+T\+O\+S is being used. 
+\end{DoxyNote}
+\hypertarget{group___flash__module_ga19cb5862dfb60718b63095ee9b427338}{}\index{Flash module documentation@{Flash module documentation}!\+\_\+\+F\+B@{\+\_\+\+F\+B}}
+\index{\+\_\+\+F\+B@{\+\_\+\+F\+B}!Flash module documentation@{Flash module documentation}}
+\subsubsection[{\+\_\+\+F\+B(volatile uint8\+\_\+t $\ast$flash\+Address)}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t \+\_\+\+F\+B (
+\begin{DoxyParamCaption}
+\item[{volatile uint8\+\_\+t $\ast$}]{flash\+Address}
+\end{DoxyParamCaption}
+)}\label{group___flash__module_ga19cb5862dfb60718b63095ee9b427338}
+
+
+Read one byte from flash with mutex access for use in R\+T\+O\+S. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em flash\+Address} & The pointer to the data to read. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+uint8\+\_\+t -\/ The data at the given address 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Assumes Flash has been initialized. 
+\end{DoxyNote}
+\hypertarget{group___flash__module_gaaad09f647db2a10cedaa89892f723d2d}{}\index{Flash module documentation@{Flash module documentation}!\+\_\+\+F\+H@{\+\_\+\+F\+H}}
+\index{\+\_\+\+F\+H@{\+\_\+\+F\+H}!Flash module documentation@{Flash module documentation}}
+\subsubsection[{\+\_\+\+F\+H(volatile uint16\+\_\+t $\ast$flash\+Address)}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t \+\_\+\+F\+H (
+\begin{DoxyParamCaption}
+\item[{volatile uint16\+\_\+t $\ast$}]{flash\+Address}
+\end{DoxyParamCaption}
+)}\label{group___flash__module_gaaad09f647db2a10cedaa89892f723d2d}
+
+
+Read one half word from flash with mutex access for use in R\+T\+O\+S. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em flash\+Address} & The pointer to the data to read. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+uint16\+\_\+t -\/ The data at the given address 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Assumes Flash has been initialized. 
+\end{DoxyNote}
+\hypertarget{group___flash__module_ga37a9a47a85d05dfe965d08d856c1184a}{}\index{Flash module documentation@{Flash module documentation}!\+\_\+\+F\+P@{\+\_\+\+F\+P}}
+\index{\+\_\+\+F\+P@{\+\_\+\+F\+P}!Flash module documentation@{Flash module documentation}}
+\subsubsection[{\+\_\+\+F\+P(volatile uint64\+\_\+t $\ast$flash\+Address)}]{\setlength{\rightskip}{0pt plus 5cm}uint64\+\_\+t \+\_\+\+F\+P (
+\begin{DoxyParamCaption}
+\item[{volatile uint64\+\_\+t $\ast$}]{flash\+Address}
+\end{DoxyParamCaption}
+)}\label{group___flash__module_ga37a9a47a85d05dfe965d08d856c1184a}
+
+
+Read one phrase from flash with mutex access for use in R\+T\+O\+S. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em flash\+Address} & The pointer to the data to read. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+uint64\+\_\+t -\/ The data at the given address 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Assumes Flash has been initialized. 
+\end{DoxyNote}
+\hypertarget{group___flash__module_gab68f612bfd13d413d78311f6b50712b0}{}\index{Flash module documentation@{Flash module documentation}!\+\_\+\+F\+W@{\+\_\+\+F\+W}}
+\index{\+\_\+\+F\+W@{\+\_\+\+F\+W}!Flash module documentation@{Flash module documentation}}
+\subsubsection[{\+\_\+\+F\+W(volatile uint32\+\_\+t $\ast$flash\+Address)}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t \+\_\+\+F\+W (
+\begin{DoxyParamCaption}
+\item[{volatile uint32\+\_\+t $\ast$}]{flash\+Address}
+\end{DoxyParamCaption}
+)}\label{group___flash__module_gab68f612bfd13d413d78311f6b50712b0}
+
+
+Read one word from flash with mutex access for use in R\+T\+O\+S. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em flash\+Address} & The pointer to the data to read. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+uint32\+\_\+t -\/ The data at the given address 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Assumes Flash has been initialized. 
+\end{DoxyNote}
+\hypertarget{group___flash__module_ga50871aff0f5af1e092aea3ed2545cf72}{}\index{Flash module documentation@{Flash module documentation}!Flash\+\_\+\+Allocate\+Var@{Flash\+\_\+\+Allocate\+Var}}
+\index{Flash\+\_\+\+Allocate\+Var@{Flash\+\_\+\+Allocate\+Var}!Flash module documentation@{Flash module documentation}}
+\subsubsection[{Flash\+\_\+\+Allocate\+Var(volatile void $\ast$$\ast$variable, const uint8\+\_\+t size)}]{\setlength{\rightskip}{0pt plus 5cm}bool Flash\+\_\+\+Allocate\+Var (
+\begin{DoxyParamCaption}
+\item[{volatile void $\ast$$\ast$}]{variable, }
+\item[{const uint8\+\_\+t}]{size}
+\end{DoxyParamCaption}
+)}\label{group___flash__module_ga50871aff0f5af1e092aea3ed2545cf72}
+
+
+Allocates space for a non-\/volatile variable in the Flash memory. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em variable} & is the address of a pointer to a variable that is to be allocated space in Flash memory. The pointer will be allocated to a relevant address\+: If the variable is a byte, then any address. If the variable is a half-\/word, then an even address. If the variable is a word, then an address divisible by 4. This allows the resulting variable to be used with the relevant Flash\+\_\+\+Write function which assumes a certain memory address. e.\+g. a 16-\/bit variable will be on an even address \\
+\hline
+{\em size} & The size, in bytes, of the variable that is to be allocated space in the Flash memory. Valid values are 1, 2 and 4. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bool -\/ T\+R\+U\+E if the variable was allocated space in the Flash memory. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Assumes Flash has been initialized. 
+\end{DoxyNote}
+\hypertarget{group___flash__module_ga06868787ccef73e69bd236d3b93b68f3}{}\index{Flash module documentation@{Flash module documentation}!Flash\+\_\+\+Erase@{Flash\+\_\+\+Erase}}
+\index{Flash\+\_\+\+Erase@{Flash\+\_\+\+Erase}!Flash module documentation@{Flash module documentation}}
+\subsubsection[{Flash\+\_\+\+Erase(void)}]{\setlength{\rightskip}{0pt plus 5cm}bool Flash\+\_\+\+Erase (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{group___flash__module_ga06868787ccef73e69bd236d3b93b68f3}
+
+
+Erases the entire Flash sector. 
+
+\begin{DoxyReturn}{Returns}
+bool -\/ T\+R\+U\+E if the Flash \char`\"{}data\char`\"{} sector was erased successfully. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Assumes Flash has been initialized. 
+\end{DoxyNote}
+\hypertarget{group___flash__module_gaa5782279b5e558cafc2f135c0a1177d3}{}\index{Flash module documentation@{Flash module documentation}!Flash\+\_\+\+Init@{Flash\+\_\+\+Init}}
+\index{Flash\+\_\+\+Init@{Flash\+\_\+\+Init}!Flash module documentation@{Flash module documentation}}
+\subsubsection[{Flash\+\_\+\+Init(void)}]{\setlength{\rightskip}{0pt plus 5cm}bool Flash\+\_\+\+Init (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{group___flash__module_gaa5782279b5e558cafc2f135c0a1177d3}
+
+
+Enables the Flash module. 
+
+\begin{DoxyReturn}{Returns}
+bool -\/ T\+R\+U\+E if the Flash was setup successfully. 
+\end{DoxyReturn}
+\hypertarget{group___flash__module_ga65d0676992303c4a7d5a5cea121a409b}{}\index{Flash module documentation@{Flash module documentation}!Flash\+\_\+\+Write@{Flash\+\_\+\+Write}}
+\index{Flash\+\_\+\+Write@{Flash\+\_\+\+Write}!Flash module documentation@{Flash module documentation}}
+\subsubsection[{Flash\+\_\+\+Write(volatile void $\ast$const address, const uint32\+\_\+t data, uint8\+\_\+t data\+Size)}]{\setlength{\rightskip}{0pt plus 5cm}bool Flash\+\_\+\+Write (
+\begin{DoxyParamCaption}
+\item[{volatile void $\ast$const}]{address, }
+\item[{const uint32\+\_\+t}]{data, }
+\item[{uint8\+\_\+t}]{data\+Size}
+\end{DoxyParamCaption}
+)}\label{group___flash__module_ga65d0676992303c4a7d5a5cea121a409b}
+
+
+Writes to flash with mutex access for use in an R\+T\+O\+S. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em address} & The address of the data. \\
+\hline
+{\em data} & The data to be written. Cast as 32 bit but will write 16 and 8. \\
+\hline
+{\em data\+Size} & The size in bits of the data to be written. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bool -\/ T\+R\+U\+E if the Flash \char`\"{}data\char`\"{} was written successfully. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Assumes Flash has been initialized. 
+\end{DoxyNote}
+
+
+\subsection{Variable Documentation}
+\hypertarget{group___flash__module_ga7b51eb443d81e2c63615818e8e3bac4e}{}\index{Flash module documentation@{Flash module documentation}!C\+C\+I\+F\+Semaphore@{C\+C\+I\+F\+Semaphore}}
+\index{C\+C\+I\+F\+Semaphore@{C\+C\+I\+F\+Semaphore}!Flash module documentation@{Flash module documentation}}
+\subsubsection[{C\+C\+I\+F\+Semaphore}]{\setlength{\rightskip}{0pt plus 5cm}O\+S\+\_\+\+E\+C\+B$\ast$ C\+C\+I\+F\+Semaphore}\label{group___flash__module_ga7b51eb443d81e2c63615818e8e3bac4e}
+The C\+C\+I\+F semaphore for Flash \hypertarget{group___flash__module_gaa7d07a8c0083c83ae73e54469b80f627}{}\index{Flash module documentation@{Flash module documentation}!Flash\+Access\+Mutex@{Flash\+Access\+Mutex}}
+\index{Flash\+Access\+Mutex@{Flash\+Access\+Mutex}!Flash module documentation@{Flash module documentation}}
+\subsubsection[{Flash\+Access\+Mutex}]{\setlength{\rightskip}{0pt plus 5cm}O\+S\+\_\+\+E\+C\+B$\ast$ Flash\+Access\+Mutex}\label{group___flash__module_gaa7d07a8c0083c83ae73e54469b80f627}
+The Flash access Mutex 

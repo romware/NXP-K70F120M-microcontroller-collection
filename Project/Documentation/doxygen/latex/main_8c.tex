@@ -1,0 +1,243 @@
+\hypertarget{main_8c}{}\section{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/main.c File Reference}
+\label{main_8c}\index{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/main.\+c@{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/main.\+c}}
+
+
+Main module. This module contains user\textquotesingle{}s application code.  
+
+
+{\ttfamily \#include \char`\"{}types.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Cpu.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}O\+S.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Events.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}P\+E\+\_\+\+Types.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}P\+E\+\_\+\+Error.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}P\+E\+\_\+\+Const.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}I\+O\+\_\+\+Map.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}L\+E\+Ds.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}M\+K70\+F12.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}U\+A\+R\+T.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}F\+I\+F\+O.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}packet.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Flash.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}P\+I\+T.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}F\+T\+M.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}R\+T\+C.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}accel.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}I2\+C.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}median.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}analog.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}kiss\+\_\+fft.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}kiss\+\_\+fftr.\+h\char`\"{}}\\*
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{struct_t_voltage_data}{T\+Voltage\+Data}
+\begin{DoxyCompactList}\small\item\em Data structure used to hold A\+D\+C voltage samples. \end{DoxyCompactList}\item 
+struct \hyperlink{struct_analog_thread_data}{Analog\+Thread\+Data}
+\begin{DoxyCompactList}\small\item\em Data structure used to pass Analog configuration to a user thread. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{group__main__module_gad4455691936f92fdd6c37566fc58ba1f}{B\+A\+U\+D\+\_\+\+R\+A\+T\+E}~115200
+\item 
+\#define \hyperlink{group__main__module_ga300da08cc989dc0963caf3a5afc024b8}{N\+B\+\_\+\+A\+N\+A\+L\+O\+G\+\_\+\+C\+H\+A\+N\+N\+E\+L\+S}~3
+\item 
+\#define \hyperlink{group__main__module_ga8147862142d26bcb84181f1cb13fe9ca}{A\+D\+C\+\_\+\+S\+A\+M\+P\+L\+E\+S\+\_\+\+P\+E\+R\+\_\+\+C\+Y\+C\+L\+E}~16
+\item 
+\#define \hyperlink{group__main__module_ga602abb8ec84dcb3b6f854a738310ea46}{A\+D\+C\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+Z\+E}~64
+\item 
+\#define \hyperlink{group__main__module_gafe78c43ff273ddaa018e3736e2432b6e}{A\+D\+C\+\_\+\+H\+A\+L\+F\+\_\+\+V\+O\+L\+T}~1638
+\item 
+\#define \hyperlink{group__main__module_gaa067e472772e40193263669629a22457}{A\+D\+C\+\_\+\+D\+E\+F\+A\+U\+L\+T\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y}~50
+\item 
+\#define \hyperlink{group__main__module_gab110f154b64270bb14d8054beb1fb53d}{D\+A\+C\+\_\+5\+V\+\_\+\+O\+U\+T}~16384
+\item 
+\#define \hyperlink{group__main__module_ga03a9b512de08ae21d6c80e8a3a7c2444}{D\+A\+C\+\_\+0\+V\+\_\+\+O\+U\+T}~0
+\item 
+\#define \hyperlink{group__main__module_ga6469928cdd99c8ad63925324d6d22046}{R\+M\+S\+\_\+\+U\+P\+P\+E\+R\+\_\+\+L\+I\+M\+I\+T}~9830
+\item 
+\#define \hyperlink{group__main__module_gaec1772e4e8dfe00517b49a1ffadc334c}{R\+M\+S\+\_\+\+L\+O\+W\+E\+R\+\_\+\+L\+I\+M\+I\+T}~6554
+\item 
+\#define \hyperlink{group__main__module_gacb4e22d5767a0e19f846af81a2067fc1}{R\+M\+S\+\_\+\+N\+O\+M\+I\+N\+A\+L}~8192
+\item 
+\#define \hyperlink{group__main__module_gaafbbd0f2b6eece3d2d34fe20b568a235}{R\+M\+S\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+M\+I\+N}~4915
+\item 
+\#define \hyperlink{group__main__module_ga833078dd8dd1c024d2aff22110d1893f}{A\+L\+A\+R\+M\+\_\+\+T\+I\+M\+E\+R}~5000000000
+\item 
+\#define \hyperlink{group__main__module_ga00ebf8f64952fc957be8395c2ec991b9}{A\+L\+A\+R\+M\+\_\+\+T\+I\+M\+E\+R\+\_\+\+M\+I\+N}~1000000000
+\item 
+\hypertarget{main_8c_a0c25da63ce17c691412129c3d7e9ecf2}{}\#define {\bfseries analog\+Data}~((\hyperlink{group__main__module_gae5f40603a116adc42529ceedda6942c7}{T\+Analog\+Thread\+Data}$\ast$)p\+Data)\label{main_8c_a0c25da63ce17c691412129c3d7e9ecf2}
+
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct \hyperlink{struct_analog_thread_data}{Analog\+Thread\+Data} \hyperlink{group__main__module_gae5f40603a116adc42529ceedda6942c7}{T\+Analog\+Thread\+Data}
+\begin{DoxyCompactList}\small\item\em Data structure used to pass Analog configuration to a user thread. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{group__main__module_ga145fb83eaa08eeccdac4c6bf2a0243b6}{T\+Timing\+Mode} \{ {\bfseries T\+I\+M\+I\+N\+G\+\_\+\+G\+E\+T}, 
+{\bfseries T\+I\+M\+I\+N\+G\+\_\+\+D\+E\+F\+I\+N\+I\+T\+E}, 
+{\bfseries T\+I\+M\+I\+N\+G\+\_\+\+I\+N\+V\+E\+R\+S\+E}
+ \}\begin{DoxyCompactList}\small\item\em Data structure for enumerated timing parameters. \end{DoxyCompactList}
+\item 
+enum \hyperlink{group__main__module_ga14e126aa7db7e8318eb8d91d5e60f046}{T\+Output\+Mode} \{ {\bfseries O\+U\+T\+P\+U\+T\+\_\+\+D\+E\+B\+U\+G}, 
+{\bfseries O\+U\+T\+P\+U\+T\+\_\+\+R\+A\+I\+S\+E}, 
+{\bfseries O\+U\+T\+P\+U\+T\+\_\+\+L\+O\+W\+E\+R}, 
+{\bfseries O\+U\+T\+P\+U\+T\+\_\+\+A\+L\+A\+R\+M}
+ \}\begin{DoxyCompactList}\small\item\em Data structure for enumerated output. \end{DoxyCompactList}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{group__main__module_gac2875955d67e96abf6cfa8aaad5e9f75}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Init\+Modules\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group__main__module_gac1a673b52c05b40551c4b7c36b036a91}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (F\+T\+M\+L\+E\+Ds\+Off\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group__main__module_ga3d78ba9c55003ce5ad698ede23365938}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (A\+D\+C\+Data\+Process\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group__main__module_ga299162ad5226ebb9eaae8642cd049698}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Frequency\+Calculate\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group__main__module_ga5d61515ec758c7da103eb0634374a226}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Frequency\+Track\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group__main__module_gab4c1c0cd94088cbbb7b7caa74232e2b8}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Packet\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group__main__module_ga5ef089d197406620e5dc5ca788c05565}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Log\+Raises\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group__main__module_ga69af505fc5a4bc3fa2ee2670b0941d8f}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Log\+Lowers\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group__main__module_gaaaeda514c0e6fb1f52cba19cf90391dd}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (F\+F\+T\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+uint16\+\_\+t \hyperlink{group__main__module_gac1aa048780b8b9b1ca0afc96a02c8d0b}{Fast\+Sqrt} (const uint32\+\_\+t square, const uint16\+\_\+t last\+Root, const uint16\+\_\+t accuracy)
+\begin{DoxyCompactList}\small\item\em Calculates the square root of a number quickly by knowing the previous value of the square. \end{DoxyCompactList}\item 
+uint16\+\_\+t \hyperlink{group__main__module_gac84408f9255c9eb0b90c33da1420253f}{Update\+R\+M\+S\+Fast} (int16\+\_\+t $\ast$const p\+Remove\+Data, int64\+\_\+t $\ast$const p\+Previous\+Sum\+Of\+Squares, const int16\+\_\+t latest\+Data, const int16\+\_\+t oldest\+Data, const uint8\+\_\+t data\+Size, const uint16\+\_\+t last\+R\+M\+S, O\+S\+\_\+\+E\+C\+B $\ast$const mutex)
+\begin{DoxyCompactList}\small\item\em Updates the R\+M\+S using the previous sum of squares to save time. From testing it take around 64us vs 112us from scratch. \end{DoxyCompactList}\item 
+uint16\+\_\+t \hyperlink{group__main__module_ga1e2d03b35da28d24d7744132b344b329}{Protected\+Uint16\+Get} (uint16 $\ast$const p\+Variable, O\+S\+\_\+\+E\+C\+B $\ast$const mutex)
+\begin{DoxyCompactList}\small\item\em Reads a word with mutex access. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga525d3b6f47d3ea41e0682aef2962aedf}{Protected\+Uint16\+Put} (uint16\+\_\+t $\ast$const p\+Address, const uint16\+\_\+t variable, O\+S\+\_\+\+E\+C\+B $\ast$const mutex)
+\begin{DoxyCompactList}\small\item\em Puts a halfword into an address with mutex access. \end{DoxyCompactList}\item 
+uint32\+\_\+t \hyperlink{group__main__module_ga7822fc5e1635c24bd5cb91cd25b6e5e3}{Protected\+Uint32\+Get} (uint32 $\ast$const p\+Variable, O\+S\+\_\+\+E\+C\+B $\ast$const mutex)
+\begin{DoxyCompactList}\small\item\em Reads a word with mutex access. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga4668541efc4b93c31fbabaa5364940e2}{Protected\+Uint32\+Put} (uint32\+\_\+t $\ast$const p\+Address, const uint32\+\_\+t variable, O\+S\+\_\+\+E\+C\+B $\ast$const mutex)
+\begin{DoxyCompactList}\small\item\em Puts a word into an address with mutex access. \end{DoxyCompactList}\item 
+bool \hyperlink{group__main__module_gac7b38383eb6bcd18c7a9f65ec091cfb3}{Protected\+Analog\+Put} (const uint8\+\_\+t channel\+Nb, const int16\+\_\+t value)
+\begin{DoxyCompactList}\small\item\em Calls Analog\+\_\+\+Put with interrupts disabled. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga061d60c1630d2d24cae1503a3928eaed}{Protected\+F\+F\+T\+Put} (\hyperlink{structkiss__fft__cpx}{kiss\+\_\+fft\+\_\+cpx} $\ast$const fft\+Output, const uint8\+\_\+t size)
+\begin{DoxyCompactList}\small\item\em Put F\+F\+T data into a global array of frequency bins. Uses Mutex access. \end{DoxyCompactList}\item 
+uint16\+\_\+t \hyperlink{group__main__module_gacd7e92f8af4e43c2324b2cdf473f522a}{Protected\+F\+F\+T\+Get} (const uint8\+\_\+t harmonic)
+\begin{DoxyCompactList}\small\item\em Gets a harmonic magnitude from a global array off F\+F\+T frequency bins. Uses Mutex access. \end{DoxyCompactList}\item 
+bool \hyperlink{group__main__module_ga283c8978a35cdac92f6589de8542d789}{Protected\+Check\+Flags\+Off} (const bool flags\mbox{[}$\,$\mbox{]}, const uint8\+\_\+t nb\+Flags, O\+S\+\_\+\+E\+C\+B $\ast$const mutex)
+\begin{DoxyCompactList}\small\item\em Checks that no other analog thread has an output set. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga7fe9a1a6602df9e2831a5ed46a0792d8}{Protected\+Flag\+Update} (bool $\ast$const flag, const bool flag\+Value, O\+S\+\_\+\+E\+C\+B $\ast$const mutex)
+\begin{DoxyCompactList}\small\item\em Updates a flag with mutex access. \end{DoxyCompactList}\item 
+bool \hyperlink{group__main__module_ga8703dc5d6d6c78462c6d19eefcd594c7}{Handle\+Tower\+Startup} (void)
+\begin{DoxyCompactList}\small\item\em Sends the startup packets to the P\+C. \end{DoxyCompactList}\item 
+bool \hyperlink{group__main__module_gac9c8611e6ca6e8101dc2c7f34e445d0a}{Handle\+Tower\+Version} (void)
+\begin{DoxyCompactList}\small\item\em Sends the tower version packet to the P\+C. \end{DoxyCompactList}\item 
+bool \hyperlink{group__main__module_ga48b1be0eab5f4af73fbac1aa4cecbf62}{Handle\+Tower\+Number} (void)
+\begin{DoxyCompactList}\small\item\em Sets the tower number or sends the packet to the P\+C. \end{DoxyCompactList}\item 
+bool \hyperlink{group__main__module_ga642f5c203b68dd5c5d902b32c7042f8c}{Handle\+Tower\+Program\+Byte} (void)
+\begin{DoxyCompactList}\small\item\em Erases or programs a byte to Flash based on packet received. \end{DoxyCompactList}\item 
+bool \hyperlink{group__main__module_ga34b9ab4cffb0154fedb4a8e56d6e5e36}{Handle\+Tower\+Read\+Byte} (void)
+\begin{DoxyCompactList}\small\item\em Sends the byte read from Flash packet to the P\+C. \end{DoxyCompactList}\item 
+bool \hyperlink{group__main__module_ga1731ffe6036a63b162d2efcac8f934c3}{Handle\+Tower\+Mode} (void)
+\begin{DoxyCompactList}\small\item\em Sets the tower mode or sends the packet to the P\+C. \end{DoxyCompactList}\item 
+bool \hyperlink{group__main__module_gacc6c91c0f930f047522cfe82edd54848}{Handle\+Tower\+Timing\+Mode} (void)
+\begin{DoxyCompactList}\small\item\em Sets or gets timing mode as requested by P\+C. \end{DoxyCompactList}\item 
+bool \hyperlink{group__main__module_gac9cd77b60838508770fa194f3a6bf518}{Handle\+Tower\+Raises} (void)
+\begin{DoxyCompactList}\small\item\em Sets the number of raises to 0 or sends number of raises to P\+C. \end{DoxyCompactList}\item 
+bool \hyperlink{group__main__module_gaf1ede95533f72cd04d012524fcf9c3c1}{Handle\+Tower\+Lowers} (void)
+\begin{DoxyCompactList}\small\item\em Sets the number of lowers to 0 or sends number of lowers to P\+C. \end{DoxyCompactList}\item 
+bool \hyperlink{group__main__module_gab99b27ef454ed128037af63baf5fea1e}{Handle\+Tower\+Frequency} (void)
+\begin{DoxyCompactList}\small\item\em Sends the frequency to the P\+C. \end{DoxyCompactList}\item 
+bool \hyperlink{group__main__module_ga4c47eb6ca18fdb7b9aa5a78e34a377f2}{Handle\+Tower\+Voltage} (void)
+\begin{DoxyCompactList}\small\item\em Sends the voltage (R\+M\+S) of a given channel to the P\+C. \end{DoxyCompactList}\item 
+bool \hyperlink{group__main__module_ga709133d753e53f49f246ed96eef34996}{Handle\+Tower\+Harmonic} (void)
+\begin{DoxyCompactList}\small\item\em Sends the magnitude of a given harmonic to the P\+C. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_gaf57dd4c5e7e444cfe5571d411f9548c9}{Received\+Packet} (void)
+\begin{DoxyCompactList}\small\item\em Executes the command depending on what packet has been received. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga683da8b9767f92e98d83d025e74f9d36}{A\+D\+C\+Read\+Callback} (void $\ast$arg)
+\begin{DoxyCompactList}\small\item\em Reads data from the analog channels and signals semaphores for R\+M\+S and Frequency treads. \end{DoxyCompactList}\item 
+bool \hyperlink{group__main__module_gaeda7b585d318b7b1476285b82b6fed11}{Tower\+Init} (void)
+\begin{DoxyCompactList}\small\item\em Initializes the main tower components by calling the initialization routines of the supporting software modules. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_gae075b403a6575a95c5014e980b2e6112}{R\+M\+S\+Thread} (void $\ast$p\+Data)
+\begin{DoxyCompactList}\small\item\em Gets the R\+M\+S, checks limits and handles alarms and raise/lower timing. \end{DoxyCompactList}\item 
+\hypertarget{group__main__module_ga840291bc02cba5474a4cb46a9b9566fe}{}int {\bfseries main} (void)\label{group__main__module_ga840291bc02cba5474a4cb46a9b9566fe}
+
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_ga8916636821cdde434ff4869a5d9ef1b7}{A\+N\+A\+L\+O\+G\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+P\+R\+I\+O\+R\+I\+T\+I\+E\+S} \mbox{[}\hyperlink{group__main__module_ga300da08cc989dc0963caf3a5afc024b8}{N\+B\+\_\+\+A\+N\+A\+L\+O\+G\+\_\+\+C\+H\+A\+N\+N\+E\+L\+S}\mbox{]} = \{7,8,9\}
+\item 
+const uint32\+\_\+t \hyperlink{group__main__module_ga4b8052f26442dadff956fa68b94b62f2}{P\+E\+R\+I\+O\+D\+\_\+\+I2\+C\+\_\+\+P\+O\+L\+L} = 1000000000
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_gae92e2c71adaaae707782058cec983f91}{C\+O\+M\+M\+A\+N\+D\+\_\+\+S\+T\+A\+R\+T\+U\+P} = 0x04
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_gaf9fddcc7682949db939222cec848b92c}{C\+O\+M\+M\+A\+N\+D\+\_\+\+V\+E\+R} = 0x09
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_gab87bb2bd23dd78fbe94f98c0d4d51bfc}{C\+O\+M\+M\+A\+N\+D\+\_\+\+N\+U\+M} = 0x0\+B
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_gae8762c85b8519b08700226b967c9581c}{C\+O\+M\+M\+A\+N\+D\+\_\+\+P\+R\+O\+G\+R\+A\+M\+B\+Y\+T\+E} = 0x07
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_ga7bd303e78d4119c2d34e00967c1b1230}{C\+O\+M\+M\+A\+N\+D\+\_\+\+R\+E\+A\+D\+B\+Y\+T\+E} = 0x08
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_gae2909d574bfc1ab702eed1fb28a62505}{C\+O\+M\+M\+A\+N\+D\+\_\+\+M\+O\+D\+E} = 0x0\+D
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_gadf65892e5f80346910401e203bb4055e}{C\+O\+M\+M\+A\+N\+D\+\_\+\+T\+I\+M\+E} = 0x0\+C
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_ga2fc0a6886900e1e4df19015cb14cbcbd}{C\+O\+M\+M\+A\+N\+D\+\_\+\+A\+C\+C\+E\+L} = 0x10
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_gaf002f78f32e71bac2a8ffd7b916c23c7}{C\+O\+M\+M\+A\+N\+D\+\_\+\+T\+I\+M\+I\+N\+G\+M\+O\+D\+E} = 0x10
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_ga458112a297f29bcedf862af9fee21352}{C\+O\+M\+M\+A\+N\+D\+\_\+\+R\+A\+I\+S\+E\+S} = 0x11
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_ga3950ac4d5a4f4c540f6856a4ad463e14}{C\+O\+M\+M\+A\+N\+D\+\_\+\+L\+O\+W\+E\+R\+S} = 0x12
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_gad03f9b44ebc48c9db63337935fcaf46e}{C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y} = 0x17
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_ga793f5eac55477efb909e878b3021f765}{C\+O\+M\+M\+A\+N\+D\+\_\+\+V\+O\+L\+T\+A\+G\+E} = 0x18
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_gae55bd8263a510b359f8b4ebca3e6a91d}{C\+O\+M\+M\+A\+N\+D\+\_\+\+S\+P\+E\+C\+T\+R\+U\+M} = 0x19
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_ga590be3fd131777c613188298af1d7ebe}{P\+A\+R\+A\+M\+\_\+\+G\+E\+T} = 1
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_gadd09d8fcbae69002598b43a17fe09566}{P\+A\+R\+A\+M\+\_\+\+S\+E\+T} = 2
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_gaf7a418e92b8fc61e43bd6a4b55e308f2}{T\+O\+W\+E\+R\+\_\+\+V\+E\+R\+\_\+\+M\+A\+J} = 1
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_ga4cb61e8ce9aecb8cc246efa06637d082}{T\+O\+W\+E\+R\+\_\+\+V\+E\+R\+\_\+\+M\+I\+N} = 0
+\item 
+volatile \hyperlink{unionuint16union__t}{uint16union\+\_\+t} $\ast$ \hyperlink{group__main__module_ga65fc76be2b0895efd0e3ba05ce041c8b}{Nv\+Tower\+Nb}
+\item 
+volatile \hyperlink{unionuint16union__t}{uint16union\+\_\+t} $\ast$ \hyperlink{group__main__module_ga34f4a2041161f5c8cda7808c766d53d0}{Nv\+Tower\+Md}
+\item 
+volatile uint8\+\_\+t $\ast$ \hyperlink{group__main__module_ga238e81a23614407f664e73f8a3d0b7fe}{Nv\+Nb\+Raises}
+\item 
+volatile uint8\+\_\+t $\ast$ \hyperlink{group__main__module_ga06256289e4edfe7e871779cd6c059053}{Nv\+Nb\+Lowers}
+\item 
+volatile uint8\+\_\+t $\ast$ \hyperlink{group__main__module_ga574579db7eb4f4ab648d318e638fd615}{Nv\+Timing\+Md}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Main module. This module contains user\textquotesingle{}s application code. 
+
+\begin{DoxyVersion}{Version}
+1.\+0 
+\end{DoxyVersion}
+\begin{DoxyAuthor}{Author}
+12403756 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2018-\/06-\/17
+\end{DoxyDate}
+
+\begin{DoxyItemize}
+\item \#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#
+\end{DoxyItemize}
+
+\begin{DoxyVersion}{Version}
+6.\+0 
+\end{DoxyVersion}

@@ -1,0 +1,60 @@
+\hypertarget{union_t_packet}{}\section{T\+Packet Union Reference}
+\label{union_t_packet}\index{T\+Packet@{T\+Packet}}
+\subsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+uint8\+\_\+t \hyperlink{union_t_packet_a27c34aeafd4c778f8e489e4c38436ddf}{bytes} \mbox{[}P\+A\+C\+K\+E\+T\+\_\+\+N\+B\+\_\+\+B\+Y\+T\+E\+S\mbox{]}
+\item 
+\hypertarget{union_t_packet_a2301c8afdbab53b838775401de8010e7}{}\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+struct \{\\
+\>uint8\_t \hyperlink{union_t_packet_a5cec09aa383544e7b1413e08205d09ea}{command}\\
+\>union \{\\
+\>\>struct \{\\
+\>\>\>uint8\_t \hyperlink{union_t_packet_a9092cb6480edf4918477b59d9c67938e}{parameter1}\\
+\>\>\>uint8\_t \hyperlink{union_t_packet_a0a5a82f359bb43dc5b9f412d5f1de33c}{parameter2}\\
+\>\>\>uint8\_t \hyperlink{union_t_packet_ab3ac2f9a6cfe5b6a7ae0987d21de472b}{parameter3}\\
+\>\>\} {\bfseries separate}\\
+\>\>struct \{\\
+\>\>\>uint16\_t \hyperlink{union_t_packet_a84940acc736f6d6379c6ebd65dfd05eb}{parameter12}\\
+\>\>\>uint8\_t {\bfseries parameter3}\\
+\>\>\} {\bfseries combined12}\\
+\>\>struct \{\\
+\>\>\>uint8\_t {\bfseries paramater1}\\
+\>\>\>uint16\_t \hyperlink{union_t_packet_a92905f7e01f01bd1439dc4668b6808c1}{parameter23}\\
+\>\>\} {\bfseries combined23}\\
+\>\} {\bfseries parameters}\\
+\>uint8\_t {\bfseries checksum}\\
+\} {\bfseries packetStruct}\label{union_t_packet_a2301c8afdbab53b838775401de8010e7}
+\\
+
+\end{tabbing}\end{DoxyCompactItemize}
+
+
+\subsection{Field Documentation}
+\hypertarget{union_t_packet_a27c34aeafd4c778f8e489e4c38436ddf}{}\index{T\+Packet@{T\+Packet}!bytes@{bytes}}
+\index{bytes@{bytes}!T\+Packet@{T\+Packet}}
+\subsubsection[{bytes}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t T\+Packet\+::bytes\mbox{[}P\+A\+C\+K\+E\+T\+\_\+\+N\+B\+\_\+\+B\+Y\+T\+E\+S\mbox{]}}\label{union_t_packet_a27c34aeafd4c778f8e489e4c38436ddf}
+The packet as an array of bytes. \hypertarget{union_t_packet_a5cec09aa383544e7b1413e08205d09ea}{}\index{T\+Packet@{T\+Packet}!command@{command}}
+\index{command@{command}!T\+Packet@{T\+Packet}}
+\subsubsection[{command}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t T\+Packet\+::command}\label{union_t_packet_a5cec09aa383544e7b1413e08205d09ea}
+The packet\textquotesingle{}s command. \hypertarget{union_t_packet_a9092cb6480edf4918477b59d9c67938e}{}\index{T\+Packet@{T\+Packet}!parameter1@{parameter1}}
+\index{parameter1@{parameter1}!T\+Packet@{T\+Packet}}
+\subsubsection[{parameter1}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t T\+Packet\+::parameter1}\label{union_t_packet_a9092cb6480edf4918477b59d9c67938e}
+The packet\textquotesingle{}s 1st parameter. \hypertarget{union_t_packet_a84940acc736f6d6379c6ebd65dfd05eb}{}\index{T\+Packet@{T\+Packet}!parameter12@{parameter12}}
+\index{parameter12@{parameter12}!T\+Packet@{T\+Packet}}
+\subsubsection[{parameter12}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t T\+Packet\+::parameter12}\label{union_t_packet_a84940acc736f6d6379c6ebd65dfd05eb}
+Parameter 1 and 2 concatenated. \hypertarget{union_t_packet_a0a5a82f359bb43dc5b9f412d5f1de33c}{}\index{T\+Packet@{T\+Packet}!parameter2@{parameter2}}
+\index{parameter2@{parameter2}!T\+Packet@{T\+Packet}}
+\subsubsection[{parameter2}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t T\+Packet\+::parameter2}\label{union_t_packet_a0a5a82f359bb43dc5b9f412d5f1de33c}
+The packet\textquotesingle{}s 2nd parameter. \hypertarget{union_t_packet_a92905f7e01f01bd1439dc4668b6808c1}{}\index{T\+Packet@{T\+Packet}!parameter23@{parameter23}}
+\index{parameter23@{parameter23}!T\+Packet@{T\+Packet}}
+\subsubsection[{parameter23}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t T\+Packet\+::parameter23}\label{union_t_packet_a92905f7e01f01bd1439dc4668b6808c1}
+Parameter 2 and 3 concatenated. \hypertarget{union_t_packet_ab3ac2f9a6cfe5b6a7ae0987d21de472b}{}\index{T\+Packet@{T\+Packet}!parameter3@{parameter3}}
+\index{parameter3@{parameter3}!T\+Packet@{T\+Packet}}
+\subsubsection[{parameter3}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t T\+Packet\+::parameter3}\label{union_t_packet_ab3ac2f9a6cfe5b6a7ae0987d21de472b}
+The packet\textquotesingle{}s 3rd parameter. 
+
+The documentation for this union was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/\hyperlink{packet_8h}{packet.\+h}\end{DoxyCompactItemize}

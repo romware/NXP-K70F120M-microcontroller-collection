@@ -1,0 +1,42 @@
+\hypertarget{_i2_c_8h}{}\section{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/\+I2\+C.h File Reference}
+\label{_i2_c_8h}\index{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/\+I2\+C.\+h@{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/\+I2\+C.\+h}}
+
+
+I/\+O routines for the K70 I2\+C interface.  
+
+
+{\ttfamily \#include \char`\"{}types.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}O\+S.\+h\char`\"{}}\\*
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{struct_t_i2_c_module}{T\+I2\+C\+Module}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{group___i2_c__module_ga4fc37bd20c1e62b168e314e8b447a853}{I2\+C\+\_\+\+Init} (const \hyperlink{struct_t_i2_c_module}{T\+I2\+C\+Module} $\ast$const a\+I2\+C\+Module, const uint32\+\_\+t module\+Clk)
+\begin{DoxyCompactList}\small\item\em Sets up the I2\+C before first use. \end{DoxyCompactList}\item 
+void \hyperlink{group___i2_c__module_ga0d6844ce590bbf5cc557fdf0747ad551}{I2\+C\+\_\+\+Select\+Slave\+Device} (const uint8\+\_\+t slave\+Address)
+\begin{DoxyCompactList}\small\item\em Selects the current slave device. \end{DoxyCompactList}\item 
+void \hyperlink{group___i2_c__module_gacaac94d86a7213791fb691d57c6f278b}{I2\+C\+\_\+\+Write} (const uint8\+\_\+t register\+Address, const uint8\+\_\+t data)
+\begin{DoxyCompactList}\small\item\em Write a byte of data to a specified register. \end{DoxyCompactList}\item 
+void \hyperlink{group___i2_c__module_ga3692682bb1cb84e1a3d0c31195451bd9}{I2\+C\+\_\+\+Poll\+Read} (const uint8\+\_\+t register\+Address, uint8\+\_\+t $\ast$const data, const uint8\+\_\+t nb\+Bytes)
+\begin{DoxyCompactList}\small\item\em Reads data of a specified length starting from a specified register. \end{DoxyCompactList}\item 
+void \hyperlink{group___i2_c__module_ga3685b2f03da2fa00b0cb671a0cce4f3f}{I2\+C\+\_\+\+Int\+Read} (const uint8\+\_\+t register\+Address, uint8\+\_\+t $\ast$const data, const uint8\+\_\+t nb\+Bytes)
+\begin{DoxyCompactList}\small\item\em Reads data of a specified length starting from a specified register. \end{DoxyCompactList}\item 
+void \hyperlink{group__accel__module_ga445500277ba0e363873b34cffc015745}{\+\_\+\+\_\+attribute\+\_\+\+\_\+} ((interrupt)) I2\+C\+\_\+\+I\+S\+R(void)
+\begin{DoxyCompactList}\small\item\em Interrupt service routine for the I2\+C. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+I/\+O routines for the K70 I2\+C interface. 
+
+This contains the functions for operating the I2\+C (inter-\/integrated circuit) module.
+
+\begin{DoxyAuthor}{Author}
+12403756, 12551519 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2018-\/04-\/29 
+\end{DoxyDate}

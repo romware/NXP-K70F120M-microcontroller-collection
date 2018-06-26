@@ -262,6 +262,7 @@ uint16_t FastSqrt(const uint32_t square, const uint16_t lastRoot, const uint16_t
  *  @param oldestData The oldest data sample to be removed next time
  *  @param dataSize The number of data samples for average of sum of squares
  *  @param lastRMS The last RMS value of the data
+ *  @param mutex The mutex for access to previous data
  *  @return uint16_t - The RMS value
  */
 uint16_t UpdateRMSFast(int16_t* const pRemoveData, int64_t* const pPreviousSumOfSquares, const int16_t latestData,
@@ -294,7 +295,6 @@ uint16_t UpdateRMSFast(int16_t* const pRemoveData, int64_t* const pPreviousSumOf
   // Return the calculated RMS
   return (uint16_t)FastSqrt(newSumOfSquares /dataSize, lastRMS, 1);
 }
-
 /*! @brief Reads a word with mutex access
  *
  *  @param pVariable The address of the variable.
@@ -391,7 +391,7 @@ void ProtectedFFTPut(kiss_fft_cpx* const fftOutput, const uint8_t size)
 
 /*! @brief Gets a harmonic magnitude from a global array off FFT frequency bins. Uses Mutex access.
  *
- *  @param The harmonic number
+ *  @param harmonic The harmonic number
  *  @return void
  */
 uint16_t ProtectedFFTGet(const uint8_t harmonic)
@@ -411,8 +411,8 @@ uint16_t ProtectedFFTGet(const uint8_t harmonic)
 
 /*! @brief Checks that no other analog thread has an output set
  *
- *  @param outputs[] The array of flags
- *  @param nboutputs The number of flags in the array
+ *  @param flags The array of flags
+ *  @param nbFlags The number of flags in the array
  *  @param mutex The mutex to the flag/flag array
  *  @return bool - TRUE if all flags are false
  */

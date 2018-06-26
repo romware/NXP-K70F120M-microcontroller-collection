@@ -1,0 +1,150 @@
+\hypertarget{group___i2_c__module}{}\section{I2\+C module documentation}
+\label{group___i2_c__module}\index{I2\+C module documentation@{I2\+C module documentation}}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{group___i2_c__module_ga4fc37bd20c1e62b168e314e8b447a853}{I2\+C\+\_\+\+Init} (const \hyperlink{struct_t_i2_c_module}{T\+I2\+C\+Module} $\ast$const a\+I2\+C\+Module, const uint32\+\_\+t module\+Clk)
+\begin{DoxyCompactList}\small\item\em Sets up the I2\+C before first use. \end{DoxyCompactList}\item 
+void \hyperlink{group___i2_c__module_ga0d6844ce590bbf5cc557fdf0747ad551}{I2\+C\+\_\+\+Select\+Slave\+Device} (const uint8\+\_\+t slave\+Address)
+\begin{DoxyCompactList}\small\item\em Selects the current slave device. \end{DoxyCompactList}\item 
+void \hyperlink{group___i2_c__module_gacaac94d86a7213791fb691d57c6f278b}{I2\+C\+\_\+\+Write} (const uint8\+\_\+t register\+Address, const uint8\+\_\+t data)
+\begin{DoxyCompactList}\small\item\em Write a byte of data to a specified register. \end{DoxyCompactList}\item 
+void \hyperlink{group___i2_c__module_ga3692682bb1cb84e1a3d0c31195451bd9}{I2\+C\+\_\+\+Poll\+Read} (const uint8\+\_\+t register\+Address, uint8\+\_\+t $\ast$const data, const uint8\+\_\+t nb\+Bytes)
+\begin{DoxyCompactList}\small\item\em Reads data of a specified length starting from a specified register. \end{DoxyCompactList}\item 
+void \hyperlink{group___i2_c__module_ga3685b2f03da2fa00b0cb671a0cce4f3f}{I2\+C\+\_\+\+Int\+Read} (const uint8\+\_\+t register\+Address, uint8\+\_\+t $\ast$const data, const uint8\+\_\+t nb\+Bytes)
+\begin{DoxyCompactList}\small\item\em Reads data of a specified length starting from a specified register. \end{DoxyCompactList}\item 
+void \hyperlink{group___i2_c__module_ga445500277ba0e363873b34cffc015745}{\+\_\+\+\_\+attribute\+\_\+\+\_\+} ((interrupt))
+\begin{DoxyCompactList}\small\item\em Interrupt service routine for the I2\+C. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Function Documentation}
+\hypertarget{group___i2_c__module_ga445500277ba0e363873b34cffc015745}{}\index{I2\+C module documentation@{I2\+C module documentation}!\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}!I2\+C module documentation@{I2\+C module documentation}}
+\subsubsection[{\+\_\+\+\_\+attribute\+\_\+\+\_\+((interrupt))}]{\setlength{\rightskip}{0pt plus 5cm}void \+\_\+\+\_\+attribute\+\_\+\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{(interrupt)}]{}
+\end{DoxyParamCaption}
+)}\label{group___i2_c__module_ga445500277ba0e363873b34cffc015745}
+
+
+Interrupt service routine for the I2\+C. 
+
+Interrupt service routine for the U\+A\+R\+T.
+
+Interrupt service routine for the R\+T\+C.
+
+Interrupt service routine for the P\+I\+T.
+
+Interrupt service routine for the F\+T\+M.
+
+Interrupt service routine for the Flash.
+
+Interrupt service routine for the accelerometer.
+
+Only used for reading data. At the end of reception, the user callback function will be called. \begin{DoxyNote}{Note}
+Assumes the I2\+C module has been initialized. 
+\end{DoxyNote}
+\hypertarget{group___i2_c__module_ga4fc37bd20c1e62b168e314e8b447a853}{}\index{I2\+C module documentation@{I2\+C module documentation}!I2\+C\+\_\+\+Init@{I2\+C\+\_\+\+Init}}
+\index{I2\+C\+\_\+\+Init@{I2\+C\+\_\+\+Init}!I2\+C module documentation@{I2\+C module documentation}}
+\subsubsection[{I2\+C\+\_\+\+Init(const T\+I2\+C\+Module $\ast$const a\+I2\+C\+Module, const uint32\+\_\+t module\+Clk)}]{\setlength{\rightskip}{0pt plus 5cm}bool I2\+C\+\_\+\+Init (
+\begin{DoxyParamCaption}
+\item[{const {\bf T\+I2\+C\+Module} $\ast$const}]{a\+I2\+C\+Module, }
+\item[{const uint32\+\_\+t}]{module\+Clk}
+\end{DoxyParamCaption}
+)}\label{group___i2_c__module_ga4fc37bd20c1e62b168e314e8b447a853}
+
+
+Sets up the I2\+C before first use. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em a\+I2\+C\+Module} & is a structure containing the operating conditions for the module. \\
+\hline
+{\em module\+Clk} & The module clock in Hz. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+B\+O\+O\+L -\/ T\+R\+U\+E if the I2\+C module was successfully initialized. 
+\end{DoxyReturn}
+\hypertarget{group___i2_c__module_ga3685b2f03da2fa00b0cb671a0cce4f3f}{}\index{I2\+C module documentation@{I2\+C module documentation}!I2\+C\+\_\+\+Int\+Read@{I2\+C\+\_\+\+Int\+Read}}
+\index{I2\+C\+\_\+\+Int\+Read@{I2\+C\+\_\+\+Int\+Read}!I2\+C module documentation@{I2\+C module documentation}}
+\subsubsection[{I2\+C\+\_\+\+Int\+Read(const uint8\+\_\+t register\+Address, uint8\+\_\+t $\ast$const data, const uint8\+\_\+t nb\+Bytes)}]{\setlength{\rightskip}{0pt plus 5cm}void I2\+C\+\_\+\+Int\+Read (
+\begin{DoxyParamCaption}
+\item[{const uint8\+\_\+t}]{register\+Address, }
+\item[{uint8\+\_\+t $\ast$const}]{data, }
+\item[{const uint8\+\_\+t}]{nb\+Bytes}
+\end{DoxyParamCaption}
+)}\label{group___i2_c__module_ga3685b2f03da2fa00b0cb671a0cce4f3f}
+
+
+Reads data of a specified length starting from a specified register. 
+
+Uses interrupts as the method of data reception. 
+\begin{DoxyParams}{Parameters}
+{\em register\+Address} & The register address. \\
+\hline
+{\em data} & A pointer to store the bytes that are read. \\
+\hline
+{\em nb\+Bytes} & The number of bytes to read. \\
+\hline
+\end{DoxyParams}
+\hypertarget{group___i2_c__module_ga3692682bb1cb84e1a3d0c31195451bd9}{}\index{I2\+C module documentation@{I2\+C module documentation}!I2\+C\+\_\+\+Poll\+Read@{I2\+C\+\_\+\+Poll\+Read}}
+\index{I2\+C\+\_\+\+Poll\+Read@{I2\+C\+\_\+\+Poll\+Read}!I2\+C module documentation@{I2\+C module documentation}}
+\subsubsection[{I2\+C\+\_\+\+Poll\+Read(const uint8\+\_\+t register\+Address, uint8\+\_\+t $\ast$const data, const uint8\+\_\+t nb\+Bytes)}]{\setlength{\rightskip}{0pt plus 5cm}void I2\+C\+\_\+\+Poll\+Read (
+\begin{DoxyParamCaption}
+\item[{const uint8\+\_\+t}]{register\+Address, }
+\item[{uint8\+\_\+t $\ast$const}]{data, }
+\item[{const uint8\+\_\+t}]{nb\+Bytes}
+\end{DoxyParamCaption}
+)}\label{group___i2_c__module_ga3692682bb1cb84e1a3d0c31195451bd9}
+
+
+Reads data of a specified length starting from a specified register. 
+
+Uses polling as the method of data reception. 
+\begin{DoxyParams}{Parameters}
+{\em register\+Address} & The register address. \\
+\hline
+{\em data} & A pointer to store the bytes that are read. \\
+\hline
+{\em nb\+Bytes} & The number of bytes to read. \\
+\hline
+\end{DoxyParams}
+\hypertarget{group___i2_c__module_ga0d6844ce590bbf5cc557fdf0747ad551}{}\index{I2\+C module documentation@{I2\+C module documentation}!I2\+C\+\_\+\+Select\+Slave\+Device@{I2\+C\+\_\+\+Select\+Slave\+Device}}
+\index{I2\+C\+\_\+\+Select\+Slave\+Device@{I2\+C\+\_\+\+Select\+Slave\+Device}!I2\+C module documentation@{I2\+C module documentation}}
+\subsubsection[{I2\+C\+\_\+\+Select\+Slave\+Device(const uint8\+\_\+t slave\+Address)}]{\setlength{\rightskip}{0pt plus 5cm}void I2\+C\+\_\+\+Select\+Slave\+Device (
+\begin{DoxyParamCaption}
+\item[{const uint8\+\_\+t}]{slave\+Address}
+\end{DoxyParamCaption}
+)}\label{group___i2_c__module_ga0d6844ce590bbf5cc557fdf0747ad551}
+
+
+Selects the current slave device. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em slave\+Address} & The slave device address. \\
+\hline
+\end{DoxyParams}
+\hypertarget{group___i2_c__module_gacaac94d86a7213791fb691d57c6f278b}{}\index{I2\+C module documentation@{I2\+C module documentation}!I2\+C\+\_\+\+Write@{I2\+C\+\_\+\+Write}}
+\index{I2\+C\+\_\+\+Write@{I2\+C\+\_\+\+Write}!I2\+C module documentation@{I2\+C module documentation}}
+\subsubsection[{I2\+C\+\_\+\+Write(const uint8\+\_\+t register\+Address, const uint8\+\_\+t data)}]{\setlength{\rightskip}{0pt plus 5cm}void I2\+C\+\_\+\+Write (
+\begin{DoxyParamCaption}
+\item[{const uint8\+\_\+t}]{register\+Address, }
+\item[{const uint8\+\_\+t}]{data}
+\end{DoxyParamCaption}
+)}\label{group___i2_c__module_gacaac94d86a7213791fb691d57c6f278b}
+
+
+Write a byte of data to a specified register. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em register\+Address} & The register address. \\
+\hline
+{\em data} & The 8-\/bit data to write. \\
+\hline
+\end{DoxyParams}

@@ -1,0 +1,69 @@
+\hypertarget{group___vectors__module}{}\section{Vectors module documentation}
+\label{group___vectors__module}\index{Vectors module documentation@{Vectors module documentation}}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{group___vectors__module_ga445500277ba0e363873b34cffc015745}{\+\_\+\+\_\+attribute\+\_\+\+\_\+} ((interrupt))
+\begin{DoxyCompactList}\small\item\em Interrupt service routine for the accelerometer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Function Documentation}
+\hypertarget{group___vectors__module_ga445500277ba0e363873b34cffc015745}{}\index{Vectors module documentation@{Vectors module documentation}!\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}!Vectors module documentation@{Vectors module documentation}}
+\subsubsection[{\+\_\+\+\_\+attribute\+\_\+\+\_\+((interrupt))}]{\setlength{\rightskip}{0pt plus 5cm}void \+\_\+\+\_\+attribute\+\_\+\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{(interrupt)}]{}
+\end{DoxyParamCaption}
+)}\label{group___vectors__module_ga445500277ba0e363873b34cffc015745}
+
+
+Interrupt service routine for the accelerometer. 
+
+Interrupt service routine for the U\+A\+R\+T.
+
+Interrupt service routine for the R\+T\+C.
+
+Interrupt service routine for the P\+I\+T.
+
+Interrupt service routine for the I2\+C.
+
+Interrupt service routine for the F\+T\+M.
+
+Interrupt service routine for the Flash.
+
+The accelerometer has data ready. The user callback function will be called. \begin{DoxyNote}{Note}
+Assumes the accelerometer has been initialized.
+\end{DoxyNote}
+Interrupt service routine for the accelerometer.
+
+\begin{DoxyNote}{Note}
+Assumes flash has been initialized and a R\+T\+O\+S is being used.
+\end{DoxyNote}
+Interrupt service routine for the accelerometer.
+
+If a timer channel was set up as output compare, then the user callback function will be called. \begin{DoxyNote}{Note}
+Assumes the F\+T\+M has been initialized.
+\end{DoxyNote}
+Interrupt service routine for the accelerometer.
+
+Only used for reading data. At the end of reception, the user callback function will be called. \begin{DoxyNote}{Note}
+Assumes the I2\+C module has been initialized.
+\end{DoxyNote}
+Interrupt service routine for the accelerometer.
+
+The periodic interrupt timer has timed out. The user callback function will be called. \begin{DoxyNote}{Note}
+Assumes the P\+I\+T has been initialized.
+\end{DoxyNote}
+Interrupt service routine for the accelerometer.
+
+The R\+T\+C has incremented one second. The user callback function will be called. \begin{DoxyNote}{Note}
+Assumes the R\+T\+C has been initialized.
+\end{DoxyNote}
+Interrupt service routine for the accelerometer.
+
+\begin{DoxyNote}{Note}
+Assumes the transmit and receive F\+I\+F\+Os have been initialized. 
+\end{DoxyNote}

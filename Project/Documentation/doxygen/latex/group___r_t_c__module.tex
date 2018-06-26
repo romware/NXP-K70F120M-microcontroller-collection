@@ -1,0 +1,114 @@
+\hypertarget{group___r_t_c__module}{}\section{R\+T\+C module documentation}
+\label{group___r_t_c__module}\index{R\+T\+C module documentation@{R\+T\+C module documentation}}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{group___r_t_c__module_ga8f6fdd811ffd21bc967984a6046ec8b4}{R\+T\+C\+\_\+\+Init} (O\+S\+\_\+\+E\+C\+B $\ast$read\+Semaphore)
+\begin{DoxyCompactList}\small\item\em Initializes the R\+T\+C before first use. \end{DoxyCompactList}\item 
+void \hyperlink{group___r_t_c__module_gacbe916e4fad6bfc2ffcde604fa6afb52}{R\+T\+C\+\_\+\+Set} (const uint8\+\_\+t hours, const uint8\+\_\+t minutes, const uint8\+\_\+t seconds)
+\begin{DoxyCompactList}\small\item\em Sets the value of the real time clock. \end{DoxyCompactList}\item 
+void \hyperlink{group___r_t_c__module_ga46e1f15e3b27e2de58d7f213a3bc865d}{R\+T\+C\+\_\+\+Get} (uint8\+\_\+t $\ast$const hours, uint8\+\_\+t $\ast$const minutes, uint8\+\_\+t $\ast$const seconds)
+\begin{DoxyCompactList}\small\item\em Gets the value of the real time clock. \end{DoxyCompactList}\item 
+void \hyperlink{group___r_t_c__module_ga445500277ba0e363873b34cffc015745}{\+\_\+\+\_\+attribute\+\_\+\+\_\+} ((interrupt))
+\begin{DoxyCompactList}\small\item\em Interrupt service routine for the R\+T\+C. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Function Documentation}
+\hypertarget{group___r_t_c__module_ga445500277ba0e363873b34cffc015745}{}\index{R\+T\+C module documentation@{R\+T\+C module documentation}!\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}!R\+T\+C module documentation@{R\+T\+C module documentation}}
+\subsubsection[{\+\_\+\+\_\+attribute\+\_\+\+\_\+((interrupt))}]{\setlength{\rightskip}{0pt plus 5cm}void \+\_\+\+\_\+attribute\+\_\+\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{(interrupt)}]{}
+\end{DoxyParamCaption}
+)}\label{group___r_t_c__module_ga445500277ba0e363873b34cffc015745}
+
+
+Interrupt service routine for the R\+T\+C. 
+
+Interrupt service routine for the U\+A\+R\+T.
+
+Interrupt service routine for the P\+I\+T.
+
+Interrupt service routine for the I2\+C.
+
+Interrupt service routine for the F\+T\+M.
+
+Interrupt service routine for the Flash.
+
+Interrupt service routine for the accelerometer.
+
+The R\+T\+C has incremented one second. The user callback function will be called. \begin{DoxyNote}{Note}
+Assumes the R\+T\+C has been initialized. 
+\end{DoxyNote}
+\hypertarget{group___r_t_c__module_ga46e1f15e3b27e2de58d7f213a3bc865d}{}\index{R\+T\+C module documentation@{R\+T\+C module documentation}!R\+T\+C\+\_\+\+Get@{R\+T\+C\+\_\+\+Get}}
+\index{R\+T\+C\+\_\+\+Get@{R\+T\+C\+\_\+\+Get}!R\+T\+C module documentation@{R\+T\+C module documentation}}
+\subsubsection[{R\+T\+C\+\_\+\+Get(uint8\+\_\+t $\ast$const hours, uint8\+\_\+t $\ast$const minutes, uint8\+\_\+t $\ast$const seconds)}]{\setlength{\rightskip}{0pt plus 5cm}void R\+T\+C\+\_\+\+Get (
+\begin{DoxyParamCaption}
+\item[{uint8\+\_\+t $\ast$const}]{hours, }
+\item[{uint8\+\_\+t $\ast$const}]{minutes, }
+\item[{uint8\+\_\+t $\ast$const}]{seconds}
+\end{DoxyParamCaption}
+)}\label{group___r_t_c__module_ga46e1f15e3b27e2de58d7f213a3bc865d}
+
+
+Gets the value of the real time clock. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em hours} & The address of a variable to store the real time clock hours. \\
+\hline
+{\em minutes} & The address of a variable to store the real time clock minutes. \\
+\hline
+{\em seconds} & The address of a variable to store the real time clock seconds. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Assumes that the R\+T\+C module has been initialized. 
+\end{DoxyNote}
+\hypertarget{group___r_t_c__module_ga8f6fdd811ffd21bc967984a6046ec8b4}{}\index{R\+T\+C module documentation@{R\+T\+C module documentation}!R\+T\+C\+\_\+\+Init@{R\+T\+C\+\_\+\+Init}}
+\index{R\+T\+C\+\_\+\+Init@{R\+T\+C\+\_\+\+Init}!R\+T\+C module documentation@{R\+T\+C module documentation}}
+\subsubsection[{R\+T\+C\+\_\+\+Init(\+O\+S\+\_\+\+E\+C\+B $\ast$read\+Semaphore)}]{\setlength{\rightskip}{0pt plus 5cm}bool R\+T\+C\+\_\+\+Init (
+\begin{DoxyParamCaption}
+\item[{O\+S\+\_\+\+E\+C\+B $\ast$}]{read\+Semaphore}
+\end{DoxyParamCaption}
+)}\label{group___r_t_c__module_ga8f6fdd811ffd21bc967984a6046ec8b4}
+
+
+Initializes the R\+T\+C before first use. 
+
+Sets up the control register for the R\+T\+C and locks it. Enables the R\+T\+C and sets an interrupt every second. 
+\begin{DoxyParams}{Parameters}
+{\em read\+Semaphore} & is a semaphore for reading R\+T\+C. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bool -\/ T\+R\+U\+E if the R\+T\+C was successfully initialized. 
+\end{DoxyReturn}
+\hypertarget{group___r_t_c__module_gacbe916e4fad6bfc2ffcde604fa6afb52}{}\index{R\+T\+C module documentation@{R\+T\+C module documentation}!R\+T\+C\+\_\+\+Set@{R\+T\+C\+\_\+\+Set}}
+\index{R\+T\+C\+\_\+\+Set@{R\+T\+C\+\_\+\+Set}!R\+T\+C module documentation@{R\+T\+C module documentation}}
+\subsubsection[{R\+T\+C\+\_\+\+Set(const uint8\+\_\+t hours, const uint8\+\_\+t minutes, const uint8\+\_\+t seconds)}]{\setlength{\rightskip}{0pt plus 5cm}void R\+T\+C\+\_\+\+Set (
+\begin{DoxyParamCaption}
+\item[{const uint8\+\_\+t}]{hours, }
+\item[{const uint8\+\_\+t}]{minutes, }
+\item[{const uint8\+\_\+t}]{seconds}
+\end{DoxyParamCaption}
+)}\label{group___r_t_c__module_gacbe916e4fad6bfc2ffcde604fa6afb52}
+
+
+Sets the value of the real time clock. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em hours} & The desired value of the real time clock hours (0-\/23). \\
+\hline
+{\em minutes} & The desired value of the real time clock minutes (0-\/59). \\
+\hline
+{\em seconds} & The desired value of the real time clock seconds (0-\/59). \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Assumes that the R\+T\+C module has been initialized and all input parameters are in range. 
+\end{DoxyNote}

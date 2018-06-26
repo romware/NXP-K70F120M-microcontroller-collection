@@ -1,0 +1,52 @@
+\hypertarget{_flash_8c}{}\section{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/\+Flash.c File Reference}
+\label{_flash_8c}\index{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/\+Flash.\+c@{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/\+Flash.\+c}}
+
+
+Routines for erasing and writing to the Flash.  
+
+
+{\ttfamily \#include \char`\"{}M\+K70\+F12.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}L\+E\+Ds.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Flash.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}O\+S.\+h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{group___flash__module_gaa5782279b5e558cafc2f135c0a1177d3}{Flash\+\_\+\+Init} (void)
+\begin{DoxyCompactList}\small\item\em Enables the Flash module. \end{DoxyCompactList}\item 
+bool \hyperlink{group___flash__module_ga50871aff0f5af1e092aea3ed2545cf72}{Flash\+\_\+\+Allocate\+Var} (volatile void $\ast$$\ast$variable, const uint8\+\_\+t size)
+\begin{DoxyCompactList}\small\item\em Allocates space for a non-\/volatile variable in the Flash memory. \end{DoxyCompactList}\item 
+bool \hyperlink{group___flash__module_ga06868787ccef73e69bd236d3b93b68f3}{Flash\+\_\+\+Erase} (void)
+\begin{DoxyCompactList}\small\item\em Erases the entire Flash sector. \end{DoxyCompactList}\item 
+bool \hyperlink{group___flash__module_ga65d0676992303c4a7d5a5cea121a409b}{Flash\+\_\+\+Write} (volatile void $\ast$const address, const uint32\+\_\+t data, uint8\+\_\+t data\+Size)
+\begin{DoxyCompactList}\small\item\em Writes to flash with mutex access for use in an R\+T\+O\+S. \end{DoxyCompactList}\item 
+uint8\+\_\+t \hyperlink{group___flash__module_ga19cb5862dfb60718b63095ee9b427338}{\+\_\+\+F\+B} (volatile uint8\+\_\+t $\ast$flash\+Address)
+\begin{DoxyCompactList}\small\item\em Read one byte from flash with mutex access for use in R\+T\+O\+S. \end{DoxyCompactList}\item 
+uint16\+\_\+t \hyperlink{group___flash__module_gaaad09f647db2a10cedaa89892f723d2d}{\+\_\+\+F\+H} (volatile uint16\+\_\+t $\ast$flash\+Address)
+\begin{DoxyCompactList}\small\item\em Read one half word from flash with mutex access for use in R\+T\+O\+S. \end{DoxyCompactList}\item 
+uint32\+\_\+t \hyperlink{group___flash__module_gab68f612bfd13d413d78311f6b50712b0}{\+\_\+\+F\+W} (volatile uint32\+\_\+t $\ast$flash\+Address)
+\begin{DoxyCompactList}\small\item\em Read one word from flash with mutex access for use in R\+T\+O\+S. \end{DoxyCompactList}\item 
+uint64\+\_\+t \hyperlink{group___flash__module_ga37a9a47a85d05dfe965d08d856c1184a}{\+\_\+\+F\+P} (volatile uint64\+\_\+t $\ast$flash\+Address)
+\begin{DoxyCompactList}\small\item\em Read one phrase from flash with mutex access for use in R\+T\+O\+S. \end{DoxyCompactList}\item 
+void \hyperlink{group___flash__module_ga445500277ba0e363873b34cffc015745}{\+\_\+\+\_\+attribute\+\_\+\+\_\+} ((interrupt))
+\begin{DoxyCompactList}\small\item\em Interrupt service routine for the Flash. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+O\+S\+\_\+\+E\+C\+B $\ast$ \hyperlink{group___flash__module_ga7b51eb443d81e2c63615818e8e3bac4e}{C\+C\+I\+F\+Semaphore}
+\item 
+O\+S\+\_\+\+E\+C\+B $\ast$ \hyperlink{group___flash__module_gaa7d07a8c0083c83ae73e54469b80f627}{Flash\+Access\+Mutex}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Routines for erasing and writing to the Flash. 
+
+This contains the functions needed for accessing the internal Flash.
+
+\begin{DoxyAuthor}{Author}
+12403756, 12551519 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2018-\/04-\/13 
+\end{DoxyDate}

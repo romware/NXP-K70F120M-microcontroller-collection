@@ -1,0 +1,116 @@
+\hypertarget{struct_c_r_c___mem_map}{}\section{C\+R\+C\+\_\+\+Mem\+Map Struct Reference}
+\label{struct_c_r_c___mem_map}\index{C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}}
+
+
+{\ttfamily \#include $<$M\+K70\+F12.\+h$>$}
+
+\subsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{struct_c_r_c___mem_map_a7008cc6b10212324165bf4cfbfa4e86d}{}\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+union \{\\
+\>struct \{\\
+\>\>uint16\_t \hyperlink{struct_c_r_c___mem_map_ae22498ebf770ee808517eb8c70208759}{CRCL}\\
+\>\>uint16\_t \hyperlink{struct_c_r_c___mem_map_a686eb1f6250f2141314e79ac63d07b05}{CRCH}\\
+\>\} {\bfseries ACCESS16BIT}\\
+\>uint32\_t \hyperlink{struct_c_r_c___mem_map_acfe268e8629b93af602c35ce7e917bf7}{CRC}\\
+\>struct \{\\
+\>\>uint8\_t \hyperlink{struct_c_r_c___mem_map_a67b4eb3ac1b5f1129cfbc0ba848db17f}{CRCLL}\\
+\>\>uint8\_t \hyperlink{struct_c_r_c___mem_map_a5bd8cdac1a017e655a8e9dbb382ce981}{CRCLU}\\
+\>\>uint8\_t \hyperlink{struct_c_r_c___mem_map_af8040ed6eefc8200e2cb2564550481ab}{CRCHL}\\
+\>\>uint8\_t \hyperlink{struct_c_r_c___mem_map_a6a8a36dbd6cc59ba899a8e7be34d05df}{CRCHU}\\
+\>\} {\bfseries ACCESS8BIT}\\
+\}; \label{struct_c_r_c___mem_map_a7008cc6b10212324165bf4cfbfa4e86d}
+\\
+
+\end{tabbing}\item 
+\hypertarget{struct_c_r_c___mem_map_a4d1f334e7e2be9866e96062985261442}{}\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+union \{\\
+\>struct \{\\
+\>\>uint16\_t \hyperlink{struct_c_r_c___mem_map_a4cd3b43b213defbaa07381a32b24af67}{GPOLYL}\\
+\>\>uint16\_t \hyperlink{struct_c_r_c___mem_map_a423da9d8034f39564aedb877f7c5043b}{GPOLYH}\\
+\>\} {\bfseries GPOLY\_ACCESS16BIT}\\
+\>uint32\_t \hyperlink{struct_c_r_c___mem_map_ab897251ee30cb234786a0f0a305f4620}{GPOLY}\\
+\>struct \{\\
+\>\>uint8\_t \hyperlink{struct_c_r_c___mem_map_afefe4288aecf5a31ca6f6d64317eeb4b}{GPOLYLL}\\
+\>\>uint8\_t \hyperlink{struct_c_r_c___mem_map_a0ba8bc9ddb8de4ca001f205f32cdd626}{GPOLYLU}\\
+\>\>uint8\_t \hyperlink{struct_c_r_c___mem_map_a73effe5217fb833a57c7e84707e5ebe6}{GPOLYHL}\\
+\>\>uint8\_t \hyperlink{struct_c_r_c___mem_map_ae7c166006427c82d21b88417313cf511}{GPOLYHU}\\
+\>\} {\bfseries GPOLY\_ACCESS8BIT}\\
+\}; \label{struct_c_r_c___mem_map_a4d1f334e7e2be9866e96062985261442}
+\\
+
+\end{tabbing}\item 
+\hypertarget{struct_c_r_c___mem_map_a360f10dfa828c228e827cdde4fe1a28e}{}\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+union \{\\
+\>uint32\_t \hyperlink{struct_c_r_c___mem_map_ad980a8cdef83fed7e103f88ad051e155}{CTRL}\\
+\>struct \{\\
+\>\>uint8\_t {\bfseries RESERVED\_0} \mbox{[}3\mbox{]}\\
+\>\>uint8\_t \hyperlink{struct_c_r_c___mem_map_a30abe06fea900d839a8558bd48e0a3a0}{CTRLHU}\\
+\>\} {\bfseries CTRL\_ACCESS8BIT}\\
+\}; \label{struct_c_r_c___mem_map_a360f10dfa828c228e827cdde4fe1a28e}
+\\
+
+\end{tabbing}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+C\+R\+C -\/ Peripheral register structure 
+
+\subsection{Field Documentation}
+\hypertarget{struct_c_r_c___mem_map_acfe268e8629b93af602c35ce7e917bf7}{}\index{C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}!C\+R\+C@{C\+R\+C}}
+\index{C\+R\+C@{C\+R\+C}!C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}}
+\subsubsection[{C\+R\+C}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t C\+R\+C\+\_\+\+Mem\+Map\+::\+C\+R\+C}\label{struct_c_r_c___mem_map_acfe268e8629b93af602c35ce7e917bf7}
+C\+R\+C Data Register, offset\+: 0x0 \hypertarget{struct_c_r_c___mem_map_a686eb1f6250f2141314e79ac63d07b05}{}\index{C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}!C\+R\+C\+H@{C\+R\+C\+H}}
+\index{C\+R\+C\+H@{C\+R\+C\+H}!C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}}
+\subsubsection[{C\+R\+C\+H}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t C\+R\+C\+\_\+\+Mem\+Map\+::\+C\+R\+C\+H}\label{struct_c_r_c___mem_map_a686eb1f6250f2141314e79ac63d07b05}
+C\+R\+C\+\_\+\+C\+R\+C\+H register., offset\+: 0x2 \hypertarget{struct_c_r_c___mem_map_af8040ed6eefc8200e2cb2564550481ab}{}\index{C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}!C\+R\+C\+H\+L@{C\+R\+C\+H\+L}}
+\index{C\+R\+C\+H\+L@{C\+R\+C\+H\+L}!C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}}
+\subsubsection[{C\+R\+C\+H\+L}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t C\+R\+C\+\_\+\+Mem\+Map\+::\+C\+R\+C\+H\+L}\label{struct_c_r_c___mem_map_af8040ed6eefc8200e2cb2564550481ab}
+C\+R\+C\+\_\+\+C\+R\+C\+H\+L register., offset\+: 0x2 \hypertarget{struct_c_r_c___mem_map_a6a8a36dbd6cc59ba899a8e7be34d05df}{}\index{C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}!C\+R\+C\+H\+U@{C\+R\+C\+H\+U}}
+\index{C\+R\+C\+H\+U@{C\+R\+C\+H\+U}!C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}}
+\subsubsection[{C\+R\+C\+H\+U}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t C\+R\+C\+\_\+\+Mem\+Map\+::\+C\+R\+C\+H\+U}\label{struct_c_r_c___mem_map_a6a8a36dbd6cc59ba899a8e7be34d05df}
+C\+R\+C\+\_\+\+C\+R\+C\+H\+U register., offset\+: 0x3 \hypertarget{struct_c_r_c___mem_map_ae22498ebf770ee808517eb8c70208759}{}\index{C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}!C\+R\+C\+L@{C\+R\+C\+L}}
+\index{C\+R\+C\+L@{C\+R\+C\+L}!C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}}
+\subsubsection[{C\+R\+C\+L}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t C\+R\+C\+\_\+\+Mem\+Map\+::\+C\+R\+C\+L}\label{struct_c_r_c___mem_map_ae22498ebf770ee808517eb8c70208759}
+C\+R\+C\+\_\+\+C\+R\+C\+L register., offset\+: 0x0 \hypertarget{struct_c_r_c___mem_map_a67b4eb3ac1b5f1129cfbc0ba848db17f}{}\index{C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}!C\+R\+C\+L\+L@{C\+R\+C\+L\+L}}
+\index{C\+R\+C\+L\+L@{C\+R\+C\+L\+L}!C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}}
+\subsubsection[{C\+R\+C\+L\+L}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t C\+R\+C\+\_\+\+Mem\+Map\+::\+C\+R\+C\+L\+L}\label{struct_c_r_c___mem_map_a67b4eb3ac1b5f1129cfbc0ba848db17f}
+C\+R\+C\+\_\+\+C\+R\+C\+L\+L register., offset\+: 0x0 \hypertarget{struct_c_r_c___mem_map_a5bd8cdac1a017e655a8e9dbb382ce981}{}\index{C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}!C\+R\+C\+L\+U@{C\+R\+C\+L\+U}}
+\index{C\+R\+C\+L\+U@{C\+R\+C\+L\+U}!C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}}
+\subsubsection[{C\+R\+C\+L\+U}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t C\+R\+C\+\_\+\+Mem\+Map\+::\+C\+R\+C\+L\+U}\label{struct_c_r_c___mem_map_a5bd8cdac1a017e655a8e9dbb382ce981}
+C\+R\+C\+\_\+\+C\+R\+C\+L\+U register., offset\+: 0x1 \hypertarget{struct_c_r_c___mem_map_ad980a8cdef83fed7e103f88ad051e155}{}\index{C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}!C\+T\+R\+L@{C\+T\+R\+L}}
+\index{C\+T\+R\+L@{C\+T\+R\+L}!C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}}
+\subsubsection[{C\+T\+R\+L}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t C\+R\+C\+\_\+\+Mem\+Map\+::\+C\+T\+R\+L}\label{struct_c_r_c___mem_map_ad980a8cdef83fed7e103f88ad051e155}
+C\+R\+C Control Register, offset\+: 0x8 \hypertarget{struct_c_r_c___mem_map_a30abe06fea900d839a8558bd48e0a3a0}{}\index{C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}!C\+T\+R\+L\+H\+U@{C\+T\+R\+L\+H\+U}}
+\index{C\+T\+R\+L\+H\+U@{C\+T\+R\+L\+H\+U}!C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}}
+\subsubsection[{C\+T\+R\+L\+H\+U}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t C\+R\+C\+\_\+\+Mem\+Map\+::\+C\+T\+R\+L\+H\+U}\label{struct_c_r_c___mem_map_a30abe06fea900d839a8558bd48e0a3a0}
+C\+R\+C\+\_\+\+C\+T\+R\+L\+H\+U register., offset\+: 0x\+B \hypertarget{struct_c_r_c___mem_map_ab897251ee30cb234786a0f0a305f4620}{}\index{C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}!G\+P\+O\+L\+Y@{G\+P\+O\+L\+Y}}
+\index{G\+P\+O\+L\+Y@{G\+P\+O\+L\+Y}!C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}}
+\subsubsection[{G\+P\+O\+L\+Y}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t C\+R\+C\+\_\+\+Mem\+Map\+::\+G\+P\+O\+L\+Y}\label{struct_c_r_c___mem_map_ab897251ee30cb234786a0f0a305f4620}
+C\+R\+C Polynomial Register, offset\+: 0x4 \hypertarget{struct_c_r_c___mem_map_a423da9d8034f39564aedb877f7c5043b}{}\index{C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}!G\+P\+O\+L\+Y\+H@{G\+P\+O\+L\+Y\+H}}
+\index{G\+P\+O\+L\+Y\+H@{G\+P\+O\+L\+Y\+H}!C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}}
+\subsubsection[{G\+P\+O\+L\+Y\+H}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t C\+R\+C\+\_\+\+Mem\+Map\+::\+G\+P\+O\+L\+Y\+H}\label{struct_c_r_c___mem_map_a423da9d8034f39564aedb877f7c5043b}
+C\+R\+C\+\_\+\+G\+P\+O\+L\+Y\+H register., offset\+: 0x6 \hypertarget{struct_c_r_c___mem_map_a73effe5217fb833a57c7e84707e5ebe6}{}\index{C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}!G\+P\+O\+L\+Y\+H\+L@{G\+P\+O\+L\+Y\+H\+L}}
+\index{G\+P\+O\+L\+Y\+H\+L@{G\+P\+O\+L\+Y\+H\+L}!C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}}
+\subsubsection[{G\+P\+O\+L\+Y\+H\+L}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t C\+R\+C\+\_\+\+Mem\+Map\+::\+G\+P\+O\+L\+Y\+H\+L}\label{struct_c_r_c___mem_map_a73effe5217fb833a57c7e84707e5ebe6}
+C\+R\+C\+\_\+\+G\+P\+O\+L\+Y\+H\+L register., offset\+: 0x6 \hypertarget{struct_c_r_c___mem_map_ae7c166006427c82d21b88417313cf511}{}\index{C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}!G\+P\+O\+L\+Y\+H\+U@{G\+P\+O\+L\+Y\+H\+U}}
+\index{G\+P\+O\+L\+Y\+H\+U@{G\+P\+O\+L\+Y\+H\+U}!C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}}
+\subsubsection[{G\+P\+O\+L\+Y\+H\+U}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t C\+R\+C\+\_\+\+Mem\+Map\+::\+G\+P\+O\+L\+Y\+H\+U}\label{struct_c_r_c___mem_map_ae7c166006427c82d21b88417313cf511}
+C\+R\+C\+\_\+\+G\+P\+O\+L\+Y\+H\+U register., offset\+: 0x7 \hypertarget{struct_c_r_c___mem_map_a4cd3b43b213defbaa07381a32b24af67}{}\index{C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}!G\+P\+O\+L\+Y\+L@{G\+P\+O\+L\+Y\+L}}
+\index{G\+P\+O\+L\+Y\+L@{G\+P\+O\+L\+Y\+L}!C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}}
+\subsubsection[{G\+P\+O\+L\+Y\+L}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t C\+R\+C\+\_\+\+Mem\+Map\+::\+G\+P\+O\+L\+Y\+L}\label{struct_c_r_c___mem_map_a4cd3b43b213defbaa07381a32b24af67}
+C\+R\+C\+\_\+\+G\+P\+O\+L\+Y\+L register., offset\+: 0x4 \hypertarget{struct_c_r_c___mem_map_afefe4288aecf5a31ca6f6d64317eeb4b}{}\index{C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}!G\+P\+O\+L\+Y\+L\+L@{G\+P\+O\+L\+Y\+L\+L}}
+\index{G\+P\+O\+L\+Y\+L\+L@{G\+P\+O\+L\+Y\+L\+L}!C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}}
+\subsubsection[{G\+P\+O\+L\+Y\+L\+L}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t C\+R\+C\+\_\+\+Mem\+Map\+::\+G\+P\+O\+L\+Y\+L\+L}\label{struct_c_r_c___mem_map_afefe4288aecf5a31ca6f6d64317eeb4b}
+C\+R\+C\+\_\+\+G\+P\+O\+L\+Y\+L\+L register., offset\+: 0x4 \hypertarget{struct_c_r_c___mem_map_a0ba8bc9ddb8de4ca001f205f32cdd626}{}\index{C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}!G\+P\+O\+L\+Y\+L\+U@{G\+P\+O\+L\+Y\+L\+U}}
+\index{G\+P\+O\+L\+Y\+L\+U@{G\+P\+O\+L\+Y\+L\+U}!C\+R\+C\+\_\+\+Mem\+Map@{C\+R\+C\+\_\+\+Mem\+Map}}
+\subsubsection[{G\+P\+O\+L\+Y\+L\+U}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t C\+R\+C\+\_\+\+Mem\+Map\+::\+G\+P\+O\+L\+Y\+L\+U}\label{struct_c_r_c___mem_map_a0ba8bc9ddb8de4ca001f205f32cdd626}
+C\+R\+C\+\_\+\+G\+P\+O\+L\+Y\+L\+U register., offset\+: 0x5 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+D\+:/\+Embedded Software U\+S/es18aut13/\+Project/\+Static\+\_\+\+Code/\+I\+O\+\_\+\+Map/\hyperlink{_m_k70_f12_8h}{M\+K70\+F12.\+h}\end{DoxyCompactItemize}

@@ -1,0 +1,33 @@
+\hypertarget{_p_i_t_8h}{}\section{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/\+P\+I\+T.h File Reference}
+\label{_p_i_t_8h}\index{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/\+P\+I\+T.\+h@{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/\+P\+I\+T.\+h}}
+
+
+Routines for controlling Periodic Interrupt Timer (P\+I\+T) on the T\+W\+R-\/\+K70\+F120\+M.  
+
+
+{\ttfamily \#include \char`\"{}types.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}O\+S.\+h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{group___p_i_t__module_gae69097a83912a25b357df1046aea9b52}{P\+I\+T\+\_\+\+Init} (const uint32\+\_\+t module\+Clk, void($\ast$user\+Function)(void $\ast$), void $\ast$user\+Arguments)
+\begin{DoxyCompactList}\small\item\em Sets up the P\+I\+T before first use. \end{DoxyCompactList}\item 
+void \hyperlink{group___p_i_t__module_gae012c6f6b7396828c558c92ad0a27ed5}{P\+I\+T\+\_\+\+Set} (const uint32\+\_\+t period, const bool restart)
+\begin{DoxyCompactList}\small\item\em Sets the value of the desired period of the P\+I\+T. \end{DoxyCompactList}\item 
+void \hyperlink{group___p_i_t__module_gaed902f6158d6681e4b05d078575e4b09}{P\+I\+T\+\_\+\+Enable} (const bool enable)
+\begin{DoxyCompactList}\small\item\em Enables or disables the P\+I\+T. \end{DoxyCompactList}\item 
+void \hyperlink{group__accel__module_ga445500277ba0e363873b34cffc015745}{\+\_\+\+\_\+attribute\+\_\+\+\_\+} ((interrupt)) P\+I\+T\+\_\+\+I\+S\+R(void)
+\begin{DoxyCompactList}\small\item\em Interrupt service routine for the P\+I\+T. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Routines for controlling Periodic Interrupt Timer (P\+I\+T) on the T\+W\+R-\/\+K70\+F120\+M. 
+
+This contains the functions for operating the periodic interrupt timer (P\+I\+T).
+
+\begin{DoxyAuthor}{Author}
+12403756, 12551519 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2018-\/04-\/13 
+\end{DoxyDate}

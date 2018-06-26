@@ -1,0 +1,163 @@
+\hypertarget{group___u_a_r_t__module}{}\section{U\+A\+R\+T module documentation}
+\label{group___u_a_r_t__module}\index{U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{group___u_a_r_t__module_ga2dc6c99815245d0539b23bd5ef9301b1}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Rx\+U\+A\+R\+T\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group___u_a_r_t__module_ga3256718fed574cf8e1a1a2912218e8ac}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Tx\+U\+A\+R\+T\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+bool \hyperlink{group___u_a_r_t__module_gae5760d1a086ec79a33901db253000af9}{U\+A\+R\+T\+\_\+\+Init} (const uint32\+\_\+t baud\+Rate, const uint32\+\_\+t module\+Clk)
+\begin{DoxyCompactList}\small\item\em Sets up the U\+A\+R\+T interface before first use. \end{DoxyCompactList}\item 
+void \hyperlink{group___u_a_r_t__module_ga2825651a32e14bba982ea79dbc505ef7}{U\+A\+R\+T\+\_\+\+In\+Char} (uint8\+\_\+t $\ast$const data\+Ptr)
+\begin{DoxyCompactList}\small\item\em Get a character from the receive F\+I\+F\+O if it is not empty. \end{DoxyCompactList}\item 
+void \hyperlink{group___u_a_r_t__module_ga0bf706acb65883a6fe98326fbb490038}{U\+A\+R\+T\+\_\+\+Out\+Char} (const uint8\+\_\+t data)
+\begin{DoxyCompactList}\small\item\em Put a byte in the transmit F\+I\+F\+O if it is not full. \end{DoxyCompactList}\item 
+void \hyperlink{group___u_a_r_t__module_ga445500277ba0e363873b34cffc015745}{\+\_\+\+\_\+attribute\+\_\+\+\_\+} ((interrupt))
+\begin{DoxyCompactList}\small\item\em Interrupt service routine for the U\+A\+R\+T. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+O\+S\+\_\+\+E\+C\+B $\ast$ \hyperlink{group___u_a_r_t__module_ga4339f0c853f01fbc291b1eb07ea99b0d}{Rx\+U\+A\+R\+T\+Semaphore}
+\item 
+O\+S\+\_\+\+E\+C\+B $\ast$ \hyperlink{group___u_a_r_t__module_ga38ffbfe2005f45b683a4c00b0a578255}{Tx\+U\+A\+R\+T\+Semaphore}
+\item 
+\hyperlink{struct_t_f_i_f_o}{T\+F\+I\+F\+O} \hyperlink{group___u_a_r_t__module_ga57a6bee2e32f83a4a1b52c99299794b8}{Rx\+F\+I\+F\+O}
+\item 
+\hyperlink{struct_t_f_i_f_o}{T\+F\+I\+F\+O} \hyperlink{group___u_a_r_t__module_gabfc40789d380623f1ba598e006927b5e}{Tx\+F\+I\+F\+O}
+\item 
+uint8\+\_\+t \hyperlink{group___u_a_r_t__module_gac7796c8a7e3acba11d9a5c78bab6df3b}{Dummy\+Read}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Function Documentation}
+\hypertarget{group___u_a_r_t__module_ga445500277ba0e363873b34cffc015745}{}\index{U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}!\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}!U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}}
+\subsubsection[{\+\_\+\+\_\+attribute\+\_\+\+\_\+((interrupt))}]{\setlength{\rightskip}{0pt plus 5cm}void \+\_\+\+\_\+attribute\+\_\+\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{(interrupt)}]{}
+\end{DoxyParamCaption}
+)}\label{group___u_a_r_t__module_ga445500277ba0e363873b34cffc015745}
+
+
+Interrupt service routine for the U\+A\+R\+T. 
+
+Interrupt service routine for the R\+T\+C.
+
+Interrupt service routine for the P\+I\+T.
+
+Interrupt service routine for the I2\+C.
+
+Interrupt service routine for the F\+T\+M.
+
+Interrupt service routine for the Flash.
+
+Interrupt service routine for the accelerometer.
+
+\begin{DoxyNote}{Note}
+Assumes the transmit and receive F\+I\+F\+Os have been initialized. 
+\end{DoxyNote}
+\hypertarget{group___u_a_r_t__module_ga2dc6c99815245d0539b23bd5ef9301b1}{}\index{U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}!O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}}
+\index{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}!U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}}
+\subsubsection[{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K(\+Rx\+U\+A\+R\+T\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)}]{\setlength{\rightskip}{0pt plus 5cm}O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K (
+\begin{DoxyParamCaption}
+\item[{Rx\+U\+A\+R\+T\+Thread\+Stack}]{, }
+\item[{T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E}]{}
+\end{DoxyParamCaption}
+)}\label{group___u_a_r_t__module_ga2dc6c99815245d0539b23bd5ef9301b1}
+The stack for the Rx\+U\+A\+R\+T thread. \hypertarget{group___u_a_r_t__module_ga3256718fed574cf8e1a1a2912218e8ac}{}\index{U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}!O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}}
+\index{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K@{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K}!U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}}
+\subsubsection[{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K(\+Tx\+U\+A\+R\+T\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)}]{\setlength{\rightskip}{0pt plus 5cm}O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K (
+\begin{DoxyParamCaption}
+\item[{Tx\+U\+A\+R\+T\+Thread\+Stack}]{, }
+\item[{T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E}]{}
+\end{DoxyParamCaption}
+)}\label{group___u_a_r_t__module_ga3256718fed574cf8e1a1a2912218e8ac}
+The stack for the Tx\+U\+A\+R\+T thread. \hypertarget{group___u_a_r_t__module_ga2825651a32e14bba982ea79dbc505ef7}{}\index{U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}!U\+A\+R\+T\+\_\+\+In\+Char@{U\+A\+R\+T\+\_\+\+In\+Char}}
+\index{U\+A\+R\+T\+\_\+\+In\+Char@{U\+A\+R\+T\+\_\+\+In\+Char}!U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}}
+\subsubsection[{U\+A\+R\+T\+\_\+\+In\+Char(uint8\+\_\+t $\ast$const data\+Ptr)}]{\setlength{\rightskip}{0pt plus 5cm}void U\+A\+R\+T\+\_\+\+In\+Char (
+\begin{DoxyParamCaption}
+\item[{uint8\+\_\+t $\ast$const}]{data\+Ptr}
+\end{DoxyParamCaption}
+)}\label{group___u_a_r_t__module_ga2825651a32e14bba982ea79dbc505ef7}
+
+
+Get a character from the receive F\+I\+F\+O if it is not empty. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data\+Ptr} & A pointer to memory to store the retrieved byte. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Assumes that U\+A\+R\+T\+\_\+\+Init has been called. 
+\end{DoxyNote}
+\hypertarget{group___u_a_r_t__module_gae5760d1a086ec79a33901db253000af9}{}\index{U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}!U\+A\+R\+T\+\_\+\+Init@{U\+A\+R\+T\+\_\+\+Init}}
+\index{U\+A\+R\+T\+\_\+\+Init@{U\+A\+R\+T\+\_\+\+Init}!U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}}
+\subsubsection[{U\+A\+R\+T\+\_\+\+Init(const uint32\+\_\+t baud\+Rate, const uint32\+\_\+t module\+Clk)}]{\setlength{\rightskip}{0pt plus 5cm}bool U\+A\+R\+T\+\_\+\+Init (
+\begin{DoxyParamCaption}
+\item[{const uint32\+\_\+t}]{baud\+Rate, }
+\item[{const uint32\+\_\+t}]{module\+Clk}
+\end{DoxyParamCaption}
+)}\label{group___u_a_r_t__module_gae5760d1a086ec79a33901db253000af9}
+
+
+Sets up the U\+A\+R\+T interface before first use. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em baud\+Rate} & The desired baud rate in bits/sec. \\
+\hline
+{\em module\+Clk} & The module clock rate in Hz \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bool -\/ T\+R\+U\+E if the U\+A\+R\+T was successfully initialized. 
+\end{DoxyReturn}
+\hypertarget{group___u_a_r_t__module_ga0bf706acb65883a6fe98326fbb490038}{}\index{U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}!U\+A\+R\+T\+\_\+\+Out\+Char@{U\+A\+R\+T\+\_\+\+Out\+Char}}
+\index{U\+A\+R\+T\+\_\+\+Out\+Char@{U\+A\+R\+T\+\_\+\+Out\+Char}!U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}}
+\subsubsection[{U\+A\+R\+T\+\_\+\+Out\+Char(const uint8\+\_\+t data)}]{\setlength{\rightskip}{0pt plus 5cm}void U\+A\+R\+T\+\_\+\+Out\+Char (
+\begin{DoxyParamCaption}
+\item[{const uint8\+\_\+t}]{data}
+\end{DoxyParamCaption}
+)}\label{group___u_a_r_t__module_ga0bf706acb65883a6fe98326fbb490038}
+
+
+Put a byte in the transmit F\+I\+F\+O if it is not full. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & The byte to be placed in the transmit F\+I\+F\+O. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Assumes that U\+A\+R\+T\+\_\+\+Init has been called. 
+\end{DoxyNote}
+
+
+\subsection{Variable Documentation}
+\hypertarget{group___u_a_r_t__module_gac7796c8a7e3acba11d9a5c78bab6df3b}{}\index{U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}!Dummy\+Read@{Dummy\+Read}}
+\index{Dummy\+Read@{Dummy\+Read}!U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}}
+\subsubsection[{Dummy\+Read}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Dummy\+Read}\label{group___u_a_r_t__module_gac7796c8a7e3acba11d9a5c78bab6df3b}
+The dummy read of U\+A\+R\+T2\+\_\+\+D. \hypertarget{group___u_a_r_t__module_ga57a6bee2e32f83a4a1b52c99299794b8}{}\index{U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}!Rx\+F\+I\+F\+O@{Rx\+F\+I\+F\+O}}
+\index{Rx\+F\+I\+F\+O@{Rx\+F\+I\+F\+O}!U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}}
+\subsubsection[{Rx\+F\+I\+F\+O}]{\setlength{\rightskip}{0pt plus 5cm}{\bf T\+F\+I\+F\+O} Rx\+F\+I\+F\+O}\label{group___u_a_r_t__module_ga57a6bee2e32f83a4a1b52c99299794b8}
+The Receive F\+I\+F\+O \hypertarget{group___u_a_r_t__module_ga4339f0c853f01fbc291b1eb07ea99b0d}{}\index{U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}!Rx\+U\+A\+R\+T\+Semaphore@{Rx\+U\+A\+R\+T\+Semaphore}}
+\index{Rx\+U\+A\+R\+T\+Semaphore@{Rx\+U\+A\+R\+T\+Semaphore}!U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}}
+\subsubsection[{Rx\+U\+A\+R\+T\+Semaphore}]{\setlength{\rightskip}{0pt plus 5cm}O\+S\+\_\+\+E\+C\+B$\ast$ Rx\+U\+A\+R\+T\+Semaphore}\label{group___u_a_r_t__module_ga4339f0c853f01fbc291b1eb07ea99b0d}
+The Receive F\+I\+F\+O semaphore \hypertarget{group___u_a_r_t__module_gabfc40789d380623f1ba598e006927b5e}{}\index{U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}!Tx\+F\+I\+F\+O@{Tx\+F\+I\+F\+O}}
+\index{Tx\+F\+I\+F\+O@{Tx\+F\+I\+F\+O}!U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}}
+\subsubsection[{Tx\+F\+I\+F\+O}]{\setlength{\rightskip}{0pt plus 5cm}{\bf T\+F\+I\+F\+O} Tx\+F\+I\+F\+O}\label{group___u_a_r_t__module_gabfc40789d380623f1ba598e006927b5e}
+The Transmit F\+I\+F\+O \hypertarget{group___u_a_r_t__module_ga38ffbfe2005f45b683a4c00b0a578255}{}\index{U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}!Tx\+U\+A\+R\+T\+Semaphore@{Tx\+U\+A\+R\+T\+Semaphore}}
+\index{Tx\+U\+A\+R\+T\+Semaphore@{Tx\+U\+A\+R\+T\+Semaphore}!U\+A\+R\+T module documentation@{U\+A\+R\+T module documentation}}
+\subsubsection[{Tx\+U\+A\+R\+T\+Semaphore}]{\setlength{\rightskip}{0pt plus 5cm}O\+S\+\_\+\+E\+C\+B$\ast$ Tx\+U\+A\+R\+T\+Semaphore}\label{group___u_a_r_t__module_ga38ffbfe2005f45b683a4c00b0a578255}
+The Transmit F\+I\+F\+O semaphore 

@@ -1,0 +1,103 @@
+\hypertarget{group___f_t_m__module}{}\section{F\+T\+M module documentation}
+\label{group___f_t_m__module}\index{F\+T\+M module documentation@{F\+T\+M module documentation}}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{group___f_t_m__module_ga5f31811e067b5690d5f73c8e77019a6b}{F\+T\+M\+\_\+\+Init} ()
+\begin{DoxyCompactList}\small\item\em Sets up the F\+T\+M before first use. \end{DoxyCompactList}\item 
+bool \hyperlink{group___f_t_m__module_gae4928af832114c8173e43d10e4144c1f}{F\+T\+M\+\_\+\+Set} (const \hyperlink{struct_t_f_t_m_channel}{T\+F\+T\+M\+Channel} $\ast$const a\+F\+T\+M\+Channel)
+\begin{DoxyCompactList}\small\item\em Sets up a timer channel. \end{DoxyCompactList}\item 
+bool \hyperlink{group___f_t_m__module_gabb34a0dd79d879502fd81c0efa9440ec}{F\+T\+M\+\_\+\+Start\+Timer} (const \hyperlink{struct_t_f_t_m_channel}{T\+F\+T\+M\+Channel} $\ast$const a\+F\+T\+M\+Channel)
+\begin{DoxyCompactList}\small\item\em Starts a timer if set up for output compare. \end{DoxyCompactList}\item 
+void \hyperlink{group___f_t_m__module_ga445500277ba0e363873b34cffc015745}{\+\_\+\+\_\+attribute\+\_\+\+\_\+} ((interrupt))
+\begin{DoxyCompactList}\small\item\em Interrupt service routine for the F\+T\+M. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Function Documentation}
+\hypertarget{group___f_t_m__module_ga445500277ba0e363873b34cffc015745}{}\index{F\+T\+M module documentation@{F\+T\+M module documentation}!\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}!F\+T\+M module documentation@{F\+T\+M module documentation}}
+\subsubsection[{\+\_\+\+\_\+attribute\+\_\+\+\_\+((interrupt))}]{\setlength{\rightskip}{0pt plus 5cm}void \+\_\+\+\_\+attribute\+\_\+\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{(interrupt)}]{}
+\end{DoxyParamCaption}
+)}\label{group___f_t_m__module_ga445500277ba0e363873b34cffc015745}
+
+
+Interrupt service routine for the F\+T\+M. 
+
+Interrupt service routine for the U\+A\+R\+T.
+
+Interrupt service routine for the R\+T\+C.
+
+Interrupt service routine for the P\+I\+T.
+
+Interrupt service routine for the I2\+C.
+
+Interrupt service routine for the Flash.
+
+Interrupt service routine for the accelerometer.
+
+If a timer channel was set up as output compare, then the user callback function will be called. \begin{DoxyNote}{Note}
+Assumes the F\+T\+M has been initialized. 
+\end{DoxyNote}
+\hypertarget{group___f_t_m__module_ga5f31811e067b5690d5f73c8e77019a6b}{}\index{F\+T\+M module documentation@{F\+T\+M module documentation}!F\+T\+M\+\_\+\+Init@{F\+T\+M\+\_\+\+Init}}
+\index{F\+T\+M\+\_\+\+Init@{F\+T\+M\+\_\+\+Init}!F\+T\+M module documentation@{F\+T\+M module documentation}}
+\subsubsection[{F\+T\+M\+\_\+\+Init()}]{\setlength{\rightskip}{0pt plus 5cm}bool F\+T\+M\+\_\+\+Init (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{group___f_t_m__module_ga5f31811e067b5690d5f73c8e77019a6b}
+
+
+Sets up the F\+T\+M before first use. 
+
+Enables the F\+T\+M as a free running 16-\/bit counter. \begin{DoxyReturn}{Returns}
+bool -\/ T\+R\+U\+E if the F\+T\+M was successfully initialized. 
+\end{DoxyReturn}
+\hypertarget{group___f_t_m__module_gae4928af832114c8173e43d10e4144c1f}{}\index{F\+T\+M module documentation@{F\+T\+M module documentation}!F\+T\+M\+\_\+\+Set@{F\+T\+M\+\_\+\+Set}}
+\index{F\+T\+M\+\_\+\+Set@{F\+T\+M\+\_\+\+Set}!F\+T\+M module documentation@{F\+T\+M module documentation}}
+\subsubsection[{F\+T\+M\+\_\+\+Set(const T\+F\+T\+M\+Channel $\ast$const a\+F\+T\+M\+Channel)}]{\setlength{\rightskip}{0pt plus 5cm}bool F\+T\+M\+\_\+\+Set (
+\begin{DoxyParamCaption}
+\item[{const {\bf T\+F\+T\+M\+Channel} $\ast$const}]{a\+F\+T\+M\+Channel}
+\end{DoxyParamCaption}
+)}\label{group___f_t_m__module_gae4928af832114c8173e43d10e4144c1f}
+
+
+Sets up a timer channel. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em a\+F\+T\+M\+Channel} & is a structure containing the parameters to be used in setting up the timer channel. channel\+Nb is the channel number of the F\+T\+M to use. delay\+Count is the delay count (in module clock periods) for an output compare event. timer\+Function is used to set the timer up as either an input capture or an output compare. io\+Type is a union that depends on the setting of the channel as input capture or output compare\+: output\+Action is the action to take on a successful output compare. input\+Detection is the type of input capture detection. user\+Semaphore is a pointer to a semaphore \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bool -\/ T\+R\+U\+E if the timer was set up successfully. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Assumes the F\+T\+M has been initialized. 
+\end{DoxyNote}
+\hypertarget{group___f_t_m__module_gabb34a0dd79d879502fd81c0efa9440ec}{}\index{F\+T\+M module documentation@{F\+T\+M module documentation}!F\+T\+M\+\_\+\+Start\+Timer@{F\+T\+M\+\_\+\+Start\+Timer}}
+\index{F\+T\+M\+\_\+\+Start\+Timer@{F\+T\+M\+\_\+\+Start\+Timer}!F\+T\+M module documentation@{F\+T\+M module documentation}}
+\subsubsection[{F\+T\+M\+\_\+\+Start\+Timer(const T\+F\+T\+M\+Channel $\ast$const a\+F\+T\+M\+Channel)}]{\setlength{\rightskip}{0pt plus 5cm}bool F\+T\+M\+\_\+\+Start\+Timer (
+\begin{DoxyParamCaption}
+\item[{const {\bf T\+F\+T\+M\+Channel} $\ast$const}]{a\+F\+T\+M\+Channel}
+\end{DoxyParamCaption}
+)}\label{group___f_t_m__module_gabb34a0dd79d879502fd81c0efa9440ec}
+
+
+Starts a timer if set up for output compare. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em a\+F\+T\+M\+Channel} & is a structure containing the parameters to be used in setting up the timer channel. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bool -\/ T\+R\+U\+E if the timer was started successfully. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Assumes the F\+T\+M has been initialized. 
+\end{DoxyNote}

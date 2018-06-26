@@ -1,0 +1,48 @@
+\hypertarget{accel_8h}{}\section{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/accel.h File Reference}
+\label{accel_8h}\index{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/accel.\+h@{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/accel.\+h}}
+
+
+H\+A\+L for the accelerometer.  
+
+
+{\ttfamily \#include \char`\"{}types.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}O\+S.\+h\char`\"{}}\\*
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{struct_t_accel_setup}{T\+Accel\+Setup}
+\item 
+union \hyperlink{union_t_accel_data}{T\+Accel\+Data}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{accel_8h_aa4058f7fc9c8d14d82445b6e61702845}{}enum {\bfseries T\+Accel\+Mode} \{ {\bfseries A\+C\+C\+E\+L\+\_\+\+P\+O\+L\+L}, 
+{\bfseries A\+C\+C\+E\+L\+\_\+\+I\+N\+T}
+ \}\label{accel_8h_aa4058f7fc9c8d14d82445b6e61702845}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{group__accel__module_gad5a20dbb7475bf6023e591d6a4e7312d}{Accel\+\_\+\+Init} (const \hyperlink{struct_t_accel_setup}{T\+Accel\+Setup} $\ast$const accel\+Setup)
+\begin{DoxyCompactList}\small\item\em Initializes the accelerometer by calling the initialization routines of the supporting software modules. \end{DoxyCompactList}\item 
+void \hyperlink{group__accel__module_ga8cc8e053f2474e24cb761f1de0f769d8}{Accel\+\_\+\+Read\+X\+Y\+Z} (uint8\+\_\+t data\mbox{[}3\mbox{]})
+\begin{DoxyCompactList}\small\item\em Reads X, Y and Z accelerations. \end{DoxyCompactList}\item 
+void \hyperlink{group__accel__module_ga4f26113eba1169f1d886f8236626f4a7}{Accel\+\_\+\+Set\+Mode} (const T\+Accel\+Mode mode)
+\begin{DoxyCompactList}\small\item\em Set the mode of the accelerometer. \end{DoxyCompactList}\item 
+void \hyperlink{group__accel__module_ga445500277ba0e363873b34cffc015745}{\+\_\+\+\_\+attribute\+\_\+\+\_\+} ((interrupt)) Accel\+Data\+Ready\+\_\+\+I\+S\+R(void)
+\begin{DoxyCompactList}\small\item\em Interrupt service routine for the accelerometer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+H\+A\+L for the accelerometer. 
+
+This contains the functions for interfacing to the M\+M\+A8451\+Q accelerometer.
+
+\begin{DoxyAuthor}{Author}
+12403756, 12551519 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2018-\/04-\/29 
+\end{DoxyDate}

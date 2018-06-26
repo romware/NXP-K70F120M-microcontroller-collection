@@ -1,0 +1,35 @@
+\hypertarget{_r_t_c_8c}{}\section{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/\+R\+T\+C.c File Reference}
+\label{_r_t_c_8c}\index{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/\+R\+T\+C.\+c@{D\+:/\+Embedded Software U\+S/es18aut13/\+Project/sources/\+R\+T\+C.\+c}}
+
+
+Routines for controlling the Real Time Clock (R\+T\+C) on the T\+W\+R-\/\+K70\+F120\+M.  
+
+
+{\ttfamily \#include \char`\"{}R\+T\+C.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}M\+K70\+F12.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Cpu.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}O\+S.\+h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{group___r_t_c__module_ga8f6fdd811ffd21bc967984a6046ec8b4}{R\+T\+C\+\_\+\+Init} (O\+S\+\_\+\+E\+C\+B $\ast$read\+Semaphore)
+\begin{DoxyCompactList}\small\item\em Initializes the R\+T\+C before first use. \end{DoxyCompactList}\item 
+void \hyperlink{group___r_t_c__module_gacbe916e4fad6bfc2ffcde604fa6afb52}{R\+T\+C\+\_\+\+Set} (const uint8\+\_\+t hours, const uint8\+\_\+t minutes, const uint8\+\_\+t seconds)
+\begin{DoxyCompactList}\small\item\em Sets the value of the real time clock. \end{DoxyCompactList}\item 
+void \hyperlink{group___r_t_c__module_ga46e1f15e3b27e2de58d7f213a3bc865d}{R\+T\+C\+\_\+\+Get} (uint8\+\_\+t $\ast$const hours, uint8\+\_\+t $\ast$const minutes, uint8\+\_\+t $\ast$const seconds)
+\begin{DoxyCompactList}\small\item\em Gets the value of the real time clock. \end{DoxyCompactList}\item 
+void \hyperlink{group___r_t_c__module_ga445500277ba0e363873b34cffc015745}{\+\_\+\+\_\+attribute\+\_\+\+\_\+} ((interrupt))
+\begin{DoxyCompactList}\small\item\em Interrupt service routine for the R\+T\+C. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Routines for controlling the Real Time Clock (R\+T\+C) on the T\+W\+R-\/\+K70\+F120\+M. 
+
+This contains the functions for operating the real time clock (R\+T\+C).
+
+\begin{DoxyAuthor}{Author}
+12403756, 12551519 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2018-\/04-\/13 
+\end{DoxyDate}
