@@ -1408,6 +1408,7 @@ static void FTMLEDsOffThread(void* pData)
  */
 static void FFTThread(void* pData)
 {
+   // Allocate memory manually as malloc fails. This is large enough for the malloc requested size.
    uint8_t memory[500];                                               /*!< Memory space allocated for kiss_fftr_cfg*/
    size_t size = 500;                                                 /*!< Size of memory allocated for kiss_fftr_cfg*/
    kiss_fft_scalar fftInput[ADC_SAMPLES_PER_CYCLE];                   /*!< Scalar array for input data*/
