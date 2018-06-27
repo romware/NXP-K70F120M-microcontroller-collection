@@ -330,7 +330,6 @@ static bool HandleTowerVoltage(void)
 
 /*! @brief Sends the tower spectrum packet for a selected harmonic
  *
- *  @note Tested speed of Math.h sqrt and float FFT speed - 242us whereas this is 26us. Therefore on average 216us faster
  *  @return bool - TRUE if spectrum packet is sent
  */
 static bool HandleTowerSpectrum(void)
@@ -713,7 +712,7 @@ void CalculateFrequencyThread(void* pData)
 /*! @brief Calculates the Spectrum on an ADC channel
  *
  *  @param pData is not used.
- *  @note Assumes that Analog_Init has been called successfully.
+ *  @note Tested speed of FFT and quick square root combined - 242us.
  */
 void CalculateSpectrumThread(void* pData)
 {

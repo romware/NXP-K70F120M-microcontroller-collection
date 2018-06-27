@@ -99,6 +99,9 @@ Calculates R\+M\+S of given values.
 {\em prev\+Root} & is the previously calculated R\+M\+S. \\
 \hline
 \end{DoxyParams}
+\begin{DoxyNote}{Note}
+tested speed with Math.\+h sqrt function -\/ 38us whereas this is 14us. Therefore on average 24us faster. 
+\end{DoxyNote}
 \begin{DoxyReturn}{Returns}
 uint16 -\/ R\+M\+S value 
 \end{DoxyReturn}
@@ -203,9 +206,6 @@ Calculates the square root of a given value efficiently using previous roots.
 {\em prev\+Root} & is the previously calculated root. \\
 \hline
 \end{DoxyParams}
-\begin{DoxyNote}{Note}
-tested speed of Math.\+h sqrt function -\/ 38us whereas this is 25us. Therefore on average 13us faster. 
-\end{DoxyNote}
 \begin{DoxyReturn}{Returns}
 uint32 -\/ Square root value 
 \end{DoxyReturn}

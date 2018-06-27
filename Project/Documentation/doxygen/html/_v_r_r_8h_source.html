@@ -117,8 +117,8 @@ $(document).ready(function(){initNavTree('_v_r_r_8h_source.html','');});
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="group___v_r_r__module.html#ga93027d44790f5625dc76fe8546c9692b">VRR_ProtectedAnalogPut</a>(uint8_t <span class="keyword">const</span> channelNb, int16_t <span class="keyword">const</span> value);</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;uint32_t <a class="code" href="group___v_r_r__module.html#gaf7bfe3281cde13a415309080ff5b0dc4">VRR_QuickSquareRoot</a>(<span class="keyword">const</span> uint32_t targetSquare, uint32_t prevRoot);</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;uint32_t <a class="code" href="group___v_r_r__module.html#gaf7bfe3281cde13a415309080ff5b0dc4">VRR_QuickSquareRoot</a>(<span class="keyword">const</span> uint32_t targetSquare, uint32_t prevRoot);</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;uint16_t <a class="code" href="group___v_r_r__module.html#ga133f79b2a87bb1e8c5ec256642b2e0d5">VRR_CalculateRMS</a>(<span class="keyword">const</span> int16_t data[], <span class="keyword">const</span> uint8_t length, <span class="keyword">const</span> uint16_t prevRoot);</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group___v_r_r__module.html#ga19d2f6b20d6ec746b143317ea8add0db">VRR_CheckAlarm</a>(int64_t* timerDelay, int64_t* minDelay, int64_t* timerRate, <span class="keyword">const</span> uint32_t defaultRate, <span class="keyword">const</span> uint8_t mode,</div>
@@ -130,7 +130,7 @@ $(document).ready(function(){initNavTree('_v_r_r_8h_source.html','');});
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="types_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div><div class="ttdoc">Declares new types. </div></div>
-<div class="ttc" id="group___v_r_r__module_html_gaf7bfe3281cde13a415309080ff5b0dc4"><div class="ttname"><a href="group___v_r_r__module.html#gaf7bfe3281cde13a415309080ff5b0dc4">VRR_QuickSquareRoot</a></div><div class="ttdeci">uint32_t VRR_QuickSquareRoot(const uint32_t targetSquare, uint32_t prevRoot)</div><div class="ttdoc">Calculates the square root of a given value efficiently using previous roots. </div><div class="ttdef"><b>Definition:</b> VRR.c:69</div></div>
+<div class="ttc" id="group___v_r_r__module_html_gaf7bfe3281cde13a415309080ff5b0dc4"><div class="ttname"><a href="group___v_r_r__module.html#gaf7bfe3281cde13a415309080ff5b0dc4">VRR_QuickSquareRoot</a></div><div class="ttdeci">uint32_t VRR_QuickSquareRoot(const uint32_t targetSquare, uint32_t prevRoot)</div><div class="ttdoc">Calculates the square root of a given value efficiently using previous roots. </div><div class="ttdef"><b>Definition:</b> VRR.c:68</div></div>
 <div class="ttc" id="group___v_r_r__module_html_ga86c619fba042609fa87246ef742e466e"><div class="ttname"><a href="group___v_r_r__module.html#ga86c619fba042609fa87246ef742e466e">VRR_SetFrequency</a></div><div class="ttdeci">void VRR_SetFrequency(OS_ECB *frequencyAccess, uint32_t *frequencyPtr, const uint32_t frequency, const uint16_t rms, uint32_t *periodAnalogSamplePtr)</div><div class="ttdoc">Sets the frequency to a new value. </div><div class="ttdef"><b>Definition:</b> VRR.c:181</div></div>
 <div class="ttc" id="_v_r_r_8h_html_a145fb83eaa08eeccdac4c6bf2a0243b6"><div class="ttname"><a href="_v_r_r_8h.html#a145fb83eaa08eeccdac4c6bf2a0243b6">TTimingMode</a></div><div class="ttdeci">TTimingMode</div><div class="ttdoc">Timing mode parameters for tower to PC protocol. </div><div class="ttdef"><b>Definition:</b> VRR.h:38</div></div>
 <div class="ttc" id="group___v_r_r__module_html_ga133f79b2a87bb1e8c5ec256642b2e0d5"><div class="ttname"><a href="group___v_r_r__module.html#ga133f79b2a87bb1e8c5ec256642b2e0d5">VRR_CalculateRMS</a></div><div class="ttdeci">uint16_t VRR_CalculateRMS(const int16_t data[], const uint8_t length, const uint16_t prevRoot)</div><div class="ttdoc">Calculates RMS of given values. </div><div class="ttdef"><b>Definition:</b> VRR.c:111</div></div>
@@ -148,7 +148,7 @@ $(document).ready(function(){initNavTree('_v_r_r_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_08d237fc27d4ecd563f71c5d52f2fecc.html">sources</a></li><li class="navelem"><a class="el" href="_v_r_r_8h.html">VRR.h</a></li>
-    <li class="footer">Generated on Tue Jun 26 2018 16:43:03 for Project by
+    <li class="footer">Generated on Wed Jun 27 2018 17:42:24 for Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

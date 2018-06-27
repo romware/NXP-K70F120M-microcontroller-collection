@@ -82,7 +82,6 @@ bool VRR_ProtectedAnalogPut(uint8_t const channelNb, int16_t const value);
  *
  *  @param targetSquare is the number to find the root of.
  *  @param prevRoot is the previously calculated root.
- *  @note tested speed of Math.h sqrt function - 38us whereas this is 25us. Therefore on average 13us faster.
  *  @return uint32 - Square root value
  */
 uint32_t VRR_QuickSquareRoot(const uint32_t targetSquare, uint32_t prevRoot);
@@ -92,6 +91,7 @@ uint32_t VRR_QuickSquareRoot(const uint32_t targetSquare, uint32_t prevRoot);
  *  @param data is the sample data from the ADC.
  *  @param length is the length of the data.
  *  @param prevRoot is the previously calculated RMS.
+ *  @note tested speed with Math.h sqrt function - 38us whereas this is 14us. Therefore on average 24us faster.
  *  @return uint16 - RMS value
  */
 uint16_t VRR_CalculateRMS(const int16_t data[], const uint8_t length, const uint16_t prevRoot);
