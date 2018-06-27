@@ -238,7 +238,7 @@ static bool HandleTowerTiming(void)
   if(Packet_Parameter1 == TIMING_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Sends the timing mode packet
-    return Packet_Put(COMMAND_TIMING,TIMING_GET,TimingMode,0);
+    return Packet_Put(COMMAND_TIMING,TimingMode,0,0);
   }
   else if((Packet_Parameter1 == TIMING_DEFINITE || Packet_Parameter1 == TIMING_INVERSE) && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
@@ -259,7 +259,7 @@ static bool HandleTowerRaises(void)
   if(Packet_Parameter1 == DEVIATION_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Sends the number of raises packet
-    return Packet_Put(COMMAND_RAISES,DEVIATION_GET,Flash_Read8(NvCountRaises),0);
+    return Packet_Put(COMMAND_RAISES,Flash_Read8(NvCountRaises),0,0);
   }
   else if(Packet_Parameter1 == DEVIATION_RESET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
@@ -279,7 +279,7 @@ static bool HandleTowerLowers(void)
   if(Packet_Parameter1 == DEVIATION_GET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
     // Sends the number of raises packet
-    return Packet_Put(COMMAND_LOWERS,DEVIATION_GET,Flash_Read8(NvCountLowers),0);
+    return Packet_Put(COMMAND_LOWERS,Flash_Read8(NvCountLowers),0,0);
   }
   else if(Packet_Parameter1 == DEVIATION_RESET && Packet_Parameter2 == 0 && Packet_Parameter3 == 0)
   {
@@ -782,7 +782,13 @@ void RaisesThread(void* pData)
   for (;;)
   {
     (void)OS_SemaphoreWait(RaisesSemaphore, 0);
-    Flash_Write((uint32_t*)NvCountRaises,Flash_Read8(NvCountRaises)+1,8);
+    
+    uint8_t count = Flash_Read8(NvCountRaises);
+    
+    if(count < 254)
+    {
+      Flash_Write((uint32_t*)NvCountRaises,Flash_Read8(NvCountRaises)+1,8);
+    }
   }
 }
 
@@ -796,7 +802,13 @@ void LowersThread(void* pData)
   for (;;)
   {
     (void)OS_SemaphoreWait(LowersSemaphore, 0);
-    Flash_Write((uint32_t*)NvCountLowers,Flash_Read8(NvCountLowers)+1,8);
+    
+    uint8_t count = Flash_Read8(NvCountLowers);
+    
+    if(count < 254)
+    {
+      Flash_Write((uint32_t*)NvCountLowers,Flash_Read8(NvCountLowers)+1,8);
+    }
   }
 }
 
@@ -818,7 +830,7 @@ int main(void)
   error = OS_ThreadCreate(InitModulesThread,
                           NULL,
                           &InitModulesThreadStack[THREAD_STACK_SIZE - 1],
-  		                    0);
+                          0);
 
   // Create threads for analog RMS calculations
   for (uint8_t threadNb = VRR_CHANNEL_1; threadNb < VRR_NB_CHANNELS; threadNb++)
