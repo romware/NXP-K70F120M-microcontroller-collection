@@ -1,0 +1,42 @@
+\hypertarget{_flash_8c}{}\section{C\+:/\+Users/12551519/\+Desktop/es18aut13/\+Project/sources/\+Flash.c File Reference}
+\label{_flash_8c}\index{C\+:/\+Users/12551519/\+Desktop/es18aut13/\+Project/sources/\+Flash.\+c@{C\+:/\+Users/12551519/\+Desktop/es18aut13/\+Project/sources/\+Flash.\+c}}
+
+
+Routines for erasing and writing to the Flash.  
+
+
+{\ttfamily \#include \char`\"{}M\+K70\+F12.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}L\+E\+Ds.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Flash.\+h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{group___flash__module_gab6bef2c581b902a2bca7a0d04409ad30}{Flash\+\_\+\+Init} (O\+S\+\_\+\+E\+C\+B $\ast$flash\+Access\+Semaphore)
+\begin{DoxyCompactList}\small\item\em Enables the Flash module. \end{DoxyCompactList}\item 
+bool \hyperlink{group___flash__module_ga50871aff0f5af1e092aea3ed2545cf72}{Flash\+\_\+\+Allocate\+Var} (volatile void $\ast$$\ast$variable, const uint8\+\_\+t size)
+\begin{DoxyCompactList}\small\item\em Allocates space for a non-\/volatile variable in the Flash memory. \end{DoxyCompactList}\item 
+bool \hyperlink{group___flash__module_ga06868787ccef73e69bd236d3b93b68f3}{Flash\+\_\+\+Erase} (void)
+\begin{DoxyCompactList}\small\item\em Erases the entire Flash sector. \end{DoxyCompactList}\item 
+bool \hyperlink{group___flash__module_gab920a95573638276676b5a9417e282fd}{Flash\+\_\+\+Write} (volatile uint32\+\_\+t $\ast$const address, const uint32\+\_\+t data, const uint8\+\_\+t size)
+\begin{DoxyCompactList}\small\item\em Writes to Flash. T\+O\+D\+O\+:comments. \end{DoxyCompactList}\item 
+uint8\+\_\+t \hyperlink{group___flash__module_ga10da7ee9a2d8d8bc4bc6fc698c9197ac}{Flash\+\_\+\+Read8} (volatile uint8\+\_\+t $\ast$const address)
+\begin{DoxyCompactList}\small\item\em Reads from Flash. \end{DoxyCompactList}\item 
+uint16\+\_\+t \hyperlink{group___flash__module_gab00365afc70a3e21ea3987c3c5e97132}{Flash\+\_\+\+Read16} (volatile uint16\+\_\+t $\ast$const address)
+\begin{DoxyCompactList}\small\item\em Reads from Flash. \end{DoxyCompactList}\item 
+uint32\+\_\+t \hyperlink{group___flash__module_gad7c248518fd800ac3af6b4cf52843e82}{Flash\+\_\+\+Read32} (volatile uint32\+\_\+t $\ast$const address)
+\begin{DoxyCompactList}\small\item\em Reads from Flash. \end{DoxyCompactList}\item 
+uint64\+\_\+t \hyperlink{group___flash__module_ga4a5eef3ce2a12cc3b20450882ec6e904}{Flash\+\_\+\+Read64} (volatile uint64\+\_\+t $\ast$const address)
+\begin{DoxyCompactList}\small\item\em Reads from Flash. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Routines for erasing and writing to the Flash. 
+
+This contains the functions needed for accessing the internal Flash.
+
+\begin{DoxyAuthor}{Author}
+12403756, 12551519 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2018-\/04-\/13 
+\end{DoxyDate}

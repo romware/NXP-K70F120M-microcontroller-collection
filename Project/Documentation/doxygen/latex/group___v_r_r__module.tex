@@ -1,0 +1,285 @@
+\hypertarget{group___v_r_r__module}{}\section{V\+R\+R module documentation}
+\label{group___v_r_r__module}\index{V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{group___v_r_r__module_ga756bc6b6907a4561fe65c47e79fcac7a}{V\+R\+R\+\_\+\+Init} (void)
+\begin{DoxyCompactList}\small\item\em Sets up the V\+R\+R before first use. \end{DoxyCompactList}\item 
+bool \hyperlink{group___v_r_r__module_ga93027d44790f5625dc76fe8546c9692b}{V\+R\+R\+\_\+\+Protected\+Analog\+Put} (uint8\+\_\+t const channel\+Nb, int16\+\_\+t const value)
+\begin{DoxyCompactList}\small\item\em Sends a value to an analog input channel. \end{DoxyCompactList}\item 
+uint32\+\_\+t \hyperlink{group___v_r_r__module_gaf7bfe3281cde13a415309080ff5b0dc4}{V\+R\+R\+\_\+\+Quick\+Square\+Root} (const uint32\+\_\+t target\+Square, uint32\+\_\+t prev\+Root)
+\begin{DoxyCompactList}\small\item\em Calculates the square root of a given value efficiently using previous roots. \end{DoxyCompactList}\item 
+uint16\+\_\+t \hyperlink{group___v_r_r__module_ga133f79b2a87bb1e8c5ec256642b2e0d5}{V\+R\+R\+\_\+\+Calculate\+R\+M\+S} (const int16\+\_\+t data\mbox{[}$\,$\mbox{]}, const uint8\+\_\+t length, const uint16\+\_\+t prev\+Root)
+\begin{DoxyCompactList}\small\item\em Calculates R\+M\+S of given values. \end{DoxyCompactList}\item 
+void \hyperlink{group___v_r_r__module_ga19d2f6b20d6ec746b143317ea8add0db}{V\+R\+R\+\_\+\+Check\+Alarm} (int64\+\_\+t $\ast$timer\+Delay, int64\+\_\+t $\ast$min\+Delay, int64\+\_\+t $\ast$timer\+Rate, const uint32\+\_\+t default\+Rate, const uint8\+\_\+t mode, const uint16\+\_\+t deviation, bool $\ast$alarm, bool $\ast$adjustment, O\+S\+\_\+\+E\+C\+B $\ast$semaphore, const int8\+\_\+t channel)
+\begin{DoxyCompactList}\small\item\em Triggers the alarm, adjustment and timer when the R\+M\+S is out of bounds. \end{DoxyCompactList}\item 
+void \hyperlink{group___v_r_r__module_ga86c619fba042609fa87246ef742e466e}{V\+R\+R\+\_\+\+Set\+Frequency} (O\+S\+\_\+\+E\+C\+B $\ast$frequency\+Access, uint32\+\_\+t $\ast$frequency\+Ptr, const uint32\+\_\+t frequency, const uint16\+\_\+t rms, uint32\+\_\+t $\ast$period\+Analog\+Sample\+Ptr)
+\begin{DoxyCompactList}\small\item\em Sets the frequency to a new value. \end{DoxyCompactList}\item 
+uint32\+\_\+t \hyperlink{group___v_r_r__module_ga62b2158646147efadf49c870f3245c0d}{V\+R\+R\+\_\+\+Calculate\+Frequency} (const int16\+\_\+t sample\+Data\mbox{[}$\,$\mbox{]}, const uint16\+\_\+t rms, const uint32\+\_\+t period\+Analog\+Sample)
+\begin{DoxyCompactList}\small\item\em Calculates the frequency from sample data. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const uint64\+\_\+t \hyperlink{group___v_r_r__module_gadc0a5545fe71ae0a54e9790b83f3cc35}{V\+R\+R\+\_\+\+P\+E\+R\+I\+O\+D\+\_\+\+T\+I\+M\+E\+R\+\_\+\+D\+E\+L\+A\+Y} = 5000000000
+\item 
+const uint64\+\_\+t \hyperlink{group___v_r_r__module_ga6dcb39a1c723e97c190362e56504ce0f}{V\+R\+R\+\_\+\+P\+E\+R\+I\+O\+D\+\_\+\+M\+I\+N\+\_\+\+D\+E\+L\+A\+Y} = 1000000000
+\item 
+const uint32\+\_\+t \hyperlink{group___v_r_r__module_ga9cff33455fa636577df049d46c6a732c}{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+D\+E\+F\+A\+U\+L\+T} = 500
+\item 
+const uint32\+\_\+t \hyperlink{group___v_r_r__module_gac34989c91ba32cf4a1203e112a690e99}{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W} = 475
+\item 
+const uint32\+\_\+t \hyperlink{group___v_r_r__module_gaa6799d90e01e04a1f23b6a1046b9d2c2}{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H} = 525
+\item 
+const int16\+\_\+t \hyperlink{group___v_r_r__module_gad55bb968f6baf24de7bc84da9af56299}{V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+Z\+E\+R\+O} = 0
+\item 
+const int16\+\_\+t \hyperlink{group___v_r_r__module_gab6986e66860b0f542175fa87d09b9b0c}{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+H\+A\+L\+F} = 1638
+\item 
+const int16\+\_\+t \hyperlink{group___v_r_r__module_gad3aaefa339469ae93a965e64c9e19695}{V\+R\+R\+\_\+\+V\+O\+L\+T} = 3277
+\item 
+const int16\+\_\+t \hyperlink{group___v_r_r__module_ga9475d7ceaf1b4b9d63d458bc8df3c5e0}{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y} = 4915
+\item 
+const int16\+\_\+t \hyperlink{group___v_r_r__module_ga7fbce20dbb31f9b5e6891e728242b3b7}{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W} = 6553
+\item 
+const int16\+\_\+t \hyperlink{group___v_r_r__module_ga5d7a8b53b78d87dd46bd3d348a81e9c3}{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+N\+O\+M\+I\+N\+A\+L} = 8192
+\item 
+const int16\+\_\+t \hyperlink{group___v_r_r__module_ga0222ba2e8509010d4dcdd18351cf44ba}{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H} = 9830
+\item 
+const int16\+\_\+t \hyperlink{group___v_r_r__module_gadc76104466768c55588f9dfa0d80d851}{V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+F\+I\+V\+E} = 16384
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Function Documentation}
+\hypertarget{group___v_r_r__module_ga62b2158646147efadf49c870f3245c0d}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+Calculate\+Frequency@{V\+R\+R\+\_\+\+Calculate\+Frequency}}
+\index{V\+R\+R\+\_\+\+Calculate\+Frequency@{V\+R\+R\+\_\+\+Calculate\+Frequency}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+Calculate\+Frequency(const int16\+\_\+t sample\+Data[], const uint16\+\_\+t rms, const uint32\+\_\+t period\+Analog\+Sample)}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t V\+R\+R\+\_\+\+Calculate\+Frequency (
+\begin{DoxyParamCaption}
+\item[{const int16\+\_\+t}]{sample\+Data\mbox{[}$\,$\mbox{]}, }
+\item[{const uint16\+\_\+t}]{rms, }
+\item[{const uint32\+\_\+t}]{period\+Analog\+Sample}
+\end{DoxyParamCaption}
+)}\label{group___v_r_r__module_ga62b2158646147efadf49c870f3245c0d}
+
+
+Calculates the frequency from sample data. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sample\+Data} & is the sample data taken from the A\+D\+C. \\
+\hline
+{\em rms} & is value of the calculated R\+M\+S on the selected channel. \\
+\hline
+{\em period\+Analog\+Sample} & is the period at which the A\+D\+C is sampling. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+uint32\+\_\+t -\/ The frequency 
+\end{DoxyReturn}
+\hypertarget{group___v_r_r__module_ga133f79b2a87bb1e8c5ec256642b2e0d5}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+Calculate\+R\+M\+S@{V\+R\+R\+\_\+\+Calculate\+R\+M\+S}}
+\index{V\+R\+R\+\_\+\+Calculate\+R\+M\+S@{V\+R\+R\+\_\+\+Calculate\+R\+M\+S}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+Calculate\+R\+M\+S(const int16\+\_\+t data[], const uint8\+\_\+t length, const uint16\+\_\+t prev\+Root)}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t V\+R\+R\+\_\+\+Calculate\+R\+M\+S (
+\begin{DoxyParamCaption}
+\item[{const int16\+\_\+t}]{data\mbox{[}$\,$\mbox{]}, }
+\item[{const uint8\+\_\+t}]{length, }
+\item[{const uint16\+\_\+t}]{prev\+Root}
+\end{DoxyParamCaption}
+)}\label{group___v_r_r__module_ga133f79b2a87bb1e8c5ec256642b2e0d5}
+
+
+Calculates R\+M\+S of given values. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & is the sample data from the A\+D\+C. \\
+\hline
+{\em length} & is the length of the data. \\
+\hline
+{\em prev\+Root} & is the previously calculated R\+M\+S. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+tested speed with Math.\+h sqrt function -\/ 38us whereas this is 14us. Therefore on average 24us faster. 
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+uint16 -\/ R\+M\+S value 
+\end{DoxyReturn}
+\hypertarget{group___v_r_r__module_ga19d2f6b20d6ec746b143317ea8add0db}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+Check\+Alarm@{V\+R\+R\+\_\+\+Check\+Alarm}}
+\index{V\+R\+R\+\_\+\+Check\+Alarm@{V\+R\+R\+\_\+\+Check\+Alarm}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+Check\+Alarm(int64\+\_\+t $\ast$timer\+Delay, int64\+\_\+t $\ast$min\+Delay, int64\+\_\+t $\ast$timer\+Rate, const uint32\+\_\+t default\+Rate, const uint8\+\_\+t mode, const uint16\+\_\+t deviation, bool $\ast$alarm, bool $\ast$adjustment, O\+S\+\_\+\+E\+C\+B $\ast$semaphore, const int8\+\_\+t channel)}]{\setlength{\rightskip}{0pt plus 5cm}void V\+R\+R\+\_\+\+Check\+Alarm (
+\begin{DoxyParamCaption}
+\item[{int64\+\_\+t $\ast$}]{timer\+Delay, }
+\item[{int64\+\_\+t $\ast$}]{min\+Delay, }
+\item[{int64\+\_\+t $\ast$}]{timer\+Rate, }
+\item[{const uint32\+\_\+t}]{default\+Rate, }
+\item[{const uint8\+\_\+t}]{mode, }
+\item[{const uint16\+\_\+t}]{deviation, }
+\item[{bool $\ast$}]{alarm, }
+\item[{bool $\ast$}]{adjustment, }
+\item[{O\+S\+\_\+\+E\+C\+B $\ast$}]{semaphore, }
+\item[{const int8\+\_\+t}]{channel}
+\end{DoxyParamCaption}
+)}\label{group___v_r_r__module_ga19d2f6b20d6ec746b143317ea8add0db}
+
+
+Triggers the alarm, adjustment and timer when the R\+M\+S is out of bounds. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em timer\+Delay} & is the five second counter when an alarm has been triggered. \\
+\hline
+{\em min\+Delay} & is the one second minimum counter when an alarm has been triggered on inverse mode. \\
+\hline
+{\em timer\+Rate} & is the rate which the timer\+Delay is decremented. \\
+\hline
+{\em default\+Rate} & is the initial timer\+Rate. \\
+\hline
+{\em mode} & is the timing mode setting. \\
+\hline
+{\em deviation} & is how much the R\+M\+S is away from the boundaries. \\
+\hline
+{\em alarm} & is whether it has been triggered on this channel. \\
+\hline
+{\em adjustment} & is whether it has been triggered on this channel. \\
+\hline
+{\em semaphore} & is to signal lowers or raises in Flash. \\
+\hline
+{\em channel} & is the the channel number on the A\+D\+C. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void 
+\end{DoxyReturn}
+\hypertarget{group___v_r_r__module_ga756bc6b6907a4561fe65c47e79fcac7a}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+Init@{V\+R\+R\+\_\+\+Init}}
+\index{V\+R\+R\+\_\+\+Init@{V\+R\+R\+\_\+\+Init}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+Init(void)}]{\setlength{\rightskip}{0pt plus 5cm}bool V\+R\+R\+\_\+\+Init (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{group___v_r_r__module_ga756bc6b6907a4561fe65c47e79fcac7a}
+
+
+Sets up the V\+R\+R before first use. 
+
+\begin{DoxyReturn}{Returns}
+bool -\/ T\+R\+U\+E if the V\+R\+R was successfully initialized. 
+\end{DoxyReturn}
+\hypertarget{group___v_r_r__module_ga93027d44790f5625dc76fe8546c9692b}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+Protected\+Analog\+Put@{V\+R\+R\+\_\+\+Protected\+Analog\+Put}}
+\index{V\+R\+R\+\_\+\+Protected\+Analog\+Put@{V\+R\+R\+\_\+\+Protected\+Analog\+Put}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+Protected\+Analog\+Put(uint8\+\_\+t const channel\+Nb, int16\+\_\+t const value)}]{\setlength{\rightskip}{0pt plus 5cm}bool V\+R\+R\+\_\+\+Protected\+Analog\+Put (
+\begin{DoxyParamCaption}
+\item[{uint8\+\_\+t const}]{channel\+Nb, }
+\item[{int16\+\_\+t const}]{value}
+\end{DoxyParamCaption}
+)}\label{group___v_r_r__module_ga93027d44790f5625dc76fe8546c9692b}
+
+
+Sends a value to an analog input channel. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em channel\+Nb} & is the number of the analog output channel to send the value to. \\
+\hline
+{\em value} & is the value to write to the analog channel. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bool -\/ true if the analog value was output successfully. 
+\end{DoxyReturn}
+\hypertarget{group___v_r_r__module_gaf7bfe3281cde13a415309080ff5b0dc4}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+Quick\+Square\+Root@{V\+R\+R\+\_\+\+Quick\+Square\+Root}}
+\index{V\+R\+R\+\_\+\+Quick\+Square\+Root@{V\+R\+R\+\_\+\+Quick\+Square\+Root}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+Quick\+Square\+Root(const uint32\+\_\+t target\+Square, uint32\+\_\+t prev\+Root)}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t V\+R\+R\+\_\+\+Quick\+Square\+Root (
+\begin{DoxyParamCaption}
+\item[{const uint32\+\_\+t}]{target\+Square, }
+\item[{uint32\+\_\+t}]{prev\+Root}
+\end{DoxyParamCaption}
+)}\label{group___v_r_r__module_gaf7bfe3281cde13a415309080ff5b0dc4}
+
+
+Calculates the square root of a given value efficiently using previous roots. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em target\+Square} & is the number to find the root of. \\
+\hline
+{\em prev\+Root} & is the previously calculated root. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+uint32 -\/ Square root value 
+\end{DoxyReturn}
+\hypertarget{group___v_r_r__module_ga86c619fba042609fa87246ef742e466e}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+Set\+Frequency@{V\+R\+R\+\_\+\+Set\+Frequency}}
+\index{V\+R\+R\+\_\+\+Set\+Frequency@{V\+R\+R\+\_\+\+Set\+Frequency}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+Set\+Frequency(\+O\+S\+\_\+\+E\+C\+B $\ast$frequency\+Access, uint32\+\_\+t $\ast$frequency\+Ptr, const uint32\+\_\+t frequency, const uint16\+\_\+t rms, uint32\+\_\+t $\ast$period\+Analog\+Sample\+Ptr)}]{\setlength{\rightskip}{0pt plus 5cm}void V\+R\+R\+\_\+\+Set\+Frequency (
+\begin{DoxyParamCaption}
+\item[{O\+S\+\_\+\+E\+C\+B $\ast$}]{frequency\+Access, }
+\item[{uint32\+\_\+t $\ast$}]{frequency\+Ptr, }
+\item[{const uint32\+\_\+t}]{frequency, }
+\item[{const uint16\+\_\+t}]{rms, }
+\item[{uint32\+\_\+t $\ast$}]{period\+Analog\+Sample\+Ptr}
+\end{DoxyParamCaption}
+)}\label{group___v_r_r__module_ga86c619fba042609fa87246ef742e466e}
+
+
+Sets the frequency to a new value. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em frequency\+Access} & the mutex to protect frequency. \\
+\hline
+{\em frequency\+Ptr} & is the pointer to the current frequency. \\
+\hline
+{\em frequency} & is the new frequency to set. \\
+\hline
+{\em rms} & is the current R\+M\+S value. \\
+\hline
+{\em period\+Analog\+Sample\+Ptr} & is the pointer to the current sample rate. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void 
+\end{DoxyReturn}
+
+
+\subsection{Variable Documentation}
+\hypertarget{group___v_r_r__module_ga9cff33455fa636577df049d46c6a732c}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+D\+E\+F\+A\+U\+L\+T@{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+D\+E\+F\+A\+U\+L\+T}}
+\index{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+D\+E\+F\+A\+U\+L\+T@{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+D\+E\+F\+A\+U\+L\+T}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+D\+E\+F\+A\+U\+L\+T}]{\setlength{\rightskip}{0pt plus 5cm}const uint32\+\_\+t V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+D\+E\+F\+A\+U\+L\+T = 500}\label{group___v_r_r__module_ga9cff33455fa636577df049d46c6a732c}
+Default frequency (50\+Hz) \hypertarget{group___v_r_r__module_gaa6799d90e01e04a1f23b6a1046b9d2c2}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H@{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H}}
+\index{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H@{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H}]{\setlength{\rightskip}{0pt plus 5cm}const uint32\+\_\+t V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H = 525}\label{group___v_r_r__module_gaa6799d90e01e04a1f23b6a1046b9d2c2}
+High limit frequency (52.\+5\+Hz) \hypertarget{group___v_r_r__module_gac34989c91ba32cf4a1203e112a690e99}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W@{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W}}
+\index{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W@{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W}]{\setlength{\rightskip}{0pt plus 5cm}const uint32\+\_\+t V\+R\+R\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W = 475}\label{group___v_r_r__module_gac34989c91ba32cf4a1203e112a690e99}
+Low limit frequency (47.\+5\+Hz) \hypertarget{group___v_r_r__module_ga9475d7ceaf1b4b9d63d458bc8df3c5e0}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y@{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y}}
+\index{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y@{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y}]{\setlength{\rightskip}{0pt plus 5cm}const int16\+\_\+t V\+R\+R\+\_\+\+L\+I\+M\+I\+T\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y = 4915}\label{group___v_r_r__module_ga9475d7ceaf1b4b9d63d458bc8df3c5e0}
+V\+R\+R\+\_\+\+V\+O\+L\+T x1.\+5 \hypertarget{group___v_r_r__module_gadc76104466768c55588f9dfa0d80d851}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+F\+I\+V\+E@{V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+F\+I\+V\+E}}
+\index{V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+F\+I\+V\+E@{V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+F\+I\+V\+E}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+F\+I\+V\+E}]{\setlength{\rightskip}{0pt plus 5cm}const int16\+\_\+t V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+F\+I\+V\+E = 16384}\label{group___v_r_r__module_gadc76104466768c55588f9dfa0d80d851}
+V\+R\+R\+\_\+\+V\+O\+L\+T x5 \hypertarget{group___v_r_r__module_gad55bb968f6baf24de7bc84da9af56299}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+Z\+E\+R\+O@{V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+Z\+E\+R\+O}}
+\index{V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+Z\+E\+R\+O@{V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+Z\+E\+R\+O}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+Z\+E\+R\+O}]{\setlength{\rightskip}{0pt plus 5cm}const int16\+\_\+t V\+R\+R\+\_\+\+O\+U\+T\+\_\+\+Z\+E\+R\+O = 0}\label{group___v_r_r__module_gad55bb968f6baf24de7bc84da9af56299}
+V\+R\+R\+\_\+\+V\+O\+L\+T x0 \hypertarget{group___v_r_r__module_ga6dcb39a1c723e97c190362e56504ce0f}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+P\+E\+R\+I\+O\+D\+\_\+\+M\+I\+N\+\_\+\+D\+E\+L\+A\+Y@{V\+R\+R\+\_\+\+P\+E\+R\+I\+O\+D\+\_\+\+M\+I\+N\+\_\+\+D\+E\+L\+A\+Y}}
+\index{V\+R\+R\+\_\+\+P\+E\+R\+I\+O\+D\+\_\+\+M\+I\+N\+\_\+\+D\+E\+L\+A\+Y@{V\+R\+R\+\_\+\+P\+E\+R\+I\+O\+D\+\_\+\+M\+I\+N\+\_\+\+D\+E\+L\+A\+Y}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+P\+E\+R\+I\+O\+D\+\_\+\+M\+I\+N\+\_\+\+D\+E\+L\+A\+Y}]{\setlength{\rightskip}{0pt plus 5cm}const uint64\+\_\+t V\+R\+R\+\_\+\+P\+E\+R\+I\+O\+D\+\_\+\+M\+I\+N\+\_\+\+D\+E\+L\+A\+Y = 1000000000}\label{group___v_r_r__module_ga6dcb39a1c723e97c190362e56504ce0f}
+Period of analog timer delay minium (1 second) \hypertarget{group___v_r_r__module_gadc0a5545fe71ae0a54e9790b83f3cc35}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+P\+E\+R\+I\+O\+D\+\_\+\+T\+I\+M\+E\+R\+\_\+\+D\+E\+L\+A\+Y@{V\+R\+R\+\_\+\+P\+E\+R\+I\+O\+D\+\_\+\+T\+I\+M\+E\+R\+\_\+\+D\+E\+L\+A\+Y}}
+\index{V\+R\+R\+\_\+\+P\+E\+R\+I\+O\+D\+\_\+\+T\+I\+M\+E\+R\+\_\+\+D\+E\+L\+A\+Y@{V\+R\+R\+\_\+\+P\+E\+R\+I\+O\+D\+\_\+\+T\+I\+M\+E\+R\+\_\+\+D\+E\+L\+A\+Y}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+P\+E\+R\+I\+O\+D\+\_\+\+T\+I\+M\+E\+R\+\_\+\+D\+E\+L\+A\+Y}]{\setlength{\rightskip}{0pt plus 5cm}const uint64\+\_\+t V\+R\+R\+\_\+\+P\+E\+R\+I\+O\+D\+\_\+\+T\+I\+M\+E\+R\+\_\+\+D\+E\+L\+A\+Y = 5000000000}\label{group___v_r_r__module_gadc0a5545fe71ae0a54e9790b83f3cc35}
+Period of analog timer delay (5 seconds) \hypertarget{group___v_r_r__module_gad3aaefa339469ae93a965e64c9e19695}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+V\+O\+L\+T@{V\+R\+R\+\_\+\+V\+O\+L\+T}}
+\index{V\+R\+R\+\_\+\+V\+O\+L\+T@{V\+R\+R\+\_\+\+V\+O\+L\+T}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+V\+O\+L\+T}]{\setlength{\rightskip}{0pt plus 5cm}const int16\+\_\+t V\+R\+R\+\_\+\+V\+O\+L\+T = 3277}\label{group___v_r_r__module_gad3aaefa339469ae93a965e64c9e19695}
+One volt ((2$^\wedge$15 -\/ 1)/10) \hypertarget{group___v_r_r__module_gab6986e66860b0f542175fa87d09b9b0c}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+H\+A\+L\+F@{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+H\+A\+L\+F}}
+\index{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+H\+A\+L\+F@{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+H\+A\+L\+F}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+H\+A\+L\+F}]{\setlength{\rightskip}{0pt plus 5cm}const int16\+\_\+t V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+H\+A\+L\+F = 1638}\label{group___v_r_r__module_gab6986e66860b0f542175fa87d09b9b0c}
+V\+R\+R\+\_\+\+V\+O\+L\+T x0.\+5 \hypertarget{group___v_r_r__module_ga0222ba2e8509010d4dcdd18351cf44ba}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H@{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H}}
+\index{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H@{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H}]{\setlength{\rightskip}{0pt plus 5cm}const int16\+\_\+t V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+H\+I\+G\+H = 9830}\label{group___v_r_r__module_ga0222ba2e8509010d4dcdd18351cf44ba}
+V\+R\+R\+\_\+\+V\+O\+L\+T x3 \hypertarget{group___v_r_r__module_ga7fbce20dbb31f9b5e6891e728242b3b7}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W@{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W}}
+\index{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W@{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W}]{\setlength{\rightskip}{0pt plus 5cm}const int16\+\_\+t V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+L\+I\+M\+I\+T\+\_\+\+L\+O\+W = 6553}\label{group___v_r_r__module_ga7fbce20dbb31f9b5e6891e728242b3b7}
+V\+R\+R\+\_\+\+V\+O\+L\+T x2 \hypertarget{group___v_r_r__module_ga5d7a8b53b78d87dd46bd3d348a81e9c3}{}\index{V\+R\+R module documentation@{V\+R\+R module documentation}!V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+N\+O\+M\+I\+N\+A\+L@{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+N\+O\+M\+I\+N\+A\+L}}
+\index{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+N\+O\+M\+I\+N\+A\+L@{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+N\+O\+M\+I\+N\+A\+L}!V\+R\+R module documentation@{V\+R\+R module documentation}}
+\subsubsection[{V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+N\+O\+M\+I\+N\+A\+L}]{\setlength{\rightskip}{0pt plus 5cm}const int16\+\_\+t V\+R\+R\+\_\+\+V\+O\+L\+T\+\_\+\+N\+O\+M\+I\+N\+A\+L = 8192}\label{group___v_r_r__module_ga5d7a8b53b78d87dd46bd3d348a81e9c3}
+V\+R\+R\+\_\+\+V\+O\+L\+T x2.\+5 

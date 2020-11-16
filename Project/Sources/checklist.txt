@@ -1,0 +1,56 @@
+VRR – Basic Functionality
+
+/2 G A P Voltage sampling.
+Three channels have synchronous sampling.						- Done
+16 samples per cycle at 50 Hz.									- Done
+Hard real-time constraint met.									- Done
+
+/6 G A P True RMS. 
+Measurement of true RMS for voltage.							- Done
+Speed of calculation.											- Done
+Efficiency of algorithm.										- Done
+
+/4 G A P Outputs.
+Three channel operation is aggregated 							- Done
+	(raise/lower initiated on any channel).
+Alarm signal.													- Done
+Non-volatile storage of number of raise/lower events.			- Done
+
+/6 G A P Timing. 
+Definite.														- Done
+Inverse.														- Done
+Accuracy.														- Done
+
+/2 G A P Settings / interrogation.
+Tower protocol expanded to achieve Basic Functionality.			- Done
+
+/20 SUBTOTAL
+
+
+VRR – Intermediate Functionality
+
+/5 G A P Sample rate. 
+16 samples per cycle 											- Done
+	(i.e. frequency measurement to 0.1 Hz and tracking).
+
+/5 G A P RTOS. 
+Multiple threads are used with an RTOS – i.e.					- Done
+	one thread for analog, 
+	one thread for PC comms, 
+	one thread for logic, etc.
+
+/2 G A P Settings / interrogation.
+Tower protocol expanded to achieve Intermediate Functionality.	- Done
+
+/12 SUBTOTAL
+
+
+VRR – Advanced Functionality
+
+/8 G A P Spectrum. 												- Done
+Spectral content of Phase A voltage up to 350 Hz with 50 Hz resolution.
+Magnitude of 50 Hz component calculated.						- Done
+Tower protocol expanded to achieve Advanced Functionality.		- Done
+
+/8 SUBTOTAL
+

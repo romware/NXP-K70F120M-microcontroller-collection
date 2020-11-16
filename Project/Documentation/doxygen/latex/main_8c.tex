@@ -1,0 +1,122 @@
+\hypertarget{main_8c}{}\section{C\+:/\+Users/12551519/\+Desktop/es18aut13/\+Project/sources/main.c File Reference}
+\label{main_8c}\index{C\+:/\+Users/12551519/\+Desktop/es18aut13/\+Project/sources/main.\+c@{C\+:/\+Users/12551519/\+Desktop/es18aut13/\+Project/sources/main.\+c}}
+
+
+Main module. This module contains user\textquotesingle{}s application code.  
+
+
+{\ttfamily \#include \char`\"{}types.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Cpu.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}O\+S.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Events.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}P\+E\+\_\+\+Types.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}P\+E\+\_\+\+Error.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}P\+E\+\_\+\+Const.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}I\+O\+\_\+\+Map.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}M\+K70\+F12.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}L\+E\+Ds.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}U\+A\+R\+T.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}F\+I\+F\+O.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}packet.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Flash.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}P\+I\+T.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}F\+T\+M.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}V\+R\+R.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}kiss\+\_\+fft.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}kiss\+\_\+fftr.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}analog.\+h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{group__main__module_gad4455691936f92fdd6c37566fc58ba1f}{B\+A\+U\+D\+\_\+\+R\+A\+T\+E}~115200
+\item 
+\#define \hyperlink{group__main__module_ga26db2f437905e35d7c8305cfd9842307}{F\+I\+X\+E\+D\+\_\+\+P\+O\+I\+N\+T}~32
+\item 
+\hypertarget{main_8c_a0c25da63ce17c691412129c3d7e9ecf2}{}\#define {\bfseries analog\+Data}~((\hyperlink{_v_r_r_8h_ae5f40603a116adc42529ceedda6942c7}{T\+Analog\+Thread\+Data}$\ast$)p\+Data)\label{main_8c_a0c25da63ce17c691412129c3d7e9ecf2}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{group__main__module_gac2875955d67e96abf6cfa8aaad5e9f75}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Init\+Modules\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group__main__module_ga78e32208fd29f8777453fba66cb23512}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (L\+E\+Ds\+Off\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group__main__module_gab4c1c0cd94088cbbb7b7caa74232e2b8}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Packet\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group__main__module_ga05a413cec42e7d893bccc45d54001bb7}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Raises\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group__main__module_ga74d9df5a06cceec1b45c61e69c6d1718}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Lowers\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group__main__module_gaf1afd8f3ce4eedf9ad5254b8750ad1fa}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Frequency\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+\hyperlink{group__main__module_ga9abdf6124e333220d024a49b5ce39883}{O\+S\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K} (Spectrum\+Thread\+Stack, T\+H\+R\+E\+A\+D\+\_\+\+S\+T\+A\+C\+K\+\_\+\+S\+I\+Z\+E)
+\item 
+void \hyperlink{group__main__module_gad34224c2b50d9cf295ffb21b305b149f}{Array\+Copy} (int16\+\_\+t array1\mbox{[}$\,$\mbox{]}, int16\+\_\+t array2\mbox{[}$\,$\mbox{]}, const uint8\+\_\+t length)
+\begin{DoxyCompactList}\small\item\em Insert samples from one array into another. \end{DoxyCompactList}\item 
+bool \hyperlink{group__main__module_gaa069de5ba1209f491602c162f072b664}{Array\+Any\+True} (const bool data\mbox{[}$\,$\mbox{]}, const uint8\+\_\+t length)
+\begin{DoxyCompactList}\small\item\em Checks if any alarm in an array is true. \end{DoxyCompactList}\item 
+uint32\+\_\+t \hyperlink{group__main__module_ga30c3cdc49b63ff8d4b2c0ef1e70bc108}{Protected\+Get\+Analog\+Sample\+Period} (void)
+\begin{DoxyCompactList}\small\item\em Returns the Analog Sample Period. \end{DoxyCompactList}\item 
+uint16\+\_\+t \hyperlink{group__main__module_gadbebeafdb3e77340dbd2d75495f7a879}{Protected\+Get\+R\+M\+S} (\hyperlink{_v_r_r_8h_ae5f40603a116adc42529ceedda6942c7}{T\+Analog\+Thread\+Data} $\ast$channel\+Data)
+\begin{DoxyCompactList}\small\item\em Returns the current R\+M\+S of a channel. \end{DoxyCompactList}\item 
+uint16\+\_\+t \hyperlink{group__main__module_gae89738835c20ca367e44b56d544507f5}{Protected\+Set\+R\+M\+S} (\hyperlink{_v_r_r_8h_ae5f40603a116adc42529ceedda6942c7}{T\+Analog\+Thread\+Data} $\ast$channel\+Data, const uint16\+\_\+t rms)
+\begin{DoxyCompactList}\small\item\em Sets the current R\+M\+S of a channel. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga2eb25994db6055485099e1c3088154f5}{Protected\+Get\+Cycle} (\hyperlink{_v_r_r_8h_ae5f40603a116adc42529ceedda6942c7}{T\+Analog\+Thread\+Data} $\ast$channel\+Data, int16\+\_\+t sample\+Data\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Gets the sample data of one analog cycle. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga7f941dc4a9429f548c9b2c2f4fa6e16d}{Protected\+Get\+Two\+Cycles} (\hyperlink{_v_r_r_8h_ae5f40603a116adc42529ceedda6942c7}{T\+Analog\+Thread\+Data} $\ast$channel\+Data, int16\+\_\+t sample\+Data\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Gets the sample data of two analog cycles. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_gaf57dd4c5e7e444cfe5571d411f9548c9}{Received\+Packet} (void)
+\begin{DoxyCompactList}\small\item\em Executes the command depending on what packet has been received. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga5bb615c293d6b116d3c327bd223f2a4a}{Analog\+Sample\+Callback} (void $\ast$arg)
+\begin{DoxyCompactList}\small\item\em Reads analog data from the A\+D\+C on a specific channel. \end{DoxyCompactList}\item 
+bool \hyperlink{group__main__module_gaeda7b585d318b7b1476285b82b6fed11}{Tower\+Init} (void)
+\begin{DoxyCompactList}\small\item\em Initializes the main tower components by calling the initialization routines of the supporting software modules. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga202b6a897d73aca5d3d20cde43ce7a54}{Calculate\+R\+M\+S\+Thread} (void $\ast$p\+Data)
+\begin{DoxyCompactList}\small\item\em Calculates the R\+M\+S value on an A\+D\+C channel. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga39400542b35c71e63af9b23a072c2412}{Calculate\+Frequency\+Thread} (void $\ast$p\+Data)
+\begin{DoxyCompactList}\small\item\em Calculates the Frequency value on an A\+D\+C channel. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga41af216646a8e64f0bc0767a77244c4c}{Calculate\+Spectrum\+Thread} (void $\ast$p\+Data)
+\begin{DoxyCompactList}\small\item\em Calculates the Spectrum on an A\+D\+C channel. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_gad6f4e9bc8436aeebcc4776b05a7173ae}{Raises\+Thread} (void $\ast$p\+Data)
+\begin{DoxyCompactList}\small\item\em Increments the raises count and writes to Flash. \end{DoxyCompactList}\item 
+void \hyperlink{group__main__module_ga58206eaf11b86e19e48708e5d3e5cc3f}{Lowers\+Thread} (void $\ast$p\+Data)
+\begin{DoxyCompactList}\small\item\em Increments the lowers count and writes to Flash. \end{DoxyCompactList}\item 
+\hypertarget{group__main__module_ga840291bc02cba5474a4cb46a9b9566fe}{}int {\bfseries main} (void)\label{group__main__module_ga840291bc02cba5474a4cb46a9b9566fe}
+
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_gab8928c10e70b1b264be7ff2809bdbafc}{C\+O\+M\+M\+A\+N\+D\+\_\+\+T\+I\+M\+I\+N\+G} = 0x10
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_ga458112a297f29bcedf862af9fee21352}{C\+O\+M\+M\+A\+N\+D\+\_\+\+R\+A\+I\+S\+E\+S} = 0x11
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_ga3950ac4d5a4f4c540f6856a4ad463e14}{C\+O\+M\+M\+A\+N\+D\+\_\+\+L\+O\+W\+E\+R\+S} = 0x12
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_gad03f9b44ebc48c9db63337935fcaf46e}{C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+R\+E\+Q\+U\+E\+N\+C\+Y} = 0x17
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_ga793f5eac55477efb909e878b3021f765}{C\+O\+M\+M\+A\+N\+D\+\_\+\+V\+O\+L\+T\+A\+G\+E} = 0x18
+\item 
+const uint8\+\_\+t \hyperlink{group__main__module_gae55bd8263a510b359f8b4ebca3e6a91d}{C\+O\+M\+M\+A\+N\+D\+\_\+\+S\+P\+E\+C\+T\+R\+U\+M} = 0x19
+\item 
+volatile uint8\+\_\+t $\ast$ \hyperlink{group__main__module_ga515a64111062904ebde3d38b51d1d7d2}{Nv\+Count\+Raises}
+\item 
+volatile uint8\+\_\+t $\ast$ \hyperlink{group__main__module_ga5f7c64789a946f4a8d7c20e94b875f30}{Nv\+Count\+Lowers}
+\item 
+volatile uint8\+\_\+t $\ast$ \hyperlink{group__main__module_ga56dcc37aec297d091908aa8c6c90a89e}{Nv\+Timing\+Mode}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Main module. This module contains user\textquotesingle{}s application code. 
+
+\begin{DoxyVersion}{Version}
+2.\+0 
+\end{DoxyVersion}
+\begin{DoxyAuthor}{Author}
+12551519 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2018-\/05-\/13 
+\end{DoxyDate}

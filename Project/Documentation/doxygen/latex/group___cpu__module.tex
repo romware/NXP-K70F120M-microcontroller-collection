@@ -1,0 +1,135 @@
+\hypertarget{group___cpu__module}{}\section{Cpu module documentation}
+\label{group___cpu__module}\index{Cpu module documentation@{Cpu module documentation}}
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{struct_t_cpu_clock_configuration}{T\+Cpu\+Clock\+Configuration}
+\item 
+struct \hyperlink{structt_vector_table}{t\+Vector\+Table}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___cpu__module_gae2f84b335ab99b9e98d41e8a530b1540}{}\#define {\bfseries P\+Ecfg\+\_\+\+F\+L\+A\+S\+H}~1\+U\label{group___cpu__module_gae2f84b335ab99b9e98d41e8a530b1540}
+
+\item 
+\hypertarget{group___cpu__module_ga532954dc988486bfe48200c796380120}{}\#define {\bfseries C\+P\+U\+\_\+\+B\+U\+S\+\_\+\+C\+L\+K\+\_\+\+H\+Z}~25000000\+U /$\ast$ Initial value of the bus clock frequency in Hz $\ast$/\label{group___cpu__module_ga532954dc988486bfe48200c796380120}
+
+\item 
+\hypertarget{group___cpu__module_ga9dee0abd722c849e54c662ab11a1d2cf}{}\#define {\bfseries C\+P\+U\+\_\+\+C\+O\+R\+E\+\_\+\+C\+L\+K\+\_\+\+H\+Z}~50000000\+U /$\ast$ Initial value of the core/system clock frequency in Hz.  $\ast$/\label{group___cpu__module_ga9dee0abd722c849e54c662ab11a1d2cf}
+
+\item 
+\hypertarget{group___cpu__module_ga37d43e31f65dd620040aec363e95b5a8}{}\#define {\bfseries C\+P\+U\+\_\+\+C\+L\+O\+C\+K\+\_\+\+C\+O\+N\+F\+I\+G\+\_\+\+N\+U\+M\+B\+E\+R}~0x01\+U /$\ast$ Specifies number of defined clock configurations. $\ast$/\label{group___cpu__module_ga37d43e31f65dd620040aec363e95b5a8}
+
+\item 
+\hypertarget{group___cpu__module_ga39018ca5854bea36700d3b30f6c08195}{}\#define {\bfseries C\+P\+U\+\_\+\+B\+U\+S\+\_\+\+C\+L\+K\+\_\+\+H\+Z\+\_\+\+C\+L\+O\+C\+K\+\_\+\+C\+O\+N\+F\+I\+G0}~25000000\+U /$\ast$ Value of the bus clock frequency in the clock configuration 0 in Hz. $\ast$/\label{group___cpu__module_ga39018ca5854bea36700d3b30f6c08195}
+
+\item 
+\hypertarget{group___cpu__module_ga64b9007ea0c78e588ed565373bcec805}{}\#define {\bfseries C\+P\+U\+\_\+\+C\+O\+R\+E\+\_\+\+C\+L\+K\+\_\+\+H\+Z\+\_\+\+C\+L\+O\+C\+K\+\_\+\+C\+O\+N\+F\+I\+G0}~50000000\+U /$\ast$ Value of the core/system clock frequency in the clock configuration 0 in Hz. $\ast$/\label{group___cpu__module_ga64b9007ea0c78e588ed565373bcec805}
+
+\item 
+\hypertarget{group___cpu__module_gacf80ae1c70da6f1932185345fb089ce2}{}\#define {\bfseries C\+P\+U\+\_\+\+X\+T\+A\+L\+\_\+\+C\+L\+K\+\_\+\+H\+Z}~50000000\+U /$\ast$ Value of the external crystal or oscillator clock frequency in Hz $\ast$/\label{group___cpu__module_gacf80ae1c70da6f1932185345fb089ce2}
+
+\item 
+\hypertarget{group___cpu__module_gab701f4ea593c322e0f7a3ee5f0572834}{}\#define {\bfseries C\+P\+U\+\_\+\+X\+T\+A\+L32k\+\_\+\+C\+L\+K\+\_\+\+H\+Z}~32768\+U /$\ast$ Value of the external 32k crystal or oscillator clock frequency in Hz $\ast$/\label{group___cpu__module_gab701f4ea593c322e0f7a3ee5f0572834}
+
+\item 
+\hypertarget{group___cpu__module_ga925e4835a9fdb52f03bd354d62d6ba0a}{}\#define {\bfseries C\+P\+U\+\_\+\+I\+N\+T\+\_\+\+S\+L\+O\+W\+\_\+\+C\+L\+K\+\_\+\+H\+Z}~32768\+U /$\ast$ Value of the slow internal oscillator clock frequency in Hz  $\ast$/\label{group___cpu__module_ga925e4835a9fdb52f03bd354d62d6ba0a}
+
+\item 
+\hypertarget{group___cpu__module_ga741ad9275688de8051f4bebd98a682bc}{}\#define {\bfseries C\+P\+U\+\_\+\+I\+N\+T\+\_\+\+F\+A\+S\+T\+\_\+\+C\+L\+K\+\_\+\+H\+Z}~4000000\+U /$\ast$ Value of the fast internal oscillator clock frequency in Hz  $\ast$/\label{group___cpu__module_ga741ad9275688de8051f4bebd98a682bc}
+
+\item 
+\hypertarget{group___cpu__module_ga5bf3022570d9bb7a0d666f2dd9db6a34}{}\#define {\bfseries C\+P\+U\+\_\+\+F\+A\+M\+I\+L\+Y\+\_\+\+Kinetis}~/$\ast$ Specification of the core type of the selected cpu $\ast$/\label{group___cpu__module_ga5bf3022570d9bb7a0d666f2dd9db6a34}
+
+\item 
+\hypertarget{group___cpu__module_gacd513a4c0c142604e0fa3fbaf5f92e42}{}\#define {\bfseries C\+P\+U\+\_\+\+D\+E\+R\+I\+V\+A\+T\+I\+V\+E\+\_\+\+M\+K70\+F\+N1\+M0\+M\+J15}~/$\ast$ Name of the selected cpu derivative $\ast$/\label{group___cpu__module_gacd513a4c0c142604e0fa3fbaf5f92e42}
+
+\item 
+\hypertarget{group___cpu__module_ga4fcc1df1d7918b17e6f8af2228b9a1c4}{}\#define {\bfseries C\+P\+U\+\_\+\+P\+A\+R\+T\+N\+U\+M\+\_\+\+M\+K70\+F\+N1\+M0\+V\+M\+J12}~/$\ast$ Part number of the selected cpu $\ast$/\label{group___cpu__module_ga4fcc1df1d7918b17e6f8af2228b9a1c4}
+
+\item 
+\hypertarget{group___cpu__module_gab62ca27d0a6a531f35842a6e3a94b454}{}\#define {\bfseries C\+P\+U\+\_\+\+L\+I\+T\+T\+L\+E\+\_\+\+E\+N\+D\+I\+A\+N}~/$\ast$ The selected cpu uses little endian $\ast$/\label{group___cpu__module_gab62ca27d0a6a531f35842a6e3a94b454}
+
+\item 
+\hypertarget{group___cpu__module_ga4d7ade6a1c335a7e5233938aa9197157}{}\#define {\bfseries C\+P\+U\+\_\+\+C\+L\+O\+C\+K\+\_\+\+C\+O\+N\+F\+I\+G\+\_\+0}~0x00\+U /$\ast$ Clock configuration 0 identifier $\ast$/\label{group___cpu__module_ga4d7ade6a1c335a7e5233938aa9197157}
+
+\item 
+\hypertarget{group___cpu__module_ga6fe0b841d40421ee48af4a4e01e48ddf}{}\#define {\bfseries C\+P\+U\+\_\+\+C\+O\+R\+E\+\_\+\+C\+L\+K\+\_\+\+H\+Z\+\_\+\+C\+O\+N\+F\+I\+G\+\_\+0}~50000000\+U\+L /$\ast$ Core clock frequency in clock configuration 0 $\ast$/\label{group___cpu__module_ga6fe0b841d40421ee48af4a4e01e48ddf}
+
+\item 
+\hypertarget{group___cpu__module_gaf060a047649b9537eb77354ab7917a8b}{}\#define {\bfseries C\+P\+U\+\_\+\+B\+U\+S\+\_\+\+C\+L\+K\+\_\+\+H\+Z\+\_\+\+C\+O\+N\+F\+I\+G\+\_\+0}~25000000\+U\+L /$\ast$ Bus clock frequency in clock configuration 0 $\ast$/\label{group___cpu__module_gaf060a047649b9537eb77354ab7917a8b}
+
+\item 
+\hypertarget{group___cpu__module_ga706c0d4dd14c93181b7a99badddc9a51}{}\#define {\bfseries C\+P\+U\+\_\+\+F\+L\+E\+X\+B\+U\+S\+\_\+\+C\+L\+K\+\_\+\+H\+Z\+\_\+\+C\+O\+N\+F\+I\+G\+\_\+0}~10000000\+U\+L /$\ast$ Flexbus clock frequency in clock configuration 0 $\ast$/\label{group___cpu__module_ga706c0d4dd14c93181b7a99badddc9a51}
+
+\item 
+\hypertarget{group___cpu__module_ga09c9820f38d931a0400b832d2582c6f7}{}\#define {\bfseries C\+P\+U\+\_\+\+F\+L\+A\+S\+H\+\_\+\+C\+L\+K\+\_\+\+H\+Z\+\_\+\+C\+O\+N\+F\+I\+G\+\_\+0}~12500000\+U\+L /$\ast$ F\+L\+A\+S\+H clock frequency in clock configuration 0 $\ast$/\label{group___cpu__module_ga09c9820f38d931a0400b832d2582c6f7}
+
+\item 
+\hypertarget{group___cpu__module_ga7bf843fdf59af5fcaf48bea898884a3e}{}\#define {\bfseries C\+P\+U\+\_\+\+U\+S\+B\+\_\+\+C\+L\+K\+\_\+\+H\+Z\+\_\+\+C\+O\+N\+F\+I\+G\+\_\+0}~0\+U\+L /$\ast$ U\+S\+B clock frequency in clock configuration 0 $\ast$/\label{group___cpu__module_ga7bf843fdf59af5fcaf48bea898884a3e}
+
+\item 
+\hypertarget{group___cpu__module_gad2aaa2918b640ae3833fc84e8f983c3c}{}\#define {\bfseries C\+P\+U\+\_\+\+P\+L\+L\+\_\+\+F\+L\+L\+\_\+\+C\+L\+K\+\_\+\+H\+Z\+\_\+\+C\+O\+N\+F\+I\+G\+\_\+0}~0\+U\+L /$\ast$ P\+L\+L/\+F\+L\+L clock frequency in clock configuration 0 $\ast$/\label{group___cpu__module_gad2aaa2918b640ae3833fc84e8f983c3c}
+
+\item 
+\hypertarget{group___cpu__module_ga860e7441eac7d5e35385bcd62b019d9d}{}\#define {\bfseries C\+P\+U\+\_\+\+M\+C\+G\+I\+R\+\_\+\+C\+L\+K\+\_\+\+H\+Z\+\_\+\+C\+O\+N\+F\+I\+G\+\_\+0}~32768\+U\+L /$\ast$ M\+C\+G internal reference clock frequency in clock configuration 0 $\ast$/\label{group___cpu__module_ga860e7441eac7d5e35385bcd62b019d9d}
+
+\item 
+\hypertarget{group___cpu__module_ga2960ebfe6475f475999ea8f1d5448483}{}\#define {\bfseries C\+P\+U\+\_\+\+O\+S\+C\+E\+R\+\_\+\+C\+L\+K\+\_\+\+H\+Z\+\_\+\+C\+O\+N\+F\+I\+G\+\_\+0}~50000000\+U\+L /$\ast$ System O\+S\+C external reference clock frequency in clock configuration 0 $\ast$/\label{group___cpu__module_ga2960ebfe6475f475999ea8f1d5448483}
+
+\item 
+\hypertarget{group___cpu__module_ga092702a75fd1041eb311850abb022240}{}\#define {\bfseries C\+P\+U\+\_\+\+E\+R\+C\+L\+K32\+K\+\_\+\+C\+L\+K\+\_\+\+H\+Z\+\_\+\+C\+O\+N\+F\+I\+G\+\_\+0}~32768\+U\+L /$\ast$ External reference clock 32k frequency in clock configuration 0 $\ast$/\label{group___cpu__module_ga092702a75fd1041eb311850abb022240}
+
+\item 
+\hypertarget{group___cpu__module_gafd8ec2ac4ea47574f95d0e5a6f80807e}{}\#define {\bfseries C\+P\+U\+\_\+\+M\+C\+G\+F\+F\+\_\+\+C\+L\+K\+\_\+\+H\+Z\+\_\+\+C\+O\+N\+F\+I\+G\+\_\+0}~24414\+U\+L /$\ast$ M\+C\+G fixed frequency clock $\ast$/\label{group___cpu__module_gafd8ec2ac4ea47574f95d0e5a6f80807e}
+
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___cpu__module_gafea04d3e8135767c03ce099f02e97437}{}typedef void($\ast$const {\bfseries t\+Isr\+Func}) (void)\label{group___cpu__module_gafea04d3e8135767c03ce099f02e97437}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___cpu__module_ga0ee0366b566c5a7b6088ef899c4d19a7}{}void {\bfseries Cpu\+\_\+\+Set\+B\+A\+S\+E\+P\+R\+I} (uint32\+\_\+t Level)\label{group___cpu__module_ga0ee0366b566c5a7b6088ef899c4d19a7}
+
+\item 
+\hypertarget{group___cpu__module_gafa0067fa0d355a26ca9894983c01be6f}{}{\bfseries P\+E\+\_\+\+I\+S\+R} (Cpu\+\_\+\+Interrupt)\label{group___cpu__module_gafa0067fa0d355a26ca9894983c01be6f}
+
+\item 
+\hypertarget{group___cpu__module_ga32a8d86789a3326b3120bf1e1c1d4252}{}void {\bfseries \+\_\+\+\_\+init\+\_\+hardware} (void)\label{group___cpu__module_ga32a8d86789a3326b3120bf1e1c1d4252}
+
+\item 
+\hypertarget{group___cpu__module_ga95039f54c45f24c1b4ed640fa2f63f11}{}void {\bfseries P\+E\+\_\+low\+\_\+level\+\_\+init} (void)\label{group___cpu__module_ga95039f54c45f24c1b4ed640fa2f63f11}
+
+\item 
+\hypertarget{group___cpu__module_ga2d9b5b981f451cdf47bf43b4f9cc9e03}{}{\bfseries \+\_\+\+\_\+attribute\+\_\+\+\_\+} ((section(\char`\"{}.cfmconfig\char`\"{}))) const\label{group___cpu__module_ga2d9b5b981f451cdf47bf43b4f9cc9e03}
+
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___cpu__module_ga326c16dd0db38f80ec48c7727d764481}{}volatile uint8\+\_\+t {\bfseries S\+R\+\_\+reg}\label{group___cpu__module_ga326c16dd0db38f80ec48c7727d764481}
+
+\item 
+\hypertarget{group___cpu__module_ga08ee8b0f642aeef5bbbce3bb4ec1bb28}{}volatile uint8\+\_\+t {\bfseries S\+R\+\_\+lock} = 0x00\+U\label{group___cpu__module_ga08ee8b0f642aeef5bbbce3bb4ec1bb28}
+
+\item 
+\hypertarget{group___cpu__module_gab69281f0e90d16198a5595ed7f471441}{}const \hyperlink{struct_t_cpu_clock_configuration}{T\+Cpu\+Clock\+Configuration} {\bfseries P\+E\+\_\+\+Cpu\+Clock\+Configurations} \mbox{[}C\+P\+U\+\_\+\+C\+L\+O\+C\+K\+\_\+\+C\+O\+N\+F\+I\+G\+\_\+\+N\+U\+M\+B\+E\+R\mbox{]}\label{group___cpu__module_gab69281f0e90d16198a5595ed7f471441}
+
+\item 
+\hypertarget{group___cpu__module_ga17baaa5ab2c8895394c51a01248c5195}{}const \hyperlink{structt_vector_table}{t\+Vector\+Table} {\bfseries \+\_\+\+\_\+vect\+\_\+table}\label{group___cpu__module_ga17baaa5ab2c8895394c51a01248c5195}
+
+\item 
+\hypertarget{group___cpu__module_ga326c16dd0db38f80ec48c7727d764481}{}volatile uint8\+\_\+t {\bfseries S\+R\+\_\+reg}\label{group___cpu__module_ga326c16dd0db38f80ec48c7727d764481}
+
+\item 
+\hypertarget{group___cpu__module_ga08ee8b0f642aeef5bbbce3bb4ec1bb28}{}volatile uint8\+\_\+t {\bfseries S\+R\+\_\+lock}\label{group___cpu__module_ga08ee8b0f642aeef5bbbce3bb4ec1bb28}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
