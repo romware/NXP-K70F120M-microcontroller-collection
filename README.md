@@ -1,6 +1,6 @@
 # NXP-K70F120M-microcontroller-collection
 
-[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://github.com/romware/NXP-K70F120M-microcontroller-collection)
+![version](https://img.shields.io/badge/version-5.0.0-blue)
 
 **NXP-K70F120M-microcontroller-collection** is a collection of embedded lab projects for the NXP K70 microcontroller.
 
